@@ -34,7 +34,7 @@
 
             {{-- <a href="{{ route('admin.settings.home') }}" wire:navigate title="{{ __('Settings') }}"
                 class="@if(request()->routeIs('admin.settings.home')) bg-black/30 hover:bg-black/30 @endif hover:bg-black/30 rounded-full text-white p-1 px-2 text-sm flex items-center gap-x-2">
-                <x-ui::icon name="settings" class="w-5 h-5" />
+                <ui:icon name="settings" class="w-5 h-5" />
                 <span class="hidden lg:block">{{ __('Settings') }}</span>
             </a> --}}
 

@@ -15,6 +15,7 @@ Route::as('admin.')
         Route::livewire('/account', 'admin::account.home')->name('account.home');
         Route::livewire('/orders', 'admin::orders.home')->name('orders.home');
         Route::livewire('/clients', 'admin::clients.home')->name('clients.home');
+        Route::livewire('/clients/{id}', 'admin::clients.detail')->name('clients.detail');
         Route::livewire('/manage-page', 'admin::page.home')->name('page.home');
         // Route::post('upload-media', [\App\Actions\UploadMedia::class, 'upload'])->name('upload-media');
         // Route::post('upload-image', [\App\Actions\UploadImage::class, 'upload'])->name('upload-image');

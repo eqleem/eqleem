@@ -29,5 +29,15 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+        Schema::create('tenantables', function (Blueprint $table) {
+            $table->bigInteger('tenant_id')->unsigned();
+            $table->morphs('tenantable');
+            $table->boolean('active')->default(true);
+            $table->json('meta')->nullable();
+            $table->timestamps();
+            $table->unique(['tenant_id', 'tenantable_id', 'tenantable_type'], 'tenantables_ids_type_unique');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade')->onUpdate('cascade');
+        });
     }
 };

@@ -1,3 +1,4 @@
+ 
 <?php
 use SaKanjo\EasyMetrics\Metrics;
 use App\Models\User;

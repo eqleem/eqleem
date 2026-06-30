@@ -10,6 +10,7 @@
         <script src="{{ asset('assets/js/twind.custom.js') }}"></script>
  
         <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
  
         <script>
             let config = { ...@js(config('twind')), ...customTwindconf };

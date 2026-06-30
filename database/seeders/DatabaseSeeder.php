@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
                 'uuid' => (string) Str::uuid(),
                 'name' => 'Admin',
                 'password' => Hash::make('112233'),
+                'current_tenant_id' => 1,
             ],
         ));
 

@@ -6,7 +6,7 @@
         </x-slot:icon>
         {{-- Hide for now, #TODO, and flexable order based on entry type  --}}
         {{-- <x-slot:actions>
-            <x-ui::button wire:click="addResponse" label="{{ __('New order') }}" icon="square-rounded-plus" />
+            <ui:button wire:click="addResponse" label="{{ __('New order') }}" icon="square-rounded-plus" />
         </x-slot:actions> --}}
 
         manage page page ..

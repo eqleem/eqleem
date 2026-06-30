@@ -12,7 +12,11 @@ class AdminMiddleware
     {
         // dd(auth()->user());
         // dd(auth()->user()->tenant);
-        setCurrentTenant(auth()->user()->tenant);
+        $tenant = auth()->user()?->currentTenant ?? auth()->user()?->tenant;
+
+        if ($tenant) {
+            setCurrentTenant($tenant);
+        }
 
         return $next($request);
     }

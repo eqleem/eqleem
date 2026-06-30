@@ -2,18 +2,14 @@
 
 namespace App\Models;
 
-// use App\Domain\Sales\Models\SalesDocument;
-// use App\Domain\Support\Models\Contact;
-use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
+use App\Traits\MorphTenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
 
 class Client extends Model
 {
-    use HasUuid;
+    use HasUuid, MorphTenantable;
 
     protected $fillable = [
         'tenant_id',

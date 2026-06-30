@@ -14,26 +14,55 @@ if (! function_exists('setCurrentTenant')) {
     }
 }
 
+if (! function_exists('resolveCurrentTenant')) {
+    function resolveCurrentTenant(): ?Tenant
+    {
+        $tenant = Context::getHidden('tenant');
+
+        if ($tenant instanceof Tenant) {
+            return $tenant;
+        }
+
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $tenant = $user->currentTenant ?? $user->tenant;
+
+        if ($tenant instanceof Tenant) {
+            setCurrentTenant($tenant);
+        }
+
+        return $tenant;
+    }
+}
+
 if (! function_exists('currentTenant')) {
     function currentTenant(): ?Tenant
     {
-        return Context::getHidden('tenant');
+        return resolveCurrentTenant();
     }
 }
 
 if (! function_exists('tenant')) {
     function tenant($key = null, $default = null)
     {
-        $tenant = Context::getHidden('tenant');
-
-        return data_get($tenant, $key, $default);
+        return data_get(resolveCurrentTenant(), $key, $default);
     }
 }
 
 if (! function_exists('currentTenantId')) {
     function currentTenantId(): ?int
     {
-        return Context::getHidden('tenant_id');
+        $tenantId = Context::getHidden('tenant_id');
+
+        if ($tenantId) {
+            return (int) $tenantId;
+        }
+
+        return resolveCurrentTenant()?->id;
     }
 }
 
