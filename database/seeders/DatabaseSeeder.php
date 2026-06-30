@@ -2,9 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,9 +21,26 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $admin = Model::unguarded(fn () => User::firstOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
+                'uuid' => (string) Str::uuid(),
+                'name' => 'Admin',
+                'password' => Hash::make('112233'),
+            ],
+        ));
+
+        Model::unguarded(fn () => Tenant::firstOrCreate(
+            ['id' => 1],
+            [
+                'uuid' => (string) Str::uuid(),
+                'name' => 'Tenant 1',
+                'handle' => 'tenant-1',
+                'user_id' => $admin->id,
+                'active' => true,
+                'status' => 'active',
+            ],
+        ));
+
     }
 }

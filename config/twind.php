@@ -1,0 +1,115 @@
+<?php
+
+return [
+    'darkMode' => 'class',
+    'hash' => false,
+    'theme' => [
+        'extend' => [
+            'colors' => [
+                'primary' => [
+                    50 => '#EBEEFA',
+                    100 => '#D7DDF4',
+                    200 => '#B2BFEB',
+                    300 => '#8A9DE0',
+                    400 => '#667ED7',
+                    500 => '#3D5CCC',
+                    600 => '#2D48AA',
+                    700 => '#21357D',
+                    800 => '#162455',
+                    900 => '#0B1128',
+                    950 => '#050914',
+                ],
+                'gray' => [
+                    50 => '#fafaf9',
+                    100 => '#f5f5f4',
+                    200 => '#e7e5e4',
+                    300 => '#d6d3d1',
+                    400 => '#a8a29e',
+                    500 => '#78716c',
+                    600 => '#57534e',
+                    700 => '#44403c',
+                    800 => '#292524',
+                    900 => '#1c1917',
+                ],
+            ],
+            'fontFamily' => [
+                'sans' => 'ibmps, sans-serif',
+                'codec-ultra' => 'codec-ultra',
+                'title' => 'codec-ultra',
+                'poster' => 'vesterbro-poster',
+                'wicklow' => 'wicklow',
+                'logo' => 'allabbad',
+                'almushaf' => 'almushaf',
+                'eqleem' => 'eqleem',
+            ],
+        ],
+    ],
+    'preflight' => [
+        '@font-face' => [
+            [
+                'fontFamily' => 'almushaf',
+                'src' => 'url(/assets/fonts/almushaf.eot?#iefix), url(/assets/fonts/almushaf.woff) format("woff2") ',
+                'fontStyle' => 'normal',
+                'fontWeight' => 400,
+                'fontDisplay' => 'auto',
+            ],
+            [
+                'fontFamily' => 'eqleem',
+                'src' => 'url(/assets/fonts/as-wc26-bold.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 600,
+                'fontDisplay' => 'auto',
+            ],
+            [
+                'fontFamily' => 'codec-ultra',
+                'src' => 'url(/assets/fonts/codec-pro-me-ultra-trial.ttf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 600,
+                'fontDisplay' => 'auto',
+            ],
+            [
+                'fontFamily' => 'vesterbro-poster',
+                'src' => 'url(/assets/fonts/try-vesterbro-poster.ttf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 600,
+                'fontDisplay' => 'auto',
+            ],
+            [
+                'fontFamily' => 'wicklow',
+                'src' => 'url(/assets/fonts/f37-wicklow-arabic-stencil-trial-black.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 600,
+                'fontDisplay' => 'auto',
+            ],
+            [
+                'fontFamily' => 'effra',
+                'src' => 'url(/assets/fonts/Effra_WArbc_Rg.woff) format("woff2")',
+                'fontStyle' => 'normal',
+                'fontWeight' => 400,
+                'fontDisplay' => 'auto',
+            ], [
+                'fontFamily' => 'ibmps',
+                'src' => 'url(/assets/fonts/ibmps/IBMPlexSansArabic-Regular.ttf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 400,
+                'fontDisplay' => 'auto',
+            ], [
+                'fontFamily' => 'ibmps',
+                'src' => 'url(/assets/fonts/ibmps/IBMPlexSansArabic-Thin.ttf)',
+                'fontStyle' => 'thin',
+                'fontWeight' => 100,
+                'fontDisplay' => 'auto',
+            ], [
+                'fontFamily' => 'ibmps',
+                'src' => 'url(/assets/fonts/ibmps/IBMPlexSansArabic-SemiBold.ttf)',
+                'fontStyle' => 'semibold',
+                'fontWeight' => 500,
+                'fontDisplay' => 'auto',
+            ],
+
+        ],
+        'body' => [
+            'fontSize' => '1rem',
+        ],
+    ],
+];
