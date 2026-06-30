@@ -30,10 +30,10 @@ new class extends Component
         <livewire:admin::home.visits-count :range="$range" lazy />
         <livewire:admin::home.clients-count :range="$range" lazy />
     </div>
-    {{-- <div role="list" class="bg-gray-300/30 p-1 rounded-2xl grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-5 mb-8">
-        <livewire:admin.views.widgets.orders-chart :range="$range" lazy />
-        <livewire:admin.views.widgets.visits-chart :range="$range" lazy />
-        <livewire:admin.views.widgets.members-chart :range="$range" lazy />
-        <livewire:admin.views.widgets.sales-chart :range="$range" lazy />
-    </div> --}}
+    <div role="list" class="bg-gray-300/30 p-1 rounded-2xl grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-5 mb-8">
+        <livewire:admin::home.orders-chart :range="$range" lazy />
+        <livewire:admin::home.visits-chart :range="$range" lazy />
+        <livewire:admin::home.clients-chart :range="$range" lazy />
+        <livewire:admin::home.sales-chart :range="$range" lazy />
+    </div>
 </ui:container>
