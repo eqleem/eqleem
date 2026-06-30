@@ -10,8 +10,10 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        config()->set('tenant', auth()->user()->tenant);
- 
+        // dd(auth()->user());
+        // dd(auth()->user()->tenant);
+        setCurrentTenant(auth()->user()->tenant);
+
         return $next($request);
     }
 }

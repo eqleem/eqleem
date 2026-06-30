@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "683d9e7f281ad271d7ffeeb91f86b7fa",
+    "content-hash": "aa9d6a46a541b45bc1a25035f22ed0ef",
     "packages": [
         {
             "name": "brick/math",
@@ -3527,6 +3527,74 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.3"
             },
             "time": "2026-06-18T03:57:49+00:00"
+        },
+        {
+            "name": "sakanjo/laravel-easy-metrics",
+            "version": "v1.1.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sakanjo/laravel-easy-metrics.git",
+                "reference": "a1d306fe54c95bb79d337a57172476345f0b00c7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sakanjo/laravel-easy-metrics/zipball/a1d306fe54c95bb79d337a57172476345f0b00c7",
+                "reference": "a1d306fe54c95bb79d337a57172476345f0b00c7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.13",
+                "orchestra/testbench": "^8.14",
+                "pestphp/pest": "^2.24",
+                "phpstan/phpstan": "^1.10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SaKanjo\\EasyMetrics\\EasyMetricsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SaKanjo\\EasyMetrics\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Salah Kanjo",
+                    "email": "dev.salah.kanjo@gmail.com"
+                }
+            ],
+            "description": "Generate metrics with ease and precision.",
+            "keywords": [
+                "Metrics",
+                "charts",
+                "laravel",
+                "reports"
+            ],
+            "support": {
+                "issues": "https://github.com/sakanjo/laravel-easy-metrics/issues",
+                "source": "https://github.com/sakanjo/laravel-easy-metrics/tree/v1.1.12"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sakanjo",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-01T12:05:30+00:00"
         },
         {
             "name": "symfony/clock",
