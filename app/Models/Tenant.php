@@ -34,6 +34,11 @@ class Tenant extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function theme(): BelongsTo
+    {
+        return $this->belongsTo(Theme::class);
+    }
+
     public function getUrlAttribute(): string
     {
         return route('tenant.home', $this->handle);

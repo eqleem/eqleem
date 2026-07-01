@@ -1,5 +1,5 @@
 <div class="divide-y divide-gray-200 divide-dotted">
-    <div class="bg-gray-100 p-3 flex items-center gap-x-7 w-full">
+    <div class="bg-gray-100 p-3 flex items-center gap-x-4 w-full">
         <div class="ps-3" x-cloak>
             <div class="flex items-center">
                 <ui:check-all />
@@ -13,6 +13,8 @@
 
                 <input wire:model.live="search" type="text" placeholder="ابحث .."
                     class="block w-full rounded-lg py-1.5 ps-10 text-gray-800 ring-0 ring-inset border-transparent border ring-gray-200 placeholder:text-gray-400 focus:border focus:outline-none focus:border-primary-500 sm:text-sm sm:leading-6">
+
+                
             </div>
         </div>
         <div x-show="$wire.selectedIds.length > 0" x-cloak class="flex items-center gap-x-2">
@@ -29,6 +31,14 @@
                 {{ __('Delete selected') }}<span x-text="'('+$wire.selectedIds.length+')'"></span>
             </button>
         </div>
+        <div class=" ">
+            <ui:button @click.prevent="$dispatch('openmodal', { modal: 'add-blog-post' })" label="تدوينة جديدة"
+                icon="square-rounded-plus" />
+        </div>
+ 
+        <ui:modal title="إضافة تدوينة جديدة" size="2xl" name="add-blog-post">
+            <livewire:admin::page.content.blog.add-post :contentType="$contentType" />
+        </ui:modal>
     </div>
 
     <div class="relative last-child:rounded-b-2xl pb-4X p-1">

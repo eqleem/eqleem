@@ -45,4 +45,37 @@ return [
             'detail' => 'admin::page.content.portfolio.detail',
         ],
     ],
+    'menu' => [
+        'order' => 5,
+        'slug' => 'menu',
+        'name' => 'قائمة الطعام',
+        'description' => 'إدارة أصناف وعناصر قائمة الطعام.',
+        'icon' => 'assets/icons/tabler/chef-hat.svg',
+        'components' => [
+            'index' => 'admin::page.content.menu.index',
+            'detail' => 'admin::page.content.menu.detail',
+        ],
+    ],
+    'services' => [
+        'order' => 6,
+        'slug' => 'services',
+        'name' => 'الخدمات',
+        'description' => 'عرض وإدارة الخدمات المقدمة.',
+        'icon' => 'assets/icons/tabler/hotel-service.svg',
+        'components' => [
+            'index' => 'admin::page.content.services.index',
+            'detail' => 'admin::page.content.services.detail',
+        ],
+    ],
+    'unit-rental' => [
+        'order' => 7,
+        'slug' => 'unit-rental',
+        'name' => 'تأجير الوحدات',
+        'description' => 'إدارة الوحدات المتاحة للتأجير.',
+        'icon' => 'assets/icons/tabler/building-estate.svg',
+        'components' => [
+            'index' => 'admin::page.content.unit-rental.index',
+            'detail' => 'admin::page.content.unit-rental.detail',
+        ],
+    ],
 ];

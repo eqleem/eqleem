@@ -99,6 +99,7 @@
 <?php
 
 use App\Models\Content;
+use App\Models\Taxonomy;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -158,10 +159,10 @@ new class extends \Livewire\Component
      */
     public function categories(): array
     {
-        $items = Content::query()
+        $items = Taxonomy::query()
             ->type('blog_category')
-            ->orderBy('title')
-            ->pluck('title', 'id');
+            ->orderBy('name')
+            ->pluck('name', 'id');
 
         return ['' => 'اختر القسم ('.$items->count().')'] + $items->all();
     }

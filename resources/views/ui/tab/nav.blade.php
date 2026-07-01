@@ -4,7 +4,7 @@
     'name' => '',
     'activeClass' => 'bg-white rounded-t-md',
 ])
-<a @click.prevent="activeTab = '{{ $name }}'"
+<a @click.prevent="setTab('{{ $name }}')"
     :class="{ '{{ $activeClass }}': activeTab === '{{ $name }}' }" class="inline-block px-3 py-2.5 text-sm [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
     href="#{{ $name }}" {{ $attributes }}>
     @if ($icon)
