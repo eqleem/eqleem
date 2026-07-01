@@ -1,48 +1,62 @@
 <ui:container>
-    <ui:mainbox title="{{ __('Account') }}"
-        subtitle="{{ __('الحساب والبيانات الشخصية، تجدها هنا.') }}">
+    <ui:mainbox title="{{ __('Account info') }}" subtitle="{{ __('Manager your account info.') }}">
         <x-slot:icon>
-            <ui:icon name="message-2" class="!w-7 !h-7 text-gray-500 p-0.5" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"></path>
+                <path opacity=".4" d="M20.59 22c0-3.87-3.85-7-8.59-7s-8.59 3.13-8.59 7" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
         </x-slot:icon>
-        {{-- Hide for now, #TODO, and flexable order based on entry type  --}}
-        {{-- <x-slot:actions>
-            <ui:button wire:click="addResponse" label="{{ __('New order') }}" icon="square-rounded-plus" />
-        </x-slot:actions> --}}
 
-        account page ..
-        {{-- <livewire:admin.views.orders.table lazy /> --}}
+        <ui:form wire:submit="submit">
+            <ui:input name="name" label="{{ __('Name') }}" placeholder="{{ __('Name') }}" />
+            <ui:input name="email" label="{{ __('Email') }}" placeholder="your@email.com" dir="ltr" />
+
+            <x-slot:footer>
+                <ui:button target="submit" label="{{ __('Save') }}" />
+            </x-slot:footer>
+        </ui:form>
     </ui:mainbox>
 </ui:container>
 
- <?php
-//  use Catalog\Subscription\Models\Plan;
- 
- new class extends \Livewire\Component {
-    //  public $tenant;
-    //  public $currentPlanId;
- 
-    //  function mount()
-    //  {
-    //      $this->tenant = tenant();
-    //      $this->currentPlanId = tenant('subscription.plan.id');
-    //  }
- 
-    //  public function with()
-    //  {
-    //      return [
-    //          // 'plans' => Plan::where('is_system', true)->with('features')->get(),
-    //          'plans' => Plan::where('is_system', true)->where('active', true)->get(),
-    //      ];
-    //  }
- 
-    //  public function cancelSubscription()
-    //  {
-    //      tenant('subscription')->cancel();
-    //      //  tenant('subscription')->suppress();
-    //  }
- 
-     public function render()
-     {
-         return $this->view()->layout('admin::layout')->title(__('Account'));
-     }
- }; ?>
+
+<?php
+new class extends \Livewire\Component {
+    public $title = 'Account info';
+    public $name;
+    public $email;
+
+    function mount()
+    {
+        $user = auth()->user();
+        $this->name = $user->name;
+        $this->email = $user->email;
+    }
+
+    public function rules()
+    {
+        return [
+            'name' => ['required', 'string', 'min:2', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email,' . auth()->id()],
+        ];
+    }
+
+    function submit()
+    {
+        $this->validate();
+
+        auth()->user()->name = $this->name;
+        auth()->user()->email = $this->email;
+        auth()->user()->save();
+
+        //  cache()->forget('auth.user'); // refactor later
+
+        $this->dispatch('notify', text: __('Account info updated successfully.'));
+    }
+
+    public function rendering($view): void
+    {
+        $view->title(__('Members'))->layout('admin::layout');
+    }
+}; ?>

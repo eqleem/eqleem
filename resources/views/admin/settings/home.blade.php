@@ -11,31 +11,29 @@
             </svg>
         </x-slot>
         <div class="p-4 lg:p-6 px-4 lg:px-8 grid lg:grid-cols-4 gap-5 grid-cols-2 border-t-2 border-dotted">
-            @foreach ($settings as  $setting)
-                
-                    <a href="{{ route('admin.settings.detail', ['slug' => $setting['slug']]) }}" wire:navigate
-                        class="flex gap-x-3 items-center bg-gray-100 hover:bg-gray-200/80 p-2 rounded-xl">
-                        <div class="bg-white p-2 rounded-xl shrink-0">
-                            <img class="h-10 w-10" src="{{ asset($setting['icon']) }}"
-                                alt="{{ __($setting['name']) }}">
-                        </div>
-                        <div class="truncate">
-                            <p class="text-sm font-medium text-gray-700">
-                                {{ __($setting['name']) }}
-                            </p>
-                            <small class="text-gray-500 font-normal text-xs truncate">
-                                {{ $setting['description'] }} </small>
-                        </div>
-                    </a>
-              
+            @foreach ($settings as  $setting)   
+                <a href="{{ route('admin.settings.detail', ['slug' => $setting['slug']]) }}" wire:navigate
+                    class="flex gap-x-3 items-center bg-gray-100 hover:bg-gray-200/80 p-2 rounded-xl">
+                    <div class="bg-white p-2 rounded-xl shrink-0">
+                        <img class="h-10 w-10" src="{{ asset($setting['icon']) }}"
+                            alt="{{ __($setting['name']) }}">
+                    </div>
+                    <div class="truncate">
+                        <p class="text-sm font-medium text-gray-700">
+                            {{ __($setting['name']) }}
+                        </p>
+                        <small class="text-gray-500 font-normal text-xs truncate">
+                            {{ $setting['description'] }} </small>
+                    </div>
+                </a>
             @endforeach
         </div>
     </ui:mainbox>
 </ui:container>
 
- <?php
+<?php
  
- new class extends \Livewire\Component {
+new class extends \Livewire\Component {
 
     public $settings = [];
 
