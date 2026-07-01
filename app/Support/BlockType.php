@@ -11,6 +11,8 @@ class BlockType
         public string $description,
         public string $component,
         public int $order = 0,
+        public bool $default = false,
+        public ?string $editor = null,
     ) {}
 
     /**
@@ -25,6 +27,8 @@ class BlockType
             description: $config['description'],
             component: $config['component'],
             order: $config['order'] ?? 0,
+            default: $config['default'] ?? false,
+            editor: $config['editor'] ?? null,
         );
     }
 
@@ -41,6 +45,8 @@ class BlockType
             'description' => $this->description,
             'component' => $this->component,
             'order' => $this->order,
+            'default' => $this->default,
+            'editor' => $this->editor,
         ];
     }
 }

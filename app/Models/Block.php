@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed>|null $data
  * @property Carbon|null $published_at
  * @property bool $active
+ * @property bool $is_default
  */
 #[Fillable([
     'tenant_id',
@@ -33,11 +34,11 @@ use Illuminate\Support\Carbon;
     'parent_id',
     'title',
     'slug',
-    'position',
     'variant',
     'sort_order',
     'status',
     'active',
+    'is_default',
     'data',
     'published_at',
 ])]
@@ -54,6 +55,7 @@ class Block extends Model
             'data' => 'array',
             'published_at' => 'datetime',
             'active' => 'boolean',
+            'is_default' => 'boolean',
         ];
     }
 

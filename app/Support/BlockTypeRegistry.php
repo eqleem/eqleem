@@ -17,6 +17,22 @@ class BlockTypeRegistry
             ->values();
     }
 
+    /**
+     * @return Collection<int, BlockType>
+     */
+    public function defaults(): Collection
+    {
+        return $this->all()->filter(fn (BlockType $blockType): bool => $blockType->default);
+    }
+
+    /**
+     * @return Collection<int, BlockType>
+     */
+    public function addable(): Collection
+    {
+        return $this->all()->filter(fn (BlockType $blockType): bool => ! $blockType->default);
+    }
+
     public function find(string $slug): ?BlockType
     {
         $config = config("block-types.{$slug}");
@@ -31,9 +47,11 @@ class BlockTypeRegistry
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function options(): array
+    public function options(bool $addableOnly = false): array
     {
-        return $this->all()
+        $types = $addableOnly ? $this->addable() : $this->all();
+
+        return $types
             ->map(fn (BlockType $blockType): array => $blockType->toArray())
             ->all();
     }

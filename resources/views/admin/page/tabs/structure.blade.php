@@ -1,97 +1,145 @@
 <div>
-    <ui:mainbox>
+    <ui:mainbox title="هيكل الصفحة" subtitle="إدارة وترتيب بلوكات الصفحة الرئيسية.">
+        <x-slot:icon>
+            <img src="{{ asset($tab['icon']) }}" class="w-7 h-7" alt="">
+        </x-slot:icon>
 
-        <ui:alert color="blue" text="إدارة ترتيب الأقسام وإضافة أو إزالة الكتل من الصفحة الرئيسية." class="mx-4" />
-     
+        <x-slot:actions>
+            <ui:button
+                icon="square-rounded-plus"
+                label="إضافة بلوك"
+                @click.prevent="$wire.openAddBlockModal()"
+            />
+        </x-slot:actions>
 
-        <div
-            wire:sortable-group="updateBlockOrder"
-            class="p-4 space-y-6"
-        >
-            @foreach ($positions as $position)
-                <section
-                    wire:key="block-position-{{ $position['slug'] }}"
-                    class="rounded-xl borderx border-gray-200 bg-stone-100 overflow-hidden"
+        <div class="p-4 space-y-4">
+            @if ($topBlocks->isNotEmpty())
+                <div class="rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden">
+                    <ul class="p-2 space-y-1.5">
+                        @foreach ($topBlocks as $block)
+                            @include('admin.page.partials.structure-system-block', ['block' => $block])
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="relative min-h-20 rounded-xl border border-gray-200 bg-gray-50/80">
+                <ul
+                    wire:sortable="updateBlockOrder"
+                    wire:sortable.options="{ animation: 150 }"
+                    class="p-2 space-y-1.5"
                 >
-                    <div class="flex items-center justify-between gap-3 px-4 py-3 xborder-b border-gray-200/80 bg-white/60">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <img
-                                src="{{ $position['icon_url'] }}"
-                                alt=""
-                                class="w-5 h-5 shrink-0 opacity-70"
-                            >
-                            <div class="min-w-0">
-                                <h3 class="text-sm font-semibold text-gray-800">{{ $position['name'] }}</h3>
-                                <p class="text-xs text-gray-500 truncate">{{ $position['description'] }}</p>
-                            </div>
-                        </div>
-
-                        <ui:button
-                            variant="outline"
-                            icon="square-rounded-plus"
-                            label="إضافة بلوك"
-                            class="!h-8 !px-2.5 !text-xs"
-                            @click.prevent="$wire.openAddBlockModal('{{ $position['slug'] }}')"
-                        />
-                    </div>
-
-                    <div class="relative min-h-14">
-                        <ul
-                            wire:sortable-group.item-group="{{ $position['slug'] }}"
-                            wire:sortable-group.options="{ animation: 150 }"
-                            class="p-2 space-y-1.5"
+                    @foreach ($userBlocks as $block)
+                        <li
+                            wire:sortable.item="{{ $block['id'] }}"
+                            wire:key="block-{{ $block['id'] }}"
+                            class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 hover:border-gray-200 transition @unless ($block['active']) opacity-50 @endunless"
                         >
-                            @foreach ($blocksByPosition[$position['slug']] ?? [] as $block)
-                                <li
-                                    wire:sortable-group.item="{{ $block['id'] }}"
-                                    wire:key="block-{{ $block['id'] }}"
-                                    class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 hover:border-gray-200 transition"
+                            <button
+                                type="button"
+                                wire:sortable.handle
+                                class="cursor-grab active:cursor-grabbing rounded-md p-1 text-gray-300 hover:bg-gray-100 hover:text-gray-500 transition"
+                                aria-label="سحب لإعادة الترتيب"
+                            >
+                                <ui:icon name="grip-vertical" class="!w-4 !h-4" />
+                            </button>
+
+                            @if ($block['editable'])
+                                <button
+                                    type="button"
+                                    wire:click="openEditBlockModal({{ $block['id'] }})"
+                                    class="flex flex-1 min-w-0 items-center gap-2 text-start hover:text-primary-600 transition"
                                 >
-                                    <button
-                                        type="button"
-                                        wire:sortable-group.handle
-                                        class="cursor-grab active:cursor-grabbing rounded-md p-1 text-gray-300 hover:bg-gray-100 hover:text-gray-500 transition"
-                                        aria-label="سحب لإعادة الترتيب"
-                                    >
-                                        <ui:icon name="grip-vertical" class="!w-4 !h-4" />
-                                    </button>
-
-                                    <div class="flex-1 min-w-0 text-sm font-medium text-gray-800 truncate">
-                                        {{ $block['title'] }}
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
-                                        aria-label="خيارات"
-                                    >
-                                        <ui:icon name="dots" class="!w-4 !h-4" />
-                                    </button>
-
                                     <img
                                         src="{{ $block['icon_url'] }}"
                                         alt=""
-                                        class="w-8 h-8 shrink-0 rounded-lg bg-gray-100 p-1.5"
+                                        class="w-6 h-6 shrink-0 rounded-md bg-gray-100 p-1"
                                     >
-                                </li>
-                            @endforeach
-                        </ul>
+                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $block['title'] }}</span>
+                                </button>
+                            @else
+                                <div class="flex flex-1 min-w-0 items-center gap-2">
+                                    <img
+                                        src="{{ $block['icon_url'] }}"
+                                        alt=""
+                                        class="w-6 h-6 shrink-0 rounded-md bg-gray-100 p-1"
+                                    >
+                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $block['title'] }}</span>
+                                </div>
+                            @endif
 
-                        @if (collect($blocksByPosition[$position['slug']] ?? [])->isEmpty())
-                            <div class="pointer-events-none absolutex inset-0 flex items-center justify-center text-[11px] text-gray-300 select-none pb-3">
-                                أضف بلوك أو اسحب بلوكات هنا
-                            </div>
-                        @endif
-                    </div>
-                </section>
-            @endforeach
+                            <button
+                                type="button"
+                                wire:click.stop="deleteBlock({{ $block['id'] }})"
+                                wire:confirm="هل أنت متأكد من حذف هذا البلوك؟"
+                                wire:loading.attr="disabled"
+                                wire:target="deleteBlock({{ $block['id'] }})"
+                                class="shrink-0 rounded-lg p-1 text-red-400/80 hover:bg-red-50 hover:text-red-500 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
+                                aria-label="حذف البلوك"
+                            >
+                                <ui:icon name="trash" class="!w-4 !h-4" />
+                            </button>
+
+                            @if ($block['editable'])
+                                <button
+                                    type="button"
+                                    wire:click="openEditBlockModal({{ $block['id'] }})"
+                                    class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition"
+                                    aria-label="خيارات البلوك"
+                                >
+                                    <ui:icon name="settings-cog" class="!w-4 !h-4" />
+                                </button>
+                            @endif
+
+                            <button
+                                type="button"
+                                wire:click.stop="toggleBlockActive({{ $block['id'] }})"
+                                wire:loading.attr="disabled"
+                                wire:target="toggleBlockActive({{ $block['id'] }})"
+                                class="shrink-0 rounded-lg p-1 hover:bg-gray-100 transition disabled:opacity-50"
+                                aria-label="{{ $block['active'] ? 'تعطيل البلوك' : 'تفعيل البلوك' }}"
+                                role="switch"
+                                aria-checked="{{ $block['active'] ? 'true' : 'false' }}"
+                            >
+                                <span
+                                    @class([
+                                        'relative inline-block h-5 w-9 rounded-full transition-colors duration-200',
+                                        'bg-gray-200' => ! $block['active'],
+                                        'bg-primary-500' => $block['active'],
+                                    ])
+                                >
+                                    <span
+                                        @class([
+                                            'absolute top-0.5 size-4 rounded-full bg-white shadow-sm transition-all duration-200',
+                                            'start-0.5' => ! $block['active'],
+                                            'end-0.5 start-auto' => $block['active'],
+                                        ])
+                                    ></span>
+                                </span>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+
+                @if ($userBlocks->isEmpty())
+                    <p class="pointer-events-none absolute inset-0 flex items-center justify-center text-[11px] text-gray-300 select-none">
+                        أضف بلوك أو اسحب بلوكات هنا
+                    </p>
+                @endif
+            </div>
+
+            @if ($bottomBlocks->isNotEmpty())
+                <div class="rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden">
+                    <ul class="p-2 space-y-1.5">
+                        @foreach ($bottomBlocks as $block)
+                            @include('admin.page.partials.structure-system-block', ['block' => $block])
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
 
-        <ui:modal
-            title="{{ $addBlockModalTitle }}"
-            size="lg"
-            name="add-block"
-        >
+        <ui:modal title="إضافة بلوك" size="lg" name="add-block">
             <div class="p-4 space-y-2">
                 @foreach ($blockTypes as $blockType)
                     <button
@@ -114,13 +162,22 @@
                 @endforeach
             </div>
         </ui:modal>
+
+        <ui:modal title="{{ $editingBlockTitle }}" size="lg" name="edit-block">
+            @if ($editingBlockId && $editingBlockEditor)
+                <livewire:dynamic-component
+                    :is="$editingBlockEditor"
+                    :block-id="$editingBlockId"
+                    :key="'block-editor-'.$editingBlockId"
+                />
+            @endif
+        </ui:modal>
     </ui:mainbox>
 </div>
 
 <?php
 
 use App\Models\Block;
-use App\Support\BlockPositionRegistry;
 use App\Support\BlockTypeRegistry;
 use Illuminate\Support\Collection;
 
@@ -129,47 +186,66 @@ new class extends \Livewire\Component
     /** @var array<string, mixed> */
     public array $tab = [];
 
-    public ?string $addBlockPosition = null;
+    public ?int $editingBlockId = null;
 
-    public function openAddBlockModal(string $position, BlockPositionRegistry $positions): void
+    public ?string $editingBlockEditor = null;
+
+    public string $editingBlockTitle = '';
+
+    public function openAddBlockModal(): void
     {
-        if (! $positions->find($position)) {
-            return;
-        }
-
-        $this->addBlockPosition = $position;
-
         $this->dispatch('openmodal', modal: 'add-block');
     }
 
-    public function addBlock(string $type, BlockTypeRegistry $blockTypes, BlockPositionRegistry $positions): void
+    public function openEditBlockModal(int $blockId, BlockTypeRegistry $blockTypes): void
     {
-        $blockType = $blockTypes->find($type);
-        $blockPosition = $this->addBlockPosition
-            ? $positions->find($this->addBlockPosition)
-            : null;
+        $tenantId = currentTenantId();
 
-        if (! $blockType || ! $blockPosition) {
+        $block = Block::query()
+            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
+            ->whereNull('parent_id')
+            ->find($blockId);
+
+        if (! $block) {
             return;
         }
 
-        $position = $blockPosition->slug;
+        $blockType = $blockTypes->find($block->type);
+
+        if (! $blockType?->editor) {
+            return;
+        }
+
+        $this->editingBlockId = $block->id;
+        $this->editingBlockEditor = $blockType->editor;
+        $this->editingBlockTitle = $block->title ?? $blockType->name;
+
+        $this->dispatch('openmodal', modal: 'edit-block');
+    }
+
+    public function addBlock(string $type, BlockTypeRegistry $blockTypes): void
+    {
+        $blockType = $blockTypes->find($type);
+
+        if (! $blockType || $blockType->default) {
+            return;
+        }
 
         $tenantId = currentTenantId();
 
         $maxOrder = Block::query()
             ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
             ->whereNull('parent_id')
-            ->where('position', $position)
+            ->where('is_default', false)
             ->max('sort_order') ?? 0;
 
         Block::create([
             'tenant_id' => $tenantId,
             'component' => $blockType->component,
             'type' => $blockType->slug,
-            'position' => $position,
             'title' => $blockType->name,
             'sort_order' => $maxOrder + 1,
+            'is_default' => false,
             'status' => 'draft',
             'active' => true,
         ]);
@@ -178,85 +254,123 @@ new class extends \Livewire\Component
     }
 
     /**
-     * @param  array<int, array{order: int, value: string, items: array<int, array{order: int, value: string}>}>  $groups
+     * @param  array<int, array{order: int, value: string}>  $items
      */
-    public function updateBlockOrder(array $groups, BlockPositionRegistry $positions): void
+    public function updateBlockOrder(array $items): void
     {
-        $validPositions = $positions->all()->pluck('slug')->all();
         $tenantId = currentTenantId();
 
-        foreach ($groups as $group) {
-            $position = $group['value'];
-
-            if (! in_array($position, $validPositions, true)) {
-                continue;
-            }
-
-            foreach ($group['items'] as $item) {
-                Block::query()
-                    ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-                    ->whereNull('parent_id')
-                    ->where('id', $item['value'])
-                    ->update([
-                        'position' => $position,
-                        'sort_order' => $item['order'],
-                    ]);
-            }
+        foreach ($items as $item) {
+            Block::query()
+                ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
+                ->whereNull('parent_id')
+                ->where('is_default', false)
+                ->where('id', $item['value'])
+                ->update(['sort_order' => $item['order']]);
         }
     }
 
-    /**
-     * @return array<string, Collection<int, array<string, mixed>>>
-     */
-    protected function blocksByPosition(BlockPositionRegistry $positions, BlockTypeRegistry $blockTypes): array
+    public function toggleBlockActive(int $blockId): void
     {
         $tenantId = currentTenantId();
+
+        $block = Block::query()
+            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
+            ->whereNull('parent_id')
+            ->where('is_default', false)
+            ->find($blockId);
+
+        if (! $block) {
+            return;
+        }
+
+        $block->update(['active' => ! $block->active]);
+    }
+
+    public function deleteBlock(int $blockId): void
+    {
+        $tenantId = currentTenantId();
+
+        Block::query()
+            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
+            ->whereNull('parent_id')
+            ->where('is_default', false)
+            ->where('id', $blockId)
+            ->delete();
+    }
+
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
+    protected function mapBlocks(Collection $blocks, BlockTypeRegistry $blockTypes): Collection
+    {
         $typeIcons = $blockTypes->all()->mapWithKeys(
             fn ($blockType): array => [$blockType->slug => $blockType->icon]
         );
+
+        $editors = $blockTypes->all()->mapWithKeys(
+            fn ($blockType): array => [$blockType->slug => $blockType->editor]
+        );
+
+        return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
+            $icon = $typeIcons->get($block->type, 'assets/icons/tabler/Blockquote.svg');
+
+            return [
+                'id' => $block->id,
+                'title' => $block->title,
+                'type' => $block->type,
+                'sort_order' => $block->sort_order,
+                'is_default' => $block->is_default,
+                'editable' => filled($editors->get($block->type)),
+                'active' => $block->active,
+                'icon_url' => asset($icon),
+            ];
+        });
+    }
+
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
+    protected function blocksForTypes(Collection $blocks, array $types): Collection
+    {
+        return collect($types)
+            ->map(fn (string $type): ?array => $blocks->firstWhere('type', $type))
+            ->filter()
+            ->values();
+    }
+
+    /**
+     * @return array{top: Collection<int, array<string, mixed>>, user: Collection<int, array<string, mixed>>, bottom: Collection<int, array<string, mixed>>}
+     */
+    protected function groupedBlocks(BlockTypeRegistry $blockTypes): array
+    {
+        $tenantId = currentTenantId();
 
         $blocks = Block::query()
             ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
             ->whereNull('parent_id')
             ->orderBy('sort_order')
-            ->get(['id', 'title', 'type', 'position', 'sort_order']);
+            ->get(['id', 'title', 'type', 'sort_order', 'is_default', 'active']);
 
-        $grouped = $blocks->groupBy('position');
+        $mapped = $this->mapBlocks($blocks, $blockTypes);
+        $system = $mapped->where('is_default', true)->values();
 
-        return $positions->all()
-            ->mapWithKeys(function ($position) use ($grouped, $typeIcons): array {
-                $items = ($grouped->get($position->slug) ?? collect())
-                    ->map(function (Block $block) use ($typeIcons): array {
-                        $icon = $typeIcons->get($block->type, 'assets/icons/tabler/Blockquote.svg');
-
-                        return [
-                            'id' => $block->id,
-                            'title' => $block->title,
-                            'type' => $block->type,
-                            'position' => $block->position,
-                            'sort_order' => $block->sort_order,
-                            'icon_url' => asset($icon),
-                        ];
-                    });
-
-                return [$position->slug => $items];
-            })
-            ->all();
+        return [
+            'top' => $this->blocksForTypes($system, ['top-nav', 'header', 'cta']),
+            'user' => $mapped->where('is_default', false)->values(),
+            'bottom' => $this->blocksForTypes($system, ['footer', 'float-links']),
+        ];
     }
 
-    public function render(BlockPositionRegistry $positions, BlockTypeRegistry $blockTypes)
+    public function render(BlockTypeRegistry $blockTypes)
     {
-        $activePosition = $this->addBlockPosition
-            ? $positions->find($this->addBlockPosition)
-            : null;
+        $grouped = $this->groupedBlocks($blockTypes);
 
         return $this->view([
-            'positions' => $positions->options(),
-            'blockTypes' => $blockTypes->options(),
-            'blocksByPosition' => $this->blocksByPosition($positions, $blockTypes),
-            'addBlockModalTitle' => $activePosition
-                ? 'إضافة بلوك — '.$activePosition->name
-                : 'إضافة بلوك',
+            'blockTypes' => $blockTypes->options(addableOnly: true),
+            'topBlocks' => $grouped['top'],
+            'userBlocks' => $grouped['user'],
+            'bottomBlocks' => $grouped['bottom'],
         ]);
     }
 }; ?>
