@@ -19,6 +19,8 @@ new class extends Component
 ?>
 
 <ui:container>
+    <livewire:admin::home.welcome-widget lazy />
+
     <div class="text-sm mb-2 bg-gray-300/30 p-2 px-3 rounded-lg text-gray-700">
         ملخّص الشهر
         <b class="inline-block ms-2">{{ now()->translatedFormat('M Y') }}</b>

@@ -34,7 +34,7 @@
         class="flex lg:gap-5 gap-2 items-start"
     >
         {{-- Tab nav (right in RTL) --}}
-        <nav class="lg:w-56 w-auto shrink-0 bg-gray-300/30 rounded-xl p-0.5 space-y-0.5">
+        <nav class="lg:w-48 w-auto shrink-0 bg-gray-300/30 rounded-xl p-0.5 space-y-0.5">
             <template x-for="tab in tabs.filter((item) => item.type === 'fixed')" :key="tab.id">
                 <button
                     type="button"
