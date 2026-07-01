@@ -76,7 +76,7 @@ new class extends Livewire\Component {
         if ($this->event) {
             $this->dispatch($this->event, client: $client);
         } else {
-            return redirect(route('admin.clients.detail', ['id' => $client->id]));
+            return redirect(route('admin.clients.detail', ['id' => $client->uuid]));
         }
     }
 };

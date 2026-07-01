@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
 
 #[Fillable(['name', 'handle', 'user_id', 'theme_id', 'active', 'data', 'meta', 'config', 'phone', 'email', 'status', 'role'])]
 #[Hidden(['deleted_at'])]
@@ -22,7 +23,7 @@ class Tenant extends Model
     {
         return [
             'data' => 'array',
-            'meta' => 'array',
+            'meta' => SchemalessAttributes::class,
             'config' => 'array',
             'active' => 'boolean',
         ];
@@ -31,6 +32,11 @@ class Tenant extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return route('tenant.home', $this->handle);
     }
 
     public function getLogoAttribute(): string

@@ -1,5 +1,5 @@
  <ui:container>
-     <ui:mainbox title="إدارة الإشتراك" subtitle="للمعلومات ولإدارة الاشتراك الخاص بهذه الكتالوج.">
+     <ui:mainbox title="إدارة الإشتراك" subtitle="للمعلومات ولإدارة الاشتراك الخاص بهذه الصفحة.">
          <x-slot:icon>
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
                  <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="1.5"

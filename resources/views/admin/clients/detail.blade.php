@@ -98,7 +98,7 @@ new class extends \Livewire\Component {
 
     public function mount(): void
     {
-        $this->client = Client::whereId(request()->id)->firstOrFail();
+        $this->client = Client::whereUuid(request()->id)->firstOrFail();
     }
 
     public function rendering($view): void

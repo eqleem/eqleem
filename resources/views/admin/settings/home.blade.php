@@ -1,5 +1,5 @@
 <ui:container>
-    <ui:mainbox title="{{ __('Settings') }}" subtitle="{{ __('Manage settings and apps.') }}">
+    <ui:mainbox title="{{ __('Settings') }}" subtitle="تعديل وتخصيص النظام حسب مشروعك.">
         <x-slot:icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
                 <path opacity=".34" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.5"
@@ -16,14 +16,14 @@
                     <a href="{{ route('admin.settings.detail', ['slug' => $setting['slug']]) }}" wire:navigate
                         class="flex gap-x-3 items-center bg-gray-100 hover:bg-gray-200/80 p-2 rounded-xl">
                         <div class="bg-white p-2 rounded-xl shrink-0">
-                            <img class="h-10 w-10" src="{{ asset('assets/icons/business/023-email.svg') }}"
-                                alt="{{ $setting['name'] }}">
+                            <img class="h-10 w-10" src="{{ asset($setting['icon']) }}"
+                                alt="{{ __($setting['name']) }}">
                         </div>
                         <div class="truncate">
                             <p class="text-sm font-medium text-gray-700">
-                                {{ $setting['name'] }}
+                                {{ __($setting['name']) }}
                             </p>
-                            <small class="text-gray-500 text-xs truncate">
+                            <small class="text-gray-500 font-normal text-xs truncate">
                                 {{ $setting['description'] }} </small>
                         </div>
                     </a>
@@ -39,16 +39,9 @@
 
     public $settings = [];
 
-    public function mount()
+    public function mount(): void
     {
-        $this->settings = [
-            'users' => [
-                'slug' => 'users',
-                'name' => __('Users'),
-                'description' => 'Manage users',
-                'icon' => 'users',
-            ],
-        ];
+        $this->settings = config('settings');
     }
 
      public function render()

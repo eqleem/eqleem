@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <div class="{{ $formClass }}">
+    <div class="space-y-2" {{ $attributes->class($formClass) }}>
         {{ $slot }}
 
         @if($inputs)

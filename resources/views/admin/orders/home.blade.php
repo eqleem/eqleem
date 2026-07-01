@@ -4,45 +4,24 @@
         <x-slot:icon>
             <ui:icon name="message-2" class="!w-7 !h-7 text-gray-500 p-0.5" />
         </x-slot:icon>
-        {{-- Hide for now, #TODO, and flexable order based on entry type  --}}
-        {{-- <x-slot:actions>
-            <ui:button wire:click="addResponse" label="{{ __('New order') }}" icon="square-rounded-plus" />
-        </x-slot:actions> --}}
+        <x-slot:actions>
+            <ui:button @click.prevent="$dispatch('openmodal', { modal: 'add-order' })" label="إضافة طلب"
+                icon="square-rounded-plus" />
+        </x-slot:actions>
 
-        orders page ..
-        {{-- <livewire:admin.views.orders.table lazy /> --}}
+        <livewire:admin::orders.table lazy />
+
+        <ui:modal title="إضافة طلب جديد" size="4xl" name="add-order">
+            <livewire:admin::orders.add-order />
+        </ui:modal>
     </ui:mainbox>
 </ui:container>
 
- <?php
-//  use Catalog\Subscription\Models\Plan;
- 
- new class extends \Livewire\Component {
-    //  public $tenant;
-    //  public $currentPlanId;
- 
-    //  function mount()
-    //  {
-    //      $this->tenant = tenant();
-    //      $this->currentPlanId = tenant('subscription.plan.id');
-    //  }
- 
-    //  public function with()
-    //  {
-    //      return [
-    //          // 'plans' => Plan::where('is_system', true)->with('features')->get(),
-    //          'plans' => Plan::where('is_system', true)->where('active', true)->get(),
-    //      ];
-    //  }
- 
-    //  public function cancelSubscription()
-    //  {
-    //      tenant('subscription')->cancel();
-    //      //  tenant('subscription')->suppress();
-    //  }
- 
-     public function render()
-     {
-         return $this->view()->layout('admin::layout')->title(__('Orders'));
-     }
- }; ?>
+<?php
+
+new class extends \Livewire\Component {
+    public function rendering($view): void
+    {
+        $view->title(__('Orders'))->layout('admin::layout');
+    }
+}; ?>

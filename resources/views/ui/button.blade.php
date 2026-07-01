@@ -2,7 +2,7 @@
     'label' => null,
     'href' => null,
     'icon' => null,
-    'wireTarget' => '',
+    'target' => null,
     'variant' => 'primary',
     'rounded' => null,
     'current' => null,
@@ -11,6 +11,7 @@
 ])
 
 @php $iconTrailing = $attributes->get('icon:trailing'); @endphp
+@php $wireTarget = $attributes->get('wire:target') ?? $target; @endphp
  
 @php
     $tag = $href ? 'a' : 'button';

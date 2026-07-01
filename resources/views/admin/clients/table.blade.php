@@ -1,7 +1,7 @@
 <div class=" divide-y divide-gray-200 divide-dotted">
 
     <div class="bg-gray-100 p-3 flex items-center gap-x-7 w-full">
-        <div class="ps-3">
+        <div class="ps-3"  x-cloak>
             <div class="flex items-center">
                 <ui:check-all />
             </div>
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <div class="relative last-child:rounded-b-2xl pb-4X">
+    <div class="relative last-child:rounded-b-2xl pb-4X p-1">
 
         @if ($results->count() == 0)
             <ui:empty subtitle="سيتم عرض العملاء هنا بعد إضافتهم أو شراء أحد المنتجات أو الخدمات.">
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="py-3 w-full">
-                            <a href="{{ route('admin.clients.detail', ['id' => $item->id]) }}" wire:navigate
+                            <a href="{{ route('admin.clients.detail', ['id' => $item->uuid]) }}" wire:navigate
                                 class="flex items-center gap-x-2">
 
                                 <img class="h-10 w-10 flex-none rounded-full bg-gray-50" src="{{ $item->avatar }}"
@@ -106,7 +106,7 @@
                                         tabindex="-1" x-transition.scale.origin.top>
 
 
-                                        <a href="{{ route('admin.clients.detail', ['id' => $item->id]) }}"
+                                        <a href="{{ route('admin.clients.detail', ['id' => $item->uuid]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
                                             {{ __('View') }}

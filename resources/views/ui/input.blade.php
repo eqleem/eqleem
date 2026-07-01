@@ -8,7 +8,7 @@
     'label' => null,
     'focus' => false,
     'errormsg' => true,
-    'dir' => null,
+    'dir' => 'rtl',
     'key' => null,
     'icon' => null,
     'description' => '',
