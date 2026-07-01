@@ -23,7 +23,7 @@
 
 <?php
 
-use App\Models\User;
+use App\Models\Client;
 use SaKanjo\EasyMetrics\Metrics\Value;
 
 new class extends \Livewire\Component {
@@ -33,7 +33,7 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        [$this->value, $this->growth] = Value::make(User::class)
+        [$this->value, $this->growth] = Value::make(Client::class)
             ->withGrowthRate()
             ->ranges($this->range)
             ->count();

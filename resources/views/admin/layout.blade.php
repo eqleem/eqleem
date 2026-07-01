@@ -28,7 +28,7 @@
         </style>
         @livewireStyles
     </head>
-    <body class="antialiased bg-stone-100 min-h-screen">
+    <body class="antialiased bg-stone-200 min-h-screen">
         <ui:notify />
         <x-admin::header />
         <x-admin::navbar />
