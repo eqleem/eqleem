@@ -7,11 +7,12 @@
         <ui:tab.group
             :active="$activeBlogTab"
             url-key="section"
-            :valid-tabs="['posts', 'categories']"
+            :valid-tabs="['posts', 'categories', 'customize']"
         >
             <x-slot name="nav" class="border-b border-stone-200 px-px">
                 <ui:tab.nav name="posts" label="التدوينات" icon="article" activeClass="border-b-2 !border-primary-500 text-stone-900" />
                 <ui:tab.nav name="categories" label="تصنيفات المدونة" icon="category" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav name="customize" label="تخصيص المدونة" icon="palette" activeClass="border-b-2 !border-primary-500 text-stone-900" />
             </x-slot>
 
             <x-slot name="content">
@@ -21,6 +22,12 @@
 
                 <ui:tab.content name="categories" class="!p-0 !rounded-none">
                     <livewire:admin::page.content.blog.categories-table :contentType="$contentType" lazy />
+                </ui:tab.content>
+
+                <ui:tab.content name="customize">
+                    <p class="text-sm text-stone-600 leading-relaxed">
+                        هذا نص تجريبي لتبويب تخصيص المدونة. سيتم تعديله لاحقاً.
+                    </p>
                 </ui:tab.content>
             </x-slot>
         </ui:tab.group>
@@ -37,7 +44,7 @@ new class extends \Livewire\Component
     public string $activeBlogTab = 'posts';
 
     /** @var list<string> */
-    private const BLOG_TABS = ['posts', 'categories'];
+    private const BLOG_TABS = ['posts', 'categories', 'customize'];
 
     public function mount(): void
     {

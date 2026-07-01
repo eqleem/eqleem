@@ -35,12 +35,14 @@ new class extends \Livewire\Component
 
     public string $parentId = '';
 
-    public function mount(?int $categoryId = null): void
+    public function mount(?int $categoryId = null, ?int $defaultParentId = null): void
     {
         $this->categoryId = $categoryId;
 
         if ($categoryId) {
             $this->loadCategory();
+        } elseif ($defaultParentId) {
+            $this->parentId = (string) $defaultParentId;
         }
     }
 
@@ -128,6 +130,13 @@ new class extends \Livewire\Component
 
             $modal = 'edit-blog-category';
         } else {
+            $parentId = filled($this->parentId) ? (int) $this->parentId : null;
+
+            $attributes['sort_order'] = (int) Taxonomy::query()
+                ->type('blog_category')
+                ->where('parent_id', $parentId)
+                ->max('sort_order') + 1;
+
             Taxonomy::query()->create($attributes);
 
             $this->reset(['name', 'description', 'parentId']);

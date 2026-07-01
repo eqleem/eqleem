@@ -12,12 +12,16 @@
         </div>
 
         <div>
-            <ui:button @click.prevent="$dispatch('openmodal', { modal: 'add-blog-category' })" label="تصنيف جديد"
+            <ui:button wire:click="openAddCategoryModal" label="تصنيف جديد"
                 icon="square-rounded-plus" />
         </div>
 
-        <ui:modal title="إضافة تصنيف" size="lg" name="add-blog-category">
-            <livewire:admin::page.content.blog.category-form :contentType="$contentType" :key="'add-blog-category'" />
+        <ui:modal :title="$addingParentId ? 'إضافة قسم فرعي' : 'إضافة تصنيف'" size="lg" name="add-blog-category">
+            <livewire:admin::page.content.blog.category-form
+                :contentType="$contentType"
+                :default-parent-id="$addingParentId"
+                :key="'add-blog-category-'.($addingParentId ?? 'root')"
+            />
         </ui:modal>
     </div>
 
@@ -43,10 +47,13 @@
                         @if ($search === '')
                             wire:sortable.item="{{ $category->id }}"
                         @endif
-                        class="group flex items-center justify-between gap-x-7 w-full hover:bg-gray-50 last:rounded-b-2xl"
+                        class="group flex items-center justify-between gap-x-4 w-full hover:bg-gray-50 last:rounded-b-2xl"
                     >
-                        <div class="py-3 w-full px-6">
-                            <div class="flex items-center gap-x-3 min-w-0">
+                        <div
+                            class="py-3 w-full min-w-0"
+                            style="padding-inline-start: calc(1.5rem + {{ ($category->depth ?? 0) * 1.25 }}rem)"
+                        >
+                            <div class="flex items-center gap-x-3 min-w-0 pe-4">
                                 @if ($search === '')
                                     <button
                                         type="button"
@@ -66,7 +73,6 @@
                                     type="button"
                                     wire:click="openEditModal({{ $category->id }})"
                                     class="min-w-0 text-start hover:text-primary-600 transition"
-                                    style="padding-inline-start: {{ ($category->depth ?? 0) * 1.25 }}rem"
                                 >
                                     <h2 class="text-base text-gray-700 truncate">{{ $category->name }}</h2>
                                     @if (filled($category->description))
@@ -76,7 +82,17 @@
                             </div>
                         </div>
 
-                        <div class="pe-6">
+                        <div class="flex items-center gap-x-1 pe-6 shrink-0">
+                            <button
+                                type="button"
+                                wire:click="openAddCategoryModal({{ $category->id }})"
+                                class="rounded-lg p-1.5 text-gray-400 hover:bg-primary-50 hover:text-primary-600 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
+                                title="إضافة قسم فرعي"
+                                aria-label="إضافة قسم فرعي"
+                            >
+                                <ui:icon name="square-rounded-plus" class="!w-4 !h-4" />
+                            </button>
+
                             <div x-data="{ dropdownMenu: false }">
                                 <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
                                     <button @click="dropdownMenu = ! dropdownMenu" type="button"
@@ -109,10 +125,10 @@
             </ul>
         @endif
 
-        <div wire:loading wire:target="search, delete, openEditModal, updateCategoryOrder"
+        <div wire:loading wire:target="search, delete, openEditModal, openAddCategoryModal, updateCategoryOrder"
             class="absolute inset-0 bg-white opacity-50"></div>
 
-        <div wire:loading.flex wire:target="search, delete, openEditModal, updateCategoryOrder"
+        <div wire:loading.flex wire:target="search, delete, openEditModal, openAddCategoryModal, updateCategoryOrder"
             class="flex justify-center items-center absolute inset-0">
             <ui:icon name="loader-3" class="animate-spin text-gray-300 w-10 h-10" />
         </div>
@@ -143,6 +159,8 @@ new class extends \Livewire\Component
 
     public ?int $editingCategoryId = null;
 
+    public ?int $addingParentId = null;
+
     public function placeholder(): string
     {
         return loadingIcon();
@@ -152,6 +170,17 @@ new class extends \Livewire\Component
     public function refreshList(): void
     {
         $this->editingCategoryId = null;
+        $this->addingParentId = null;
+    }
+
+    public function openAddCategoryModal(?int $parentId = null): void
+    {
+        if ($parentId !== null && ! Taxonomy::query()->type('blog_category')->whereKey($parentId)->exists()) {
+            return;
+        }
+
+        $this->addingParentId = $parentId;
+        $this->dispatch('openmodal', modal: 'add-blog-category');
     }
 
     public function openEditModal(int $categoryId): void
