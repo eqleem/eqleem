@@ -56,7 +56,7 @@ new class extends Livewire\Component
 
         return $this->redirect(route('admin.page.home', [
             'tab' => $this->contentType['tab_id'],
-            'item' => $content->id,
+            'item' => $content->uuid,
         ]), navigate: true);
     }
 

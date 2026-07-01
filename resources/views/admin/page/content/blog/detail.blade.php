@@ -56,7 +56,7 @@
             <ui:ck
                 name="body"
                 :value="$body"
-                :model-id="$itemId"
+                :model-id="$content->id"
                 model-type="content"
             />
         </div>
@@ -149,7 +149,8 @@ new class extends \Livewire\Component
     {
         return Content::query()
             ->type('blog')
-            ->findOrFail($this->itemId);
+            ->where('uuid', $this->itemId)
+            ->firstOrFail();
     }
 
     /**

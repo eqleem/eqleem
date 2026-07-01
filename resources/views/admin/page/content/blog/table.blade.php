@@ -42,7 +42,7 @@
         @else
             <div class="pb-4">
                 @foreach ($results as $item)
-                    <div wire:key="blog-post-{{ $item->id }}"
+                    <div wire:key="blog-post-{{ $item->uuid }}"
                         class="flex items-center justify-between gap-x-7 w-full hover:bg-gray-50 last:rounded-b-2xl">
                         <div class="ps-6">
                             <div class="flex items-center">
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                         <div class="py-3 w-full">
-                            <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->id]) }}"
+                            <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
                                 wire:navigate class="flex items-center gap-x-2">
                                 <img class="h-10 w-10 flex-none rounded-full bg-gray-50"
                                     src="{{ $item->avatar }}" alt="">
@@ -92,7 +92,7 @@
                                     <div x-show="dropdownMenu"
                                         class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-48 flex-col gap-y-px"
                                         x-transition.scale.origin.top>
-                                        <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->id]) }}"
+                                        <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
                                             {{ __('View') }}

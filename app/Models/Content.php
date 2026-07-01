@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 ])]
 class Content extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use BelongsToTenant, HasUuid, SoftDeletes;
 
     protected function casts(): array
     {
