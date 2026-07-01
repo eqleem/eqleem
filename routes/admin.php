@@ -18,8 +18,8 @@ Route::as('admin.')
         Route::livewire('/clients', 'admin::clients.home')->name('clients.home');
         Route::livewire('/clients/{id}', 'admin::clients.detail')->name('clients.detail');
         Route::livewire('/manage-page', 'admin::page.home')->name('page.home');
-        // Route::post('upload-media', [\App\Actions\UploadMedia::class, 'upload'])->name('upload-media');
-        // Route::post('upload-image', [\App\Actions\UploadImage::class, 'upload'])->name('upload-image');
+        Route::post('upload-media', [\App\Actions\UploadMedia::class, 'upload'])->name('upload-media');
+        Route::post('upload-image', [\App\Actions\UploadImage::class, 'upload'])->name('upload-image');
         // Route::middleware(['web'])
         //     ->group(function () {
         //         Volt::route('/content', 'admin.content.index')->name('content');

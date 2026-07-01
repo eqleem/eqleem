@@ -1,0 +1,210 @@
+.ce-toolbar {
+    position: absolute;
+    left: auto;
+    right: auto;
+}
+/* @media screen and (min-width: 630px) {
+    .ce-toolbar {
+        right: -8px;
+    }
+}
+@media (max-width: 630px) {
+    .ce-toolbar {
+        right: 100%;
+    }
+} */
+
+.ce-toolbar__actions {
+    right: auto;
+    /* left: 100%; */
+}
+.ce-block__content {
+    /* max-width: 100%; */
+    margin: 0 auto;
+    padding-right: 16px;
+}
+.ce-popover {
+    left: auto;
+    right: 0;
+}
+.sl-overlay {
+    background: #000;
+    opacity: 0.8;
+}
+
+.sl-wrapper .sl-image img {
+    border-radius: 10px;
+}
+
+.sl-wrapper .sl-navigation button {
+    position: fixed;
+    top: 50%;
+    margin-top: -22px;
+    height: 44px;
+    width: 22px;
+    line-height: 44px;
+    text-align: center;
+    display: block;
+    z-index: 10060;
+    font-family: Arial, Baskerville, monospace;
+    color: #fff;
+}
+.sl-wrapper .sl-close {
+    color: #fff;
+}
+.sl-wrapper .sl-counter {
+    color: #fff;
+}
+.sl-wrapper {
+    color: #fff !important;
+}
+
+/* Alignment  TEMP fixes !! */
+/* .ce-paragraph--right {
+    text-align: left !important;
+}
+.ce-paragraph--left {
+    text-align: right !important;
+}
+
+.ce-header--right {
+    text-align: left !important;
+}
+.ce-header--left {
+    text-align: right !important;
+} */
+
+[dir="rtl"] .ce-popover-item__icon {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+/* editorjs plugins */
+/* @import "../js/editorjs/p2/p2.css"; */
+
+@media (min-width: 1000px) {
+    .ce-paragraph {
+        line-height: 1em !important;
+        font-size: 0.9rem;
+        outline: none;
+    }
+}
+.ce-paragraph {
+    line-height: 1.9em !important;
+    font-size: 1.1rem;
+    outline: none;
+}
+.ce-paragraph--right {
+    text-align: right;
+}
+.ce-paragraph--center {
+    text-align: center;
+}
+.ce-paragraph--left {
+    text-align: left;
+}
+
+.ce-paragraph--justify {
+    text-align: justify;
+}
+
+.ce-paragraph[data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: #707684;
+    font-weight: normal;
+    opacity: 0;
+    font-size: 0.9rem;
+}
+
+/** Show placeholder at the first paragraph if Editor is empty */
+.codex-editor--empty
+    .ce-block:first-child
+    .ce-paragraph[data-placeholder]:empty::before {
+    opacity: 1;
+}
+
+.codex-editor--toolbox-opened
+    .ce-block:first-child
+    .ce-paragraph[data-placeholder]:empty::before,
+.codex-editor--empty
+    .ce-block:first-child
+    .ce-paragraph[data-placeholder]:empty:focus::before {
+    opacity: 0;
+}
+
+.ce-paragraph p:first-of-type {
+    margin-top: 0;
+}
+
+.ce-paragraph p:last-of-type {
+    margin-bottom: 0;
+}
+
+.svg-icon {
+    width: 1em;
+    height: 1em;
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+    fill: #4691f6;
+}
+
+.svg-icon circle {
+    stroke: #4691f6;
+    stroke-width: 1;
+}
+
+/* Header css ............ */
+
+/**
+ * Plugin styles
+ */
+.ce-header {
+    padding: 0.6em 0 3px;
+    margin: 0;
+    line-height: 1.25em;
+    outline: none;
+}
+
+.ce-header p,
+.ce-header div {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/**
+   * Styles for Plugin icon in Toolbar
+   */
+
+.ce-header[contentEditable="true"][data-placeholder]::before {
+    position: absolute;
+    content: attr(data-placeholder);
+    color: #707684;
+    font-weight: normal;
+    display: none;
+    cursor: text;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty::before {
+    display: block;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty:focus::before {
+    display: none;
+}
+
+/* Alignment*/
+.ce-header--right {
+    text-align: right;
+}
+.ce-header--center {
+    text-align: center;
+}
+.ce-header--left {
+    text-align: left;
+}
+.ce-header--justify {
+    text-align: justify;
+}

@@ -51,10 +51,21 @@
 <div wire:ignore id="ck{{ $modelId }}" x-data="{
     editor: null,
     value: @entangle($name),
+    initialContent: @js($value ?? ''),
     init() {
+        if (typeof ClassicEditor === 'undefined') {
+            console.error('CKEditor is not loaded. Run npm run build or npm run dev.');
+
+            return;
+        }
+
+        this.$nextTick(() => {
+            const content = this.value || this.initialContent || this.$refs.ckeditor?.value || '';
+
         ClassicEditor
             .create(this.$refs.ckeditor, {
-                plugins: [Essentials, Bold, Italic, Font, Paragraph, BlockQuote, Heading, List, Link, MediaEmbed, Underline, ImageCkEditor, ImageUpload, ImageResize, ImageStyle, ImageToolbar, ImageCaption, SimpleUploadAdapter, HorizontalLine, AutoImage, ImageInsert, CodeBlock, Autoformat, Alignment],
+                initialData: content,
+                plugins: [Essentials, Bold, Italic, Font, Paragraph, BlockQuote, Heading, List, Link, MediaEmbed, Underline, Image, ImageUpload, ImageResize, ImageStyle, ImageToolbar, ImageCaption, SimpleUploadAdapter, HorizontalLine, AutoImage, ImageInsert, CodeBlock, Autoformat, Alignment],
                 language: {
                     // The UI will be English.
                     ui: 'ar',
@@ -111,7 +122,7 @@
                 },
                 simpleUpload: {
                     // The URL that the images are uploaded to.
-                    uploadUrl: '{{ route('dashboard.upload-media') }}',
+                    uploadUrl: '{{ route('admin.upload-media') }}',
 
                     // Enable the XMLHttpRequest.withCredentials property.
                     withCredentials: true,
@@ -123,16 +134,35 @@
                         modelType: '{{ $modelType }}',
                         modelId: '{{ $modelId }}',
                         mediaCollection: '{{ $mediaCollection }}',
-                        tenantId: '{{ currentTenant()->id }}',
+                        tenantId: '{{ currentTenantId() }}',
  
                     },
 
                 },
             }).then(editor => {
+                this.editor = editor;
+
+                if (! this.value && content) {
+                    this.value = content;
+                }
+
                 editor.model.document.on('change:data', () => {
                     this.value = editor.getData();
                 });
-            })
+
+                this.$watch('value', (newValue) => {
+                    if (! this.editor) {
+                        return;
+                    }
+
+                    const current = this.editor.getData();
+
+                    if ((newValue ?? '') !== current) {
+                        this.editor.setData(newValue ?? '');
+                    }
+                });
+            });
+        });
     },
 }" class="w-full">
 
@@ -141,7 +171,7 @@
                 class=" ">{{ $label }}</span> </label>
     @endif --}}
 
-    <textarea x-ref="ckeditor" dir="auto" placeholder="اكتب شيئاً .. " class="w-full">{{ $value }}</textarea>
+    <textarea x-ref="ckeditor" dir="auto" placeholder="اكتب شيئاً .. " class="w-full">{!! $value ?? '' !!}</textarea>
 </div> 
 
 </ui:field>

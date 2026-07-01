@@ -12,7 +12,7 @@
                     <path d="M14.5 11.5h2v2"></path>
                 </g>
             </svg>
-            <span class="hiddenX Xlg:block">{{ __('Home') }}</span>
+            <span class="hidden md:block">{{ __('Home') }}</span>
         </a>
  
         <a href="{{ route('admin.orders.home') }}" wire:navigate
@@ -25,8 +25,7 @@
                 <path opacity=".4" d="M15.995 11h.008M11.995 11h.009M7.995 11h.008" stroke="currentColor"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
-            {{ __('Orders') }}
-            {{-- <span class="hidden md:block">{{ __('& Responses') }}</span> --}}
+            <span class="hidden md:block">{{ __('Orders') }}</span>
         </a>
         <a href="{{ route('admin.clients.home') }}" wire:navigate
             class="h-9 text-sm md:text-base w-full md:w-auto justify-center flex items-center gap-x-2 p-1.5 px-1 md:px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ request()->is('*/clients') || request()->is('*/clients/*') ? 'bg-gray-100 text-gray-900' : '' }}">
@@ -38,11 +37,11 @@
                 <ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4" />
             </svg>
             
-            <span class="hiddenX lg:blockX">{{ __('Clients') }}</span>
+            <span class="hidden lg:block">{{ __('Clients') }}</span>
         </a>
 
         <a href="{{ route('admin.page.home') }}" wire:navigate
-            class="h-9 text-sm md:text-base w-fullx md:w-autoX justify-center flex items-center gap-x-2 p-1.5 px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ request()->is('*/manage-page') || request()->is('*/manage-page/*') ? 'bg-gray-100 text-gray-900' : '' }}">
+            class="h-9 text-sm md:text-base w-full md:w-auto justify-center flex items-center gap-x-2 p-1.5 px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ request()->is('*/manage-page') || request()->is('*/manage-page/*') ? 'bg-gray-100 text-gray-900' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
                 <path d="M0 0h24v24H0z" fill="none" />
                 <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -54,7 +53,7 @@
             <span class="hidden md:block">{{ __('Manage page') }}</span>
         </a>
         <a href="{{ route('admin.settings.home') }}" wire:navigate
-            class="h-9 text-sm md:text-base w-fullx md:w-autoX justify-center flex items-center gap-x-2 p-1.5 px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ request()->is('*/settings') || request()->is('*/settings/*') ? 'bg-gray-100 text-gray-900' : '' }}">
+            class="h-9 text-sm md:text-base w-full md:w-auto justify-center flex items-center gap-x-2 p-1.5 px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ request()->is('*/settings') || request()->is('*/settings/*') ? 'bg-gray-100 text-gray-900' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                 <path opacity=".34" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.5"
                     stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>

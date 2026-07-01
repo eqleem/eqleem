@@ -12,6 +12,7 @@
     'info' => '',
     'placeholder' => '',
     'target' => null,
+    'uploadLabel' => null,
 ])
 
 <ui:field name="{{ $name }}" info="{{ $info }}" label="{{ __($label) }}">
@@ -41,7 +42,7 @@
                     </svg>
                 </div>
 
-            {{ __('Upload file') }}
+            {{ $uploadLabel ?? __('Upload file') }}
         </b>
  
     </label>

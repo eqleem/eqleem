@@ -8,6 +8,7 @@ use App\Models\Page;
 use App\Models\User;
 use App\Models\Block;
 use App\Models\Post;
+use App\Models\Content;
  
 
 class UploadMedia
@@ -34,6 +35,10 @@ class UploadMedia
   
         if($modelType == 'block'){
             $model = Block::whereId($modelId)->firstOrFail();
+        }
+        
+        if($modelType == 'content'){
+            $model = Content::whereId($modelId)->firstOrFail();
         }
    
         $media = $model->addMedia(
