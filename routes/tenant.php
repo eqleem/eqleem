@@ -3,6 +3,18 @@
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
 use Illuminate\Support\Facades\Route;
+use Pages\Branches;
+use Pages\Cart;
+use Pages\Changelog;
+use Pages\Checkout;
+use Pages\Contact;
+use Pages\Faq;
+use Pages\Features;
+use Pages\Pricing;
+use Pages\Resume;
+use Pages\Reviews;
+use Store\Detail;
+use Store\Index;
 
 Route::prefix('{tenant}')
     ->middleware(ResolveTenantFromPath::class, SetTenantTheme::class)
@@ -10,37 +22,44 @@ Route::prefix('{tenant}')
     ->namespace('App\Livewire\Tenant')
     ->group(function () {
         Route::get('/', Home::class)->name('home');
-        // Route::livewire('/', 'tenant::home')->name('home');
-        // Route::livewire('/store', 'tenant::store.index')->name('store.index');
-        // Route::livewire('/store/product/{slug}', 'tenant::store.detail')->name('store.detail');
-        // Route::livewire('/properties-rental', 'tenant::properties-rental.index')->name('properties-rental.index');
-        // Route::livewire('/properties-rental/{slug}', 'tenant::properties-rental.detail')->name('properties-rental.detail');
-        // Route::livewire('/properties', 'tenant::properties.index')->name('properties.index');
-        // Route::livewire('/properties/{slug}', 'tenant::properties.detail')->name('properties.detail');
 
-        // Route::livewire('/courses', 'tenant::courses.index')->name('courses.index');
-        // Route::livewire('/courses/{slug}', 'tenant::courses.detail')->name('courses.detail');
-        // Route::livewire('/playlists', 'tenant::playlists.index')->name('playlists.index');
-        // Route::livewire('/playlists/{slug}', 'tenant::playlists.detail')->name('playlists.detail');
-        // Route::livewire('/menu', 'tenant::menu.index')->name('menu.index');
-        // Route::livewire('/services', 'tenant::services.index')->name('services.index');
-        // Route::livewire('/services/{slug}', 'tenant::services.detail')->name('services.detail');
-        // Route::livewire('/branches', 'tenant::pages.branches')->name('pages.branches');
-        // Route::livewire('/changelog', 'tenant::pages.changelog')->name('pages.changelog');
-        // Route::livewire('/resume', 'tenant::pages.resume')->name('pages.resume');
-        // Route::livewire('/reviews', 'tenant::pages.reviews')->name('pages.reviews');
-        // Route::livewire('/faq', 'tenant::pages.faq')->name('pages.faq');
-        // Route::livewire('/features', 'tenant::pages.features')->name('pages.features');
-        // Route::livewire('/pricing', 'tenant::pages.pricing')->name('pages.pricing');
-        // Route::livewire('/contact', 'tenant::pages.contact')->name('pages.contact');
-        // Route::livewire('/checkout', 'tenant::pages.checkout')->name('pages.checkout');
-        // Route::livewire('/cart', 'tenant::pages.cart')->name('pages.cart');
+        Route::get('/store', Index::class)->name('store.index');
+        Route::get('/store/product/{slug}', Detail::class)->name('store.detail');
 
-        // // Route::livewire('/pages/{slug}', 'tenant::pages.detail')->name('pages.detail');
-        // Route::livewire('/portfolio', 'tenant::portfolio.index')->name('portfolio.index');
-        // Route::livewire('/portfolio/{slug}', 'tenant::portfolio.detail')->name('portfolio.detail');
-        // Route::livewire('/blog', 'tenant::blog.index')->name('blog.index');
-        // Route::livewire('/blog/{slug}', 'tenant::blog.detail')->name('blog.detail');
-        // Route::livewire('/newsletter', 'tenant::newsletter.index')->name('newsletter.index');
-        // Route::livewire('/newsletter/{slug}', 'tenant::newsletter.detail')->name('newsletter.detail');
+        Route::get('/properties-rental', PropertiesRental\Index::class)->name('properties-rental.index');
+        Route::get('/properties-rental/{slug}', PropertiesRental\Detail::class)->name('properties-rental.detail');
+
+        Route::get('/properties', Properties\Index::class)->name('properties.index');
+        Route::get('/properties/{slug}', Properties\Detail::class)->name('properties.detail');
+
+        Route::get('/courses', Courses\Index::class)->name('courses.index');
+        Route::get('/courses/{slug}', Courses\Detail::class)->name('courses.detail');
+
+        Route::get('/playlists', Playlists\Index::class)->name('playlists.index');
+        Route::get('/playlists/{slug}', Playlists\Detail::class)->name('playlists.detail');
+
+        Route::get('/menu', Menu\Index::class)->name('menu.index');
+
+        Route::get('/services', Services\Index::class)->name('services.index');
+        Route::get('/services/{slug}', Services\Detail::class)->name('services.detail');
+
+        Route::get('/portfolio', Portfolio\Index::class)->name('portfolio.index');
+        Route::get('/portfolio/{slug}', Portfolio\Detail::class)->name('portfolio.detail');
+
+        Route::get('/blog', Blog\Index::class)->name('blog.index');
+        Route::get('/blog/{slug}', Blog\Detail::class)->name('blog.detail');
+
+        Route::get('/newsletter', Newsletter\Index::class)->name('newsletter.index');
+        Route::get('/newsletter/{slug}', Newsletter\Detail::class)->name('newsletter.detail');
+
+        Route::get('/branches', Branches::class)->name('pages.branches');
+        Route::get('/changelog', Changelog::class)->name('pages.changelog');
+        Route::get('/resume', Resume::class)->name('pages.resume');
+        Route::get('/reviews', Reviews::class)->name('pages.reviews');
+        Route::get('/faq', Faq::class)->name('pages.faq');
+        Route::get('/features', Features::class)->name('pages.features');
+        Route::get('/pricing', Pricing::class)->name('pages.pricing');
+        Route::get('/contact', Contact::class)->name('pages.contact');
+        Route::get('/checkout', Checkout::class)->name('pages.checkout');
+        Route::get('/cart', Cart::class)->name('pages.cart');
     });

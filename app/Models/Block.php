@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use App\Traits\BelongsToTenant;
 
 /**
  * @property int $id
@@ -44,7 +45,7 @@ use Illuminate\Support\Carbon;
 ])]
 class Block extends Model
 {
-    use HasUuid;
+    use HasUuid, BelongsToTenant;
 
     /**
      * @return array<string, string>

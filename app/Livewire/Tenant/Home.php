@@ -8,6 +8,6 @@ class Home extends Component
 {
     public function render()
     {
-        return tenantView('home')->title('Home');
+        return tenantView('home')->title('الرئيسية');
     }
 }

@@ -4,37 +4,22 @@
     </p>
 
     <div class="space-y-2">
-        <p class="text-xs font-semibold text-gray-500 pt-1">الجانب الأيسر</p>
-
-        <ui:toggle name="showShare" label="زر المشاركة" />
+ 
+        <ui:toggle name="showShareButton" label="زر المشاركة" />
         <ui:toggle name="showThemeToggle" label="زر الوضع الليلي" />
         <ui:toggle name="showLanguageSwitcher" label="مبدّل اللغة" live />
-
-        @if ($showLanguageSwitcher)
-            <ui:input name="languageLabel" label="نص اللغة" placeholder="English" />
-        @endif
-
-        <ui:separator />
-
-        <p class="text-xs font-semibold text-gray-500">الوسط</p>
-
+ 
         <ui:toggle name="showBackButton" label="زر الرجوع للرئيسية" />
+ 
+        <div class="flex items-center gap-2">
+            <ui:toggle name="showClientLogin" label="زر دخول العملاء" live />
 
-        <ui:separator />
-
-        <p class="text-xs font-semibold text-gray-500">الجانب الأيمن</p>
-
-        <ui:toggle name="showCustomerLogin" label="زر دخول العملاء" live />
-
-        @if ($showCustomerLogin)
-            <ui:input name="customerLoginLabel" label="نص زر الدخول" placeholder="دخول العملاء" />
-        @endif
-
-        <ui:separator />
-
-        <p class="text-xs font-semibold text-gray-500">المشاركة</p>
-
-        <ui:input name="shareText" label="نص المشاركة الافتراضي" placeholder="شاهد هذه الصفحة" />
+            @if ($showClientLogin)
+                <ui:input name="clientLoginLabel"  placeholder="دخول العملاء" />
+            @endif
+        </div>
+       
+  
     </div>
 
     <x-slot:footer>
@@ -50,22 +35,18 @@ new class extends \Livewire\Component
 {
     use EditsBlock;
 
-    public bool $showShare = true;
+    public bool $showShareButton = true;
 
     public bool $showThemeToggle = true;
 
     public bool $showLanguageSwitcher = true;
-
-    public string $languageLabel = 'English';
-
+ 
     public bool $showBackButton = true;
 
-    public bool $showCustomerLogin = true;
+    public bool $showClientLogin = true;
 
-    public string $customerLoginLabel = 'دخول العملاء';
-
-    public string $shareText = 'شاهد هذه الصفحة';
-
+    public string $clientLoginLabel = 'دخول العملاء';
+ 
     protected function blockType(): string
     {
         return 'top-nav';
@@ -77,14 +58,12 @@ new class extends \Livewire\Component
 
         $data = $this->block()->data ?? [];
 
-        $this->showShare = (bool) ($data['show_share'] ?? true);
+        $this->showShareButton = (bool) ($data['show_share_button'] ?? true);
         $this->showThemeToggle = (bool) ($data['show_theme_toggle'] ?? true);
         $this->showLanguageSwitcher = (bool) ($data['show_language_switcher'] ?? true);
-        $this->languageLabel = (string) ($data['language_label'] ?? 'English');
         $this->showBackButton = (bool) ($data['show_back_button'] ?? true);
-        $this->showCustomerLogin = (bool) ($data['show_customer_login'] ?? true);
-        $this->customerLoginLabel = (string) ($data['customer_login_label'] ?? 'دخول العملاء');
-        $this->shareText = (string) ($data['share_text'] ?? 'شاهد هذه الصفحة');
+        $this->showClientLogin = (bool) ($data['show_client_login'] ?? true);
+        $this->clientLoginLabel = (string) ($data['client_login_label'] ?? 'دخول العملاء');
     }
 
     /**
@@ -93,9 +72,7 @@ new class extends \Livewire\Component
     protected function rules(): array
     {
         return [
-            'languageLabel' => 'required_if:showLanguageSwitcher,true|nullable|string|max:50',
-            'customerLoginLabel' => 'required_if:showCustomerLogin,true|nullable|string|max:100',
-            'shareText' => 'nullable|string|max:255',
+            'clientLoginLabel' => 'required_if:showClientLogin,true|nullable|string|max:100',
         ];
     }
 
@@ -104,14 +81,12 @@ new class extends \Livewire\Component
         $this->validate();
 
         $this->saveData([
-            'show_share' => $this->showShare,
+            'show_share_button' => $this->showShareButton,
             'show_theme_toggle' => $this->showThemeToggle,
             'show_language_switcher' => $this->showLanguageSwitcher,
-            'language_label' => $this->languageLabel,
             'show_back_button' => $this->showBackButton,
-            'show_customer_login' => $this->showCustomerLogin,
-            'customer_login_label' => $this->customerLoginLabel,
-            'share_text' => $this->shareText,
+            'show_client_login' => $this->showClientLogin,
+            'client_login_label' => $this->clientLoginLabel,
         ]);
     }
 }; ?>
