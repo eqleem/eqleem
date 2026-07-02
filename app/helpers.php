@@ -102,3 +102,12 @@ if (! function_exists('loadingIcon')) {
         </div>';
     }
 }
+
+if (! function_exists('tenantView')) {
+    function tenantView($view, $data = [])
+    {
+        return view()
+            ->first(['tenant-theme::'.$view, 'default-tenant-theme::'.$view, $view], $data)
+            ->layout('layouts.tenant');
+    }
+}

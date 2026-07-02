@@ -27,7 +27,7 @@
         </style>
         @livewireStyles
     </head>
-    <body class="antialiased bg-stone-100">
+    <body class="">
         {{ $slot }}
 
         @stack('scripts')

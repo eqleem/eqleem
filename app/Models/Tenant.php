@@ -58,4 +58,5 @@ class Tenant extends Model
 
         return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$this->uuid;
     }
+ 
 }
