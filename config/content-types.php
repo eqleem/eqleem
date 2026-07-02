@@ -92,6 +92,7 @@ return [
     'forms' => [
         'order' => 9,
         'slug' => 'forms',
+        'model_type' => 'form',
         'name' => 'النماذج',
         'description' => 'إنشاء وإدارة نماذج التواصل وجمع البيانات.',
         'icon' => 'assets/icons/stationery/005-clipboard.svg',

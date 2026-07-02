@@ -234,7 +234,14 @@ class CtaLink
 
     public static function isForm(Content $link): bool
     {
-        return ($link->data['link_type'] ?? '') === 'form';
+        $data = $link->data ?? [];
+        $linkType = $data['link_type'] ?? '';
+
+        if ($linkType === 'form') {
+            return true;
+        }
+
+        return $linkType === 'item' && ($data['content_type'] ?? '') === 'forms';
     }
 
     public static function formContentId(Content $link): ?int
@@ -287,6 +294,13 @@ class CtaLink
         ];
     }
 
+    public static function modelType(string $contentTypeSlug): string
+    {
+        $modelType = config("content-types.{$contentTypeSlug}.model_type");
+
+        return is_string($modelType) && filled($modelType) ? $modelType : $contentTypeSlug;
+    }
+
     /**
      * @return Collection<int, Content>
      */
@@ -335,7 +349,7 @@ class CtaLink
         }
 
         return Content::query()
-            ->type($type)
+            ->type(self::modelType($type))
             ->where(function ($query) use ($search): void {
                 $query->where('title', 'like', '%'.$search.'%')
                     ->orWhere('slug', 'like', '%'.$search.'%');
@@ -351,7 +365,7 @@ class CtaLink
     protected static function recentByType(string $type, int $limit): Collection
     {
         return Content::query()
-            ->type($type)
+            ->type(self::modelType($type))
             ->orderByDesc('updated_at')
             ->limit($limit)
             ->get(['id', 'title', 'slug', 'type']);

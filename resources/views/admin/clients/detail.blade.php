@@ -55,6 +55,7 @@
                 <x-slot name="nav" class="border-b">
                     <ui:tab.nav name="info" label="{{ __('Personal info') }}"
                         activeClass="border-b-2 !border-blue-800" />
+                    <ui:tab.nav name="orders" label="{{ __('Orders') }}" />
                 </x-slot>
                 <x-slot name="content">
                     <ui:tab.content name="info"
@@ -80,6 +81,9 @@
                             <dd class="mt-2 text-base font-bold text-gray-700">
                                 {{ data_get($client, 'city', '-') }}</dd>
                         </div>
+                    </ui:tab.content>
+                    <ui:tab.content name="orders" class="!p-0 !rounded-none">
+                        <livewire:admin::clients.orders-table :client="$client" lazy />
                     </ui:tab.content>
                 </x-slot>
             </ui:tab.group>

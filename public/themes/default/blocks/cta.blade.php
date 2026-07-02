@@ -30,15 +30,15 @@
     @endif
 
     @foreach($ctaLinks as $link)
-        @if($link['isForm'])
+        @if($link['isForm'] && filled($link['formContentId']))
             <x-tenant-theme::modal wire:key="cta-form-modal-{{ $link['id'] }}" name="cta-form-{{ $link['id'] }}" maxWidth="md">
                 <x-slot:title>{{ $link['label'] }}</x-slot:title>
 
-                <div class="space-y-4 text-right">
-                    <p class="text-sm leading-relaxed text-stone-600">
-                        {{ $link['formDescription'] }}
-                    </p>
-                </div>
+                <livewire:tenant.forms.submit
+                    :form-content-id="$link['formContentId']"
+                    :block-id="$block?->id"
+                    :key="'cta-form-submit-'.$link['id']"
+                />
 
                 <x-slot:footer>
                     <button type="button" x-on:click="$dispatch('close-modal', { name: 'cta-form-{{ $link['id'] }}' })" class="rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50">

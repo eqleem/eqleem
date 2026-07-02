@@ -130,6 +130,7 @@
                                         </div>
                                         <input
                                             wire:model.live.debounce.300ms="contentSearch"
+                                            wire:focus="showRecentContent"
                                             type="text"
                                             placeholder="ابحث بالاسم..."
                                             class="block w-full rounded-lg py-2 ps-10 text-gray-800 border border-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm @error('contentId') border-red-300 @enderror"
@@ -241,11 +242,26 @@ new class extends \Livewire\Component
         $this->showContentResults = false;
     }
 
+    public function showRecentContent(): void
+    {
+        if (mb_strlen(trim($this->contentSearch)) < 2) {
+            $this->showContentResults = true;
+        }
+    }
+
     public function updatedContentSearch(): void
     {
         $this->contentId = null;
         $this->selectedContentTitle = '';
-        $this->showContentResults = mb_strlen(trim($this->contentSearch)) >= 2;
+
+        $searchLength = mb_strlen(trim($this->contentSearch));
+
+        $this->showContentResults = match (true) {
+            $searchLength >= 2 => true,
+            $searchLength === 0 => $this->showContentResults,
+            default => false,
+        };
+
         $this->resetErrorBag('contentId');
     }
 
@@ -254,7 +270,7 @@ new class extends \Livewire\Component
         $this->contentId = null;
         $this->contentSearch = '';
         $this->selectedContentTitle = '';
-        $this->showContentResults = false;
+        $this->showContentResults = $this->needsContentPicker();
         $this->resetErrorBag('contentId');
     }
 
@@ -481,7 +497,7 @@ new class extends \Livewire\Component
         if (str_starts_with($this->linkType, 'item:')) {
             $contentType = Str::after($this->linkType, 'item:');
 
-            return Content::query()->type($contentType)->whereKey($id)->first();
+            return Content::query()->type(CtaLink::modelType($contentType))->whereKey($id)->first();
         }
 
         return null;
@@ -500,7 +516,9 @@ new class extends \Livewire\Component
                 ->orderBy('sort_order')
                 ->get(),
             'contentResults' => $this->needsContentPicker() && $this->showContentResults
-                ? CtaLink::searchContents($this->linkType, $this->contentSearch)
+                ? (mb_strlen(trim($this->contentSearch)) >= 2
+                    ? CtaLink::searchContents($this->linkType, $this->contentSearch)
+                    : CtaLink::recentContents($this->linkType))
                 : collect(),
         ];
     }

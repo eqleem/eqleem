@@ -23,6 +23,7 @@
     'infoDir' => null,
     'copyable' => false,
     'goto' => false,
+    'live' => false,
 ])
 
 @php $iconTrailing = $attributes->get('icon:trailing'); @endphp
@@ -36,7 +37,13 @@
         @endif
 
         <input id="{{ $name }}" type="{{ $type }}"
-            @if ($name) wire:model="{{ $name }}" @endif
+            @if ($name)
+                @if ($live)
+                    wire:model.live="{{ $name }}"
+                @else
+                    wire:model="{{ $name }}"
+                @endif
+            @endif
             {{ $disabled ? 'disabled="disabled"' : '' }} 
     
             placeholder="{{ $placeholder }}"
