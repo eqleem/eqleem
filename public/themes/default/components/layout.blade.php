@@ -3,7 +3,7 @@
     'width' => 'max-w-5xl',
 ])
 
-<div class="p-2 md:p-px bg-stone-200 min-h-screen [background-image:linear-gradient(rgba(255,255,255,0.2)_2px,transparent_2px),linear-gradient(90deg,rgba(255,255,255,0.3)_2px,transparent_2px)] [background-size:40px_40px]">
+<div class="p-2 md:p-px bg-{{ theme_option('bgColor', 'stone-200') }} min-h-screen [background-image:linear-gradient(rgba(255,255,255,0.2)_2px,transparent_2px),linear-gradient(90deg,rgba(255,255,255,0.3)_2px,transparent_2px)] [background-size:40px_40px]">
     
     <div class="{{ $width }} mx-auto relative">
         @livewire('tenant.blocks.top-nav')

@@ -6,6 +6,22 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
+if (! function_exists('theme_option')) {
+    /**
+     * @return array<string, mixed>|mixed
+     */
+    function theme_option(?string $key = null, mixed $default = null): mixed
+    {
+        $options = Context::get('theme_options', []);
+
+        if ($key === null) {
+            return is_array($options) ? $options : [];
+        }
+
+        return data_get($options, $key, $default);
+    }
+}
+
 if (! function_exists('setCurrentTenant')) {
     function setCurrentTenant(Tenant $tenant): void
     {

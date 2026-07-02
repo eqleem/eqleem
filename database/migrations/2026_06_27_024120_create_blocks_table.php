@@ -28,6 +28,9 @@ return new class extends Migration
                 ->constrained('blocks')
                 ->cascadeOnDelete();
 
+            $table->foreignId('theme_id')
+                ->nullable()->index();
+
             $table->string('title')->nullable();
 
             $table->string('slug')->nullable();
@@ -53,6 +56,7 @@ return new class extends Migration
 
             $table->index('tenant_id');
             $table->index('parent_id');
+            $table->index('theme_id');
             $table->index('position');
             $table->index('type');
             $table->index('status');

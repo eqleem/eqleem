@@ -2,15 +2,66 @@
 
 namespace App\Livewire\Tenant\Blocks;
 
-use App\Livewire\Concerns\RendersBlock;
+use App\Livewire\Concerns\ResolvesTenantBlockView;
+use App\Models\Block;
+use App\Models\Content;
+use App\Support\BusinessDocuments;
+use App\Support\CtaLink;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class Footer extends Component
 {
-    use RendersBlock;
+    use ResolvesTenantBlockView;
 
     protected function blockType(): string
     {
         return 'footer';
+    }
+
+    public function render(): View
+    {
+        $block = $this->resolveSingletonBlock();
+        $blockData = $block?->data ?? [];
+
+        return $this->renderTenantBlockView($block, [
+            'showDocumentsWarranties' => BusinessDocuments::showsDocumentsWarranties($blockData),
+            'businessDocuments' => BusinessDocuments::visibleForBlockData($blockData),
+            'footerLinks' => $this->preparedLinks($this->footerLinks($block)),
+        ]);
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
+    protected function footerLinks(?Block $block): Collection
+    {
+        if (! $block) {
+            return collect();
+        }
+
+        return Content::query()
+            ->where('block_id', $block->id)
+            ->type('footer-link')
+            ->where('active', true)
+            ->orderBy('sort_order')
+            ->get();
+    }
+
+    /**
+     * @param  Collection<int, Content>  $footerLinks
+     * @return Collection<int, array{id: int, label: string, url: ?string, opensInNewTab: bool}>
+     */
+    protected function preparedLinks(Collection $footerLinks): Collection
+    {
+        return $footerLinks->map(function (Content $link): array {
+            return [
+                'id' => $link->id,
+                'label' => CtaLink::label($link),
+                'url' => CtaLink::url($link),
+                'opensInNewTab' => CtaLink::opensInNewTab($link),
+            ];
+        });
     }
 }

@@ -204,9 +204,23 @@
                     </div>
 
                     <div x-cloak x-show="activeTab === 'customize'">
-                        <div class="rounded-xl border border-dashed border-stone-200 bg-stone-50/50 px-4 py-10 text-center text-sm text-stone-500">
-                            سيتم تعديلها لاحقاً ..
-                        </div>
+                        @if (count($themeOptionsSchema) > 0)
+                            <ui:form wire:submit="saveThemeOptions" class="!p-0">
+                                <div class="space-y-2">
+                                    @foreach ($themeOptionsSchema as $key => $field)
+                                        @include('admin.components.theme-option-field', [
+                                            'key' => $key,
+                                            'field' => $field,
+                                            'value' => $themeOptions[$key] ?? ($field['default'] ?? ''),
+                                        ])
+                                    @endforeach
+                                </div>
+
+                                <x-slot:footer>
+                                    <ui:button target="saveThemeOptions" label="{{ __('Save') }}" />
+                                </x-slot>
+                            </ui:form>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -218,15 +232,27 @@
 
 use App\Models\Theme;
 use Illuminate\Support\Collection;
+use Livewire\WithFileUploads;
 
 new class extends \Livewire\Component
 {
+    use WithFileUploads;
+
     /** @var array<string, mixed> */
     public array $tab = [];
 
     public ?int $selectedThemeId = null;
 
     public ?int $tenantThemeId = null;
+
+    /** @var array<string, array<string, mixed>> */
+    public array $themeOptionsSchema = [];
+
+    /** @var array<string, mixed> */
+    public array $themeOptions = [];
+
+    /** @var array<string, mixed> */
+    public array $themeOptionUploads = [];
 
     public function mount(): void
     {
@@ -241,6 +267,8 @@ new class extends \Livewire\Component
             ->value('id');
 
         $this->selectedThemeId = $this->tenantThemeId ?? $firstThemeId;
+
+        $this->loadThemeOptions();
     }
 
     public function selectTheme(int $themeId): void
@@ -256,6 +284,93 @@ new class extends \Livewire\Component
         }
 
         $this->selectedThemeId = $themeId;
+        $this->loadThemeOptions();
+    }
+
+    public function saveThemeOptions(): void
+    {
+        $tenant = currentTenant();
+
+        if (! $tenant || $this->themeOptionsSchema === []) {
+            return;
+        }
+
+        $rules = [];
+
+        foreach ($this->themeOptionsSchema as $key => $field) {
+            if (($field['type'] ?? null) !== 'upload-single-image') {
+                continue;
+            }
+
+            if (! isset($this->themeOptionUploads[$key])) {
+                continue;
+            }
+
+            $rules['themeOptionUploads.'.$key] = ['nullable', 'image', 'max:15024'];
+        }
+
+        if ($rules !== []) {
+            $this->validate($rules);
+        }
+
+        foreach ($this->themeOptionsSchema as $key => $field) {
+            if (($field['type'] ?? null) !== 'upload-single-image') {
+                continue;
+            }
+
+            if (! isset($this->themeOptionUploads[$key])) {
+                continue;
+            }
+
+            $this->themeOptions[$key] = $this->themeOptionUploads[$key]
+                ->storePublicly('tenant-media/'.$tenant->uuid.'/theme', 'spaces');
+
+            unset($this->themeOptionUploads[$key]);
+        }
+
+        $tenant->saveThemeSettingsFor($this->selectedThemeId, $this->themeOptions);
+
+        $this->dispatch('notify', text: __('Settings updated successfully.'));
+    }
+
+    protected function loadThemeOptions(): void
+    {
+        $this->themeOptionsSchema = [];
+        $this->themeOptions = [];
+        $this->themeOptionUploads = [];
+
+        if (! $this->selectedThemeId) {
+            return;
+        }
+
+        $theme = Theme::query()
+            ->where('id', $this->selectedThemeId)
+            ->where('active', true)
+            ->where('public', true)
+            ->first(['slug']);
+
+        if (! $theme) {
+            return;
+        }
+
+        $optionsPath = public_path('themes/'.$theme->slug.'/options.json');
+
+        if (! is_file($optionsPath)) {
+            return;
+        }
+
+        $schema = json_decode((string) file_get_contents($optionsPath), true);
+
+        if (! is_array($schema)) {
+            return;
+        }
+
+        $this->themeOptionsSchema = $schema;
+        $saved = currentTenant()?->themeSettingsFor($this->selectedThemeId) ?? [];
+
+        foreach ($schema as $key => $field) {
+            $this->themeOptions[$key] = data_get($saved, $key, $field['default'] ?? '');
+        }
     }
 
     public function setDefaultTheme(): void
@@ -278,6 +393,7 @@ new class extends \Livewire\Component
 
         $tenant->update(['theme_id' => $this->selectedThemeId]);
         $this->tenantThemeId = $this->selectedThemeId;
+        $this->loadThemeOptions();
 
         $this->dispatch('notify', text: 'تم تعيين القالب الافتراضي بنجاح.');
     }
@@ -337,6 +453,8 @@ new class extends \Livewire\Component
         return $this->view([
             'themes' => $themes,
             'selectedTheme' => $themes->firstWhere('id', $this->selectedThemeId),
+            'themeOptionsSchema' => $this->themeOptionsSchema,
+            'themeOptions' => $this->themeOptions,
         ]);
     }
 }; ?>

@@ -4,8 +4,8 @@ return [
     'general-info' => [
         'order' => 1,
         'slug' => 'general-info',
-        'name' => 'معلومات المشروع',
-        'description' => 'بيانات الصفحة الأساسية',
+        'name' => 'معلومات النشاط',
+        'description' => 'بيانات النشاط التجاري',
         'icon' => 'assets/icons/stationery/011-id-card.svg',
         'components' => [
             'index' => 'admin::settings.info.general-info',

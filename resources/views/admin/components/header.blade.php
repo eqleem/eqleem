@@ -9,7 +9,8 @@
                 @else
                     <img src="{{ asset('assets/images/t-logo.png') }}" alt="" class="h-8 rounded-sm ms-1">
                 @endif
-                {{ tenant('name') }}
+ 
+                <span class="hidden md:block">{{ tenant('name') }}</span>
             </a>
 
             <a href="{{ route('admin.plan.home') }}" wire:navigate
@@ -32,11 +33,11 @@
                 </svg>
             </a>
 
-            {{-- <a href="{{ route('admin.settings.home') }}" wire:navigate title="{{ __('Settings') }}"
-                class="@if(request()->routeIs('admin.settings.home')) bg-black/30 hover:bg-black/30 @endif hover:bg-black/30 rounded-full text-white p-1 px-2 text-sm flex items-center gap-x-2">
+            <a href="{{ route('admin.settings.home') }}" wire:navigate title="{{ __('Settings') }}"
+                class="@if(request()->routeIs('admin.settings.home')) bg-black/30 hover:bg-black/30 @endif hover:bg-black/30  rounded-full text-white p-1 px-2 text-sm flex items-center gap-x-2 md:hidden">
                 <ui:icon name="settings" class="w-5 h-5" />
                 <span class="hidden lg:block">{{ __('Settings') }}</span>
-            </a> --}}
+            </a>
 
             <div class="" x-data="{ dropdownMenu: false }">
                 <div class="relative" @click.outside="dropdownMenu=false">

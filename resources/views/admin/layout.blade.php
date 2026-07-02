@@ -14,6 +14,12 @@
  
         <script>
             let config = { ...@js(config('twind')), ...customTwindconf };
+            // config.theme = config.theme || {};
+            // config.theme.extend = config.theme.extend || {};
+            // config.theme.extend.colors = {
+            //     ...(config.theme.extend.colors || {}),
+            //     primary: @js($themePrimaryPalette ?? config('twind.theme.extend.colors.primary')),
+            // };
             twind.install(config);
         </script>
 
@@ -36,7 +42,7 @@
         <x-admin::header />
         <x-admin::navbar />
 
-        <main class="min-h-[80vh]">    
+        <main class="min-h-[90vh]">    
             {{ $slot }}
         </main>
 

@@ -78,4 +78,59 @@ return [
             'detail' => 'admin::page.content.unit-rental.detail',
         ],
     ],
+    'pages' => [
+        'order' => 8,
+        'slug' => 'pages',
+        'name' => 'الصفحات',
+        'description' => 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.',
+        'icon' => 'assets/icons/ecommerce/031-content.svg',
+        'components' => [
+            'index' => 'admin::page.content.pages.index',
+            'detail' => 'admin::page.content.pages.detail',
+        ],
+    ],
+    'forms' => [
+        'order' => 9,
+        'slug' => 'forms',
+        'name' => 'النماذج',
+        'description' => 'إنشاء وإدارة نماذج التواصل وجمع البيانات.',
+        'icon' => 'assets/icons/stationery/005-clipboard.svg',
+        'components' => [
+            'index' => 'admin::page.content.forms.index',
+            'detail' => 'admin::page.content.forms.detail',
+        ],
+    ],
+    'cv' => [
+        'order' => 10,
+        'slug' => 'cv',
+        'name' => 'السيرة الذاتية',
+        'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
+        'icon' => 'assets/icons/tabler/file-cv.svg',
+        'components' => [
+            'index' => 'admin::page.content.cv.index',
+            'detail' => 'admin::page.content.cv.detail',
+        ],
+    ],
+    'digital-products' => [
+        'order' => 11,
+        'slug' => 'digital-products',
+        'name' => 'المنتجات الرقمية',
+        'description' => 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
+        'icon' => 'assets/icons/tabler/file-download.svg',
+        'components' => [
+            'index' => 'admin::page.content.digital-products.index',
+            'detail' => 'admin::page.content.digital-products.detail',
+        ],
+    ],
+    'courses' => [
+        'order' => 12,
+        'slug' => 'courses',
+        'name' => 'الدورات التدريبية',
+        'description' => 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.',
+        'icon' => 'assets/icons/tabler/school-bell.svg',
+        'components' => [
+            'index' => 'admin::page.content.courses.index',
+            'detail' => 'admin::page.content.courses.detail',
+        ],
+    ],
 ];

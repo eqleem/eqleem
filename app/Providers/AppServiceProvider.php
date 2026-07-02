@@ -8,6 +8,7 @@ use App\Http\Middleware\SetTenantTheme;
 use App\Support\BlockTypeRegistry;
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
+use App\Support\TenantThemeOptions;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -21,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(BlockTypeRegistry::class);
         $this->app->singleton(ContentTypeRegistry::class);
         $this->app->singleton(PageTabRegistry::class);
+        $this->app->singleton(TenantThemeOptions::class);
     }
 
     /**

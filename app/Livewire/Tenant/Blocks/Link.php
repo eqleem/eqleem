@@ -3,11 +3,11 @@
 namespace App\Livewire\Tenant\Blocks;
 
 use App\Livewire\Concerns\ResolvesTenantBlockView;
-use App\Support\BlockLinkCard;
+use App\Support\SimpleLinkBlock;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-class BlockLink extends Component
+class Link extends Component
 {
     use ResolvesTenantBlockView;
 
@@ -15,13 +15,13 @@ class BlockLink extends Component
 
     protected function blockType(): string
     {
-        return 'block-link';
+        return 'link';
     }
 
     public function render(): View
     {
         $block = $this->resolvePageBlock($this->blockId);
-        $card = BlockLinkCard::fromBlock($block);
+        $card = SimpleLinkBlock::card($block);
 
         if (! $card) {
             return $this->renderEmptyBlockView();

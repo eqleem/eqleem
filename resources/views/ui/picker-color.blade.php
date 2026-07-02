@@ -20,10 +20,10 @@
                 @foreach ($options as $item)
                     <div>
                         <input x-model="model" name="color" type="radio" value="{{ $item }}"
-                            id="pick-{{ $item }}" class="peer hidden  "
+                            id="pick-{{ $name }}-{{ $item }}" class="peer hidden  "
                             @if ($value == $item) checked @endif />
 
-                        <label for="pick-{{ $item }}"
+                        <label for="pick-{{ $name }}-{{ $item }}"
                             class="p-0.5 rounded-lg hover:bg-black/10 peer-checked:border-black block border-2 border-transparent cursor-pointer"
                             title="{{ __(ucfirst($item)) }}">
                             <div class="w-7 h-7 rounded-md bg-{{ $item }}-500 bg-black/10"></div>

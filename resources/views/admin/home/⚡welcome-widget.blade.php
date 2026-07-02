@@ -1,5 +1,5 @@
 <div
-    class="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white shadow-lg"
+    class="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white"
     x-data="{
         shareUrl: @js($pageUrl),
         shareText: @js($shareText),

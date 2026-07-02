@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
@@ -44,6 +45,37 @@ class Tenant extends Model implements HasMedia
     public function theme(): BelongsTo
     {
         return $this->belongsTo(Theme::class);
+    }
+
+    public function themes(): MorphToMany
+    {
+        return $this->morphedByMany(Theme::class, 'tenantable')
+            ->using(Tenantable::class)
+            ->withPivot(['active', 'meta'])
+            ->withTimestamps();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function themeSettingsFor(int $themeId): array
+    {
+        $meta = $this->themes()->where('themes.id', $themeId)->first()?->pivot?->meta;
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public function saveThemeSettingsFor(int $themeId, array $options): void
+    {
+        $this->themes()->syncWithoutDetaching([
+            $themeId => [
+                'meta' => $options,
+                'active' => true,
+            ],
+        ]);
     }
 
     public function registerMediaCollections(): void

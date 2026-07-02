@@ -13,6 +13,12 @@
  
         <script>
             let config = { ...@js(config('twind')), ...customTwindconf };
+            config.theme = config.theme || {};
+            config.theme.extend = config.theme.extend || {};
+            config.theme.extend.colors = {
+                ...(config.theme.extend.colors || {}),
+                primary: @js($themePrimaryPalette ?? config('twind.theme.extend.colors.primary')),
+            };
             twind.install(config);
         </script>
         
