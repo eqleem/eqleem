@@ -26,7 +26,7 @@
 
                         <div class="overflow-hidden rounded-t-[10px] bg-stone-100">
                             <img
-                                src="{{ $theme['preview_url'] }}"
+                                src="{{ $theme['image_path'] }}"
                                 alt="{{ $theme['name'] }}"
                                 class="aspect-[2/2] w-full object-coverx object-top transition duration-300 group-hover:scale-[1.02]"
                                 loading="lazy"
@@ -309,7 +309,8 @@ new class extends \Livewire\Component
             'name' => $theme->name,
             'slug' => $theme->slug,
             'label_ar' => data_get($theme->meta, 'label_ar', $theme->name),
-            'preview_url' => asset($preview),
+            'image_path' => $theme->image_path,
+            'preview_url' => $theme->image_path,
             'gallery' => collect($gallery)->map(fn (string $path): string => asset($path))->all(),
             'type' => $theme->type,
             'app' => $theme->app,

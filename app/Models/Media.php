@@ -4,14 +4,13 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use App\Traits\BelongsToUser;
-use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Media extends BaseMedia
 {
-    use BelongsToTenant, BelongsToUser, HasUuid;
+    use BelongsToTenant, BelongsToUser;
 
     protected $fillable = ['tenant_id', 'user_id', 'uuid'];
 

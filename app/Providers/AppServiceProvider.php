@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\ResolveTenantFromPath;
+use App\Http\Middleware\SetTenantTheme;
 use App\Support\BlockTypeRegistry;
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
@@ -28,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Livewire::addPersistentMiddleware([
             AdminMiddleware::class,
+            ResolveTenantFromPath::class,
+            SetTenantTheme::class,
         ]);
     }
 }

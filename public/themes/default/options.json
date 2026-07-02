@@ -1,0 +1,58 @@
+{
+    "primaryColor": {
+        "type": "picker-color",
+        "label": "لون القالب",
+        "options": [
+            "blue",
+            "cyan",
+            "green",
+            "teal",
+            "sky",
+            "purple",
+            "violet",
+            "indigo",
+            "red",
+            "pink",
+            "fuchsia",
+            "orange",
+            "amber",
+            "yellow",
+            "zinc",
+            "emerald",
+            "lime",
+            "rose",
+            "gray"
+        ],
+        "default": "blue"
+    },
+    "bgColor": {
+        "type": "tailwindcss-colorpicker-light",
+        "label": "Background color",
+        "default": "gray-300"
+    },
+    "headerImage": {
+        "type": "upload-single-image",
+        "label": "صورة الهيدر",
+        "info": "إذا كنت ترغب بإظهار صورة في أعلى الموقع.",
+        "default": ""
+    },
+    "logoRadius": {
+        "type": "radio",
+        "label": "شكل انحناء الشعار",
+        "info": "قم باختيار طريقة عرض  حواف الشعار.",
+        "options": [
+            "rounded-full",
+            "rounded-2xl",
+            "rounded-lg",
+            "rounded-md",
+            "rounded-none"
+        ],
+        "default": "full"
+    },
+    "homeApp": {
+        "type": "select-entry-app",
+        "label": "الصفحة الرئيسية",
+        "info": "اختر التطبيق الذي تريد عرضه في الصفحة الرئيسية",
+        "default": "0"
+    }
+}

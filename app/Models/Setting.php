@@ -83,4 +83,27 @@ class Setting extends Model
             ->get()
             ->keyBy(fn (self $setting) => str($setting->slug)->after($group.'.')->toString());
     }
+
+    public const BLOG_SETTINGS_SLUG = 'blog-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function blogSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'المدونة',
+            'section_description' => 'مقالات وتدوينات متخصصة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function blogSettings(): array
+    {
+        $saved = static::forSlug(static::BLOG_SETTINGS_SLUG);
+
+        return array_merge(static::blogSettingsDefaults(), $saved?->settings ?? []);
+    }
 }

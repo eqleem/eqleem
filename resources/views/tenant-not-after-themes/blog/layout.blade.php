@@ -1,6 +1,6 @@
 @php($blogSettings = \App\Models\Setting::blogSettings())
 
-<x-tenant-theme::module-layout
+<x-tenant::module-layout
     icon="hugeicons:book-open-text"
     :title="$blogSettings['section_title']"
     :desc="$blogSettings['section_description']"
@@ -8,4 +8,4 @@
     backLinkText="العودة للمدونة"
 >
     {{ $slot }}
-</x-tenant-theme::module-layout>
+</x-tenant::module-layout>

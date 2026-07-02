@@ -308,6 +308,24 @@ class CtaLink
     /**
      * @return Collection<int, Content>
      */
+    public static function recentContents(string $linkTypeKey, int $limit = 5): Collection
+    {
+        $parsed = self::parseTypeKey($linkTypeKey);
+
+        if ($parsed['link_type'] === 'form') {
+            return self::recentByType('form', $limit);
+        }
+
+        if ($parsed['link_type'] === 'item' && filled($parsed['content_type'])) {
+            return self::recentByType($parsed['content_type'], $limit);
+        }
+
+        return collect();
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
     protected static function searchByType(string $type, string $search, int $limit): Collection
     {
         $search = trim($search);
@@ -322,6 +340,18 @@ class CtaLink
                 $query->where('title', 'like', '%'.$search.'%')
                     ->orWhere('slug', 'like', '%'.$search.'%');
             })
+            ->orderByDesc('updated_at')
+            ->limit($limit)
+            ->get(['id', 'title', 'slug', 'type']);
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
+    protected static function recentByType(string $type, int $limit): Collection
+    {
+        return Content::query()
+            ->type($type)
             ->orderByDesc('updated_at')
             ->limit($limit)
             ->get(['id', 'title', 'slug', 'type']);

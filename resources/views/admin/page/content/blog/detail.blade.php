@@ -53,6 +53,14 @@
                 info="عنوان فرعي يظهر تحت العنوان الرئيسي في الصفحة الرئيسية وعند عرض التدوينات."
             />
 
+            <ui:file name="image" label="الصورة الرئيسية" upload-label="رفع الصورة">
+                @if ($image)
+                    <img src="{{ $image->temporaryUrl() }}" class="w-full max-w-sm rounded-xl mb-2 object-cover" alt="">
+                @elseif ($currentImage)
+                    <img src="{{ $currentImage }}" class="w-full max-w-sm rounded-xl mb-2 object-cover" alt="">
+                @endif
+            </ui:file>
+
             <ui:ck
                 name="body"
                 :value="$body"
@@ -62,11 +70,12 @@
         </div>
 
         <div x-cloak x-show="formTab === 'advanced'" class="space-y-2">
-            <ui:select
-                name="categoryId"
+            <ui:checkbox-select
+                name="categoryIds"
                 label="القسم"
                 :options="$categories"
-                placeholder=""
+                :selected="$categoryIds"
+                placeholder="اختر الأقسام"
             />
 
             <ui:input
@@ -75,14 +84,6 @@
                 dir="ltr"
                 :prefix="$slugPrefix"
             />
-
-            <ui:file name="image" label="الصورة الرئيسية" upload-label="رفع الصورة">
-                @if ($image)
-                    <img src="{{ $image->temporaryUrl() }}" class="w-32 rounded-lg mb-2" alt="">
-                @elseif ($currentImage)
-                    <img src="{{ $currentImage }}" class="w-32 rounded-lg mb-2" alt="">
-                @endif
-            </ui:file>
 
             <ui:toggle name="published" label="حالة النشر" live />
         </div>
@@ -100,8 +101,8 @@
 
 use App\Models\Content;
 use App\Models\Taxonomy;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -124,7 +125,8 @@ new class extends \Livewire\Component
 
     public string $slug = '';
 
-    public string $categoryId = '';
+    /** @var array<int, string> */
+    public array $categoryIds = [];
 
     public bool $published = false;
 
@@ -141,9 +143,14 @@ new class extends \Livewire\Component
         $this->body = (string) data_get($content->data, 'body', '');
         $this->editorMode = (string) data_get($content->data, 'editor_mode', 'html');
         $this->slug = $content->slug;
-        $this->categoryId = (string) data_get($content->data, 'category_id', '');
+        $content->migrateLegacyBlogCategoriesIfNeeded();
+        $this->categoryIds = $content->taxonomiesOfType('blog_category')
+            ->pluck('id')
+            ->map(fn (mixed $id): string => (string) $id)
+            ->values()
+            ->all();
         $this->published = $content->status === 'published';
-        $this->currentImage = $this->resolveImageUrl(data_get($content->data, 'image'));
+        $this->currentImage = contentImageUrl(data_get($content->data, 'image'));
     }
 
     public function content(): Content
@@ -155,16 +162,24 @@ new class extends \Livewire\Component
     }
 
     /**
-     * @return array<string, string>
+     * @return array<int, array{id: string, label: string, selectable: bool}>
      */
     public function categories(): array
     {
-        $items = Taxonomy::query()
+        $parentIds = Taxonomy::query()
             ->type('blog_category')
-            ->orderBy('name')
-            ->pluck('name', 'id');
+            ->whereNotNull('parent_id')
+            ->pluck('parent_id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->flip();
 
-        return ['' => 'اختر القسم ('.$items->count().')'] + $items->all();
+        return Taxonomy::flatTree('blog_category')
+            ->map(fn (Taxonomy $item): array => [
+                'id' => (string) $item->id,
+                'label' => str_repeat('— ', (int) ($item->depth ?? 0)).$item->name,
+                'selectable' => ! $parentIds->has((int) $item->id),
+            ])
+            ->all();
     }
 
     public function slugPrefix(): string
@@ -185,7 +200,16 @@ new class extends \Livewire\Component
             'body' => 'nullable|string',
             'editorMode' => 'required|in:html,markdown',
             'slug' => 'required|string|max:255',
-            'categoryId' => 'nullable',
+            'categoryIds' => 'nullable|array',
+            'categoryIds.*' => [
+                Rule::exists('taxonomies', 'id')->where(function ($query): void {
+                    $query->where('type', 'blog_category');
+
+                    if ($tenantId = currentTenantId()) {
+                        $query->where('tenant_id', $tenantId);
+                    }
+                }),
+            ],
             'published' => 'boolean',
             'image' => 'nullable|image|max:15360',
         ];
@@ -211,13 +235,26 @@ new class extends \Livewire\Component
         $data['subtitle'] = $this->subtitle;
         $data['body'] = $this->body;
         $data['editor_mode'] = $this->editorMode;
-        $data['category_id'] = filled($this->categoryId) ? $this->categoryId : null;
+        $selectableIds = collect($this->categories())
+            ->where('selectable', true)
+            ->pluck('id')
+            ->map(fn (mixed $id): string => (string) $id)
+            ->all();
+
+        $categoryIds = collect($this->categoryIds)
+            ->map(fn (mixed $id): string => (string) $id)
+            ->intersect($selectableIds)
+            ->map(fn (string $id): int => (int) $id)
+            ->values()
+            ->all();
+
+        unset($data['category_ids'], $data['category_id']);
 
         if ($this->image instanceof TemporaryUploadedFile) {
             $tenantUuid = tenant('uuid') ?? 'shared';
             $path = $this->image->storePublicly('tenant-media/'.$tenantUuid.'/blog', 'spaces');
             $data['image'] = $path;
-            $this->currentImage = $this->resolveImageUrl($path);
+            $this->currentImage = contentImageUrl($path);
             $this->image = null;
         }
 
@@ -237,6 +274,8 @@ new class extends \Livewire\Component
                 ? ($content->published_at ?? now())
                 : null,
         ]);
+
+        $content->syncTaxonomiesOfType('blog_category', $categoryIds);
 
         $this->slug = $slug;
         $this->dispatch('updateBlogPostList');
@@ -267,19 +306,6 @@ new class extends \Livewire\Component
         }
 
         return $slug;
-    }
-
-    private function resolveImageUrl(?string $path): ?string
-    {
-        if (! filled($path)) {
-            return null;
-        }
-
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
-
-        return Storage::disk('spaces')->url($path);
     }
 
     public function render()

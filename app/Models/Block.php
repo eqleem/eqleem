@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property int $id
@@ -45,9 +47,9 @@ use Illuminate\Support\Carbon;
     'data',
     'published_at',
 ])]
-class Block extends Model
+class Block extends Model implements HasMedia
 {
-    use BelongsToTenant, HasUuid;
+    use BelongsToTenant, HasUuid, InteractsWithMedia;
 
     /**
      * @return array<string, string>
@@ -60,6 +62,12 @@ class Block extends Model
             'active' => 'boolean',
             'is_default' => 'boolean',
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('editor-images')
+            ->useDisk(config('media-library.disk_name'));
     }
 
     public function parent(): BelongsTo

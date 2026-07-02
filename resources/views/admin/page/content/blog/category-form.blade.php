@@ -1,7 +1,15 @@
 <ui:form wire:submit="submit">
     <ui:input name="name" label="اسم التصنيف" placeholder="مثال: أخبار الشركة" />
 
-    <ui:textarea name="description" label="الوصف" placeholder="وصف مختصر للتصنيف" rows="3" />
+    @if ($categoryId)
+        <ui:input
+            name="slug"
+            label="نص الرابط"
+            dir="ltr"
+            placeholder="مثال: company-news"
+            info="يُستخدم في فلترة التدوينات عبر الرابط."
+        />
+    @endif
 
     <ui:select
         name="parentId"
@@ -31,6 +39,8 @@ new class extends \Livewire\Component
 
     public string $name = '';
 
+    public string $slug = '';
+
     public string $description = '';
 
     public string $parentId = '';
@@ -53,6 +63,7 @@ new class extends \Livewire\Component
             ->findOrFail($this->categoryId);
 
         $this->name = $category->name;
+        $this->slug = $category->slug;
         $this->description = (string) $category->description;
         $this->parentId = (string) ($category->parent_id ?? '');
     }
@@ -94,9 +105,8 @@ new class extends \Livewire\Component
      */
     protected function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required|string|min:1|max:255',
-            'description' => 'nullable|string|max:1000',
             'parentId' => [
                 'nullable',
                 Rule::exists('taxonomies', 'id')->where(function ($query): void {
@@ -108,6 +118,25 @@ new class extends \Livewire\Component
                 }),
             ],
         ];
+
+        if ($this->categoryId) {
+            $rules['slug'] = [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('taxonomies', 'slug')
+                    ->where(function ($query): void {
+                        $query->where('type', 'blog_category');
+
+                        if ($tenantId = currentTenantId()) {
+                            $query->where('tenant_id', $tenantId);
+                        }
+                    })
+                    ->ignore($this->categoryId),
+            ];
+        }
+
+        return $rules;
     }
 
     public function submit(): void
@@ -116,7 +145,6 @@ new class extends \Livewire\Component
 
         $attributes = [
             'name' => $this->name,
-            'description' => filled($this->description) ? $this->description : null,
             'type' => 'blog_category',
             'parent_id' => filled($this->parentId) ? (int) $this->parentId : null,
         ];
@@ -125,6 +153,8 @@ new class extends \Livewire\Component
             $category = Taxonomy::query()
                 ->type('blog_category')
                 ->findOrFail($this->categoryId);
+
+            $attributes['slug'] = $this->slug;
 
             $category->update($attributes);
 
@@ -139,7 +169,7 @@ new class extends \Livewire\Component
 
             Taxonomy::query()->create($attributes);
 
-            $this->reset(['name', 'description', 'parentId']);
+            $this->reset(['name', 'slug', 'parentId']);
 
             $modal = 'add-blog-category';
         }

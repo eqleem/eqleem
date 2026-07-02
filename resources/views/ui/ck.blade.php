@@ -1,6 +1,6 @@
 @props([
     'modelId' => null,
-    'modelType' => 'entry',
+    'modelType' => 'content',
     'class' => null,
     'value' => null,
     'mediaCollection' => 'editor-images',

@@ -4,10 +4,8 @@ namespace App\Models;
 
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-  
+
 #[SoftDeletes]
 class Theme extends Model
 {
@@ -24,5 +22,11 @@ class Theme extends Model
             'public' => 'boolean',
             'sort' => 'integer',
         ];
+    }
+
+    public function getImagePathAttribute(): string
+    {
+        return file_exists(public_path('assets/images/themes/'.$this->slug.'.png')) ? asset('assets/images/themes/'.$this->slug.'.png') :
+            'https://api.dicebear.com/10.x/stripes/svg?seed='.data_get($this, 'slug') ?? config('app.name');
     }
 }

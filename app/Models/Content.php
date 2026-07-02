@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Aliziodev\LaravelTaxonomy\Traits\HasTaxonomy;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[Fillable([
     'tenant_id',
@@ -25,9 +28,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'sort_order',
     'published_at',
 ])]
-class Content extends Model
+class Content extends Model implements HasMedia
 {
-    use BelongsToTenant, HasUuid, SoftDeletes;
+    use BelongsToTenant, HasTaxonomy, HasUuid, InteractsWithMedia, SoftDeletes;
 
     protected function casts(): array
     {
@@ -91,6 +94,35 @@ class Content extends Model
             'published' => 'منشور',
             default => 'مسودة',
         };
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('editor-images')
+            ->useDisk(config('media-library.disk_name'));
+    }
+
+    public function migrateLegacyBlogCategoriesIfNeeded(): void
+    {
+        if ($this->type !== 'blog') {
+            return;
+        }
+
+        if ($this->taxonomies()->where('type', 'blog_category')->exists()) {
+            return;
+        }
+
+        $legacyIds = legacyBlogCategoryIdsFromData($this->data);
+
+        if ($legacyIds === []) {
+            return;
+        }
+
+        $this->syncTaxonomiesOfType('blog_category', $legacyIds);
+
+        $data = $this->data ?? [];
+        unset($data['category_ids'], $data['category_id']);
+        $this->forceFill(['data' => $data])->save();
     }
 
     // public function block(): BelongsTo

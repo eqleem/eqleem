@@ -62,9 +62,13 @@
                         </div>
                         <div class="py-3 w-full">
                             <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
-                                wire:navigate class="flex items-center gap-x-2">
-                                <img class="h-10 w-10 flex-none rounded-full bg-gray-50"
-                                    src="{{ $item->avatar }}" alt="">
+                                wire:navigate class="flex items-center gap-x-3">
+                                @php($imageUrl = contentImageUrl(data_get($item->data, 'image')) ?? $item->avatar)
+                                <img
+                                    class="h-12 w-12 flex-none rounded-xl object-cover bg-gray-100"
+                                    src="{{ $imageUrl }}"
+                                    alt="{{ $item->title }}"
+                                >
                                 <div>
                                     <h2 class="text-sm font-semibold truncate text-gray-700">{{ $item->title }}</h2>
                                     <div class="flex items-center gap-x-2 mt-1">

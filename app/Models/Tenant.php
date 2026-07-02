@@ -11,14 +11,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
 
 #[Fillable(['name', 'handle', 'user_id', 'theme_id', 'active', 'data', 'meta', 'config', 'phone', 'email', 'status', 'role'])]
 #[Hidden(['deleted_at'])]
 #[SoftDeletes]
-class Tenant extends Model
+class Tenant extends Model implements HasMedia
 {
-    use HasUuid;
+    use HasUuid, InteractsWithMedia;
 
     protected function casts(): array
     {
@@ -42,6 +44,13 @@ class Tenant extends Model
     public function theme(): BelongsTo
     {
         return $this->belongsTo(Theme::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('logo')
+            ->singleFile()
+            ->useDisk(config('media-library.disk_name'));
     }
 
     public function getUrlAttribute(): string
