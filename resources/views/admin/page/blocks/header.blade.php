@@ -1,73 +1,145 @@
-<ui:form wire:submit="save" class="!p-4 !rounded-none">
-    <p class="text-xs text-gray-400 mb-4">
-        تخصيص صورة الملف الشخصي والعنوان والروابط الاجتماعية في رأس الصفحة.
-    </p>
+<div x-data="{ socialModal: false }" x-cloak x-on:social-link-saved.window="socialModal = false">
+    <ui:form wire:submit="save" class="!p-4  ">
 
-    <div class="space-y-2">
-        <ui:toggle name="showAvatar" label="عرض الصورة الشخصية" live />
-        <ui:toggle name="showVerifiedBadge" label="شارة التوثيق" />
-        <ui:toggle name="showLocation" label="عرض الموقع" live />
-        <ui:toggle name="useTenantSlogan" label="استخدام شعار الموقع من الإعدادات" live />
-        <ui:toggle name="showSocialLinks" label="عرض روابط التواصل" live />
+        <div class="space-y-2">
+            <ui:toggle name="showAvatar" label="عرض الصورة الشخصية" live />
 
-        @if ($showAvatar)
-            <ui:input name="avatarUrl" label="رابط الصورة" placeholder="https://..." dir="ltr" />
-        @endif
+            @if ($showAvatar)
+                <ui:file name="avatar" label="الصورة الشخصية" uploadLabel="رفع صورة">
+                    @if ($avatar)
+                        <img src="{{ $avatar->temporaryUrl() }}" class="w-20 h-20 rounded-full object-cover mb-1">
+                    @elseif ($currentAvatarPath)
+                        <img src="{{ Storage::url($currentAvatarPath) }}" class="w-20 h-20 rounded-full object-cover mb-1">
+                    @endif
+                </ui:file>
 
-        @if ($showLocation)
-            <ui:input name="location" label="الموقع" placeholder="الرياض، السعودية" />
-        @endif
+                <ui:toggle name="showVerifiedBadge" label="شارة التوثيق" />
+            @endif
 
-        @unless ($useTenantSlogan)
-            <ui:textarea name="slogan" label="الشعار / الوصف" placeholder="وصف قصير يظهر تحت العنوان" />
-        @endunless
+            <ui:textarea name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" maxlength="250" rows="3" />
 
-        @if ($showSocialLinks)
-            <ui:separator />
-            <p class="text-xs font-semibold text-gray-500">روابط التواصل</p>
-            <ui:input name="socialTwitter" label="X (تويتر)" placeholder="https://x.com/..." dir="ltr" />
-            <ui:input name="socialInstagram" label="إنستغرام" placeholder="https://instagram.com/..." dir="ltr" />
-            <ui:input name="socialSnapchat" label="سناب شات" placeholder="https://snapchat.com/..." dir="ltr" />
-            <ui:input name="socialYoutube" label="يوتيوب" placeholder="https://youtube.com/..." dir="ltr" />
-        @endif
+            <ui:input name="country" label="الدولة" placeholder="السعودية" />
+            <ui:input name="city" label="المدينة" placeholder="الرياض" />
+
+             
+
+            <div class="space-y-2">
+                <div class="flex items-center justify-between my-4 border-b border-gray-100 pb-2 border-dotted">
+                    <p class="text-xs font-semibold text-gray-500">روابط التواصل</p>
+                    <ui:button type="button" variant="secondary" icon="square-rounded-plus" label="إضافة رابط" x-on:click="socialModal = true" />
+                </div>
+
+                @if ($socialLinks->isEmpty())
+                    <p class="text-xs text-gray-400 py-2">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
+                @else
+                    <ul
+                        wire:sortable="updateSocialOrder"
+                        wire:sortable.options="{ animation: 150 }"
+                        class="space-y-1.5"
+                    >
+                        @foreach ($socialLinks as $link)
+                            @php $network = $networks[$link->data['network'] ?? ''] ?? null; @endphp
+                            <li
+                                wire:sortable.item="{{ $link->id }}"
+                                wire:key="social-link-{{ $link->id }}"
+                                class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 hover:border-gray-200 transition"
+                            >
+                                <button
+                                    type="button"
+                                    wire:sortable.handle
+                                    class="cursor-grab active:cursor-grabbing rounded-md p-1 text-gray-300 hover:bg-gray-100 hover:text-gray-500 transition"
+                                    aria-label="سحب لإعادة الترتيب"
+                                >
+                                    <ui:icon name="grip-vertical" class="!w-4 !h-4" />
+                                </button>
+
+                                <iconify-icon icon="{{ $network['icon'] ?? 'ri:link' }}" class="text-xl text-gray-500 shrink-0"></iconify-icon>
+
+                                <div class="flex flex-1 flex-col items-center justify-start">
+                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $network['label'] ?? ($link->data['network'] ?? '') }}</span>
+                                    <span class="text-xs text-gray-400 truncate" dir="ltr">{{ $link->data['url'] ?? '' }}</span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    wire:click="deleteSocialLink({{ $link->id }})"
+                                    wire:confirm="هل أنت متأكد من حذف هذا الرابط؟"
+                                    wire:loading.attr="disabled"
+                                    wire:target="deleteSocialLink({{ $link->id }})"
+                                    class="shrink-0 rounded-lg p-1 text-red-400/80 hover:bg-red-50 hover:text-red-500 transition"
+                                    aria-label="حذف الرابط"
+                                >
+                                    <ui:icon name="trash" class="!w-4 !h-4" />
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
+
+        <x-slot:footer>
+            <ui:button type="submit" target="save" label="{{ __('Save') }}" />
+        </x-slot:footer>
+    </ui:form>
+
+    <div
+        x-show="socialModal"
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        x-transition.opacity
+    >
+        <div class="absolute inset-0 bg-gray-800/75" x-on:click="socialModal = false"></div>
+
+        <div class="relative w-full max-w-md rounded-xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-100 p-3 px-4">
+                <p class="text-sm font-semibold text-gray-600">إضافة رابط تواصل</p>
+                <button type="button" x-on:click="socialModal = false" class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200">
+                    <ui:icon name="x" class="!w-4 !h-4" />
+                </button>
+            </div>
+
+            <div class="space-y-3 p-4">
+                <ui:select name="newNetwork" label="الشبكة" :options="$networkOptions" />
+                <ui:input name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" />
+            </div>
+
+            <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4">
+                <ui:button type="button" variant="ghost" label="إلغاء" x-on:click="socialModal = false" />
+                <ui:button type="button" wire:click="addSocialLink" target="addSocialLink" label="إضافة" />
+            </div>
+        </div>
     </div>
-
-    <x-slot:footer>
-        <ui:button type="submit" target="save" label="{{ __('Save') }}" />
-    </x-slot:footer>
-</ui:form>
+</div>
 
 <?php
 
 use App\Livewire\Concerns\EditsBlock;
+use App\Models\Content;
+use Illuminate\Support\Str;
+use Livewire\WithFileUploads;
 
 new class extends \Livewire\Component
 {
-    use EditsBlock;
+    use EditsBlock, WithFileUploads;
 
     public bool $showAvatar = true;
 
-    public string $avatarUrl = '';
+    public $avatar = null;
+
+    public string $currentAvatarPath = '';
 
     public bool $showVerifiedBadge = true;
 
-    public bool $showLocation = true;
+    public string $bio = '';
 
-    public string $location = '';
+    public string $country = '';
 
-    public bool $useTenantSlogan = true;
+    public string $city = '';
 
-    public string $slogan = '';
+    public string $newNetwork = 'twitter';
 
-    public bool $showSocialLinks = true;
-
-    public string $socialTwitter = '';
-
-    public string $socialInstagram = '';
-
-    public string $socialSnapchat = '';
-
-    public string $socialYoutube = '';
+    public string $newUrl = '';
 
     protected function blockType(): string
     {
@@ -81,17 +153,19 @@ new class extends \Livewire\Component
         $data = $this->block()->data ?? [];
 
         $this->showAvatar = (bool) ($data['show_avatar'] ?? true);
-        $this->avatarUrl = (string) ($data['avatar_url'] ?? '');
+        $this->currentAvatarPath = (string) ($data['avatar_path'] ?? '');
         $this->showVerifiedBadge = (bool) ($data['show_verified_badge'] ?? true);
-        $this->showLocation = (bool) ($data['show_location'] ?? true);
-        $this->location = (string) ($data['location'] ?? '');
-        $this->useTenantSlogan = (bool) ($data['use_tenant_slogan'] ?? true);
-        $this->slogan = (string) ($data['slogan'] ?? '');
-        $this->showSocialLinks = (bool) ($data['show_social_links'] ?? true);
-        $this->socialTwitter = (string) ($data['social_twitter'] ?? '');
-        $this->socialInstagram = (string) ($data['social_instagram'] ?? '');
-        $this->socialSnapchat = (string) ($data['social_snapchat'] ?? '');
-        $this->socialYoutube = (string) ($data['social_youtube'] ?? '');
+        $this->bio = (string) ($data['bio'] ?? '');
+        $this->country = (string) ($data['country'] ?? '');
+        $this->city = (string) ($data['city'] ?? '');
+    }
+
+    /**
+     * @return array<string, array{label: string, icon: string}>
+     */
+    protected function networks(): array
+    {
+        return config('social-networks', []);
     }
 
     /**
@@ -100,33 +174,104 @@ new class extends \Livewire\Component
     protected function rules(): array
     {
         return [
-            'avatarUrl' => 'nullable|url|max:500',
-            'location' => 'nullable|string|max:100',
-            'slogan' => 'nullable|string|max:500',
-            'socialTwitter' => 'nullable|url|max:500',
-            'socialInstagram' => 'nullable|url|max:500',
-            'socialSnapchat' => 'nullable|url|max:500',
-            'socialYoutube' => 'nullable|url|max:500',
+            'bio' => 'nullable|string|max:250',
+            'country' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'avatar' => 'nullable|image|max:15024',
         ];
+    }
+
+    public function addSocialLink(): void
+    {
+        $this->validate([
+            'newNetwork' => 'required|string|in:'.implode(',', array_keys($this->networks())),
+            'newUrl' => 'required|url|max:500',
+        ]);
+
+        $maxOrder = Content::query()
+            ->where('block_id', $this->blockId)
+            ->type('social-link')
+            ->max('sort_order') ?? 0;
+
+        Content::create([
+            'block_id' => $this->blockId,
+            'type' => 'social-link',
+            'title' => $this->networks()[$this->newNetwork]['label'] ?? $this->newNetwork,
+            'slug' => $this->newNetwork.'-'.Str::lower(Str::random(8)),
+            'data' => [
+                'network' => $this->newNetwork,
+                'url' => $this->newUrl,
+            ],
+            'sort_order' => $maxOrder + 1,
+            'active' => true,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $this->reset('newNetwork', 'newUrl');
+        $this->newNetwork = 'twitter';
+
+        $this->dispatch('social-link-saved');
+    }
+
+    public function deleteSocialLink(int $id): void
+    {
+        Content::query()
+            ->where('block_id', $this->blockId)
+            ->type('social-link')
+            ->whereKey($id)
+            ->first()?->delete();
+    }
+
+    /**
+     * @param  array<int, array{order: int, value: string}>  $items
+     */
+    public function updateSocialOrder(array $items): void
+    {
+        foreach ($items as $item) {
+            Content::query()
+                ->where('block_id', $this->blockId)
+                ->type('social-link')
+                ->whereKey($item['value'])
+                ->update(['sort_order' => $item['order']]);
+        }
     }
 
     public function save(): void
     {
         $this->validate();
 
-        $this->saveData([
+        $data = [
             'show_avatar' => $this->showAvatar,
-            'avatar_url' => $this->avatarUrl,
+            'avatar_path' => $this->currentAvatarPath,
             'show_verified_badge' => $this->showVerifiedBadge,
-            'show_location' => $this->showLocation,
-            'location' => $this->location,
-            'use_tenant_slogan' => $this->useTenantSlogan,
-            'slogan' => $this->slogan,
-            'show_social_links' => $this->showSocialLinks,
-            'social_twitter' => $this->socialTwitter,
-            'social_instagram' => $this->socialInstagram,
-            'social_snapchat' => $this->socialSnapchat,
-            'social_youtube' => $this->socialYoutube,
-        ]);
+            'bio' => $this->bio,
+            'country' => $this->country,
+            'city' => $this->city,
+        ];
+
+        if ($this->avatar) {
+            $data['avatar_path'] = $this->avatar->storePublicly('tenant-media/'.currentTenant()->uuid.'/header', 'spaces');
+        }
+
+        $this->saveData($data);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function with(): array
+    {
+        return [
+            'networks' => $this->networks(),
+            'networkOptions' => collect($this->networks())
+                ->map(fn (array $network): string => $network['label'])
+                ->all(),
+            'socialLinks' => Content::query()
+                ->where('block_id', $this->blockId)
+                ->type('social-link')
+                ->orderBy('sort_order')
+                ->get(),
+        ];
     }
 }; ?>

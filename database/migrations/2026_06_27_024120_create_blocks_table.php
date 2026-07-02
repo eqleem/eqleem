@@ -41,6 +41,7 @@ return new class extends Migration
                 ->default('draft');
 
             $table->boolean('active')->default(true);
+            $table->boolean('is_default')->default(false);
 
             $table->jsonb('data')
                 ->nullable();
@@ -52,7 +53,7 @@ return new class extends Migration
 
             $table->index('tenant_id');
             $table->index('parent_id');
-            $table->index('component');
+            $table->index('position');
             $table->index('type');
             $table->index('status');
 

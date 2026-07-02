@@ -66,7 +66,7 @@
                                 <img class="h-10 w-10 flex-none rounded-full bg-gray-50"
                                     src="{{ $item->avatar }}" alt="">
                                 <div>
-                                    <h2 class="text-lg text-gray-700">{{ $item->title }}</h2>
+                                    <h2 class="text-sm font-semibold truncate text-gray-700">{{ $item->title }}</h2>
                                     <div class="flex items-center gap-x-2 mt-1">
                                         @if ($item->status === 'published')
                                             <div class="mt-1 flex items-center gap-x-1.5">

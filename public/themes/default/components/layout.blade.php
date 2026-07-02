@@ -15,12 +15,7 @@
         {{ $slot }}
     </main>
 
-    <div class="p-4 text-center text-stone-500 text-xs mt-3">
-        <p class="mb-3 text-stone-500/75">© {{ date('Y') }} {{ config('app.name') }} الحقوق محفوظة.</p>
-        <div class="flex justify-center gap-x-5 text-sm">
-            <a href="#" class="hover:text-stone-900 transition">السياسة الخصوصية</a>
-            <a href="#" class="hover:text-stone-900 transition">الشروط والأحكام</a>
-            <a href="#" class="hover:text-stone-900 transition">عرض في المتصفح</a>
-        </div>
-    </div>
+    @livewire('tenant.blocks.footer')
+
+    @livewire('tenant.blocks.float-links')
 </div>

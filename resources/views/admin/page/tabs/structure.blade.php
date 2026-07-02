@@ -27,6 +27,7 @@
                 <ul
                     wire:sortable="updateBlockOrder"
                     wire:sortable.options="{ animation: 150 }"
+                    wire:key="user-blocks-list-{{ $blocksVersion }}"
                     class="p-2 space-y-1.5"
                 >
                     @foreach ($userBlocks as $block)
@@ -122,8 +123,8 @@
                 </ul>
 
                 @if ($userBlocks->isEmpty())
-                    <p class="pointer-events-none absolute inset-0 flex items-center justify-center text-[11px] text-gray-300 select-none">
-                        أضف بلوك أو اسحب بلوكات هنا
+                    <p class="pointer-events-none absolutex pb-3 inset-0 flex items-center justify-center text-[11px] text-gray-300 select-none">
+                       أضف بلوات لصفحتك من الزر بالأعلى
                     </p>
                 @endif
             </div>
@@ -180,6 +181,7 @@
 use App\Models\Block;
 use App\Support\BlockTypeRegistry;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\On;
 
 new class extends \Livewire\Component
 {
@@ -191,6 +193,8 @@ new class extends \Livewire\Component
     public ?string $editingBlockEditor = null;
 
     public string $editingBlockTitle = '';
+
+    public int $blocksVersion = 0;
 
     public function openAddBlockModal(): void
     {
@@ -239,7 +243,7 @@ new class extends \Livewire\Component
             ->where('is_default', false)
             ->max('sort_order') ?? 0;
 
-        Block::create([
+        $block = Block::create([
             'tenant_id' => $tenantId,
             'component' => $blockType->component,
             'type' => $blockType->slug,
@@ -248,9 +252,24 @@ new class extends \Livewire\Component
             'is_default' => false,
             'status' => 'draft',
             'active' => true,
+            'position' => 'home',
         ]);
 
+        $this->blocksVersion++;
+
         $this->dispatch('closemodal');
+
+        $this->openEditBlockModal($block->id, $blockTypes);
+    }
+
+    #[On('structure-blocks-changed')]
+    public function onStructureBlocksChanged(?int $blockId = null, ?string $title = null): void
+    {
+        $this->blocksVersion++;
+
+        if ($blockId === $this->editingBlockId && filled($title)) {
+            $this->editingBlockTitle = $title;
+        }
     }
 
     /**
@@ -297,6 +316,8 @@ new class extends \Livewire\Component
             ->where('is_default', false)
             ->where('id', $blockId)
             ->delete();
+
+        $this->blocksVersion++;
     }
 
     /**
@@ -371,6 +392,7 @@ new class extends \Livewire\Component
             'topBlocks' => $grouped['top'],
             'userBlocks' => $grouped['user'],
             'bottomBlocks' => $grouped['bottom'],
+            'blocksVersion' => $this->blocksVersion,
         ]);
     }
 }; ?>

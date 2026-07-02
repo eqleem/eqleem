@@ -28,6 +28,13 @@ trait EditsBlock
     {
         $this->block()->update(['data' => $data]);
 
+        $this->notifyStructureChanged();
+
         $this->dispatch('closemodal');
+    }
+
+    protected function notifyStructureChanged(?string $title = null): void
+    {
+        $this->dispatch('structure-blocks-changed', blockId: $this->blockId, title: $title);
     }
 }

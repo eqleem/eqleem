@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
             ],
         ));
 
-        Model::unguarded(fn () => Tenant::firstOrCreate(
+        Tenant::firstOrCreate(
             ['id' => 1],
             [
                 'uuid' => (string) Str::uuid(),
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
                 'active' => true,
                 'status' => 'active',
             ],
-        ));
+        );
 
         $this->call(ThemeSeeder::class);
 

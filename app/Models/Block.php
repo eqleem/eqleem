@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use App\PageBuilder\BlockRegistry;
+use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use App\Traits\BelongsToTenant;
 
 /**
  * @property int $id
@@ -22,6 +22,7 @@ use App\Traits\BelongsToTenant;
  * @property string|null $title
  * @property string|null $slug
  * @property int $sort_order
+ * @property string $position
  * @property string $status
  * @property array<string, mixed>|null $data
  * @property Carbon|null $published_at
@@ -37,6 +38,7 @@ use App\Traits\BelongsToTenant;
     'slug',
     'variant',
     'sort_order',
+    'position',
     'status',
     'active',
     'is_default',
@@ -45,7 +47,7 @@ use App\Traits\BelongsToTenant;
 ])]
 class Block extends Model
 {
-    use HasUuid, BelongsToTenant;
+    use BelongsToTenant, HasUuid;
 
     /**
      * @return array<string, string>

@@ -68,6 +68,8 @@ new class extends \Livewire\Component
             ],
         ]);
 
+        $this->notifyStructureChanged($this->title);
+
         $this->dispatch('closemodal');
     }
 }; ?>

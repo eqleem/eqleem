@@ -2,7 +2,7 @@
     'title' => null,
     'titleIcon' => null,
     'footer' => null,
-    'size' => '3xl',
+    'size' => '4xl',
     'height' => 'auto',
     'name' => 'default',
     'escape' => true,
@@ -22,7 +22,7 @@
     <div class="fixed inset-0 overflow-y-auto">
         <div class="flex min-h-full justify-center items-center w-full">
             <div @if ($escape) @click.away="showModal = false" @endif
-                class="relative transform overflow-hiddenX rounded-xl pb-2.5 bg-white min-h-[14vh]x shadow-xl transition-all w-full sm:max-w-{{ $size }} max-w-md h-{{ $height }}">
+                class="relative transform overflow-hiddenX rounded-xl pb-2.5 bg-white min-h-[14vh]x shadow-xl transition-all w-full sm:max-w-{{ $size }} max-w-5xl m-4 lg:m-auto h-{{ $height }}">
                 <div class="flex items-center justify-between w-full p-2 border-b border-gray-100">
                     @if ($title)
                     <p class="text-gray-600 font-semibold flex items-center gap-x-2 text-sm px-2">

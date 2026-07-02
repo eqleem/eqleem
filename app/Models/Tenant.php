@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\TenantCreated;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -28,6 +29,10 @@ class Tenant extends Model
             'active' => 'boolean',
         ];
     }
+
+    protected $dispatchesEvents = [
+        'created' => TenantCreated::class,
+    ];
 
     public function user(): BelongsTo
     {
@@ -58,5 +63,4 @@ class Tenant extends Model
 
         return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$this->uuid;
     }
- 
 }

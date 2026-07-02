@@ -28,7 +28,7 @@ new class extends Livewire\Component
         ];
     }
 
-    public function submit(): mixed
+    public function submit(): void
     {
         $this->validate();
 
@@ -37,7 +37,7 @@ new class extends Livewire\Component
         if (! $tenantId) {
             $this->addError('title', __('No tenant selected.'));
 
-            return null;
+            return;
         }
 
         $slug = $this->uniqueSlug(Str::slug($this->title));
@@ -53,11 +53,11 @@ new class extends Livewire\Component
 
         $this->dispatch('updateBlogPostList');
         $this->dispatch('closemodal', modal: 'add-blog-post');
-
-        return $this->redirect(route('admin.page.home', [
-            'tab' => $this->contentType['tab_id'],
-            'item' => $content->uuid,
-        ]), navigate: true);
+        $this->dispatch(
+            'openContentItem',
+            tab: $this->contentType['tab_id'],
+            item: $content->uuid,
+        );
     }
 
     private function uniqueSlug(string $baseSlug): string

@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\Block;
 use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
+use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateDefaultBlocks
@@ -22,6 +23,7 @@ class CreateDefaultBlocks
                     'type' => $blockType->slug,
                 ],
                 [
+                    'uuid' => Str::uuid(),
                     'component' => $blockType->component,
                     'title' => $blockType->name,
                     'slug' => $blockType->slug,

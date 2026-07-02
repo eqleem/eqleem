@@ -6,6 +6,7 @@
             init() {
                 this.syncFromUrl();
                 window.addEventListener('popstate', () => this.syncFromUrl());
+                document.addEventListener('livewire:navigated', () => this.syncFromUrl());
             },
             syncFromUrl() {
                 const params = new URLSearchParams(window.location.search);
@@ -101,12 +102,27 @@
 
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
+use Livewire\Attributes\On;
 
 new class extends \Livewire\Component
 {
     public string $activeTab = 'structure';
 
     public ?string $activeItem = null;
+
+    #[On('openContentItem')]
+    public function openContentItem(string $tab, string $item): void
+    {
+        $this->activeTab = $tab;
+        $this->activeItem = $item;
+
+        $url = route('admin.page.home', [
+            'tab' => $tab,
+            'item' => $item,
+        ]);
+
+        $this->js('history.pushState({}, "", '.json_encode($url).')');
+    }
 
     public function mount(PageTabRegistry $pageTabs, ContentTypeRegistry $contentTypes): void
     {

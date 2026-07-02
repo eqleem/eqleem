@@ -1,9 +1,16 @@
 <x-tenant-theme::layout width="max-w-3xl">
 
-        <x-tenant-theme::header />
-        <x-tenant-theme::cta />
+        @livewire('tenant.blocks.header')
+        @livewire('tenant.blocks.cta')
 
-        <section class="w-full mb-5 flex flex-col gap-y-6">
+        <section class="w-full mb-5 mt-10 flex flex-col gap-y-6">
+            @foreach ($pageBlocks as $block)
+                @includeFirst([
+                    $block->variant,
+                    "tenant-theme::blocks.{$block->type}",
+                    "default-tenant-theme::blocks.{$block->type}",
+                ], ['block' => $block])
+            @endforeach
 
             {{-- <x-tenant-theme::hero /> --}}
 
@@ -20,7 +27,6 @@
             <x-tenant-theme::block-link title="الباقات والأسعار" link="{{route('tenant.pages.pricing')}}" icon="hugeicons:credit-card-change" desc="اختر الباقة المناسبة لك مع مقارنة واضحة بين المزايا والأسعار." />
             <x-tenant-theme::block-link title="الأسئلة المتكررة" link="{{route('tenant.pages.faq')}}" icon="hugeicons:help-circle" desc="إجابات واضحة وسريعة لأكثر الأسئلة حول الخدمات، الأسعار، وآلية التنفيذ." />
             <x-tenant-theme::block-link title="اتصل بنا" link="{{route('tenant.pages.contact')}}" icon="hugeicons:call" desc="تواصل معنا عبر النموذج، الجوال، البريد، والواتساب مع روابط السوشال." /> --}}
-            <x-tenant-theme::block-link title="المدونة" link="{{route('tenant.blog.index')}}" icon="hugeicons:book-open-text" desc=" مقالات ونصائح في التشطيبات والديكور: الباركيه، بديل الرخام، بديل الخشب، والشيبورد. " />
 
             {{-- <x-tenant-theme::block-link title="النشرة البريدية" link="{{route('tenant.newsletter.index')}}" icon="hugeicons:mail-at-sign-02" desc=" اشترك في النشرة البريدية وانظم إلى مجتمع المهتمين في أعمال الفن والديكور. ">
                 <div class="">

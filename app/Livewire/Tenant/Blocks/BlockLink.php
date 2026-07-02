@@ -5,12 +5,12 @@ namespace App\Livewire\Tenant\Blocks;
 use App\Livewire\Concerns\RendersBlock;
 use Livewire\Component;
 
-class TopNav extends Component
+class BlockLink extends Component
 {
     use RendersBlock;
 
     protected function blockType(): string
     {
-        return 'top-nav';
+        return 'block-link';
     }
 }
