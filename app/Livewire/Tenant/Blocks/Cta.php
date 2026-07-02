@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Tenant\Blocks;
 
-use App\Livewire\Concerns\RendersBlock;
+use App\Livewire\Concerns\ResolvesTenantBlockView;
 use App\Models\Block;
 use App\Models\Content;
 use App\Support\CtaLink;
@@ -12,7 +12,7 @@ use Livewire\Component;
 
 class Cta extends Component
 {
-    use RendersBlock;
+    use ResolvesTenantBlockView;
 
     protected function blockType(): string
     {
@@ -21,22 +21,9 @@ class Cta extends Component
 
     public function render(): View
     {
-        $type = $this->blockType();
-        $tenantId = currentTenantId();
+        $block = $this->resolveSingletonBlock();
 
-        $block = Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('type', $type)
-            ->first();
-
-        $candidates = array_values(array_filter([
-            $block?->variant,
-            "tenant-theme::blocks.{$type}",
-            "default-tenant-theme::blocks.{$type}",
-        ]));
-
-        return view()->first($candidates, [
+        return $this->renderTenantBlockView($block, [
             'block' => $block,
             'ctaLinks' => $this->preparedLinks($this->ctaLinks($block)),
         ]);
@@ -51,12 +38,7 @@ class Cta extends Component
             return collect();
         }
 
-        return Content::query()
-            ->where('block_id', $block->id)
-            ->type('cta-link')
-            ->where('active', true)
-            ->orderBy('sort_order')
-            ->get();
+        return $block->activeContents('cta-link');
     }
 
     /**
@@ -74,7 +56,7 @@ class Cta extends Component
 
         $forms = Content::query()
             ->whereIn('id', $formContentIds)
-            ->get()
+            ->get(['id', 'data'])
             ->keyBy('id');
 
         return $ctaLinks->map(function (Content $link) use ($forms): array {

@@ -5,20 +5,15 @@
 
         <section class="w-full mb-5 mt-10 flex flex-col gap-y-6">
             @foreach ($pageBlocks as $block)
-                @switch($block->type)
-                    @case('link')
-                        <livewire:tenant.blocks.link :block-id="$block->id" :key="'page-block-'.$block->id" />
-                        @break
-                    @case('block-link')
-                        <livewire:tenant.blocks.block-link :block-id="$block->id" :key="'page-block-'.$block->id" />
-                        @break
-                    @default
-                        @includeFirst([
-                            $block->variant,
-                            "tenant-theme::blocks.{$block->type}",
-                            "default-tenant-theme::blocks.{$block->type}",
-                        ], ['block' => $block])
-                @endswitch
+                @if (in_array($block->type, ['block-link', 'link'], true))
+                    <livewire:tenant.blocks.block-link :block-id="$block->id" :key="'page-block-'.$block->id" />
+                @else
+                    @includeFirst([
+                        $block->variant,
+                        "tenant-theme::blocks.{$block->type}",
+                        "default-tenant-theme::blocks.{$block->type}",
+                    ], ['block' => $block])
+                @endif
             @endforeach
 
             {{-- <x-tenant-theme::hero /> --}}

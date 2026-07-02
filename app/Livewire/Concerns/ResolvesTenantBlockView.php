@@ -9,26 +9,32 @@ trait ResolvesTenantBlockView
 {
     abstract protected function blockType(): string;
 
+    /**
+     * @return list<string>
+     */
+    protected function pageBlockTypes(): array
+    {
+        return [$this->blockType()];
+    }
+
     protected function resolveSingletonBlock(): ?Block
     {
-        $tenantId = currentTenantId();
-
-        return Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('type', $this->blockType())
-            ->first();
+        return Block::findSingleton($this->blockType());
     }
 
     protected function resolvePageBlock(int $blockId): ?Block
     {
-        $tenantId = currentTenantId();
+        return Block::findPageBlock($blockId, $this->pageBlockTypes());
+    }
 
-        return Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereKey($blockId)
-            ->where('type', $this->blockType())
-            ->first();
+    /**
+     * @param  callable(?Block): array<string, mixed>  $viewDataResolver
+     */
+    protected function renderSingletonBlockView(callable $viewDataResolver): View
+    {
+        $block = $this->resolveSingletonBlock();
+
+        return $this->renderTenantBlockView($block, $viewDataResolver($block));
     }
 
     /**
@@ -38,11 +44,18 @@ trait ResolvesTenantBlockView
     {
         $type = $block?->type ?? $this->blockType();
 
-        return array_values(array_filter([
+        $candidates = array_values(array_filter([
             $block?->variant,
             'tenant-theme::blocks.'.$type,
             'default-tenant-theme::blocks.'.$type,
         ]));
+
+        if ($type === 'link') {
+            $candidates[] = 'tenant-theme::blocks.block-link';
+            $candidates[] = 'default-tenant-theme::blocks.block-link';
+        }
+
+        return array_values(array_unique($candidates));
     }
 
     /**

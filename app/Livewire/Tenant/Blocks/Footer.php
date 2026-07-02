@@ -41,12 +41,7 @@ class Footer extends Component
             return collect();
         }
 
-        return Content::query()
-            ->where('block_id', $block->id)
-            ->type('footer-link')
-            ->where('active', true)
-            ->orderBy('sort_order')
-            ->get();
+        return $block->activeContents('footer-link');
     }
 
     /**
@@ -55,13 +50,11 @@ class Footer extends Component
      */
     protected function preparedLinks(Collection $footerLinks): Collection
     {
-        return $footerLinks->map(function (Content $link): array {
-            return [
-                'id' => $link->id,
-                'label' => CtaLink::label($link),
-                'url' => CtaLink::url($link),
-                'opensInNewTab' => CtaLink::opensInNewTab($link),
-            ];
-        });
+        return $footerLinks->map(fn (Content $link): array => [
+            'id' => $link->id,
+            'label' => CtaLink::label($link),
+            'url' => CtaLink::url($link),
+            'opensInNewTab' => CtaLink::opensInNewTab($link),
+        ]);
     }
 }

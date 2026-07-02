@@ -18,8 +18,8 @@ class Header extends Component
 
     public function render(): View
     {
-        $block = $this->resolveSingletonBlock();
-
-        return $this->renderTenantBlockView($block, HeaderBlock::viewData($block));
+        return $this->renderSingletonBlockView(
+            fn ($block) => HeaderBlock::viewData($block)
+        );
     }
 }

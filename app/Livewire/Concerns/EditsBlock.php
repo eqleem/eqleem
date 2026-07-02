@@ -12,12 +12,8 @@ trait EditsBlock
 
     protected function block(): Block
     {
-        $tenantId = currentTenantId();
-
-        return Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('type', $this->blockType())
+        return Block::queryForTenantRoots()
+            ->type($this->blockType())
             ->findOrFail($this->blockId);
     }
 

@@ -20,15 +20,10 @@ class Home extends Component
      */
     protected function pageBlocks(): Collection
     {
-        $tenantId = currentTenantId();
-
-        return Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('is_default', false)
-            ->where('active', true)
-            ->where('position', 'home')
+        return Block::queryForTenantRoots()
+            ->userBlocks()
+            ->activeOnHome()
             ->orderBy('sort_order')
-            ->get();
+            ->get(['id', 'type', 'variant']);
     }
 }

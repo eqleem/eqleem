@@ -7,6 +7,7 @@ use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +28,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $position
  * @property string $status
  * @property array<string, mixed>|null $data
+ * @property string|null $variant
  * @property Carbon|null $published_at
  * @property bool $active
  * @property bool $is_default
@@ -118,6 +120,61 @@ class Block extends Model implements HasMedia
     public function scopeType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
+    }
+
+    public function scopeForCurrentTenant(Builder $query): Builder
+    {
+        $tenantId = currentTenantId();
+
+        return $query->when($tenantId, fn (Builder $query): Builder => $query->where('tenant_id', $tenantId));
+    }
+
+    public function scopeRoots(Builder $query): Builder
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    public function scopeUserBlocks(Builder $query): Builder
+    {
+        return $query->where('is_default', false);
+    }
+
+    public function scopeActiveOnHome(Builder $query): Builder
+    {
+        return $query->where('active', true)->where('position', 'home');
+    }
+
+    public static function queryForTenantRoots(): Builder
+    {
+        return static::query()->forCurrentTenant()->roots();
+    }
+
+    public static function findSingleton(string $type): ?self
+    {
+        return static::queryForTenantRoots()->type($type)->first();
+    }
+
+    /**
+     * @param  list<string>  $types
+     */
+    public static function findPageBlock(int $id, array $types): ?self
+    {
+        return static::queryForTenantRoots()
+            ->whereKey($id)
+            ->whereIn('type', $types)
+            ->first();
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
+    public function activeContents(string $type): Collection
+    {
+        return $this->contents()
+            ->type($type)
+            ->where('active', true)
+            ->orderBy('sort_order')
+            ->get();
     }
 
     // public function formSubmissions(): HasMany

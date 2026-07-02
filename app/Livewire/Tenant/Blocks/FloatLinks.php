@@ -18,8 +18,8 @@ class FloatLinks extends Component
 
     public function render(): View
     {
-        $block = $this->resolveSingletonBlock();
-
-        return $this->renderTenantBlockView($block, FloatLinksBlock::viewData($block?->data ?? []));
+        return $this->renderSingletonBlockView(
+            fn ($block) => FloatLinksBlock::viewData($block?->data ?? [])
+        );
     }
 }

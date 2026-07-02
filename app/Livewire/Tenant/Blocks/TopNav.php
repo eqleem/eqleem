@@ -18,8 +18,8 @@ class TopNav extends Component
 
     public function render(): View
     {
-        $block = $this->resolveSingletonBlock();
-
-        return $this->renderTenantBlockView($block, TopNavBlock::viewData($block?->data ?? []));
+        return $this->renderSingletonBlockView(
+            fn ($block) => TopNavBlock::viewData($block?->data ?? [])
+        );
     }
 }

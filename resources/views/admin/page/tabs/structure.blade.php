@@ -203,12 +203,7 @@ new class extends \Livewire\Component
 
     public function openEditBlockModal(int $blockId, BlockTypeRegistry $blockTypes): void
     {
-        $tenantId = currentTenantId();
-
-        $block = Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->find($blockId);
+        $block = Block::queryForTenantRoots()->find($blockId);
 
         if (! $block) {
             return;
@@ -235,16 +230,12 @@ new class extends \Livewire\Component
             return;
         }
 
-        $tenantId = currentTenantId();
-
-        $maxOrder = Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('is_default', false)
+        $maxOrder = Block::queryForTenantRoots()
+            ->userBlocks()
             ->max('sort_order') ?? 0;
 
         $block = Block::create([
-            'tenant_id' => $tenantId,
+            'tenant_id' => currentTenantId(),
             'component' => $blockType->component,
             'type' => $blockType->slug,
             'title' => $blockType->name,
@@ -277,13 +268,9 @@ new class extends \Livewire\Component
      */
     public function updateBlockOrder(array $items): void
     {
-        $tenantId = currentTenantId();
-
         foreach ($items as $item) {
-            Block::query()
-                ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-                ->whereNull('parent_id')
-                ->where('is_default', false)
+            Block::queryForTenantRoots()
+                ->userBlocks()
                 ->where('id', $item['value'])
                 ->update(['sort_order' => $item['order']]);
         }
@@ -291,12 +278,8 @@ new class extends \Livewire\Component
 
     public function toggleBlockActive(int $blockId): void
     {
-        $tenantId = currentTenantId();
-
-        $block = Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('is_default', false)
+        $block = Block::queryForTenantRoots()
+            ->userBlocks()
             ->find($blockId);
 
         if (! $block) {
@@ -308,12 +291,8 @@ new class extends \Livewire\Component
 
     public function deleteBlock(int $blockId): void
     {
-        $tenantId = currentTenantId();
-
-        Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
-            ->where('is_default', false)
+        Block::queryForTenantRoots()
+            ->userBlocks()
             ->where('id', $blockId)
             ->delete();
 
@@ -325,16 +304,11 @@ new class extends \Livewire\Component
      */
     protected function mapBlocks(Collection $blocks, BlockTypeRegistry $blockTypes): Collection
     {
-        $typeIcons = $blockTypes->all()->mapWithKeys(
-            fn ($blockType): array => [$blockType->slug => $blockType->icon]
-        );
-
-        $editors = $blockTypes->all()->mapWithKeys(
-            fn ($blockType): array => [$blockType->slug => $blockType->editor]
-        );
+        $typeIcons = $blockTypes->iconPaths();
+        $editors = $blockTypes->editors();
 
         return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
-            $icon = $typeIcons->get($block->type, 'assets/icons/tabler/Blockquote.svg');
+            $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
 
             return [
                 'id' => $block->id,
@@ -342,7 +316,7 @@ new class extends \Livewire\Component
                 'type' => $block->type,
                 'sort_order' => $block->sort_order,
                 'is_default' => $block->is_default,
-                'editable' => filled($editors->get($block->type)),
+                'editable' => filled($editors[$block->type] ?? null),
                 'active' => $block->active,
                 'icon_url' => asset($icon),
             ];
@@ -365,11 +339,7 @@ new class extends \Livewire\Component
      */
     protected function groupedBlocks(BlockTypeRegistry $blockTypes): array
     {
-        $tenantId = currentTenantId();
-
-        $blocks = Block::query()
-            ->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId))
-            ->whereNull('parent_id')
+        $blocks = Block::queryForTenantRoots()
             ->orderBy('sort_order')
             ->get(['id', 'title', 'type', 'sort_order', 'is_default', 'active']);
 

@@ -71,12 +71,7 @@ class HeaderBlock
 
         $networks = config('social-networks', []);
 
-        return Content::query()
-            ->where('block_id', $block->id)
-            ->type('social-link')
-            ->where('active', true)
-            ->orderBy('sort_order')
-            ->get()
+        return $block->activeContents('social-link')
             ->map(function (Content $link) use ($networks): ?array {
                 $network = $networks[$link->data['network'] ?? ''] ?? null;
                 $url = (string) ($link->data['url'] ?? '');

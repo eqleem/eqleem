@@ -18,6 +18,14 @@ class BlockLink extends Component
         return 'block-link';
     }
 
+    /**
+     * @return list<string>
+     */
+    protected function pageBlockTypes(): array
+    {
+        return ['block-link', 'link'];
+    }
+
     public function render(): View
     {
         $block = $this->resolvePageBlock($this->blockId);

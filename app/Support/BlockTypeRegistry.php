@@ -55,4 +55,24 @@ class BlockTypeRegistry
             ->map(fn (BlockType $blockType): array => $blockType->toArray())
             ->all();
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function iconPaths(): array
+    {
+        return $this->all()
+            ->mapWithKeys(fn (BlockType $blockType): array => [$blockType->slug => $blockType->icon])
+            ->all();
+    }
+
+    /**
+     * @return array<string, ?string>
+     */
+    public function editors(): array
+    {
+        return $this->all()
+            ->mapWithKeys(fn (BlockType $blockType): array => [$blockType->slug => $blockType->editor])
+            ->all();
+    }
 }

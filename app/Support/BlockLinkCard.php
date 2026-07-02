@@ -16,6 +16,22 @@ class BlockLinkCard
         }
 
         $data = $block->data ?? [];
+
+        if ($block->type === 'link') {
+            $url = $data['url'] ?? null;
+
+            if (! filled($url)) {
+                return null;
+            }
+
+            return [
+                'title' => (string) ($data['title'] ?? $block->title ?? ''),
+                'url' => (string) $url,
+                'icon' => 'hugeicons:link-04',
+                'desc' => '',
+            ];
+        }
+
         $url = CtaLink::urlFromData($data);
 
         if (! filled($url)) {
