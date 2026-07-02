@@ -12,7 +12,9 @@ trait EditsBlock
 
     protected function block(): Block
     {
-        return Block::queryForTenantRoots()
+        return Block::query()
+            ->forCurrentTenant()
+            ->roots()
             ->type($this->blockType())
             ->findOrFail($this->blockId);
     }

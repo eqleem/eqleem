@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('status')->default('new');
             $table->jsonb('data');
             $table->timestamp('submitted_at')->nullable();
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
 
             $table->softDeletes();
@@ -40,14 +41,23 @@ return new class extends Migration
             $table->index('block_id');
             $table->index('status');
             $table->index('submitted_at');
+            $table->index('read_at');
         });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('form_submissions');
+        Schema::create('form_submission_replies', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('form_submission_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->text('body');
+            $table->timestamps();
+
+            $table->index('form_submission_id');
+            $table->index('user_id');
+        });
+
     }
 };

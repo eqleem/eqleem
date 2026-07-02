@@ -28,8 +28,13 @@ return new class extends Migration
                 ->constrained('blocks')
                 ->cascadeOnDelete();
 
+            $table->foreignId('content_id')
+                ->nullable()
+                ->constrained('contents')
+                ->cascadeOnDelete();
+
             $table->foreignId('theme_id')
-                ->nullable()->index();
+                ->nullable();
 
             $table->string('title')->nullable();
 
@@ -55,7 +60,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('tenant_id');
-            $table->index('parent_id');
             $table->index('theme_id');
             $table->index('position');
             $table->index('type');

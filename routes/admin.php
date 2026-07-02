@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\UploadImage;
+use App\Actions\UploadMedia;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -14,12 +16,13 @@ Route::as('admin.')
         Route::livewire('/settings/{slug}', 'admin::settings.detail')->name('settings.detail');
         Route::livewire('/account', 'admin::account.home')->name('account.home');
         Route::livewire('/orders', 'admin::orders.home')->name('orders.home');
+        Route::livewire('/orders/form-submissions/{id}', 'admin::orders.form-submission-detail')->name('orders.form-submissions.detail');
         Route::livewire('/orders/{id}', 'admin::orders.detail')->name('orders.detail');
         Route::livewire('/clients', 'admin::clients.home')->name('clients.home');
         Route::livewire('/clients/{id}', 'admin::clients.detail')->name('clients.detail');
         Route::livewire('/manage-page', 'admin::page.home')->name('page.home');
-        Route::post('upload-media', [\App\Actions\UploadMedia::class, 'upload'])->name('upload-media');
-        Route::post('upload-image', [\App\Actions\UploadImage::class, 'upload'])->name('upload-image');
+        Route::post('upload-media', [UploadMedia::class, 'upload'])->name('upload-media');
+        Route::post('upload-image', [UploadImage::class, 'upload'])->name('upload-image');
         // Route::middleware(['web'])
         //     ->group(function () {
         //         Volt::route('/content', 'admin.content.index')->name('content');

@@ -22,6 +22,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $component
  * @property string $type
  * @property int|null $parent_id
+ * @property int|null $content_id
  * @property string|null $title
  * @property string|null $slug
  * @property int $sort_order
@@ -38,6 +39,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'component',
     'type',
     'parent_id',
+    'content_id',
     'title',
     'slug',
     'variant',
@@ -75,6 +77,11 @@ class Block extends Model implements HasMedia
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function content(): BelongsTo
+    {
+        return $this->belongsTo(Content::class);
     }
 
     public function children(): HasMany
@@ -146,7 +153,15 @@ class Block extends Model implements HasMedia
 
     public static function queryForTenantRoots(): Builder
     {
-        return static::query()->forCurrentTenant()->roots();
+        return static::query()->forCurrentTenant()->roots()->whereNull('content_id');
+    }
+
+    public static function queryForContent(int $contentId): Builder
+    {
+        return static::query()
+            ->forCurrentTenant()
+            ->roots()
+            ->where('content_id', $contentId);
     }
 
     public static function findSingleton(string $type): ?self

@@ -57,6 +57,11 @@ class Order extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public static function walkingClientLabel(): string
+    {
+        return __('Walking client');
+    }
+
     public static function minorFromDecimal(float|string|null $amount): int
     {
         return (int) round(((float) $amount) * 100);

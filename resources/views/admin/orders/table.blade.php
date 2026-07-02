@@ -45,7 +45,7 @@
                                     @if ($item->client)
                                         <span class="truncate">{{ $item->client->name }}</span>
                                     @else
-                                        <span class="text-gray-400">{{ __('Guest') }}</span>
+                                        <span class="text-gray-400">{{ \App\Models\Order::walkingClientLabel() }}</span>
                                     @endif
                                     @if ($item->client?->email)
                                         <span

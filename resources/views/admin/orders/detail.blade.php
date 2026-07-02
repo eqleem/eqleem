@@ -274,7 +274,7 @@
                                     class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-gray-300">
                                     <ui:icon name="user" class="h-7 w-7" />
                                 </div>
-                                <p class="mt-3 text-sm font-semibold text-gray-700">{{ __('Guest') }}</p>
+                                <p class="mt-3 text-sm font-semibold text-gray-700">{{ \App\Models\Order::walkingClientLabel() }}</p>
                                 <p class="mt-1 text-xs text-gray-400">طلب بدون حساب عميل</p>
                             </div>
                         @endif

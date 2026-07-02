@@ -1,66 +1,102 @@
-<ui:form class="!p-0 !gap-0 max-h-[75vh] overflow-y-auto" novalidate>
-    <div class="space-y-4 p-5">
-        <ui:box title="معلومات العميل" class="border border-gray-100 shadow-sm">
-            <div class="p-4 space-y-3">
-                @if ($client_id)
-                    <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                        <div>
-                            <p class="text-sm font-bold text-gray-800">{{ $selectedClientName }}</p>
-                            @if ($selectedClientEmail)
-                                <p class="text-xs text-gray-500 mt-1">{{ $selectedClientEmail }}</p>
-                            @endif
-                            @if ($selectedClientPhone)
-                                <p class="text-xs text-gray-500 mt-0.5" dir="ltr">{{ $selectedClientPhone }}</p>
-                            @endif
-                        </div>
-                        <button type="button" wire:click="clearClient"
-                            class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50">
-                            تغيير
-                        </button>
-                    </div>
-                @else
-                    <div class="relative" x-data="{ open: @entangle('showClientResults') }">
-                        <div class="relative">
-                            <div
-                                class="absolute ps-2 right-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500">
-                                <ui:icon name="search" class="text-gray-400" />
+<div>
+    <ui:form class="!p-0 !gap-0 max-h-[75vh] overflow-y-auto" novalidate>
+        <div class="space-y-4 p-5">
+            <ui:box title="معلومات العميل" class="border border-gray-100 shadow-sm">
+                <x-slot:action>
+                    @if (! $client_id && ! $isWalkingClient)
+                        <ui:button type="button" wire:click="openCreateClientModal" icon="plus" variant="outline"
+                            label="عميل جديد" />
+                    @endif
+                </x-slot:action>
+                <div class="p-4 space-y-3">
+                    @if ($client_id)
+                        <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">{{ $selectedClientName }}</p>
+                                @if ($selectedClientEmail)
+                                    <p class="text-xs text-gray-500 mt-1">{{ $selectedClientEmail }}</p>
+                                @endif
+                                @if ($selectedClientPhone)
+                                    <p class="text-xs text-gray-500 mt-0.5" dir="ltr">{{ $selectedClientPhone }}</p>
+                                @endif
                             </div>
-                            <input wire:model.live.debounce.300ms="clientSearch" type="text"
-                                placeholder="ابحث بالاسم أو البريد أو الهاتف .."
-                                class="block w-full rounded-lg py-2 ps-10 text-gray-800 border border-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm">
+                            <button type="button" wire:click="enterClientSearch"
+                                class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50">
+                                تغيير
+                            </button>
                         </div>
-                        @error('client_id')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                        @if ($showClientResults && count($clientResults) > 0)
-                            <div
-                                class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                                @foreach ($clientResults as $client)
-                                    <button type="button" wire:click="selectClient({{ $client['id'] }})"
-                                        wire:key="client-{{ $client['id'] }}"
-                                        class="w-full text-start px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                                        <p class="text-sm font-semibold text-gray-800">{{ $client['name'] }}</p>
-                                        <p class="text-xs text-gray-500 mt-0.5">
-                                            @if ($client['email'])
-                                                <span>{{ $client['email'] }}</span>
-                                            @endif
-                                            @if ($client['phone'])
-                                                <span class="ms-2" dir="ltr">{{ $client['phone'] }}</span>
-                                            @endif
-                                        </p>
+                    @elseif ($isWalkingClient)
+                        <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-gray-400 ring-1 ring-gray-100">
+                                    <ui:icon name="user" class="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">{{ \App\Models\Order::walkingClientLabel() }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">الافتراضي — بدون حساب عميل</p>
+                                </div>
+                            </div>
+                            <button type="button" wire:click="enterClientSearch"
+                                class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50">
+                                تغيير
+                            </button>
+                        </div>
+                    @else
+                        <div class="relative" x-data="{ open: @entangle('showClientResults') }">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <div
+                                        class="absolute ps-2 right-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500">
+                                        <ui:icon name="search" class="text-gray-400" />
+                                    </div>
+                                    <input wire:model.live.debounce.300ms="clientSearch" wire:focus="showClientSearchResults"
+                                        type="text"
+                                        placeholder="ابحث بالاسم أو البريد أو الهاتف .."
+                                        class="block w-full rounded-lg py-2 ps-10 text-gray-800 border border-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm">
+                                </div>
+                                <ui:button type="button" wire:click="openCreateClientModal" icon="plus"
+                                    variant="outline" label="جديد" class="shrink-0" />
+                            </div>
+                            @error('client_id')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                            @if ($showClientResults)
+                                <div
+                                    class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-52 overflow-y-auto">
+                                    <button type="button" wire:click="selectWalkingClient"
+                                        class="w-full text-start px-3 py-2.5 hover:bg-gray-50 border-b border-gray-100 bg-gray-50/50">
+                                        <p class="text-sm font-semibold text-gray-800">{{ \App\Models\Order::walkingClientLabel() }}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">بدون حساب عميل</p>
                                     </button>
-                                @endforeach
-                            </div>
-                        @elseif ($showClientResults && $clientSearch !== '')
-                            <div
-                                class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm text-gray-500">
-                                لا توجد نتائج.
-                            </div>
-                        @endif
-                    </div>
-                @endif
-            </div>
-        </ui:box>
+                                    @foreach ($clientResults as $client)
+                                        <button type="button" wire:click="selectClient({{ $client['id'] }})"
+                                            wire:key="client-{{ $client['id'] }}"
+                                            class="w-full text-start px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                                            <p class="text-sm font-semibold text-gray-800">{{ $client['name'] }}</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">
+                                                @if ($client['email'])
+                                                    <span>{{ $client['email'] }}</span>
+                                                @endif
+                                                @if ($client['phone'])
+                                                    <span class="ms-2" dir="ltr">{{ $client['phone'] }}</span>
+                                                @endif
+                                            </p>
+                                        </button>
+                                    @endforeach
+                                    @if ($clientSearch !== '' && count($clientResults) === 0)
+                                        <button type="button" wire:click="openCreateClientModalFromSearch"
+                                            class="w-full text-start px-3 py-2.5 hover:bg-primary-50 text-sm text-primary-600 border-t border-gray-100">
+                                            <span class="font-semibold">إضافة "{{ $clientSearch }}"</span>
+                                            <span class="text-xs text-primary-500/80 ms-1">كعميل جديد</span>
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </ui:box>
 
         <ui:box title="معلومات الطلب" class="border border-gray-100 shadow-sm">
             <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -230,7 +266,42 @@
     <x-slot:footer>
         <ui:button type="button" wire:click="submit" wire:target="submit" label="حفظ الطلب" />
     </x-slot:footer>
-</ui:form>
+    </ui:form>
+
+    @if ($showCreateClientModal)
+        <template x-teleport="body">
+            <div class="fixed inset-0 z-[60] flex items-center justify-center p-4" wire:key="add-order-create-client">
+                <div class="fixed inset-0 bg-gray-900/60" aria-hidden="true"></div>
+                <div class="relative w-full max-w-lg rounded-xl bg-white shadow-2xl ring-1 ring-black/5">
+                <div class="flex items-center justify-between border-b border-gray-100 p-3">
+                    <p class="px-1 text-sm font-semibold text-gray-600">إضافة عميل جديد</p>
+                    <button type="button" wire:click="closeCreateClientModal"
+                        class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-4 p-5">
+                    <ui:input name="newClientName" label="{{ __('Name') }}" placeholder="{{ __('Name') }}" />
+                    <ui:input name="newClientPhone" label="{{ __('Phone') }}" type="number" dir="ltr"
+                        placeholder="123456789" />
+                    <ui:input name="newClientEmail" label="{{ __('Email') }}" type="email" dir="ltr"
+                        placeholder="client@email.com" />
+                    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+                        <ui:button type="button" variant="outline" label="{{ __('Cancel') }}"
+                            wire:click="closeCreateClientModal" />
+                        <ui:button type="button" wire:click="createClient" wire:target="createClient"
+                            label="{{ __('Save') }}" />
+                    </div>
+                </div>
+                </div>
+            </div>
+        </template>
+    @endif
+</div>
 
 <?php
 
@@ -243,6 +314,8 @@ use Illuminate\Validation\Rule;
 new class extends Livewire\Component {
     public ?int $client_id = null;
 
+    public bool $isWalkingClient = true;
+
     public string $clientSearch = '';
 
     public bool $showClientResults = false;
@@ -252,6 +325,14 @@ new class extends Livewire\Component {
     public ?string $selectedClientEmail = null;
 
     public ?string $selectedClientPhone = null;
+
+    public string $newClientName = '';
+
+    public string $newClientPhone = '';
+
+    public ?string $newClientEmail = null;
+
+    public bool $showCreateClientModal = false;
 
     public string $status = 'confirmed';
 
@@ -274,7 +355,7 @@ new class extends Livewire\Component {
     protected function rules(): array
     {
         return [
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'nullable|exists:clients,id',
             'status' => ['required', Rule::in(array_keys(Order::statusOptions()))],
             'payment_status' => ['required', Rule::in(array_keys(Order::paymentStatusOptions()))],
             'payment_method' => ['required', Rule::in(array_keys(Order::paymentMethodOptions()))],
@@ -290,7 +371,6 @@ new class extends Livewire\Component {
     protected function messages(): array
     {
         return [
-            'client_id.required' => 'يجب اختيار عميل.',
             'items.required' => 'يجب إضافة عنصر واحد على الأقل.',
             'items.min' => 'يجب إضافة عنصر واحد على الأقل.',
             'items.*.type.required' => 'يجب اختيار نوع العنصر.',
@@ -302,9 +382,16 @@ new class extends Livewire\Component {
         ];
     }
 
+    public function showClientSearchResults(): void
+    {
+        $this->showClientResults = true;
+        $this->isWalkingClient = false;
+    }
+
     public function updatedClientSearch(): void
     {
-        $this->showClientResults = $this->clientSearch !== '';
+        $this->showClientResults = true;
+        $this->isWalkingClient = false;
 
         if ($this->clientSearch === '') {
             return;
@@ -322,6 +409,7 @@ new class extends Livewire\Component {
         }
 
         $this->client_id = $client->id;
+        $this->isWalkingClient = false;
         $this->selectedClientName = $client->name;
         $this->selectedClientEmail = $client->email;
         $this->selectedClientPhone = $client->phone;
@@ -329,14 +417,95 @@ new class extends Livewire\Component {
         $this->showClientResults = false;
     }
 
-    public function clearClient(): void
+    public function selectWalkingClient(): void
     {
         $this->client_id = null;
+        $this->isWalkingClient = true;
         $this->selectedClientName = null;
         $this->selectedClientEmail = null;
         $this->selectedClientPhone = null;
         $this->clientSearch = '';
         $this->showClientResults = false;
+    }
+
+    public function enterClientSearch(): void
+    {
+        $this->client_id = null;
+        $this->isWalkingClient = false;
+        $this->selectedClientName = null;
+        $this->selectedClientEmail = null;
+        $this->selectedClientPhone = null;
+        $this->clientSearch = '';
+        $this->showClientResults = false;
+    }
+
+    public function openCreateClientModal(?string $name = null): void
+    {
+        $this->newClientName = trim($name ?? $this->clientSearch);
+        $this->newClientPhone = '';
+        $this->newClientEmail = null;
+        $this->resetValidation(['newClientName', 'newClientPhone', 'newClientEmail']);
+        $this->showCreateClientModal = true;
+    }
+
+    public function openCreateClientModalFromSearch(): void
+    {
+        $this->openCreateClientModal($this->clientSearch);
+    }
+
+    public function closeCreateClientModal(): void
+    {
+        $this->showCreateClientModal = false;
+    }
+
+    public function createClient(): void
+    {
+        $this->validate([
+            'newClientName' => 'required|min:1|max:255',
+            'newClientPhone' => 'required|max:14',
+            'newClientEmail' => 'nullable|email|max:255',
+        ], [
+            'newClientName.required' => 'اسم العميل مطلوب.',
+            'newClientPhone.required' => 'رقم الهاتف مطلوب.',
+        ]);
+
+        $tenantId = currentTenantId();
+
+        if (! $tenantId) {
+            $this->addError('newClientName', __('No tenant selected.'));
+
+            return;
+        }
+
+        $client = Client::withoutGlobalScope('tenantable')->firstOrCreate(
+            [
+                'phone' => $this->newClientPhone,
+            ],
+            [
+                'name' => $this->newClientName,
+                'phone' => $this->newClientPhone,
+                'email' => $this->newClientEmail,
+                'tenant_id' => $tenantId,
+            ],
+        );
+
+        $client->tenants()->sync(
+            [
+                $tenantId => [
+                    'active' => true,
+                    'meta' => [
+                        'name' => $this->newClientName,
+                        'email' => $this->newClientEmail,
+                        'phone' => $this->newClientPhone,
+                    ],
+                ],
+            ],
+            false,
+        );
+
+        $this->selectClient($client->id);
+        $this->showCreateClientModal = false;
+        $this->dispatch('notify', text: 'تم إضافة العميل واختياره.', type: 'success');
     }
 
     public function addItem(): void

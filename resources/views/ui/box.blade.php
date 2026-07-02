@@ -9,7 +9,7 @@
 
 <div {{ $attributes->class('bg-white rounded-xl w-full') }}>
     @if ($title)
-        <div class="mb-6 p-4  text-gray-600 border-b-2 border-gray-100 flex items-center justify-between">
+        <div class=" p-4  text-gray-600 border-b-2 border-gray-100 flex items-center justify-between">
             <div>
                 <div class=" flex items-center gap-x-2">
                     {{ $rightAction ?? '' }}
@@ -31,14 +31,16 @@
         </div>
     @endif
 
-    <div class="w-full [&>*:first-child]:rounded-ts-none">
+    <div class="w-full [&>*:first-child]:rounded-ts-none Xp-5 pt-0">
         @if ($content)
             <div class="p-4">
                 {{ $content }}
             </div>
         @endif
 
-        {{ $slot }}
+        <div class="">
+            {{ $slot }}
+        </div>
     </div>
 
     @if ($footer)

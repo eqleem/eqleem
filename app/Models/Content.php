@@ -130,9 +130,13 @@ class Content extends Model implements HasMedia
         $this->forceFill(['data' => $data])->save();
     }
 
-    // public function block(): BelongsTo
-    // {
-    //     return $this->belongsTo(Block::class);
-    // }
+    public function block(): BelongsTo
+    {
+        return $this->belongsTo(Block::class);
+    }
 
+    public function blocks(): HasMany
+    {
+        return $this->hasMany(Block::class)->orderBy('sort_order');
+    }
 }
