@@ -1,7 +1,7 @@
 <div class="p-4 text-center text-stone-500 text-xs mt-3">
 
     @if ($showDocumentsWarranties && $businessDocuments->isNotEmpty())
-        <div class="mb-4 flex flex-wrap items-stretch justify-center gap-3">
+        <div class="mb-7 flex flex-wrap items-stretch justify-center gap-3">
             @foreach ($businessDocuments as $document)
                 <div
                     wire:key="footer-document-{{ $document['key'] }}"
@@ -40,7 +40,7 @@
         </div>
     @endif
 
-    <div class="mt-3 flex justify-center">
+    <div class="mt-6 flex justify-center">
         <a href="https://eqleem.com" target="_blank" rel="noopener noreferrer" title="إقليم" aria-label="إقليم" class="inline-block text-stone-500 hover:text-stone-600 transition">
             <img class="h-6 w-auto" src="{{ asset('assets/images/logo-text-black.webp') }}" alt="إقليم">
         </a>
