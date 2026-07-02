@@ -1,40 +1,43 @@
-<div class="space-y-4">
+<div class="space-y-3">
     @if ($themes->isEmpty())
-        <div class="rounded-2xl bg-stone-100/50 p-8 text-center text-sm text-stone-500">
+        <div class="rounded-xl bg-stone-100/50 p-6 text-center text-sm text-stone-500">
             لا توجد قوالب متاحة حالياً.
         </div>
     @else
-        <div class="rounded-2xl bg-stone-300/30 p-3">
-            <div class="no-scrollbar flex gap-3 overflow-x-auto">
+        <div class="rounded-xl bg-stone-300/30 p-2">
+            <div class="no-scrollbar flex gap-2 overflow-x-auto">
                 @foreach ($themes as $theme)
                     <button
                         type="button"
                         wire:click="selectTheme({{ $theme['id'] }})"
                         wire:key="theme-thumb-{{ $theme['id'] }}"
                         @class([
-                            'group relative w-28 shrink-0 rounded-xl border-2 bg-transparent text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 sm:w-48',
+                            'group relative w-24 shrink-0 rounded-lg border-2 bg-transparent text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 sm:w-40',
                             'border-primary-500 shadow-md border-primary-500/15' => $selectedThemeId === $theme['id'],
                             'border-transparent hover:border-stone-200 hover:shadow-sm bg-white' => $selectedThemeId !== $theme['id'],
                         ])
                     >
                         @if ($theme['is_active'])
-                            <span class="absolute start-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
-                                <ui:icon name="Check" class="!h-3 !w-3" />
+                            <span class="absolute start-1.5 top-1.5 z-10 inline-flex items-center gap-0.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
+                                <ui:icon name="Check" class="!h-2.5 !w-2.5" />
                                 نشط
                             </span>
                         @endif
 
-                        <div class="overflow-hidden rounded-t-[10px] bg-stone-100">
+                        <div class="overflow-hidden rounded-t-md bg-stone-100">
                             <img
                                 src="{{ $theme['image_path'] }}"
                                 alt="{{ $theme['name'] }}"
-                                class="aspect-[2/2] w-full object-coverx object-top transition duration-300 group-hover:scale-[1.02]"
+                                class="aspect-square w-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
                                 loading="lazy"
                             >
                         </div>
 
-                        <div class="p-3 bg-white rounded-b-xl">
-                            <p class="truncate text-xs font-semibold text-stone-700">{{ $theme['name'] }}</p>
+                        <div class="rounded-b-lg bg-white px-2 py-1.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="min-w-0 truncate text-[11px] font-medium text-stone-700">{{ $theme['name'] }}</span>
+                                <span class="shrink-0 text-[11px] font-semibold text-green-600">{{ $theme['price_label'] }}</span>
+                            </div>
                         </div>
                     </button>
                 @endforeach
@@ -43,53 +46,54 @@
 
         @if ($selectedTheme)
             <div
-                class="overflow-hidden rounded-2xl bg-white shadow-sm"
+                class="overflow-hidden rounded-xl bg-white shadow-sm"
                 wire:key="theme-details-{{ $selectedTheme['id'] }}-{{ $selectedTheme['is_active'] ? 'active' : 'inactive' }}"
+                x-data="{ activeTab: @js($selectedTheme['is_active'] ? 'customize' : 'info') }"
             >
-                <div class="flex flex-col gap-3 border-b border-stone-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div class="min-w-0">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <h3 class="text-lg font-semibold text-stone-900">{{ $selectedTheme['name'] }}</h3>
+                <div class="border-b border-stone-100">
+                    <div class="flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex min-w-0 items-center justify-end gap-1.5">
+                                    <h3 class="truncate text-base font-semibold text-stone-900">{{ $selectedTheme['name'] }}</h3>
 
-                            @if ($selectedTheme['is_active'])
-                                <ui:badge color="green" size="sm">القالب النشط</ui:badge>
-                            @endif
+                                    @if ($selectedTheme['is_active'])
+                                        <ui:badge color="green" size="sm">القالب النشط</ui:badge>
+                                    @endif
+                                </div>
+                                <span class="shrink-0 text-sm font-semibold text-green-600">{{ $selectedTheme['price_label'] }}</span>
+                            </div>
+
+                            {{-- <p class="mt-0.5 text-end text-xs text-stone-500">{{ $selectedTheme['label_ar'] }}</p> --}}
                         </div>
 
-                        <p class="mt-0.5 text-sm text-stone-500">{{ $selectedTheme['label_ar'] }}</p>
+                        <div class="shrink-0">
+                            @if ($selectedTheme['is_active'])
+                                <div class="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700">
+                                    <ui:icon name="circle-check" class="!h-3.5 !w-3.5" />
+                                    مُفعّل على صفحتك
+                                </div>
+                            @else
+                                <ui:button
+                                    wire:click="setDefaultTheme"
+                                    wire:loading.attr="disabled"
+                                    target="setDefaultTheme"
+                                    icon="Palette"
+                                    label="تعيين كقالب افتراضي"
+                                />
+                            @endif
+                        </div>
                     </div>
 
-                    <div class="shrink-0">
-                        @if ($selectedTheme['is_active'])
-                            <div class="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700">
-                                <ui:icon name="circle-check" class="!h-4 !w-4" />
-                                مُفعّل على صفحتك
-                            </div>
-                        @else
-                            <ui:button
-                                wire:click="setDefaultTheme"
-                                wire:loading.attr="disabled"
-                                target="setDefaultTheme"
-                                icon="Palette"
-                                label="تعيين كقالب افتراضي"
-                            />
-                        @endif
-                    </div>
-                </div>
-
-                <div
-                    x-data="{ activeTab: @js($selectedTheme['is_active'] ? 'customize' : 'info') }"
-                    class="p-4 sm:p-5"
-                >
-                    <nav class="mb-5 flex w-fit items-center gap-1 rounded-xl bg-stone-100/80 p-0.5">
+                    <nav class="flex items-center gap-0.5 border-b border-stone-200  bg-stone-100">
                         @if ($selectedTheme['is_active'])
                             <button
                                 type="button"
                                 x-on:click="activeTab = 'customize'"
                                 x-bind:class="activeTab === 'customize'
-                                    ? 'bg-white text-stone-900 shadow-sm font-semibold'
-                                    : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                                class="rounded-lg px-4 py-2 text-sm transition"
+                                    ? 'border-b-2 border-primary-500 text-stone-900 font-semibold'
+                                    : 'border-b-2 border-transparent text-stone-500 hover:text-stone-700'"
+                                class="-mb-px px-3 py-2 text-xs transition sm:text-sm"
                             >
                                 تخصيص القالب
                             </button>
@@ -97,9 +101,9 @@
                                 type="button"
                                 x-on:click="activeTab = 'info'"
                                 x-bind:class="activeTab === 'info'
-                                    ? 'bg-white text-stone-900 shadow-sm font-semibold'
-                                    : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                                class="rounded-lg px-4 py-2 text-sm transition"
+                                    ? 'border-b-2 border-primary-500 text-stone-900 font-semibold'
+                                    : 'border-b-2 border-transparent text-stone-500 hover:text-stone-700'"
+                                class="-mb-px px-3 py-2 text-xs transition sm:text-sm"
                             >
                                 معلومات
                             </button>
@@ -108,9 +112,9 @@
                                 type="button"
                                 x-on:click="activeTab = 'info'"
                                 x-bind:class="activeTab === 'info'
-                                    ? 'bg-white text-stone-900 shadow-sm font-semibold'
-                                    : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                                class="rounded-lg px-4 py-2 text-sm transition"
+                                    ? 'border-b-2 border-primary-500 text-stone-900 font-semibold'
+                                    : 'border-b-2 border-transparent text-stone-500 hover:text-stone-700'"
+                                class="-mb-px px-3 py-2 text-xs transition sm:text-sm"
                             >
                                 معلومات
                             </button>
@@ -118,24 +122,26 @@
                                 type="button"
                                 x-on:click="activeTab = 'customize'"
                                 x-bind:class="activeTab === 'customize'
-                                    ? 'bg-white text-stone-900 shadow-sm font-semibold'
-                                    : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                                class="rounded-lg px-4 py-2 text-sm transition"
+                                    ? 'border-b-2 border-primary-500 text-stone-900 font-semibold'
+                                    : 'border-b-2 border-transparent text-stone-500 hover:text-stone-700'"
+                                class="-mb-px px-3 py-2 text-xs transition sm:text-sm"
                             >
                                 تخصيص القالب
                             </button>
                         @endif
                     </nav>
+                </div>
 
-                    <div x-cloak x-show="activeTab === 'info'" class="space-y-5">
+                <div class="p-3">
+                    <div x-cloak x-show="activeTab === 'info'" class="space-y-3">
                         @if (count($selectedTheme['gallery']) > 0)
-                            <div class="no-scrollbar flex gap-3 overflow-x-auto pb-1">
+                            <div class="no-scrollbar flex gap-2 overflow-x-auto">
                                 @foreach ($selectedTheme['gallery'] as $image)
-                                    <div class="shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-50">
+                                    <div class="shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
                                         <img
                                             src="{{ $image }}"
                                             alt="{{ $selectedTheme['name'] }}"
-                                            class="h-36 w-24 object-cover object-top sm:h-44 sm:w-28"
+                                            class="h-28 w-20 object-cover object-top sm:h-32 sm:w-24"
                                             loading="lazy"
                                         >
                                     </div>
@@ -143,53 +149,53 @@
                             </div>
                         @endif
 
-                        <div class="grid gap-5 lg:grid-cols-2">
-                            <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60">
-                                <div class="border-b border-stone-200 bg-white px-4 py-2.5">
-                                    <p class="text-xs font-medium text-stone-400">معاينة القالب</p>
+                        <div class="grid gap-3 lg:grid-cols-2">
+                            <div class="overflow-hidden rounded-lg border border-stone-200 bg-stone-50/60">
+                                <div class="border-b border-stone-200 bg-white px-3 py-1.5">
+                                    <p class="text-[11px] font-medium text-stone-400">معاينة القالب</p>
                                 </div>
-                                <div class="flex justify-center p-4">
+                                <div class="flex justify-center p-3">
                                     <img
                                         src="{{ $selectedTheme['preview_url'] }}"
                                         alt="{{ $selectedTheme['name'] }}"
-                                        class="max-h-80 w-auto rounded-lg border border-stone-200 bg-white shadow-sm"
+                                        class="max-h-56 w-auto rounded-md border border-stone-200 bg-white shadow-sm sm:max-h-64"
                                     >
                                 </div>
                             </div>
 
-                            <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60">
-                                <div class="border-b border-stone-200 bg-white px-4 py-2.5">
-                                    <p class="text-xs font-medium text-stone-400">معلومات القالب</p>
+                            <div class="overflow-hidden rounded-lg border border-stone-200 bg-stone-50/60">
+                                <div class="border-b border-stone-200 bg-white px-3 py-1.5">
+                                    <p class="text-[11px] font-medium text-stone-400">معلومات القالب</p>
                                 </div>
 
-                                <dl class="divide-y divide-stone-200/80 p-4">
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">المعرّف</dt>
-                                        <dd class="text-sm font-medium text-stone-800">{{ $selectedTheme['slug'] }}</dd>
+                                <dl class="divide-y divide-stone-200/80 px-3 py-1">
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">المعرّف</dt>
+                                        <dd class="text-xs font-medium text-stone-800">{{ $selectedTheme['slug'] }}</dd>
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">النوع</dt>
-                                        <dd class="text-sm font-medium text-stone-800">{{ $selectedTheme['type'] }}</dd>
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">النوع</dt>
+                                        <dd class="text-xs font-medium text-stone-800">{{ $selectedTheme['type'] }}</dd>
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">التطبيق</dt>
-                                        <dd class="text-sm font-medium text-stone-800">{{ $selectedTheme['app'] }}</dd>
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">التطبيق</dt>
+                                        <dd class="text-xs font-medium text-stone-800">{{ $selectedTheme['app'] }}</dd>
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">المصمم</dt>
-                                        <dd class="text-sm font-medium text-stone-800">{{ $selectedTheme['designer'] }}</dd>
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">المصمم</dt>
+                                        <dd class="text-xs font-medium text-stone-800">{{ $selectedTheme['designer'] }}</dd>
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">السعر</dt>
-                                        <dd class="text-sm font-semibold text-stone-800">{{ $selectedTheme['price_label'] }}</dd>
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">السعر</dt>
+                                        <dd class="text-xs font-semibold text-green-600">{{ $selectedTheme['price_label'] }}</dd>
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-4 py-2.5">
-                                        <dt class="text-sm text-stone-500">الحالة</dt>
+                                    <div class="flex items-center justify-between gap-3 py-1.5">
+                                        <dt class="text-xs text-stone-500">الحالة</dt>
                                         <dd>
                                             @if ($selectedTheme['is_active'])
                                                 <ui:badge color="green" size="sm">مُفعّل على الصفحة</ui:badge>
@@ -220,6 +226,10 @@
                                     <ui:button target="saveThemeOptions" label="{{ __('Save') }}" />
                                 </x-slot>
                             </ui:form>
+                        @else
+                            <div class="rounded-lg bg-stone-50 px-4 py-6 text-center text-sm text-stone-500">
+                                لا توجد خيارات متاحة لهذا القالب
+                            </div>
                         @endif
                     </div>
                 </div>
