@@ -290,4 +290,27 @@ class Setting extends Model
 
         return array_merge(static::courseSettingsDefaults(), $saved?->settings ?? []);
     }
+
+    public const UNIT_RENTAL_SETTINGS_SLUG = 'unit-rental-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function unitRentalSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'تأجير الوحدات',
+            'section_description' => 'احجز الوحدات المتاحة للتأجير بسهولة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function unitRentalSettings(): array
+    {
+        $saved = static::forSlug(static::UNIT_RENTAL_SETTINGS_SLUG);
+
+        return array_merge(static::unitRentalSettingsDefaults(), $saved?->settings ?? []);
+    }
 }

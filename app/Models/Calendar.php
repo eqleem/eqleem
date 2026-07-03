@@ -84,6 +84,7 @@ class Calendar extends Model
             'provider' => 'مقدم خدمة',
             'place' => 'مكان',
             'tool' => 'أداة',
+            'rental-unit' => 'وحدة تأجير',
         ];
     }
 

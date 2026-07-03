@@ -1,7 +1,9 @@
+@php($settings = \App\Models\Setting::menuSettings())
+
 <x-tenant-theme::module-layout
     icon="hugeicons:restaurant-01"
-    title="المنيو"
-    desc="اختر وجبتك المفضلة وأضفها للسلة بسرعة."
+    :title="$settings['section_title']"
+    :desc="$settings['section_description']"
     backLink="{{ route('tenant.menu.index') }}"
     backLinkText="العودة للمنيو"
 >

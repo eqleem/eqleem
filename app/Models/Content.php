@@ -135,6 +135,9 @@ class Content extends Model implements HasMedia
 
         $this->addMediaCollection('course-lesson-files')
             ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('unit-media')
+            ->useDisk(config('media-library.disk_name'));
     }
 
     public function hasMediaAtPath(string $collection, string $path): bool
@@ -236,6 +239,20 @@ class Content extends Model implements HasMedia
     {
         return collect($this->serviceImages())
             ->pluck('url')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function unitImages(): array
+    {
+        return $this->getMedia('unit-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
             ->values()
             ->all();
     }

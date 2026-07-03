@@ -2,69 +2,115 @@
 
 namespace App\Livewire\Tenant\Menu;
 
+use App\Models\Content;
+use App\Models\Setting;
+use App\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Index extends Component
 {
-    /** @var array<int, array<string, mixed>> */
-    public array $meals = [];
+    #[Url(as: 'category', except: '', history: true)]
+    public ?string $categorySlug = null;
 
-    public function mount(): void
-    {
-        $this->meals = [
-            [
-                'id' => 'm1',
-                'name' => 'وجبة دجاج مشوي',
-                'category' => 'وجبات رئيسية',
-                'price' => 32,
-                'image' => 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['بطاطس مقلية', 'سلطة خضراء', 'صوص الثوم', 'خبز إضافي'],
-            ],
-            [
-                'id' => 'm2',
-                'name' => 'برجر لحم أنجوس',
-                'category' => 'وجبات رئيسية',
-                'price' => 29,
-                'image' => 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['جبنة إضافية', 'بصل مكرمل', 'صوص باربكيو', 'مخلل'],
-            ],
-            [
-                'id' => 'm3',
-                'name' => 'طبق مشاوي مشكل',
-                'category' => 'مشاوي',
-                'price' => 48,
-                'image' => 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['رز بسمتي', 'خبز تنور', 'طحينة', 'حمص'],
-            ],
-            [
-                'id' => 'm4',
-                'name' => 'باستا ألفريدو',
-                'category' => 'وجبات رئيسية',
-                'price' => 34,
-                'image' => 'https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['فطر', 'دجاج إضافي', 'جبنة بارميزان', 'صوص حار'],
-            ],
-            [
-                'id' => 'm5',
-                'name' => 'سلطة سيزر',
-                'category' => 'مقبلات',
-                'price' => 21,
-                'image' => 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['دجاج مشوي', 'خبز محمص', 'صوص إضافي', 'جبنة بارميزان'],
-            ],
-            [
-                'id' => 'm6',
-                'name' => 'عصير برتقال طازج',
-                'category' => 'مشروبات',
-                'price' => 14,
-                'image' => 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=1200&auto=format&fit=crop',
-                'options' => ['بدون سكر', 'ثلج إضافي', 'نعناع', 'كوب كبير'],
-            ],
-        ];
-    }
+    public string $search = '';
 
     public function render()
     {
-        return tenantView('menu.index')->title('قائمة الطعام');
+        $this->syncCategorySlugFromRequest();
+
+        $categories = $this->filterCategories();
+        $categoryIds = $this->categoryFilterIds();
+
+        $meals = Content::query()
+            ->type(contentTypeModel('menu'))
+            ->published()
+            ->where('active', true)
+            ->with(['taxonomies' => fn ($query) => $query->where('type', 'menu_category')])
+            ->when(
+                $categoryIds !== [],
+                fn (Builder $query) => $query->withAnyTaxonomiesOfType('menu_category', $categoryIds),
+            )
+            ->when(
+                $this->search !== '',
+                fn (Builder $query) => $query->where(function (Builder $builder): void {
+                    $term = '%'.$this->search.'%';
+
+                    $builder->where('title', 'like', $term);
+                }),
+            )
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
+            ->get();
+
+        $mealsForJs = $meals
+            ->map(fn (Content $meal): array => [
+                'id' => (string) $meal->id,
+                'name' => $meal->title,
+                'category' => $meal->taxonomies->first()?->name ?? '',
+                'price' => (int) data_get($meal->data, 'price', 0),
+                'image' => $meal->getFirstMediaUrl('menu-media') ?: $meal->avatar,
+                'meal_options' => data_get($meal->data, 'meal_options', []),
+            ])
+            ->values()
+            ->all();
+
+        return tenantView('menu.index', [
+            'categories' => $categories,
+            'meals' => $meals,
+            'mealsForJs' => $mealsForJs,
+            'categorySlug' => $this->categorySlug,
+        ])->title(Setting::menuSettings()['section_title']);
+    }
+
+    private function syncCategorySlugFromRequest(): void
+    {
+        if (! request()->has('category')) {
+            return;
+        }
+
+        $slug = request()->query('category');
+
+        $this->categorySlug = filled($slug) ? (string) $slug : null;
+    }
+
+    /**
+     * @return Collection<int, Taxonomy>
+     */
+    private function filterCategories(): Collection
+    {
+        return Taxonomy::query()
+            ->type('menu_category')
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function categoryFilterIds(): array
+    {
+        if (! filled($this->categorySlug)) {
+            return [];
+        }
+
+        $category = Taxonomy::query()
+            ->type('menu_category')
+            ->where('slug', $this->categorySlug)
+            ->first();
+
+        if (! $category) {
+            return [];
+        }
+
+        return $category->descendants()
+            ->pluck('id')
+            ->prepend($category->id)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
     }
 }

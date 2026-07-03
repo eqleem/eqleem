@@ -1,7 +1,9 @@
+@php($settings = \App\Models\Setting::courseSettings())
+
 <x-tenant-theme::module-layout
     icon="hugeicons:presentation-06"
-    title="أكاديمية أبعاد البيت"
-    desc="دورات عملية في التشطيبات والديكور بأسلوب واضح وتطبيقات واقعية."
+    :title="$settings['section_title']"
+    :desc="$settings['section_description']"
     backLink="{{ route('tenant.courses.index') }}"
     backLinkText="العودة لقائمة الدورات"
 >

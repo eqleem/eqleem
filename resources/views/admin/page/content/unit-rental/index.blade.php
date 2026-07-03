@@ -4,22 +4,36 @@
             <img src="{{ asset($contentType['icon']) }}" class="w-7 h-7" alt="">
         </x-slot:icon>
 
-        <div class="px-4 lg:px-8 divide-y divide-gray-100">
-            @foreach ($items as $item)
-                <a
-                    href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item['id']]) }}"
-                    wire:navigate
-                    wire:key="unit-rental-item-{{ $item['id'] }}"
-                    class="flex items-center justify-between gap-4 py-4 hover:bg-gray-50 -mx-4 px-4 lg:-mx-8 lg:px-8 transition"
-                >
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800">{{ $item['title'] }}</p>
-                        <p class="text-xs text-gray-400 mt-0.5">{{ $item['subtitle'] }}</p>
-                    </div>
-                    <ui:icon name="arrow-left" class="w-4 h-4 text-gray-400 ltr:rotate-180 shrink-0" />
-                </a>
-            @endforeach
-        </div>
+        <ui:tab.group
+            :active="$activeUnitRentalTab"
+            url-key="section"
+            :valid-tabs="['units', 'categories', 'calendars', 'customize']"
+        >
+            <x-slot name="nav" class="border-b border-stone-200 px-px">
+                <ui:tab.nav name="units" label="أنواع الوحدات" icon="building-estate" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav name="categories" label="التصنيفات" icon="category" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav name="calendars" label="مخزون الوحدات" icon="calendar" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav name="customize" label="تخصيص القسم" icon="settings" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+            </x-slot>
+
+            <x-slot name="content">
+                <ui:tab.content name="units" class="!p-0 !rounded-none">
+                    <livewire:admin::page.content.unit-rental.table :contentType="$contentType" lazy />
+                </ui:tab.content>
+
+                <ui:tab.content name="categories" class="!p-0 !rounded-none">
+                    <livewire:admin::page.content.unit-rental.categories-table :contentType="$contentType" lazy />
+                </ui:tab.content>
+
+                <ui:tab.content name="calendars" class="!p-0 !rounded-none">
+                    <livewire:admin::page.content.unit-rental.calendars-table lazy />
+                </ui:tab.content>
+
+                <ui:tab.content name="customize" class="!p-4">
+                    <livewire:admin::page.content.unit-rental.customize lazy />
+                </ui:tab.content>
+            </x-slot>
+        </ui:tab.group>
     </ui:mainbox>
 </div>
 
@@ -30,17 +44,22 @@ new class extends \Livewire\Component
     /** @var array<string, mixed> */
     public array $contentType = [];
 
-    /** @return array<int, array{id: int, title: string, subtitle: string}> */
-    public function items(): array
+    public string $activeUnitRentalTab = 'units';
+
+    /** @var list<string> */
+    private const UNIT_RENTAL_TABS = ['units', 'categories', 'calendars', 'customize'];
+
+    public function mount(): void
     {
-        return [
-            ['id' => 1, 'title' => 'وحدة تجريبية ١', 'subtitle' => 'شقة — متاحة'],
-            ['id' => 2, 'title' => 'وحدة تجريبية ٢', 'subtitle' => 'فيلا — مؤجرة'],
-        ];
+        $section = request()->query('section', 'units');
+
+        if (in_array($section, self::UNIT_RENTAL_TABS, true)) {
+            $this->activeUnitRentalTab = $section;
+        }
     }
 
     public function render()
     {
-        return $this->view(['items' => $this->items()]);
+        return $this->view();
     }
 }; ?>

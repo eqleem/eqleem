@@ -2,57 +2,34 @@
 
 namespace App\Livewire\Tenant\Newsletter;
 
+use App\Models\Content;
 use Livewire\Component;
 
 class Detail extends Component
 {
-    public array $article = [];
+    public Content $issue;
 
     public function mount(string $slug): void
     {
-        $articles = [
-            'design-trends-summer-2026' => [
-                'title' => 'اتجاهات التصميم لصيف 2026',
-                'excerpt' => 'ألوان هادئة، خامات طبيعية، وحلول عملية للمساحات الصغيرة.',
-                'date' => '20 يونيو 2026',
-                'image' => 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
-                'content' => [
-                    'التوجه هذا الموسم يميل للألوان الترابية والمواد الطبيعية مثل الخشب والحجر الخفيف، لأنها تعطي إحساسا بالهدوء والاتساع داخل المنزل.',
-                    'عند اختيار الأثاث، الأفضل المزج بين القطع البسيطة والخطوط النظيفة مع إضاءة دافئة. هذا الدمج يخلق مساحة مريحة وسهلة التحديث مستقبلا.',
-                    'لو المساحة صغيرة، ركز على التخزين الذكي واستخدام المرايا والألوان الفاتحة حتى تحصل على مظهر عملي وأنيق بدون ازدحام بصري.',
-                ],
-            ],
-            'marble-alternative-guide' => [
-                'title' => 'دليل بديل الرخام: المميزات والاستخدامات',
-                'excerpt' => 'كيف تختار البديل المناسب للجدران والمداخل حسب الميزانية.',
-                'date' => '13 يونيو 2026',
-                'image' => 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
-                'content' => [
-                    'بديل الرخام صار خيارا شائعا لأنه يعطي مظهرا فاخرا مع تكلفة أقل وسهولة أعلى في التركيب مقارنة بالرخام الطبيعي.',
-                    'قبل الشراء، قارن بين السمك، مقاومة الرطوبة، وضمان الخامة. هذه النقاط تؤثر مباشرة على العمر الافتراضي وجودة النتيجة النهائية.',
-                    'يفضل استخدامه في الجدران الداخلية والمداخل مع عناية دورية بسيطة للحفاظ على اللمعة والمظهر النظيف لأطول فترة ممكنة.',
-                ],
-            ],
-            'weekly-secret-picks' => [
-                'title' => 'اختيارات النشرة السرية لهذا الأسبوع',
-                'excerpt' => '3 توصيات سريعة لتحسين شكل المنزل بدون تكلفة كبيرة.',
-                'date' => '06 يونيو 2026',
-                'image' => 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=1200&q=80',
-                'content' => [
-                    'ابدأ بتغيير الإضاءة البيضاء الحادة إلى إضاءة دافئة في مناطق الجلوس، هذا التعديل وحده يغيّر أجواء المكان بشكل واضح.',
-                    'استخدم لوحة ألوان موحدة للإكسسوارات الصغيرة مثل الوسائد والسجاد حتى يبدو التصميم أكثر اتساقا واحترافية.',
-                    'أخيرا، تخلص من الفوضى البصرية بوحدات تخزين بسيطة ومفتوحة، لأنها تمنحك شكل مرتب بدون الحاجة لتجديد كامل.',
-                ],
-            ],
-        ];
-
-        abort_unless(isset($articles[$slug]), 404);
-
-        $this->article = $articles[$slug];
+        $this->issue = Content::query()
+            ->type(contentTypeModel('newsletter'))
+            ->published()
+            ->where('active', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
     }
 
     public function render()
     {
-        return tenantView('newsletter.detail')->title('تفاصيل النشرة');
+        $displayDate = $this->issue->newsletterSentAt() ?? $this->issue->published_at;
+
+        return tenantView('newsletter.detail', [
+            'issue' => $this->issue,
+            'subject' => (string) data_get($this->issue->data, 'subject', $this->issue->title),
+            'subtitle' => (string) data_get($this->issue->data, 'subtitle', ''),
+            'body' => (string) data_get($this->issue->data, 'body', ''),
+            'imageUrl' => contentImageUrl(data_get($this->issue->data, 'image')) ?? $this->issue->avatar,
+            'displayDate' => $displayDate,
+        ])->title($this->issue->title);
     }
 }

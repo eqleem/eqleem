@@ -1,8 +1,4 @@
 <x-tenant::properties-rental.layout>
-    @push('scripts')
-        @vite(['resources/js/property-booking.js'])
-    @endpush
-
     <x-tenant::breadcrumb :links="[
         ['url' => route('tenant.properties-rental.index'), 'title' => 'تأجير الوحدات'],
         ['url' => null, 'title' => 'تفاصيل الوحدة'],

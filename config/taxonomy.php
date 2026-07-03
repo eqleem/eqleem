@@ -83,6 +83,8 @@ return [
         'menu_tag',
         'course_category',
         'course_tag',
+        'unit_category',
+        'unit_tag',
     ],
 
     /*

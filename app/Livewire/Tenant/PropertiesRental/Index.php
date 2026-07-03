@@ -2,104 +2,104 @@
 
 namespace App\Livewire\Tenant\PropertiesRental;
 
+use App\Models\Content;
+use App\Models\Setting;
+use App\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Index extends Component
 {
-    /** @var array<int, string> */
-    public array $categories = [];
+    #[Url(as: 'category', except: '', history: true)]
+    public ?string $categorySlug = null;
 
-    /** @var array<int, array<string, int|string>> */
-    public array $properties = [];
-
-    public function mount(): void
-    {
-        $this->categories = [
-            'استديو',
-            'شقة غرفة وصالة',
-            'شقة غرفتين وصالة',
-            'جناح فاخر',
-            'وحدة عائلية',
-        ];
-
-        $this->properties = [
-            [
-                'slug' => 'master-studio-hadi',
-                'name' => 'استديو هادي بسرير ماستر',
-                'location' => 'الرياض - حي العقيق',
-                'image' => 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 1,
-                'baths' => 1,
-                'area' => 35,
-                'rating' => '10.0',
-                'discount' => 25,
-                'price_per_night' => 285,
-            ],
-            [
-                'slug' => 'side-session-studio',
-                'name' => 'استديو راقٍ بجلسة جانبية',
-                'location' => 'الرياض - حي اليرموك',
-                'image' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 1,
-                'baths' => 1,
-                'area' => 30,
-                'rating' => '9.8',
-                'discount' => 15,
-                'price_per_night' => 249,
-            ],
-            [
-                'slug' => 'two-bedroom-lounge',
-                'name' => 'شقة غرفتين وصالة',
-                'location' => 'الرياض - حي الملقا',
-                'image' => 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 3,
-                'baths' => 2,
-                'area' => 90,
-                'rating' => '9.7',
-                'discount' => 8,
-                'price_per_night' => 400,
-            ],
-            [
-                'slug' => 'one-bedroom-lounge',
-                'name' => 'شقة غرفة نوم وصالة',
-                'location' => 'الرياض - حي النرجس',
-                'image' => 'https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 1,
-                'baths' => 1,
-                'area' => 60,
-                'rating' => '10.0',
-                'discount' => 5,
-                'price_per_night' => 295,
-            ],
-            [
-                'slug' => 'premium-master-suite',
-                'name' => 'جناح ماستر فاخر',
-                'location' => 'الرياض - حي الفلاح',
-                'image' => 'https://images.unsplash.com/photo-1616594039964-3f5f9f8d90f4?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 1,
-                'baths' => 1,
-                'area' => 50,
-                'rating' => '9.9',
-                'discount' => 10,
-                'price_per_night' => 320,
-            ],
-            [
-                'slug' => 'family-two-room-unit',
-                'name' => 'وحدة عائلية غرفتين',
-                'location' => 'الرياض - حي الصحافة',
-                'image' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop',
-                'beds' => 2,
-                'baths' => 2,
-                'area' => 110,
-                'rating' => '9.6',
-                'discount' => 12,
-                'price_per_night' => 360,
-            ],
-        ];
-    }
+    public string $search = '';
 
     public function render()
     {
-        return tenantView('properties-rental.index')->title('تأجير الوحدات');
+        $this->syncCategorySlugFromRequest();
+
+        $categories = $this->filterCategories();
+        $categoryIds = $this->categoryFilterIds();
+
+        $units = Content::query()
+            ->type(contentTypeModel('unit-rental'))
+            ->published()
+            ->where('active', true)
+            ->with(['taxonomies' => fn ($query) => $query->where('type', 'unit_category')])
+            ->when(
+                $categoryIds !== [],
+                fn (Builder $query) => $query->withAnyTaxonomiesOfType('unit_category', $categoryIds),
+            )
+            ->when(
+                $this->search !== '',
+                fn (Builder $query) => $query->where(function (Builder $builder): void {
+                    $term = '%'.$this->search.'%';
+
+                    $builder
+                        ->where('title', 'like', $term)
+                        ->orWhere('data->subtitle', 'like', $term);
+                }),
+            )
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return tenantView('properties-rental.index', [
+            'categories' => $categories,
+            'units' => $units,
+            'categorySlug' => $this->categorySlug,
+        ])->title(Setting::unitRentalSettings()['section_title']);
+    }
+
+    private function syncCategorySlugFromRequest(): void
+    {
+        if (! request()->has('category')) {
+            return;
+        }
+
+        $slug = request()->query('category');
+
+        $this->categorySlug = filled($slug) ? (string) $slug : null;
+    }
+
+    /**
+     * @return Collection<int, Taxonomy>
+     */
+    private function filterCategories(): Collection
+    {
+        return Taxonomy::query()
+            ->type('unit_category')
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function categoryFilterIds(): array
+    {
+        if (! filled($this->categorySlug)) {
+            return [];
+        }
+
+        $category = Taxonomy::query()
+            ->type('unit_category')
+            ->where('slug', $this->categorySlug)
+            ->first();
+
+        if (! $category) {
+            return [];
+        }
+
+        return $category->descendants()
+            ->pluck('id')
+            ->prepend($category->id)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
     }
 }

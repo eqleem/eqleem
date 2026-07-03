@@ -30,6 +30,18 @@ return [
             'index' => 'tenant.properties-rental.index',
             'detail' => 'tenant.properties-rental.detail',
         ],
+        'courses' => [
+            'index' => 'tenant.courses.index',
+            'detail' => 'tenant.courses.detail',
+        ],
+        'digital-products' => [
+            'index' => 'tenant.digital-products.index',
+            'detail' => 'tenant.digital-products.detail',
+        ],
+        'digital-services' => [
+            'index' => 'tenant.digital-services.index',
+            'detail' => 'tenant.digital-services.detail',
+        ],
     ],
 
     'icons' => [
@@ -40,6 +52,9 @@ return [
         'menu' => 'hugeicons:restaurant-01',
         'services' => 'hugeicons:travel-bag',
         'unit-rental' => 'hugeicons:bed-double',
+        'courses' => 'hugeicons:presentation-06',
+        'digital-products' => 'hugeicons:file-download',
+        'digital-services' => 'hugeicons:customer-service-01',
         'form' => 'hugeicons:file-01',
         'external' => 'hugeicons:link-04',
     ],
@@ -52,6 +67,9 @@ return [
         'menu' => 'عنصر محدد من المنيو',
         'services' => 'خدمة محددة',
         'unit-rental' => 'وحدة محددة',
+        'courses' => 'دورة محددة',
+        'digital-products' => 'منتج رقمي محدد',
+        'digital-services' => 'خدمة رقمية محددة',
     ],
 
     'block_link' => [
@@ -84,6 +102,18 @@ return [
                 'title' => 'تأجير الوحدات',
                 'description' => 'اختر وحدتك المناسبة من الاستديوهات والشقق.',
             ],
+            'courses' => [
+                'title' => 'الدورات',
+                'description' => 'دورات عملية لتعلم التشطيبات والديكور خطوة بخطوة مع تمارين وتطبيقات واقعية.',
+            ],
+            'digital-products' => [
+                'title' => 'المنتجات الرقمية',
+                'description' => 'منتجات رقمية قابلة للتحميل والوصول الفوري.',
+            ],
+            'digital-services' => [
+                'title' => 'الخدمات الرقمية',
+                'description' => 'خدمات رقمية احترافية مع مدة تسليم واضحة.',
+            ],
         ],
         'items' => [
             'store' => [
@@ -113,6 +143,18 @@ return [
             'unit-rental' => [
                 'title' => '',
                 'description' => 'استعرض وحدة محددة متاحة للتأجير.',
+            ],
+            'courses' => [
+                'title' => '',
+                'description' => 'استعرض دورة تدريبية محددة بالتفصيل.',
+            ],
+            'digital-products' => [
+                'title' => '',
+                'description' => 'تصفّح منتجاً رقمياً محدداً بالتفصيل.',
+            ],
+            'digital-services' => [
+                'title' => '',
+                'description' => 'تعرّف على خدمة رقمية محددة بالتفصيل.',
             ],
         ],
     ],

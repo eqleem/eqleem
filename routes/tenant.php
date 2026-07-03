@@ -43,6 +43,12 @@ Route::prefix('{tenant}')
         Route::get('/services', Services\Index::class)->name('services.index');
         Route::get('/services/{slug}', Services\Detail::class)->name('services.detail');
 
+        Route::get('/digital-products', DigitalProducts\Index::class)->name('digital-products.index');
+        Route::get('/digital-products/{slug}', DigitalProducts\Detail::class)->name('digital-products.detail');
+
+        Route::get('/digital-services', DigitalServices\Index::class)->name('digital-services.index');
+        Route::get('/digital-services/{slug}', DigitalServices\Detail::class)->name('digital-services.detail');
+
         Route::get('/portfolio', Portfolio\Index::class)->name('portfolio.index');
         Route::get('/portfolio/{slug}', Portfolio\Detail::class)->name('portfolio.detail');
 

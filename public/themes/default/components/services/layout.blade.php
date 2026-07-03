@@ -1,7 +1,9 @@
+@php($settings = \App\Models\Setting::serviceSettings())
+
 <x-tenant-theme::module-layout
     icon="hugeicons:travel-bag"
-    title="خدماتنا"
-    desc="خدمات التشطيبات والديكور الداخلي من التصميم للتنفيذ."
+    :title="$settings['section_title']"
+    :desc="$settings['section_description']"
     backLink="{{ route('tenant.services.index') }}"
     backLinkText="العودة للخدمات"
 >
