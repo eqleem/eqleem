@@ -49,10 +49,11 @@
 <ui:field info="{{ $info }}" :width="$width" >
 
 <div wire:ignore id="ck{{ $modelId }}" x-data="{
-    editor: null,
     value: @entangle($name),
     initialContent: @js($value ?? ''),
     init() {
+        let editorInstance = null;
+
         if (typeof ClassicEditor === 'undefined') {
             console.error('CKEditor is not loaded. Run npm run build or npm run dev.');
 
@@ -140,7 +141,7 @@
 
                 },
             }).then(editor => {
-                this.editor = editor;
+                editorInstance = editor;
 
                 if (! this.value && content) {
                     this.value = content;
@@ -151,14 +152,14 @@
                 });
 
                 this.$watch('value', (newValue) => {
-                    if (! this.editor) {
+                    if (! editorInstance) {
                         return;
                     }
 
-                    const current = this.editor.getData();
+                    const current = editorInstance.getData();
 
                     if ((newValue ?? '') !== current) {
-                        this.editor.setData(newValue ?? '');
+                        editorInstance.setData(newValue ?? '');
                     }
                 });
             });

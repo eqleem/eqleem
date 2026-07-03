@@ -35,6 +35,9 @@ window.DragDrop = DragDrop;
 // Livewire.start();
 
 import "@nextapps-be/livewire-sortablejs";
+import Sortable from "sortablejs";
+
+window.Sortable = Sortable;
 
 // ckeditor5
 

@@ -26,7 +26,7 @@
                 type="button"
                 wire:key="cta-link-{{ $link['id'] }}"
                 @class([
-                    'flex w-full items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-base rounded-2xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
+                    'flex w-full items-center justify-center gap-2 bg-primary-700 hover:bg-primary-700 text-white text-base rounded-2xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
                     'col-span-2 lg:col-span-1' => $isLonelyMobileLast && ! $isLonelyLgLast,
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,
                     'lg:col-span-3' => $isLonelyLgLast && ! $isLonelyMobileLast,

@@ -2,40 +2,38 @@
 
 namespace App\Actions;
 
-use Catalog\Media\Models\Media;
-use App\Models\Tenant;
-use App\Models\Page;
-use App\Models\User;
-use App\Models\Block;
-use App\Models\Post;
- 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class UploadImage
 {
-    public function upload()
+    public function upload(): JsonResponse
     {
-        $modelType = request()->modelType ?: request()->headers->get('modelType');
-        $modelId = request()->modelId ?: request()->headers->get('modelId');
-        $mediaCollection = request()->mediaCollection ?: request()->headers->get('mediaCollection');
-        $tenantId = request()->tenantId ?: request()->headers->get('tenantId');
- 
-        if (request()->file('file')) {
-            $file = request()->file('file');
-        } else {
-            $file = request()->file('upload');
+        $mediaCollection = request()->input('mediaCollection')
+            ?? request()->header('mediaCollection')
+            ?? 'tenant-media/'.(tenant('uuid') ?? 'shared').'/uploads';
+
+        $file = request()->file('file') ?? request()->file('upload');
+
+        if (! $file instanceof UploadedFile) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم إرسال ملف.',
+            ], 422);
         }
-  
-        $filePath = $file->store($mediaCollection);
-        
+
+        $filePath = $file->storePublicly($mediaCollection, 'spaces');
+        $url = Storage::disk('spaces')->url($filePath);
+
         return response()->json([
             'success' => true,
             'message' => 'تم رفع الملف بنجاح .',
             'file' => [
-                'url' =>  $filePath ,  
+                'url' => $url,
             ],
-            'url' =>  $filePath ,
-            'filePath' => $filePath ,
+            'url' => $url,
+            'filePath' => $filePath,
         ]);
- 
     }
 }

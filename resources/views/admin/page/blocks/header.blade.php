@@ -2,14 +2,16 @@
     <ui:form wire:submit="save" class="!p-4  ">
 
         <div class="space-y-2">
-            <ui:toggle name="showAvatar" label="عرض الصورة الشخصية" live />
+            <ui:input name="name" label="اسم الصفحة" placeholder="اسم الصفحة" />
+
+            <ui:toggle name="showAvatar" label="عرض الشعار" live />
 
             @if ($showAvatar)
-                <ui:file name="avatar" label="الصورة الشخصية" uploadLabel="رفع صورة">
-                    @if ($avatar)
-                        <img src="{{ $avatar->temporaryUrl() }}" class="w-20 h-20 rounded-full object-cover mb-1">
-                    @elseif ($currentAvatarPath)
-                        <img src="{{ Storage::url($currentAvatarPath) }}" class="w-20 h-20 rounded-full object-cover mb-1">
+                <ui:file name="logo" label="الشعار" uploadLabel="رفع شعار">
+                    @if ($logo)
+                        <img src="{{ $logo->temporaryUrl() }}" class="w-20 h-20 rounded-full object-cover mb-1">
+                    @elseif ($currentLogo)
+                        <img src="{{ $currentLogo }}" class="w-20 h-20 rounded-full object-cover mb-1">
                     @endif
                 </ui:file>
 
@@ -123,11 +125,13 @@ new class extends \Livewire\Component
 {
     use EditsBlock, WithFileUploads;
 
+    public string $name = '';
+
     public bool $showAvatar = true;
 
-    public $avatar = null;
+    public $logo = null;
 
-    public string $currentAvatarPath = '';
+    public string $currentLogo = '';
 
     public bool $showVerifiedBadge = true;
 
@@ -150,10 +154,12 @@ new class extends \Livewire\Component
     {
         $this->blockId = $blockId;
 
+        $tenant = currentTenant();
         $data = $this->block()->data ?? [];
 
+        $this->name = (string) ($tenant?->name ?? '');
+        $this->currentLogo = (string) ($tenant?->logo ?? '');
         $this->showAvatar = (bool) ($data['show_avatar'] ?? true);
-        $this->currentAvatarPath = (string) ($data['avatar_path'] ?? '');
         $this->showVerifiedBadge = (bool) ($data['show_verified_badge'] ?? true);
         $this->bio = (string) ($data['bio'] ?? '');
         $this->country = (string) ($data['country'] ?? '');
@@ -174,10 +180,11 @@ new class extends \Livewire\Component
     protected function rules(): array
     {
         return [
+            'name' => 'required|string|min:2|max:255',
             'bio' => 'nullable|string|max:250',
             'country' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
-            'avatar' => 'nullable|image|max:15024',
+            'logo' => 'nullable|image|max:15024',
         ];
     }
 
@@ -241,20 +248,29 @@ new class extends \Livewire\Component
     {
         $this->validate();
 
-        $data = [
+        $tenant = currentTenant();
+
+        if ($tenant) {
+            $tenant->name = $this->name;
+
+            if ($this->logo) {
+                $path = $this->logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
+                $tenant->meta->set('logo', $path);
+            }
+
+            $tenant->save();
+
+            $this->currentLogo = $tenant->logo;
+            $this->reset('logo');
+        }
+
+        $this->saveData([
             'show_avatar' => $this->showAvatar,
-            'avatar_path' => $this->currentAvatarPath,
             'show_verified_badge' => $this->showVerifiedBadge,
             'bio' => $this->bio,
             'country' => $this->country,
             'city' => $this->city,
-        ];
-
-        if ($this->avatar) {
-            $data['avatar_path'] = $this->avatar->storePublicly('tenant-media/'.currentTenant()->uuid.'/header', 'spaces');
-        }
-
-        $this->saveData($data);
+        ]);
     }
 
     /**

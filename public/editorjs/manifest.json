@@ -1,0 +1,13 @@
+{
+  "resources/css/editorjs.css": {
+    "file": "assets/editorjs-Ba1P9KaX.css",
+    "src": "resources/css/editorjs.css",
+    "isEntry": true
+  },
+  "resources/js/editorjs/editorjs.js": {
+    "file": "assets/editorjs-waMlge6o.js",
+    "name": "editorjs",
+    "src": "resources/js/editorjs/editorjs.js",
+    "isEntry": true
+  }
+}

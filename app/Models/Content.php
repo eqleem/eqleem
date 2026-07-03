@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -105,6 +106,69 @@ class Content extends Model implements HasMedia
     {
         $this->addMediaCollection('editor-images')
             ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('portfolio-media')
+            ->useDisk(config('media-library.disk_name'));
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function portfolioImages(): array
+    {
+        return $this->getMedia('portfolio-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function portfolioImageUrls(): array
+    {
+        return collect($this->portfolioImages())
+            ->pluck('url')
+            ->values()
+            ->all();
+    }
+
+    public function migrateLegacyPortfolioImagesIfNeeded(): void
+    {
+        if ($this->type !== 'portfolio') {
+            return;
+        }
+
+        $legacyImages = data_get($this->data, 'images', []);
+
+        if (! is_array($legacyImages) || $legacyImages === []) {
+            return;
+        }
+
+        if ($this->getMedia('portfolio-media')->isEmpty()) {
+            foreach ($legacyImages as $path) {
+                if (! filled($path) || ! is_string($path)) {
+                    continue;
+                }
+
+                $disk = config('media-library.disk_name');
+
+                if (! Storage::disk($disk)->exists($path)) {
+                    continue;
+                }
+
+                $this->addMediaFromDisk($path, $disk)
+                    ->preservingOriginal()
+                    ->toMediaCollection('portfolio-media');
+            }
+        }
+
+        $data = $this->data ?? [];
+        unset($data['images']);
+        $this->forceFill(['data' => $data])->save();
     }
 
     public function migrateLegacyBlogCategoriesIfNeeded(): void

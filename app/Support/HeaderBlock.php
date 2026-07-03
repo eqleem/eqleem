@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Models\Block;
 use App\Models\Content;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 class HeaderBlock
 {
@@ -27,24 +26,12 @@ class HeaderBlock
         return [
             'tenantName' => (string) (tenant()?->name ?? ''),
             'showAvatar' => (bool) ($data['show_avatar'] ?? true),
-            'avatarUrl' => self::avatarUrl($data),
+            'avatarUrl' => (string) (tenant()?->logo ?? ''),
             'showVerifiedBadge' => (bool) ($data['show_verified_badge'] ?? true),
             'bio' => (string) ($data['bio'] ?? ''),
             'location' => self::locationLabel($data),
             'socialLinks' => self::socialLinks($block),
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    protected static function avatarUrl(array $data): string
-    {
-        if (filled($data['avatar_path'] ?? null)) {
-            return Storage::url($data['avatar_path']);
-        }
-
-        return (string) (tenant()?->logo ?? '');
     }
 
     /**

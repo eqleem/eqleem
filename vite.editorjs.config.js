@@ -7,8 +7,8 @@ export default defineConfig({
             hotFile: "public/editorjs.hot",
             buildDirectory: "editorjs",
             input: [
-                "assets/css/editorjs.css",
-                "assets/js/editorjs/editorjs.js",
+                "resources/css/editorjs.css",
+                "resources/js/editorjs/editorjs.js",
             ],
             refresh: true,
             valetTls: "responserocket.test",

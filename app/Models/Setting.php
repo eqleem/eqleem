@@ -106,4 +106,27 @@ class Setting extends Model
 
         return array_merge(static::blogSettingsDefaults(), $saved?->settings ?? []);
     }
+
+    public const PORTFOLIO_SETTINGS_SLUG = 'portfolio-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function portfolioSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'معرض الأعمال',
+            'section_description' => 'عرض وإدارة مشاريعك وأعمالك السابقة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function portfolioSettings(): array
+    {
+        $saved = static::forSlug(static::PORTFOLIO_SETTINGS_SLUG);
+
+        return array_merge(static::portfolioSettingsDefaults(), $saved?->settings ?? []);
+    }
 }

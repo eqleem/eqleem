@@ -48,11 +48,6 @@
             "rounded-none"
         ],
         "default": "full"
-    },
-    "homeApp": {
-        "type": "select-entry-app",
-        "label": "الصفحة الرئيسية",
-        "info": "اختر التطبيق الذي تريد عرضه في الصفحة الرئيسية",
-        "default": "0"
-    }
+    } 
+    
 }

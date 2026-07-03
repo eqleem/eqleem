@@ -92,14 +92,16 @@ class Tenant extends Model implements HasMedia
 
     public function getLogoAttribute(): string
     {
-        $stored = data_get($this->data, 'logo');
+        $stored = data_get($this->meta, 'logo') ?? data_get($this->data, 'logo');
 
         if (Str::startsWith((string) $stored, 'http')) {
             return (string) $stored;
         }
 
-        if (filled($stored)) {
-            return Storage::url((string) $stored);
+        $path = is_array($stored) ? ($stored['path'] ?? null) : $stored;
+
+        if (filled($path)) {
+            return Storage::url((string) $path);
         }
 
         return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$this->uuid;

@@ -58,7 +58,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <p class="text-sm font-semibold text-gray-700">حقول النموذج</p>
-                        <p class="text-xs text-gray-400 mt-0.5">رتّب الحقول بالسحب والإفلات. تُحفظ في data.fields.</p>
+                        <p class="text-xs text-gray-400 mt-0.5">رتّب الحقول بالسحب والإفلات.</p>
                     </div>
 
                     <div x-data="{ addFieldOpen: false }" class="relative shrink-0">

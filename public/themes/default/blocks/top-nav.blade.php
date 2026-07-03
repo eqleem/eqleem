@@ -28,7 +28,7 @@
         <div class="flex items-center justify-center w-full h-14">
             @if ($showBackButtonLink)
                 <a href="{{ $homeUrl }}" wire:navigate id="backBtn" class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5X flex items-center justify-center transition-all duration-200">
-                    <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&amp;w=2074&amp;auto=format&amp;fit=crop" alt="Marcus Rivera" class="w-full h-full object-cover rounded-full transition-transform duration-500">
+                    <img src="{{tenant('logo')}}" alt="Eqleem" class="w-full h-full object-cover rounded-full transition-transform duration-500">
                 </a>
             @endif
         </div>
