@@ -166,7 +166,7 @@ new class extends Component
         $this->blockId = $blockId;
 
         $form = Content::query()
-            ->type('form')
+            ->type(contentTypeModel('forms'))
             ->whereKey($formContentId)
             ->where('active', true)
             ->first();

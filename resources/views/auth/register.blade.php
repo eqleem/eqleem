@@ -69,16 +69,22 @@ new class extends \Livewire\Component {
     protected function rules()
     {
         $rules = [
-            'user_email' => 'required|email|max:255',
+            'user_email' => 'required|email|unique:users,email|max:255',
         ];
 
         if ($this->usePassword) {
             $rules['user_name'] = 'required|min:2|max:200';
             $rules['user_password'] = 'required|min:6|max:200';
-            $rules['user_email'] = 'required|email|unique:users,email|max:255';
         }
 
         return $rules;
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'user_email.unique' => 'هذا البريد الإلكتروني مسجل مسبقاً. يمكنك تسجيل الدخول بدلاً من إنشاء حساب جديد.',
+        ];
     }
  
     function submit()
@@ -131,10 +137,25 @@ new class extends \Livewire\Component {
                 $this->reset('user_email');
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Validation errors are automatically handled by Livewire
-            throw $e;
+            foreach ($e->errors() as $field => $messages) {
+                $targetField = in_array($field, ['email', 'user_email'], true) ? 'user_email' : $field;
+
+                foreach ($messages as $message) {
+                    $this->addError($targetField, $message);
+                }
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            logger()->error($e);
+
+            $this->addError(
+                'user_email',
+                str_contains($e->getMessage(), 'users')
+                    ? 'هذا البريد الإلكتروني مسجل مسبقاً. يمكنك تسجيل الدخول بدلاً من إنشاء حساب جديد.'
+                    : 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.'
+            );
         } catch (\Exception $e) {
-            $this->addError('user_email', $e->getMessage());
+            logger()->error($e);
+            $this->addError('user_email', 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.');
         }
     }
 

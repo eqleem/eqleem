@@ -12,7 +12,7 @@ class Detail extends Component
     public function mount(string $slug): void
     {
         $this->post = Content::query()
-            ->type('blog')
+            ->type(contentTypeModel('blog'))
             ->published()
             ->where('active', true)
             ->where('slug', $slug)

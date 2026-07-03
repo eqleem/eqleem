@@ -12,6 +12,7 @@ class ContentType
         public string $name,
         public string $icon,
         public string $description,
+        public string $modelType,
         public array $components = [],
         public int $order = 0,
     ) {}
@@ -26,6 +27,7 @@ class ContentType
             name: $config['name'],
             icon: $config['icon'],
             description: $config['description'],
+            modelType: contentTypeModel($slug),
             components: $config['components'] ?? [],
             order: $config['order'] ?? 0,
         );
@@ -48,6 +50,7 @@ class ContentType
     {
         return [
             'slug' => $this->slug,
+            'model_type' => $this->modelType,
             'name' => $this->name,
             'icon' => $this->icon,
             'icon_url' => asset($this->icon),

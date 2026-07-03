@@ -49,6 +49,8 @@ Route::prefix('{tenant}')
         Route::get('/blog', Blog\Index::class)->name('blog.index');
         Route::get('/blog/{slug}', Blog\Detail::class)->name('blog.detail');
 
+        Route::get('/pages/{slug}', Page\Detail::class)->name('page.detail');
+
         Route::get('/newsletter', Newsletter\Index::class)->name('newsletter.index');
         Route::get('/newsletter/{slug}', Newsletter\Detail::class)->name('newsletter.detail');
 

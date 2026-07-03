@@ -44,7 +44,7 @@ new class extends Livewire\Component
 
         $content = Content::query()->create([
             'tenant_id' => $tenantId,
-            'type' => 'blog',
+            'type' => contentTypeModel($this->contentType['slug']),
             'title' => $this->title,
             'slug' => $slug,
             'status' => 'draft',

@@ -306,7 +306,7 @@ new class extends \Livewire\Component
 
         $contentType = Str::after($this->linkType, 'item:');
 
-        return Content::query()->type($contentType)->whereKey($id)->first();
+        return Content::query()->type(CtaLink::modelType($contentType))->whereKey($id)->first();
     }
 
     /**

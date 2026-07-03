@@ -168,6 +168,15 @@ if (! function_exists('legacyBlogCategoryIdsFromData')) {
     }
 }
 
+if (! function_exists('contentTypeModel')) {
+    function contentTypeModel(string $slug): string
+    {
+        $modelType = config("content-types.{$slug}.model_type");
+
+        return is_string($modelType) && filled($modelType) ? $modelType : $slug;
+    }
+}
+
 if (! function_exists('blogPostCategoryIds')) {
     /**
      * @return array<int, int>

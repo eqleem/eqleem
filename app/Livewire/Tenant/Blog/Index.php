@@ -25,7 +25,7 @@ class Index extends Component
         $categoryIds = $this->categoryFilterIds();
 
         $posts = Content::query()
-            ->type('blog')
+            ->type(contentTypeModel('blog'))
             ->published()
             ->where('active', true)
             ->with(['taxonomies' => fn ($query) => $query->where('type', 'blog_category')])

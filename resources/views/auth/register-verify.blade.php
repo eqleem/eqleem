@@ -36,9 +36,23 @@ new class extends \Livewire\Component {
                 
                 return redirect(route('admin.home') );
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first()
+                ?? 'البيانات المدخلة غير صالحة.';
+            session()->flash('error', $message);
+            return redirect()->route('auth.register');
+        } catch (\Illuminate\Database\QueryException $e) {
+            logger()->error($e);
+            session()->flash(
+                'error',
+                str_contains($e->getMessage(), 'users')
+                    ? 'هذا البريد الإلكتروني مسجل مسبقاً. يمكنك تسجيل الدخول بدلاً من إنشاء حساب جديد.'
+                    : 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.'
+            );
+            return redirect()->route('auth.register');
         } catch (\Exception $e) {
-            logger()->error($e->getMessage());
-            session()->flash('error', $e->getMessage());
+            logger()->error($e);
+            session()->flash('error', 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.');
             return redirect()->route('auth.register-login');
         }
     }

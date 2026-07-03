@@ -180,7 +180,7 @@ new class extends Livewire\Component
 
     public function delete(int $id): void
     {
-        Content::query()->type('blog')->whereKey($id)->first()?->delete();
+        Content::query()->type(contentTypeModel($this->contentType['slug']))->whereKey($id)->first()?->delete();
 
         $this->dispatch('notify', text: __('Item(s) deleted successfully.'));
     }
@@ -188,7 +188,7 @@ new class extends Livewire\Component
     public function deleteSelected(): void
     {
         Content::query()
-            ->type('blog')
+            ->type(contentTypeModel($this->contentType['slug']))
             ->whereIn('id', $this->selectedIds)
             ->get()
             ->each(fn (Content $item) => $item->delete());
@@ -200,7 +200,7 @@ new class extends Livewire\Component
     public function with(): array
     {
         $query = Content::query()
-            ->type('blog')
+            ->type(contentTypeModel($this->contentType['slug']))
             ->orderByDesc('id');
 
         $query = $this->applySearch($query);

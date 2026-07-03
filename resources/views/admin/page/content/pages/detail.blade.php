@@ -318,7 +318,7 @@ new class extends \Livewire\Component
     public function content(): Content
     {
         return Content::query()
-            ->type('pages')
+            ->type(contentTypeModel($this->contentType['slug']))
             ->where('uuid', $this->itemId)
             ->firstOrFail();
     }

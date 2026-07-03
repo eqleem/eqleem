@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Tenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait BelongsToTenant
@@ -14,6 +15,11 @@ trait BelongsToTenant
 
     public static function bootBelongsToTenant()
     {
+        // scope by tenant
+        static::addGlobalScope('tenant', function (Builder $builder) {
+            $builder->where('tenant_id', currentTenantId());
+        });
+
         // save
         static::creating(function (self $model) {
             $tenantId = currentTenantId();

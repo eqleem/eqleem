@@ -10,6 +10,8 @@
         <ui:toggle name="showLanguageSwitcher" label="مبدّل اللغة" live />
  
         <ui:toggle name="showBackButton" label="زر الرجوع للرئيسية" />
+
+        <ui:toggle name="showPagesMenu" label="قائمة الصفحات" />
  
         <div class="flex items-center gap-2">
             <ui:toggle name="showClientLogin" label="زر دخول العملاء" live />
@@ -43,6 +45,8 @@ new class extends \Livewire\Component
  
     public bool $showBackButton = true;
 
+    public bool $showPagesMenu = true;
+
     public bool $showClientLogin = true;
 
     public string $clientLoginLabel = 'دخول العملاء';
@@ -62,6 +66,7 @@ new class extends \Livewire\Component
         $this->showThemeToggle = (bool) ($data['show_theme_toggle'] ?? true);
         $this->showLanguageSwitcher = (bool) ($data['show_language_switcher'] ?? true);
         $this->showBackButton = (bool) ($data['show_back_button'] ?? true);
+        $this->showPagesMenu = (bool) ($data['show_pages_menu'] ?? true);
         $this->showClientLogin = (bool) ($data['show_client_login'] ?? true);
         $this->clientLoginLabel = (string) ($data['client_login_label'] ?? 'دخول العملاء');
     }
@@ -85,6 +90,7 @@ new class extends \Livewire\Component
             'show_theme_toggle' => $this->showThemeToggle,
             'show_language_switcher' => $this->showLanguageSwitcher,
             'show_back_button' => $this->showBackButton,
+            'show_pages_menu' => $this->showPagesMenu,
             'show_client_login' => $this->showClientLogin,
             'client_login_label' => $this->clientLoginLabel,
         ]);

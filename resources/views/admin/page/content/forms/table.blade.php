@@ -198,7 +198,7 @@ new class extends Livewire\Component
 
     public function delete(int $id): void
     {
-        Content::query()->type('form')->whereKey($id)->first()?->delete();
+        Content::query()->type(contentTypeModel($this->contentType['slug']))->whereKey($id)->first()?->delete();
 
         $this->dispatch('notify', text: __('Item(s) deleted successfully.'));
     }
@@ -206,7 +206,7 @@ new class extends Livewire\Component
     public function deleteSelected(): void
     {
         Content::query()
-            ->type('form')
+            ->type(contentTypeModel($this->contentType['slug']))
             ->whereIn('id', $this->selectedIds)
             ->get()
             ->each(fn (Content $item) => $item->delete());
@@ -217,14 +217,14 @@ new class extends Livewire\Component
 
     public function clone(int $id): void
     {
-        $original = Content::query()->type('form')->whereKey($id)->firstOrFail();
+        $original = Content::query()->type(contentTypeModel($this->contentType['slug']))->whereKey($id)->firstOrFail();
 
         $title = $this->clonedTitle($original->title);
         $slug = $this->uniqueSlug(Str::slug($title));
 
         $clone = Content::query()->create([
             'tenant_id' => $original->tenant_id,
-            'type' => 'form',
+            'type' => contentTypeModel($this->contentType['slug']),
             'title' => $title,
             'slug' => $slug,
             'status' => 'draft',
@@ -253,7 +253,7 @@ new class extends Livewire\Component
 
         $number = $startNumber;
 
-        while (Content::query()->type('form')->where('title', $base.' '.$this->formatArabicNumber($number))->exists()) {
+        while (Content::query()->type(contentTypeModel($this->contentType['slug']))->where('title', $base.' '.$this->formatArabicNumber($number))->exists()) {
             $number++;
         }
 
@@ -296,7 +296,7 @@ new class extends Livewire\Component
     public function with(): array
     {
         $query = Content::query()
-            ->type('form')
+            ->type(contentTypeModel($this->contentType['slug']))
             ->withCount('formSubmissions')
             ->orderByDesc('id');
 

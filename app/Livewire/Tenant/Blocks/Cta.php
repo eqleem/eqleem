@@ -55,7 +55,7 @@ class Cta extends Component
             ->values();
 
         $forms = Content::query()
-            ->type('form')
+            ->type(contentTypeModel('forms'))
             ->whereIn('id', $formContentIds)
             ->where('active', true)
             ->get(['id', 'data'])

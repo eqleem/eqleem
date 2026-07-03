@@ -4,6 +4,7 @@ return [
     'pages' => [
         'order' => 1,
         'slug' => 'pages',
+        'model_type' => 'page',
         'name' => 'الصفحات',
         'description' => 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.',
         'icon' => 'assets/icons/ecommerce/031-content.svg',
@@ -15,6 +16,7 @@ return [
     'blog' => [
         'order' => 2,
         'slug' => 'blog',
+        'model_type' => 'blog',
         'name' => 'المدونة',
         'description' => 'كتابة ونشر المقالات وتنظيم التصنيفات.',
         'icon' => 'assets/icons/stationery/002-book.svg',
@@ -26,6 +28,7 @@ return [
     'portfolio' => [
         'order' => 3,
         'slug' => 'portfolio',
+        'model_type' => 'portfolio',
         'name' => 'معرض الأعمال',
         'description' => 'عرض وإدارة مشاريعك وأعمالك السابقة.',
         'icon' => 'assets/icons/business/047-portfolio.svg',
@@ -49,6 +52,7 @@ return [
     'store' => [
         'order' => 5,
         'slug' => 'store',
+        'model_type' => 'product',
         'name' => 'المتجر الإلكتروني',
         'description' => 'إدارة المنتجات والتصنيفات وإعدادات المتجر.',
         'icon' => 'assets/icons/ecommerce/018-cart.svg',
@@ -60,6 +64,7 @@ return [
     'digital-products' => [
         'order' => 6,
         'slug' => 'digital-products',
+        'model_type' => 'digital-product',
         'name' => 'المنتجات الرقمية',
         'description' => 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
         'icon' => 'assets/icons/tabler/file-download.svg',
@@ -71,6 +76,7 @@ return [
     'services' => [
         'order' => 7,
         'slug' => 'services',
+        'model_type' => 'service',
         'name' => 'الخدمات',
         'description' => 'عرض وإدارة الخدمات المقدمة.',
         'icon' => 'assets/icons/tabler/hotel-service.svg',
@@ -82,6 +88,7 @@ return [
     'newsletter' => [
         'order' => 8,
         'slug' => 'newsletter',
+        'model_type' => 'newsletter',
         'name' => 'النشرة البريدية',
         'description' => 'إنشاء وإرسال النشرات البريدية للمشتركين.',
         'icon' => 'assets/icons/business/045-message.svg',
@@ -93,6 +100,7 @@ return [
     'menu' => [
         'order' => 9,
         'slug' => 'menu',
+        'model_type' => 'menu',
         'name' => 'قائمة الطعام',
         'description' => 'إدارة أصناف وعناصر قائمة الطعام.',
         'icon' => 'assets/icons/tabler/chef-hat.svg',
@@ -104,6 +112,7 @@ return [
     'unit-rental' => [
         'order' => 10,
         'slug' => 'unit-rental',
+        'model_type' => 'unit',
         'name' => 'تأجير الوحدات',
         'description' => 'إدارة الوحدات المتاحة للتأجير.',
         'icon' => 'assets/icons/tabler/building-estate.svg',
@@ -115,6 +124,7 @@ return [
     'cv' => [
         'order' => 11,
         'slug' => 'cv',
+        'model_type' => 'cv',
         'name' => 'السيرة الذاتية',
         'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
         'icon' => 'assets/icons/tabler/file-cv.svg',
@@ -126,6 +136,7 @@ return [
     'courses' => [
         'order' => 12,
         'slug' => 'courses',
+        'model_type' => 'course',
         'name' => 'الدورات التدريبية',
         'description' => 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.',
         'icon' => 'assets/icons/tabler/school-bell.svg',

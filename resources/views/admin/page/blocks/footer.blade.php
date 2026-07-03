@@ -547,13 +547,13 @@ new class extends \Livewire\Component
     protected function findPickableContent(int $id): ?Content
     {
         if ($this->linkType === 'form') {
-            return Content::query()->type('form')->whereKey($id)->first();
+            return Content::query()->type(contentTypeModel('forms'))->whereKey($id)->first();
         }
 
         if (str_starts_with($this->linkType, 'item:')) {
             $contentType = Str::after($this->linkType, 'item:');
 
-            return Content::query()->type($contentType)->whereKey($id)->first();
+            return Content::query()->type(CtaLink::modelType($contentType))->whereKey($id)->first();
         }
 
         return null;

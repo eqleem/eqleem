@@ -296,9 +296,7 @@ class CtaLink
 
     public static function modelType(string $contentTypeSlug): string
     {
-        $modelType = config("content-types.{$contentTypeSlug}.model_type");
-
-        return is_string($modelType) && filled($modelType) ? $modelType : $contentTypeSlug;
+        return contentTypeModel($contentTypeSlug);
     }
 
     /**
