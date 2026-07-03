@@ -129,4 +129,50 @@ class Setting extends Model
 
         return array_merge(static::portfolioSettingsDefaults(), $saved?->settings ?? []);
     }
+
+    public const STORE_SETTINGS_SLUG = 'store-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function storeSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'المتجر',
+            'section_description' => 'تسوق منتجاتنا المميزة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function storeSettings(): array
+    {
+        $saved = static::forSlug(static::STORE_SETTINGS_SLUG);
+
+        return array_merge(static::storeSettingsDefaults(), $saved?->settings ?? []);
+    }
+
+    public const SERVICE_SETTINGS_SLUG = 'service-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function serviceSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'الخدمات',
+            'section_description' => 'احجز خدماتنا المتخصصة بسهولة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function serviceSettings(): array
+    {
+        $saved = static::forSlug(static::SERVICE_SETTINGS_SLUG);
+
+        return array_merge(static::serviceSettingsDefaults(), $saved?->settings ?? []);
+    }
 }

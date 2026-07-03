@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
@@ -109,6 +110,12 @@ class Content extends Model implements HasMedia
 
         $this->addMediaCollection('portfolio-media')
             ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('store-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('service-media')
+            ->useDisk(config('media-library.disk_name'));
     }
 
     /**
@@ -134,6 +141,63 @@ class Content extends Model implements HasMedia
             ->pluck('url')
             ->values()
             ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function storeImages(): array
+    {
+        return $this->getMedia('store-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function storeImageUrls(): array
+    {
+        return collect($this->storeImages())
+            ->pluck('url')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function serviceImages(): array
+    {
+        return $this->getMedia('service-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function serviceImageUrls(): array
+    {
+        return collect($this->serviceImages())
+            ->pluck('url')
+            ->values()
+            ->all();
+    }
+
+    public function calendars(): MorphToMany
+    {
+        return $this->morphToMany(Calendar::class, 'bookable', 'bookables')
+            ->withPivot(['type', 'active'])
+            ->withTimestamps();
     }
 
     public function migrateLegacyPortfolioImagesIfNeeded(): void
