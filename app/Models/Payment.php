@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Models\Client;
+use App\Support\Money;
 use App\Traits\BelongsToTenant;
-use App\Models\User;
-use Spatie\ModelStatus\HasStatuses;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\ModelStatus\HasStatuses;
 
 class Payment extends Model
 {
-    use HasUuid, BelongsToTenant, HasStatuses, SoftDeletes;
+    use BelongsToTenant, HasStatuses, HasUuid, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -38,8 +36,9 @@ class Payment extends Model
 
     public $casts = [
         'meta' => 'json',
+        'amount' => 'integer',
     ];
- 
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -54,17 +53,22 @@ class Payment extends Model
     {
         return $this->status() ?: __($this->initial_status);
     }
-    
+
     public function getWhoAttribute()
     {
         if ($this->user_id) {
-            return $this->user->name . ' ' . ($this->source_name ? '(' . $this->source_name . ')' : '');
+            return $this->user->name.' '.($this->source_name ? '('.$this->source_name.')' : '');
         }
 
         if ($this->client_id) {
-            return $this->client->name . ' ' . ($this->source_name ? '(' . $this->source_name . ')' : '');
+            return $this->client->name.' '.($this->source_name ? '('.$this->source_name.')' : '');
         }
 
         return '-';
+    }
+
+    public function formattedAmount(): string
+    {
+        return Money::format($this->amount);
     }
 }

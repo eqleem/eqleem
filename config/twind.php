@@ -45,7 +45,7 @@ return [
                 ],
             ],
             'fontFamily' => [
-                'sans' => 'ibmps, sans-serif',
+                'sans' => 'saudi_riyal, ibmps, sans-serif',
                 'codec-ultra' => 'codec-ultra',
                 'title' => 'codec-ultra',
                 'poster' => 'vesterbro-poster',

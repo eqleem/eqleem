@@ -2,12 +2,11 @@
 
 namespace App\Actions;
 
+use App\Events\TenantCreated;
+use App\Models\Tenant;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
-use App\Models\Tenant;
-use App\Events\TenantCreated;
-use App\Models\Plan;
-    
+
 class CreateTenant
 {
     use AsAction, WithAttributes;
@@ -25,9 +24,9 @@ class CreateTenant
     public function handle(array $data): Tenant
     {
         $this->fill($data);
-        
+
         $validatedData = $this->validateAttributes();
-        
+
         $websiteId = $this->createTrafficWebsite($validatedData);
 
         $tenant = Tenant::create([
@@ -40,16 +39,9 @@ class CreateTenant
             'slogan' => 'صفحة إقليم جديدة',
         ]);
 
-        // $plan = Plan::where('slug', 'basic')
-        //     ->where('is_system', true)
-        //     ->where('active', true)
-        //     ->first();
-
-        // if ($plan) {    
-        //     $tenant->subscribeTo($plan);
-        // }
-
         event(new TenantCreated($tenant));
+
+        SubscribeTenantToPlan::make()->subscribeToFreePlan($tenant);
 
         return $tenant;
     }
@@ -57,15 +49,14 @@ class CreateTenant
     public function createTrafficWebsite($validatedData)
     {
         $response = \Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('TRAFFIC_KEY'),
+            'Authorization' => 'Bearer '.env('TRAFFIC_KEY'),
             'accept' => 'application/json',
             'content-type' => 'application/json',
-        ])->post(env('TRAFFIC_URL', 'https://traffic.wjeez.com') . '/api/v1/websites', [
-            'domain' => $validatedData['tenant_handle'] .'.'. config('app.domain'), 
-            // 'domain' => config('app.domain') . '/' . $validatedData['tenant_handle'], 
+        ])->post(env('TRAFFIC_URL', 'https://traffic.wjeez.com').'/api/v1/websites', [
+            'domain' => $validatedData['tenant_handle'].'.'.config('app.domain'),
+            // 'domain' => config('app.domain') . '/' . $validatedData['tenant_handle'],
         ]);
- 
+
         return $response->json('data.id');
     }
-
 }

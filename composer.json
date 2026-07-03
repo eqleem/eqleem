@@ -20,8 +20,18 @@
         "sakanjo/laravel-easy-metrics": "^1.1",
         "spatie/laravel-medialibrary": "*",
         "spatie/laravel-model-status": "^1.20",
-        "spatie/laravel-schemaless-attributes": "^2.6"
+        "spatie/laravel-schemaless-attributes": "^2.6",
+        "lucasdotvin/laravel-soulbscription": "@dev"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/laravel-soulbscription",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.2",

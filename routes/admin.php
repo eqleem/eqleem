@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\PaymentCallback;
 use App\Actions\UploadImage;
 use App\Actions\UploadMedia;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,8 @@ Route::as('admin.')
     ->group(function () {
         Route::livewire('/', 'admin::home')->name('home');
         Route::livewire('/plan', 'admin::plan.home')->name('plan.home');
+        Route::livewire('/plan/{plan}/checkout', 'admin::plan.checkout')->name('plan.checkout');
+        Route::get('/payments/moyasar/callback', PaymentCallback::class)->name('payments.moyasar.callback');
         Route::livewire('/settings', 'admin::settings.home')->name('settings.home');
         Route::livewire('/settings/{slug}', 'admin::settings.detail')->name('settings.detail');
         Route::livewire('/account', 'admin::account.home')->name('account.home');

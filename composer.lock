@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca3a5f7c84053d93579a5bea67584b0d",
+    "content-hash": "03faec1be52afd2e3ce5543df58b4eba",
     "packages": [
         {
             "name": "aliziodev/laravel-taxonomy",
@@ -2830,6 +2830,74 @@
                 }
             ],
             "time": "2026-03-18T12:49:31+00:00"
+        },
+        {
+            "name": "lucasdotvin/laravel-soulbscription",
+            "version": "4.3.2",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravel-soulbscription",
+                "reference": "55c47f7b7ff547582ed598a9a06fe45eefd6ebbd"
+            },
+            "require": {
+                "illuminate/contracts": "^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0|^8.1|^8.2|^8.3|^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.22|^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.5|^10.0|^11.5.3",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LucasDotVin\\Soulbscription\\SoulbscriptionServiceProvider"
+                    ],
+                    "aliases": []
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LucasDotVin\\Soulbscription\\": "src",
+                    "LucasDotVin\\Soulbscription\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "analyse": [
+                    "vendor/bin/phpcs --standard=phpcs.xml"
+                ],
+                "test": [
+                    "vendor/bin/phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lucas Vinicius",
+                    "email": "lucasvinicius211@yahoo.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A straightforward interface to handle subscriptions and features consumption.",
+            "homepage": "https://github.com/lucasdotvin/laravel-soulbscription",
+            "keywords": [
+                "laravel",
+                "laravel-soulbscription",
+                "lucasdotvin",
+                "subscriptions"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "maennchen/zipstream-php",
@@ -11601,7 +11669,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "lucasdotvin/laravel-soulbscription": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

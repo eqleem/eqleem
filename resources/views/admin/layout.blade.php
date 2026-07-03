@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>{{ $title ?? config('app.name') }} | {{ tenant('name') }}</title>
+        <title>{{ $title ?? '' }} | {{ tenant('name') }} | {{ config('app.name') }}</title>
 
         <script src="{{ asset('assets/js/twind.min.js') }}"></script>
         <script src="{{ asset('assets/js/twind.custom.js') }}"></script>
@@ -35,6 +35,8 @@
                 display: none !important;
             }
         </style>
+        <link rel="stylesheet" href="{{ asset('assets/vendor/moyasar/moyasar.css') }}">
+        <script src="{{ asset('assets/vendor/moyasar/moyasar.js') }}"></script>
         @livewireStyles
     </head>
     <body class="antialiased bg-stone-200 ">

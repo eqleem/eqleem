@@ -8,7 +8,7 @@
         <a href="{{ route('admin.orders.home') }}" wire:navigate.hover class="flex-1 truncate px-3 py-3 text-sm">
             <span class="font-semibold text-stone-700 hover:text-stone-600"> المبيعات </span>
             <p class="text-stone-400 mt-1">
-                <b class="text-2xl font-bold text-pgray-800 me-1">{{ $value }}</b>
+                <b class="text-2xl font-bold text-pgray-800 me-1">{{ money_format($value) }}</b>
                 <span class="text-xs ms-1 font-normal" title="{{ $growth }}% مقارنة بنفس الفترة السابقة">
                     @if ($growth < 0)
                         <span dir="ltr" class="text-red-500"> ⬇ {{ (int) $growth }}%</span>
@@ -33,10 +33,12 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        [$this->value, $this->growth] = Value::make(Payment::class)
+        $query = Payment::query()->where('tenant_id', tenant('id')) ;
+
+        [$this->value, $this->growth] = Value::make($query)
             ->withGrowthRate()
             ->ranges($this->range)
-            ->count();
+            ->sum('amount') ;
     }
 
     public function placeholder()

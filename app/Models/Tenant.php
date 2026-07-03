@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
@@ -21,7 +22,7 @@ use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
 #[SoftDeletes]
 class Tenant extends Model implements HasMedia
 {
-    use HasUuid, InteractsWithMedia;
+    use HasSubscriptions, HasUuid, InteractsWithMedia;
 
     protected function casts(): array
     {

@@ -2,6 +2,7 @@
 
 use App\Models\Content;
 use App\Models\Tenant;
+use App\Support\Money;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -190,5 +191,19 @@ if (! function_exists('blogPostCategoryIds')) {
             ->map(fn (mixed $id): int => (int) $id)
             ->values()
             ->all();
+    }
+}
+
+if (! function_exists('money_minor')) {
+    function money_minor(float|string|int|null $amount): int
+    {
+        return Money::toMinor($amount);
+    }
+}
+
+if (! function_exists('money_format')) {
+    function money_format(int|string|null $minor, int $precision = 2, ?string $currency = null): string
+    {
+        return Money::formatWithCurrency($minor, $currency, $precision);
     }
 }

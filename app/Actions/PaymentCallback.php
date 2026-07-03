@@ -2,12 +2,12 @@
 
 namespace App\Actions;
 
-use Lorisleiva\Actions\Concerns\AsAction;
-use Lorisleiva\Actions\Concerns\WithAttributes;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Plan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Lorisleiva\Actions\Concerns\AsAction;
+use Lorisleiva\Actions\Concerns\WithAttributes;
 
 class PaymentCallback
 {
@@ -15,63 +15,63 @@ class PaymentCallback
 
     public function rules(): array
     {
-        return [ 'id' => 'required|string' ];
+        return ['id' => 'required|string'];
     }
 
     public function handle(Request $request)
     {
         $this->fill($request->all());
-
         $validatedData = $this->validateAttributes();
- 
+
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode(config('services.moyasar.secret_key')),
+            'Authorization' => 'Basic '.base64_encode(config('services.moyasar.secret_key')),
             'Content-Type' => 'application/x-www-form-urlencoded',
-        ])->get(config('services.moyasar.base_url') . 'payments/' . $validatedData['id'])->json();
-    
-        // $payment = Payment::where('payment_id', $validatedData['id'])->first();
+        ])->get(config('services.moyasar.base_url').'payments/'.$validatedData['id'])->json();
 
-        // if($payment) {
-        //     $payment->setStatus(data_get($response, 'status'));
- 
-        //     $payment->description = data_get($response, 'description');
-        //     $payment->ip = data_get($response, 'ip');
-        //     $payment->meta = $response;
-        //     $payment->save();
+        if (data_get($response, 'status') !== 'paid') {
+            session()->flash('color', 'red');
+            session()->flash('status', 'عملية الدفع فشلت، الرجاء المحاولة مرة أخرى');
 
-        //     if(data_get($response, 'status') == 'paid') {
-        //         return $this->subscriptTo(data_get($payment, 'purchased_id'));
-        //     }  
-
-        //     // return redirect()->route('admin.subscription.index')->with('success', 'تم تفعيل الباقة بنجاح');
-        // } 
-        
-        if(data_get($response, 'status') == 'paid') {
-            return $this->subscriptTo(data_get($response, 'metadata.plan_id'));
-        }  
-
-        session()->flash('color', 'red');
-        session()->flash('status', __('عملية الدفع فشلت، الرجاء المحاولة مرة أخرى'));
-
-        return redirect()->route('admin.home');
-    }
-
-
-    function subscriptTo($planId)
-    {
-        $plan = Plan::whereId($planId)->where('is_system', true)->first();
-
-        if (auth()->user()->tenant->subscription) {
-            auth()->user()->tenant->switchTo($plan, immediately: false);
-        } else {
-            auth()->user()->tenant->subscribeTo($plan);
+            return redirect()->route('admin.plan.home');
         }
 
-        // \Mail::to(user('email'))->send(new \Catalog\Subscription\Mails\NewSubscription(user(), $this->tenant));
+        $planId = data_get($response, 'metadata.plan_id');
+        $tenant = currentTenant();
 
-        session()->flash('status', __('Subscription plan updated successfully.') );
+        if (! $tenant || ! $planId) {
+            session()->flash('color', 'red');
+            session()->flash('status', 'تعذّر إتمام الاشتراك، حاول مرة أخرى.');
 
-        return redirect(route('admin.home').'/subscription');
+            return redirect()->route('admin.plan.home');
+        }
+
+        Payment::create([
+            'tenant_id' => $tenant->id,
+            'user_id' => auth()->id(),
+            'purchased_id' => $planId,
+            'purchased_type' => Plan::class,
+            'amount' => (int) data_get($response, 'amount', 0),
+            'payment_id' => $validatedData['id'],
+            'gateway' => 'moyasar',
+            'initial_status' => data_get($response, 'status'),
+            'currency' => data_get($response, 'currency', 'SAR'),
+            'description' => data_get($response, 'description'),
+            'meta' => $response,
+            'reason' => 'tenant-subscribe-to-plan',
+        ]);
+
+        $this->subscribeTo($planId);
+
+        session()->flash('status', 'تم تفعيل الباقة بنجاح.');
+
+        return redirect()->route('admin.plan.home');
     }
-    
+
+    protected function subscribeTo(int|string $planId): void
+    {
+        $plan = Plan::query()->whereKey($planId)->where('is_system', true)->firstOrFail();
+        $tenant = currentTenant();
+
+        SubscribeTenantToPlan::run($tenant, $plan);
+    }
 }

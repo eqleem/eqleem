@@ -2,6 +2,7 @@
 
 use App\Models\Tenant;
 use App\Models\User;
+use Database\Seeders\PlanSeeder;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -12,6 +13,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(ThemeSeeder::class);
+    $this->seed(PlanSeeder::class);
 });
 
 it('creates a tenant when registering via github', function () {

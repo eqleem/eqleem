@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();
@@ -27,8 +28,7 @@ return new class extends Migration
             $table->string('reason')->nullable(); // tenant-subscribe-to-plan, client-buy-from-tenant, tenant-client-subscribe-to-tenant-plan, etc
 
             $table->string('payment_id')->nullable();
-            $table->unsignedInteger('amount')->nullable();
-            $table->unsignedInteger('amount_long')->nullable();
+            $table->unsignedBigInteger('amount')->nullable()->comment('Minor units, e.g. 9900 = 99.00 SAR');
             $table->unsignedInteger('invoice_id')->nullable();
             $table->string('ip')->nullable();
             $table->string('type', 50)->nullable();
@@ -51,5 +51,4 @@ return new class extends Migration
             $table->softDeletes();
         });
     }
-
 };

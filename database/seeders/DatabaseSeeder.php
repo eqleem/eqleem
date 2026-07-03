@@ -44,6 +44,6 @@ class DatabaseSeeder extends Seeder
         $admin->update(['current_tenant_id' => $tenant->id]);
 
         $this->call(ThemeSeeder::class);
-
+        $this->call(PlanSeeder::class);
     }
 }

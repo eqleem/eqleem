@@ -1,6 +1,16 @@
 [x-cloak] {
     display: none !important;
 }
+
+@font-face {
+    font-family: "saudi_riyal";
+    src: url("https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font@1.1.0/fonts/regular/saudi_riyal.woff2")
+        format("woff2");
+    font-weight: normal;
+    font-style: normal;
+    unicode-range: U+20C1;
+}
+
 svg {
     fill: "currentColor";
     stroke: "currentColor";

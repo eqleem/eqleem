@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Support\Money;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Number;
 
 class Order extends Model
 {
@@ -65,12 +65,12 @@ class Order extends Model
 
     public static function minorFromDecimal(float|string|null $amount): int
     {
-        return (int) round(((float) $amount) * 100);
+        return Money::toMinor($amount);
     }
 
     public static function formatMinor(int|string|null $amount): string
     {
-        return Number::format(((int) $amount) / 100, precision: 2);
+        return Money::format($amount);
     }
 
     /**
