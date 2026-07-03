@@ -1,6 +1,6 @@
 <?php
 use SaKanjo\EasyMetrics\Metrics;
-use App\Models\User;
+use App\Models\Payment;
 use App\Traits\HasChartWidget;
 
 new class extends \Livewire\Component {
@@ -15,7 +15,7 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        $data = Metrics\Trend::make(User::class)
+        $data = Metrics\Trend::make(Payment::class)
             ->ranges($this->range)
             ->countByDays();
 

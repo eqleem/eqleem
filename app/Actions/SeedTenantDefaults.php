@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Block;
 use App\Models\Content;
+use App\Models\SocialAccount;
 use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
 use App\Support\CtaLink;
@@ -76,7 +77,7 @@ class SeedTenantDefaults
                 'slug' => $network.'-'.Str::lower(Str::random(8)),
                 'data' => [
                     'network' => $network,
-                    'url' => '',
+                    'url' => $this->socialNetworkUrl($tenant, $network, $networkLabels),
                 ],
                 'sort_order' => $index + 1,
                 'active' => true,
@@ -84,6 +85,36 @@ class SeedTenantDefaults
                 'published_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * @param  array<string, array{label?: string, icon?: string, url?: string}>  $networkLabels
+     */
+    protected function socialNetworkUrl(Tenant $tenant, string $network, array $networkLabels): string
+    {
+        $template = $networkLabels[$network]['url'] ?? '';
+
+        if ($template === '') {
+            return '';
+        }
+
+        $username = $this->socialUsername($tenant);
+
+        return str_replace('{username}', $username, $template);
+    }
+
+    protected function socialUsername(Tenant $tenant): string
+    {
+        $meta = SocialAccount::query()
+            ->where('user_id', $tenant->user_id)
+            ->whereNotNull('meta')
+            ->value('meta');
+
+        if (is_array($meta) && filled($meta['nickname'] ?? null)) {
+            return (string) $meta['nickname'];
+        }
+
+        return (string) $tenant->handle;
     }
 
     protected function seedContactForm(Tenant $tenant): Content

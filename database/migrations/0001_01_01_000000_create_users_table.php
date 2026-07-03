@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('image')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('phone', 14)->nullable()->unique();
             $table->boolean('active')->default(true);
             $table->jsonb('data')->nullable();
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->text('provider_token')->nullable();
             $table->string('provider_refresh_token')->nullable();
             $table->json('meta')->nullable();
-            $table->timestamps();  
+            $table->timestamps();
             $table->index(['user_id', 'provider']);
         });
 
@@ -63,7 +63,6 @@ return new class extends Migration
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
-
 
     }
 };

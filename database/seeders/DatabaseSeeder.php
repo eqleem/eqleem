@@ -27,21 +27,21 @@ class DatabaseSeeder extends Seeder
                 'uuid' => (string) Str::uuid(),
                 'name' => 'Admin',
                 'password' => Hash::make('112233'),
-                'current_tenant_id' => 1,
             ],
         ));
 
-        Tenant::firstOrCreate(
-            ['id' => 1],
+        $tenant = Tenant::firstOrCreate(
+            ['handle' => 'tenant-1'],
             [
                 'uuid' => (string) Str::uuid(),
                 'name' => 'Tenant 1',
-                'handle' => 'tenant-1',
                 'user_id' => $admin->id,
                 'active' => true,
                 'status' => 'active',
             ],
         );
+
+        $admin->update(['current_tenant_id' => $tenant->id]);
 
         $this->call(ThemeSeeder::class);
 

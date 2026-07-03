@@ -17,7 +17,7 @@
             </ui:file>
 
             <ui:input name="name" label="اسم الصفحة" placeholder="اسم الصفحة" />
-            <ui:textarea name="slogan" label="الشعار النصّي" placeholder="مثال: Just do it ✔" />
+            {{-- <ui:textarea name="slogan" label="الشعار النصّي" placeholder="مثال: Just do it ✔" /> --}}
 
             <x-slot:footer>
                 <ui:button target="submit" label="{{ __('Save') }}" />
@@ -48,7 +48,7 @@ new class extends \Livewire\Component {
 
     public $tenant;
     public $name;
-    public $slogan;
+    // public $slogan;
     public $domain;
     public $logo;
     public $currentLogo;
@@ -57,7 +57,7 @@ new class extends \Livewire\Component {
     {
         return [
             'name' => 'required|string|min:2|max:255',
-            'slogan' => 'nullable|string|min:2|max:255',
+            // 'slogan' => 'nullable|string|min:2|max:255',
             'logo' => 'nullable|image|max:15024',
         ];
     }
@@ -67,7 +67,7 @@ new class extends \Livewire\Component {
         $this->tenant = currentTenant();
         
         $this->name = $this->tenant->name;
-        $this->slogan = data_get($this->tenant, 'meta.slogan.'.app()->getLocale()) ?? '';
+        // $this->slogan = data_get($this->tenant, 'meta.slogan.'.app()->getLocale()) ?? '';
         $this->currentLogo = $this->tenant->logo;
     }
  
@@ -76,7 +76,7 @@ new class extends \Livewire\Component {
         $this->validate();
 
         $this->tenant->name = $this->name;
-        $this->tenant->meta->set('slogan.' . app()->getLocale(), $this->slogan);
+        // $this->tenant->meta->set('slogan.' . app()->getLocale(), $this->slogan);
  
 
         if ($this->logo) {

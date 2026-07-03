@@ -11,18 +11,18 @@
                 </button>
             @endif
 
-            @if ($showThemeToggle)
+            {{-- @if ($showThemeToggle)
                 <button class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-stone-500">
                     <iconify-icon icon="solar:moon-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
                 </button>
-            @endif
+            @endif --}}
 
-            @if ($showLanguageSwitcher)
+            {{-- @if ($showLanguageSwitcher)
                 <button class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base">
                     <span class="hidden md:inline">English</span>
                     <iconify-icon icon="ri:translate" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
                 </button>
-            @endif
+            @endif --}}
         </div>
 
         <div class="flex items-center justify-center w-full h-14">
