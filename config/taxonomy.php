@@ -75,6 +75,14 @@ return [
         'service_tag',
         'store_category',
         'store_tag',
+        'digital_store_category',
+        'digital_store_tag',
+        'digital_service_category',
+        'digital_service_tag',
+        'menu_category',
+        'menu_tag',
+        'course_category',
+        'course_tag',
     ],
 
     /*

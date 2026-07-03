@@ -4,7 +4,7 @@
             <div>
                 <h3 class="text-base font-semibold text-gray-800">الأصول القابلة للحجز</h3>
                 <p class="mt-1 text-sm text-gray-500">
-                    مقدمي الخدمات بالساعة، الغرف المتاحة للحجز وغيرها يمكنك إدارتها من هنا.
+                    مقدمي الخدمات بالساعة،   يمكنك إدارة ساعات العمل المتاحة للحجز من هنا.
                 </p>
             </div>
             <ui:button wire:click="openAddModal" label="أضف جديد" icon="square-rounded-plus" />
@@ -127,6 +127,8 @@ use Livewire\Attributes\On;
 
 new class extends \Livewire\Component
 {
+    private const CALENDAR_TYPE = 'service-provider';
+
     public string $search = '';
 
     public ?int $editingCalendarId = null;
@@ -150,7 +152,7 @@ new class extends \Livewire\Component
 
     public function openEditModal(int $calendarId): void
     {
-        if (! Calendar::query()->whereKey($calendarId)->exists()) {
+        if (! Calendar::query()->where('type', self::CALENDAR_TYPE)->whereKey($calendarId)->exists()) {
             return;
         }
 
@@ -160,14 +162,16 @@ new class extends \Livewire\Component
 
     public function delete(int $id): void
     {
-        Calendar::query()->whereKey($id)->first()?->delete();
+        Calendar::query()->where('type', self::CALENDAR_TYPE)->whereKey($id)->first()?->delete();
 
         $this->dispatch('notify', text: __('Item(s) deleted successfully.'));
     }
 
     public function with(): array
     {
-        $query = Calendar::query()->orderByDesc('id');
+        $query = Calendar::query()
+            ->where('type', self::CALENDAR_TYPE)
+            ->orderByDesc('id');
 
         if ($this->search !== '') {
             $term = '%'.$this->search.'%';

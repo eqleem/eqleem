@@ -32,10 +32,14 @@ class UploadMedia
         }
 
         $maxFileSizeKb = (int) (config('media-library.max_file_size') / 1024);
+        $isDownloadCollection = in_array($mediaCollection, [
+            'digital-product-downloads',
+            'course-lesson-files',
+        ], true);
 
         request()->validate([
-            'file' => ['nullable', 'image', 'max:'.$maxFileSizeKb],
-            'upload' => ['nullable', 'image', 'max:'.$maxFileSizeKb],
+            'file' => ['nullable', $isDownloadCollection ? 'file' : 'image', 'max:'.$maxFileSizeKb],
+            'upload' => ['nullable', $isDownloadCollection ? 'file' : 'image', 'max:'.$maxFileSizeKb],
         ]);
 
         $model = $this->resolveModel(
@@ -66,6 +70,8 @@ class UploadMedia
             'message' => 'تم رفع الملف بنجاح.',
             'mediaId' => $media->id,
             'url' => $media->getUrl(),
+            'filePath' => $media->getPathRelativeToRoot(),
+            'fileName' => $media->file_name,
             'file' => [
                 'url' => $media->getUrl(),
             ],

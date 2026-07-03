@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -116,6 +117,52 @@ class Content extends Model implements HasMedia
 
         $this->addMediaCollection('service-media')
             ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('digital-product-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('digital-product-downloads')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('digital-service-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('menu-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('course-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('course-lesson-files')
+            ->useDisk(config('media-library.disk_name'));
+    }
+
+    public function hasMediaAtPath(string $collection, string $path): bool
+    {
+        if (! filled($path)) {
+            return false;
+        }
+
+        return $this->getMedia($collection)
+            ->contains(fn (Media $media): bool => $media->getPathRelativeToRoot() === $path
+                || $media->getUrl() === $path);
+    }
+
+    public function attachMediaFromDiskIfNeeded(string $collection, string $path): void
+    {
+        if (! filled($path) || $this->hasMediaAtPath($collection, $path)) {
+            return;
+        }
+
+        $disk = config('media-library.disk_name');
+
+        if (! Storage::disk($disk)->exists($path)) {
+            return;
+        }
+
+        $this->addMediaFromDisk($path, $disk)
+            ->preservingOriginal()
+            ->toMediaCollection($collection);
     }
 
     /**
@@ -193,6 +240,75 @@ class Content extends Model implements HasMedia
             ->all();
     }
 
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function digitalProductImages(): array
+    {
+        return $this->getMedia('digital-product-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, url: string, size: int}>
+     */
+    public function digitalProductDownloadFiles(): array
+    {
+        return $this->getMedia('digital-product-downloads')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'name' => $media->file_name,
+                'url' => $media->getUrl(),
+                'size' => (int) $media->size,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function menuImages(): array
+    {
+        return $this->getMedia('menu-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function menuImageUrls(): array
+    {
+        return collect($this->menuImages())
+            ->pluck('url')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function digitalServiceImages(): array
+    {
+        return $this->getMedia('digital-service-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
     public function calendars(): MorphToMany
     {
         return $this->morphToMany(Calendar::class, 'bookable', 'bookables')
@@ -266,5 +382,121 @@ class Content extends Model implements HasMedia
     public function blocks(): HasMany
     {
         return $this->hasMany(Block::class)->orderBy('sort_order');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function newsletterMailStatusOptions(): array
+    {
+        return [
+            'draft' => 'مسودة',
+            'scheduled' => 'مجدولة',
+            'sent' => 'تم الإرسال',
+        ];
+    }
+
+    public function newsletterMailStatus(): string
+    {
+        $status = (string) data_get($this->data, 'mail_status', 'draft');
+
+        return array_key_exists($status, self::newsletterMailStatusOptions())
+            ? $status
+            : 'draft';
+    }
+
+    public function getNewsletterMailStatusLabelAttribute(): string
+    {
+        return self::newsletterMailStatusOptions()[$this->newsletterMailStatus()] ?? 'مسودة';
+    }
+
+    public function newsletterSentAt(): ?Carbon
+    {
+        $value = data_get($this->data, 'sent_at');
+
+        return filled($value) ? Carbon::parse($value) : null;
+    }
+
+    public function newsletterScheduledAt(): ?Carbon
+    {
+        $value = data_get($this->data, 'scheduled_at');
+
+        return filled($value) ? Carbon::parse($value) : null;
+    }
+
+    public function newsletterRecipientsCount(): int
+    {
+        return (int) data_get($this->data, 'recipients_count', 0);
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function courseImages(): array
+    {
+        return $this->getMedia('course-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, url: string, size: int, chapter_id: ?string, lesson_id: ?string}>
+     */
+    public function courseLessonFiles(): array
+    {
+        return $this->getMedia('course-lesson-files')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'name' => $media->file_name,
+                'url' => $media->getUrl(),
+                'size' => (int) $media->size,
+                'chapter_id' => $media->getCustomProperty('chapter_id'),
+                'lesson_id' => $media->getCustomProperty('lesson_id'),
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function courseLessonCount(): int
+    {
+        return collect(data_get($this->data, 'chapters', []))
+            ->flatMap(fn (mixed $chapter): array => is_array($chapter) ? ($chapter['lessons'] ?? []) : [])
+            ->count();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function courseLevelOptions(): array
+    {
+        return [
+            'beginner' => 'مبتدئ',
+            'intermediate' => 'متوسط',
+            'advanced' => 'متقدم',
+            'none' => 'بدون تصنيف',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function courseTypeOptions(): array
+    {
+        return [
+            'recorded' => 'مسجلة',
+            'live' => 'مباشرة',
+            'hybrid' => 'مختلطة',
+        ];
+    }
+
+    public function courseLevelLabel(): string
+    {
+        $level = (string) data_get($this->data, 'level', 'none');
+
+        return self::courseLevelOptions()[$level] ?? self::courseLevelOptions()['none'];
     }
 }

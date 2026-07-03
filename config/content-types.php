@@ -73,8 +73,20 @@ return [
             'detail' => 'admin::page.content.digital-products.detail',
         ],
     ],
-    'services' => [
+    'digital-services' => [
         'order' => 7,
+        'slug' => 'digital-services',
+        'model_type' => 'digital-service',
+        'name' => 'الخدمات الرقمية',
+        'description' => 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.',
+        'icon' => 'assets/icons/tabler/cloud-computing.svg',
+        'components' => [
+            'index' => 'admin::page.content.digital-services.index',
+            'detail' => 'admin::page.content.digital-services.detail',
+        ],
+    ],
+    'services' => [
+        'order' => 8,
         'slug' => 'services',
         'model_type' => 'service',
         'name' => 'الخدمات',
@@ -86,7 +98,7 @@ return [
         ],
     ],
     'newsletter' => [
-        'order' => 8,
+        'order' => 9,
         'slug' => 'newsletter',
         'model_type' => 'newsletter',
         'name' => 'النشرة البريدية',
@@ -98,7 +110,7 @@ return [
         ],
     ],
     'menu' => [
-        'order' => 9,
+        'order' => 10,
         'slug' => 'menu',
         'model_type' => 'menu',
         'name' => 'قائمة الطعام',
@@ -110,7 +122,7 @@ return [
         ],
     ],
     'unit-rental' => [
-        'order' => 10,
+        'order' => 11,
         'slug' => 'unit-rental',
         'model_type' => 'unit',
         'name' => 'تأجير الوحدات',
@@ -122,7 +134,7 @@ return [
         ],
     ],
     'cv' => [
-        'order' => 11,
+        'order' => 12,
         'slug' => 'cv',
         'model_type' => 'cv',
         'name' => 'السيرة الذاتية',
@@ -134,7 +146,7 @@ return [
         ],
     ],
     'courses' => [
-        'order' => 12,
+        'order' => 13,
         'slug' => 'courses',
         'model_type' => 'course',
         'name' => 'الدورات التدريبية',

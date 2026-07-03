@@ -198,12 +198,19 @@
                 this.images.splice(index, 1);
             },
             addGalleryImage(path, url, mediaId = null) {
-                if (! path || this.images.some((item) => item.path === path)) {
+                if (mediaId && this.images.some((item) => item.id === mediaId)) {
                     return;
                 }
 
-                this.images.push({ id: mediaId, path, url });
-                $wire.call(this.addMethod, path);
+                if (! mediaId && path && this.images.some((item) => item.path === path)) {
+                    return;
+                }
+
+                this.images.push({ id: mediaId, path: path || url, url });
+
+                if (path || mediaId) {
+                    $wire.call(this.addMethod, path || url);
+                }
             },
             setSingleImage(path, url) {
                 this.image = url;

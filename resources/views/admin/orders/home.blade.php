@@ -4,13 +4,6 @@
         <x-slot:icon>
             <ui:icon name="message-2" class="!w-7 !h-7 text-gray-500 p-0.5" />
         </x-slot:icon>
-        <x-slot:actions>
-            @if ($activeOrdersTab === 'orders')
-                <ui:button @click.prevent="$dispatch('openmodal', { modal: 'add-order' })" label="إضافة طلب"
-                    icon="square-rounded-plus" />
-            @endif
-        </x-slot:actions>
-
         <ui:tab.group
             :active="$activeOrdersTab"
             url-key="tab"
@@ -36,10 +29,6 @@
             <x-slot name="content">
                 <ui:tab.content name="orders" class="!p-0 !rounded-none">
                     <livewire:admin::orders.table lazy />
-
-                    <ui:modal title="إضافة طلب جديد" size="4xl" name="add-order" :escape="false">
-                        <livewire:admin::orders.add-order />
-                    </ui:modal>
                 </ui:tab.content>
 
                 <ui:tab.content name="payments" class="!p-0 !rounded-none">

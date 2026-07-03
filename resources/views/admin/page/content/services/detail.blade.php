@@ -143,7 +143,6 @@ use App\Models\Content;
 use App\Models\Media;
 use App\Models\Taxonomy;
 use App\Support\Money;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -264,20 +263,7 @@ new class extends \Livewire\Component
         }
 
         $content = $this->content();
-
-        $alreadyAttached = $content->getMedia('service-media')
-            ->contains(fn (Media $media): bool => $media->getUrl() === $path);
-
-        if (! $alreadyAttached) {
-            $disk = config('media-library.disk_name');
-
-            if (Storage::disk($disk)->exists($path)) {
-                $content->addMediaFromDisk($path, $disk)
-                    ->preservingOriginal()
-                    ->toMediaCollection('service-media');
-            }
-        }
-
+        $content->attachMediaFromDiskIfNeeded('service-media', $path);
         $this->images = $content->fresh()->serviceImages();
     }
 

@@ -1,6 +1,6 @@
 <div class=" divide-y divide-gray-200 divide-dotted">
 
-    <div class="bg-gray-100 p-3 flex items-center gap-x-7 w-full">
+    <div class="bg-gray-100 p-3 flex items-center gap-x-4 w-full">
         <div class="flex-grow">
             <div class="relative text-sm text-gray-800 col-span-3">
                 <div class="absolute ps-2 right-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500">
@@ -11,6 +11,14 @@
                     class="block w-full rounded-lg   py-1.5 ps-10 text-gray-800 ring-0 ring-inset border-transparent border ring-gray-200 placeholder:text-gray-400 focus:border focus:outline-none focus:border-primary-500 sm:text-sm sm:leading-6">
             </div>
         </div>
+        <div>
+            <ui:button @click.prevent="$dispatch('openmodal', { modal: 'add-order' })" label="إضافة طلب"
+                icon="square-rounded-plus" />
+        </div>
+
+        <ui:modal title="إضافة طلب جديد" size="4xl" name="add-order" :escape="false">
+            <livewire:admin::orders.add-order />
+        </ui:modal>
     </div>
 
     <div class="relative last-child:rounded-b-2xl pb-4X p-1">

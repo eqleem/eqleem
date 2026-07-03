@@ -82,7 +82,7 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    info="السعر قبل الخصم — يُعرض مشطوباً بجانب السعر الحالي."
+                     {{-- info="السعر قبل الخصم." --}}
                 />
             </div>
 
@@ -138,7 +138,6 @@ use App\Models\Content;
 use App\Models\Media;
 use App\Models\Taxonomy;
 use App\Support\Money;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -234,20 +233,7 @@ new class extends \Livewire\Component
         }
 
         $content = $this->content();
-
-        $alreadyAttached = $content->getMedia('store-media')
-            ->contains(fn (Media $media): bool => $media->getUrl() === $path);
-
-        if (! $alreadyAttached) {
-            $disk = config('media-library.disk_name');
-
-            if (Storage::disk($disk)->exists($path)) {
-                $content->addMediaFromDisk($path, $disk)
-                    ->preservingOriginal()
-                    ->toMediaCollection('store-media');
-            }
-        }
-
+        $content->attachMediaFromDiskIfNeeded('store-media', $path);
         $this->images = $content->fresh()->storeImages();
     }
 

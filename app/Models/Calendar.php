@@ -80,6 +80,7 @@ class Calendar extends Model
     public static function typeOptions(): array
     {
         return [
+            'service-provider' => 'مقدم خدمة',
             'provider' => 'مقدم خدمة',
             'place' => 'مكان',
             'tool' => 'أداة',

@@ -13,7 +13,7 @@
                 <img src="{{ asset($contentType['icon']) }}" class="w-5 h-5 shrink-0" alt="">
                 <span class="font-semibold truncate">{{ $contentType['name'] }}</span>
                 <span class="text-gray-400">/</span>
-                <span class="text-gray-600 truncate">تحرير المشروع</span>
+                <span class="text-gray-600 truncate">تحرير الخدمة الرقمية</span>
             </div>
         </div>
 
@@ -45,22 +45,61 @@
 
     <ui:form wire:submit="save" class="!p-4 md:!p-6 !rounded-none">
         <div x-cloak x-show="formTab === 'edit'" class="space-y-2">
-            <ui:input name="title" placeholder="عنوان المشروع" />
+            <ui:input name="title" placeholder="اسم الخدمة" />
+
+            <ui:textarea
+                name="subtitle"
+                placeholder="عنوان فرعي"
+                info="عنوان فرعي يظهر تحت اسم الخدمة في صفحة العرض وقائمة الخدمات."
+            />
 
             <ui:upload
                 name="images"
                 :value="$images"
-                label="صور المشروع"
+                label="صور الخدمة"
                 :block="true"
                 :multiple="true"
                 :max-files="20"
                 :sortable="true"
-                collection="portfolio-media"
+                collection="digital-service-media"
                 :model-id="$content->id"
                 model-type="content"
                 add-method="addImage"
                 remove-method="removeImage"
                 reorder-method="reorderImages"
+            />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <ui:input
+                    name="price"
+                    label="السعر"
+                    type="number"
+                    dir="ltr"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                />
+
+                <ui:input
+                    name="deliveryDays"
+                    label="مدة التسليم"
+                    type="number"
+                    dir="ltr"
+                    step="1"
+                    min="1"
+                    placeholder="1"
+                    suffix="أيام"
+                />
+            </div>
+
+            <ui:input
+                name="comparePrice"
+                label="سعر المقارنة"
+                type="number"
+                dir="ltr"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
             />
 
             <ui:ck
@@ -72,12 +111,6 @@
         </div>
 
         <div x-cloak x-show="formTab === 'advanced'" class="space-y-2">
-            <ui:textarea
-                name="subtitle"
-                placeholder="عنوان فرعي"
-                info="عنوان فرعي يظهر تحت العنوان الرئيسي في صفحة المشروع وقائمة الأعمال."
-            />
-
             <ui:checkbox-select
                 name="categoryIds"
                 label="القسم"
@@ -110,6 +143,7 @@
 use App\Models\Content;
 use App\Models\Media;
 use App\Models\Taxonomy;
+use App\Support\Money;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -130,6 +164,12 @@ new class extends \Livewire\Component
 
     public string $slug = '';
 
+    public string $price = '';
+
+    public string $comparePrice = '';
+
+    public string $deliveryDays = '';
+
     /** @var array<int, string> */
     public array $categoryIds = [];
 
@@ -147,14 +187,16 @@ new class extends \Livewire\Component
         $this->body = (string) data_get($content->data, 'body', '');
         $this->editorMode = (string) data_get($content->data, 'editor_mode', 'html');
         $this->slug = $content->slug;
-        $content->migrateLegacyPortfolioImagesIfNeeded();
-        $this->categoryIds = $content->taxonomiesOfType('portfolio_category')
+        $this->price = $this->decimalFromMinor(data_get($content->data, 'price'));
+        $this->comparePrice = $this->decimalFromMinor(data_get($content->data, 'compare_price'));
+        $this->deliveryDays = (string) (data_get($content->data, 'delivery_days') ?? '');
+        $this->categoryIds = $content->taxonomiesOfType('digital_service_category')
             ->pluck('id')
             ->map(fn (mixed $id): string => (string) $id)
             ->values()
             ->all();
         $this->published = $content->status === 'published';
-        $this->images = $content->fresh()->portfolioImages();
+        $this->images = $content->fresh()->digitalServiceImages();
     }
 
     public function content(): Content
@@ -171,13 +213,13 @@ new class extends \Livewire\Component
     public function categories(): array
     {
         $parentIds = Taxonomy::query()
-            ->type('portfolio_category')
+            ->type('digital_service_category')
             ->whereNotNull('parent_id')
             ->pluck('parent_id')
             ->map(fn (mixed $id): int => (int) $id)
             ->flip();
 
-        return Taxonomy::flatTree('portfolio_category')
+        return Taxonomy::flatTree('digital_service_category')
             ->map(fn (Taxonomy $item): array => [
                 'id' => (string) $item->id,
                 'label' => str_repeat('— ', (int) ($item->depth ?? 0)).$item->name,
@@ -190,7 +232,7 @@ new class extends \Livewire\Component
     {
         $base = rtrim((string) (tenant('url') ?? url('/')), '/');
 
-        return $base.'/portfolio/';
+        return $base.'/digital-services/';
     }
 
     public function addImage(string $path): void
@@ -200,8 +242,8 @@ new class extends \Livewire\Component
         }
 
         $content = $this->content();
-        $content->attachMediaFromDiskIfNeeded('portfolio-media', $path);
-        $this->images = $content->fresh()->portfolioImages();
+        $content->attachMediaFromDiskIfNeeded('digital-service-media', $path);
+        $this->images = $content->fresh()->digitalServiceImages();
     }
 
     /**
@@ -210,7 +252,7 @@ new class extends \Livewire\Component
     public function reorderImages(array $orderedIds): void
     {
         $content = $this->content();
-        $validIds = $content->getMedia('portfolio-media')->pluck('id')->all();
+        $validIds = $content->getMedia('digital-service-media')->pluck('id')->all();
 
         $orderedIds = collect($orderedIds)
             ->map(fn (mixed $id): int => (int) $id)
@@ -224,19 +266,19 @@ new class extends \Livewire\Component
 
         Media::setNewOrder($orderedIds);
 
-        $this->images = $content->fresh()->portfolioImages();
+        $this->images = $content->fresh()->digitalServiceImages();
     }
 
     public function removeImage(int $mediaId): void
     {
         $content = $this->content();
-        $media = $content->getMedia('portfolio-media')->firstWhere('id', $mediaId);
+        $media = $content->getMedia('digital-service-media')->firstWhere('id', $mediaId);
 
         if ($media instanceof Media) {
             $media->delete();
         }
 
-        $this->images = $content->fresh()->portfolioImages();
+        $this->images = $content->fresh()->digitalServiceImages();
     }
 
     /**
@@ -250,10 +292,13 @@ new class extends \Livewire\Component
             'body' => 'nullable|string',
             'editorMode' => 'required|in:html,markdown',
             'slug' => 'required|string|max:255',
+            'price' => 'nullable|numeric|min:0',
+            'comparePrice' => 'nullable|numeric|min:0',
+            'deliveryDays' => 'nullable|integer|min:1|max:365',
             'categoryIds' => 'nullable|array',
             'categoryIds.*' => [
                 Rule::exists('taxonomies', 'id')->where(function ($query): void {
-                    $query->where('type', 'portfolio_category');
+                    $query->where('type', 'digital_service_category');
 
                     if ($tenantId = currentTenantId()) {
                         $query->where('tenant_id', $tenantId);
@@ -284,7 +329,9 @@ new class extends \Livewire\Component
         $data['subtitle'] = $this->subtitle;
         $data['body'] = $this->body;
         $data['editor_mode'] = $this->editorMode;
-        unset($data['images']);
+        $data['price'] = filled($this->price) ? money_minor($this->price) : 0;
+        $data['compare_price'] = filled($this->comparePrice) ? money_minor($this->comparePrice) : null;
+        $data['delivery_days'] = filled($this->deliveryDays) ? (int) $this->deliveryDays : null;
 
         $selectableIds = collect($this->categories())
             ->where('selectable', true)
@@ -316,11 +363,11 @@ new class extends \Livewire\Component
                 : null,
         ]);
 
-        $content->syncTaxonomiesOfType('portfolio_category', $categoryIds);
+        $content->syncTaxonomiesOfType('digital_service_category', $categoryIds);
 
         $this->slug = $slug;
-        $this->images = $content->fresh()->portfolioImages();
-        $this->dispatch('updatePortfolioProjectList');
+        $this->images = $content->fresh()->digitalServiceImages();
+        $this->dispatch('updateDigitalServiceList');
         $this->dispatch('notify', text: __('Saved'));
 
         if ($close) {
@@ -334,7 +381,7 @@ new class extends \Livewire\Component
 
     private function uniqueSlug(string $baseSlug, int $exceptId): string
     {
-        $slug = $baseSlug !== '' ? $baseSlug : 'project';
+        $slug = $baseSlug !== '' ? $baseSlug : 'digital-service';
         $counter = 1;
 
         while (
@@ -348,6 +395,15 @@ new class extends \Livewire\Component
         }
 
         return $slug;
+    }
+
+    private function decimalFromMinor(mixed $minor): string
+    {
+        if ($minor === null || $minor === '' || (int) $minor === 0) {
+            return '';
+        }
+
+        return (string) Money::fromMinor((int) $minor);
     }
 
     public function render()

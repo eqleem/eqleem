@@ -175,4 +175,119 @@ class Setting extends Model
 
         return array_merge(static::serviceSettingsDefaults(), $saved?->settings ?? []);
     }
+
+    public const DIGITAL_PRODUCT_SETTINGS_SLUG = 'digital-product-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function digitalProductSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'المنتجات الرقمية',
+            'section_description' => 'منتجات رقمية قابلة للتحميل والوصول الفوري',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function digitalProductSettings(): array
+    {
+        $saved = static::forSlug(static::DIGITAL_PRODUCT_SETTINGS_SLUG);
+
+        return array_merge(static::digitalProductSettingsDefaults(), $saved?->settings ?? []);
+    }
+
+    public const DIGITAL_SERVICE_SETTINGS_SLUG = 'digital-service-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function digitalServiceSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'الخدمات الرقمية',
+            'section_description' => 'خدمات رقمية احترافية مع مدة تسليم واضحة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function digitalServiceSettings(): array
+    {
+        $saved = static::forSlug(static::DIGITAL_SERVICE_SETTINGS_SLUG);
+
+        return array_merge(static::digitalServiceSettingsDefaults(), $saved?->settings ?? []);
+    }
+
+    public const MENU_SETTINGS_SLUG = 'menu-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function menuSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'قائمة الطعام',
+            'section_description' => 'وجبات طازجة مع أحجام وإضافات متنوعة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function menuSettings(): array
+    {
+        $saved = static::forSlug(static::MENU_SETTINGS_SLUG);
+
+        return array_merge(static::menuSettingsDefaults(), $saved?->settings ?? []);
+    }
+
+    public const NEWSLETTER_SETTINGS_SLUG = 'newsletter-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function newsletterSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'النشرة البريدية',
+            'section_description' => 'أحدث مقالات النشرة الأسبوعية ونشراتنا المتخصصة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function newsletterSettings(): array
+    {
+        $saved = static::forSlug(static::NEWSLETTER_SETTINGS_SLUG);
+
+        return array_merge(static::newsletterSettingsDefaults(), $saved?->settings ?? []);
+    }
+
+    public const COURSE_SETTINGS_SLUG = 'course-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function courseSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'الدورات التدريبية',
+            'section_description' => 'دورات تعليمية عملية مع دروس وفصول منظمة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function courseSettings(): array
+    {
+        $saved = static::forSlug(static::COURSE_SETTINGS_SLUG);
+
+        return array_merge(static::courseSettingsDefaults(), $saved?->settings ?? []);
+    }
 }
