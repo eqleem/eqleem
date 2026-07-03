@@ -11,7 +11,6 @@
                 {{$icon}}
             @endif
  
-            
             <div>
                 <p class="text-lg font-geist font-bold" style=""> {{$title}} </p>
                 <p class="text-sm md:text-base text-stone-400 flex items-center gap-1" style="">
