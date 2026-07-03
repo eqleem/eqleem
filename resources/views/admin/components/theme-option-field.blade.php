@@ -32,6 +32,7 @@
             :label="__($fieldLabel)"
             :info="$fieldInfo"
             :value="$value"
+            :pendingUpload="$upload ?? null"
         />
         @break
 

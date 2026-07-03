@@ -1,4 +1,4 @@
-<div>
+<div class="p-4">
     @php
         $visibleCtaLinks = $ctaLinks->filter(fn ($link) => $link['isForm'] || filled($link['url']));
         $ctaLinksCount = $visibleCtaLinks->count();

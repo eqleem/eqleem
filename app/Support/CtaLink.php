@@ -22,6 +22,147 @@ class CtaLink
         return $options;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public static function blockLinkTypeOptions(): array
+    {
+        $excludeSections = ['forms', 'pages'];
+        $excludeItems = ['cv', 'forms'];
+
+        $options = [];
+
+        foreach (config('content-types', []) as $slug => $type) {
+            if (! in_array($slug, $excludeSections, true)) {
+                $options['section:'.$slug] = 'رابط '.$type['name'];
+            }
+
+            if (! in_array($slug, $excludeItems, true) && $slug !== 'pages') {
+                $options['item:'.$slug] = config('cta-link-types.item_labels.'.$slug, 'محتوى محدد من '.$type['name']);
+            }
+        }
+
+        $options['item:pages'] = 'صفحة داخلية';
+
+        return $options;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function navLinkTypeOptions(): array
+    {
+        return [
+            'external' => 'رابط خارجي',
+        ] + self::blockLinkTypeOptions();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function linkTypeOptions(string $profile): array
+    {
+        return match ($profile) {
+            'block' => ['' => 'اختر نوع الرابط...'] + self::blockLinkTypeOptions(),
+            'nav' => self::navLinkTypeOptions(),
+            default => self::navLinkTypeOptions(),
+        };
+    }
+
+    public static function defaultTypeKey(string $profile): string
+    {
+        return match ($profile) {
+            'block' => '',
+            'nav' => 'external',
+            default => 'external',
+        };
+    }
+
+    public static function isExternalLink(string $typeKey): bool
+    {
+        return $typeKey === 'external';
+    }
+
+    public static function needsContentPicker(string $typeKey): bool
+    {
+        return str_starts_with($typeKey, 'item:');
+    }
+
+    public static function contentPickerLabel(string $typeKey): string
+    {
+        if (! str_starts_with($typeKey, 'item:')) {
+            return 'اختر المحتوى';
+        }
+
+        $contentType = substr($typeKey, 5);
+
+        if ($contentType === 'pages') {
+            return 'اختر الصفحة';
+        }
+
+        return (string) config('cta-link-types.item_labels.'.$contentType, 'اختر المحتوى');
+    }
+
+    public static function linkNamePlaceholder(string $typeKey, string $profile): string
+    {
+        if (self::isExternalLink($typeKey)) {
+            return 'مثال: تواصل معنا';
+        }
+
+        if (str_starts_with($typeKey, 'section:')) {
+            $contentType = substr($typeKey, 8);
+
+            return (string) config('content-types.'.$contentType.'.name', $profile === 'block' ? 'عنوان الرابط' : 'اسم الرابط');
+        }
+
+        if (str_starts_with($typeKey, 'item:')) {
+            return 'اتركه فارغاً لاستخدام عنوان المحتوى';
+        }
+
+        return $profile === 'block' ? 'عنوان الرابط' : 'اسم الرابط';
+    }
+
+    public static function linkNameHint(string $typeKey, string $profile): string
+    {
+        if (self::isExternalLink($typeKey)) {
+            return 'مطلوب للروابط الخارجية.';
+        }
+
+        if (str_starts_with($typeKey, 'item:')) {
+            return 'اختياري — يُستخدم عنوان المحتوى المحدد إذا تُرك فارغاً.';
+        }
+
+        if ($profile === 'block') {
+            return 'يُعبّأ تلقائياً من نوع الرابط ويمكنك تعديله.';
+        }
+
+        return 'اختياري — يُستخدم اسم المحتوى أو القسم تلقائياً إذا تُرك فارغاً.';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function allTypeLabels(): array
+    {
+        return self::navLinkTypeOptions() + self::contentLinkTypeOptions() + [
+            'form' => 'نموذج',
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public static function typeKeyFromStoredData(array $data): string
+    {
+        $linkType = $data['link_type'] ?? 'external';
+
+        if (in_array($linkType, ['external', 'form'], true)) {
+            return $linkType;
+        }
+
+        return self::typeKeyFromData($data);
+    }
+
     public static function blockLinkTitleFromTypeKey(string $typeKey): string
     {
         $parsed = self::parseTypeKey($typeKey);
@@ -124,18 +265,7 @@ class CtaLink
 
     public static function typeOptions(): array
     {
-        $options = [
-            'external' => 'رابط خارجي',
-        ];
-
-        foreach (config('content-types', []) as $slug => $type) {
-            $options['section:'.$slug] = 'رابط '.$type['name'];
-            $options['item:'.$slug] = config('cta-link-types.item_labels.'.$slug, 'محتوى محدد من '.$type['name']);
-        }
-
-        $options['form'] = 'نموذج';
-
-        return $options;
+        return self::navLinkTypeOptions();
     }
 
     public static function typeKey(Content $link): string
@@ -158,7 +288,7 @@ class CtaLink
 
     public static function typeLabel(Content $link): string
     {
-        return self::typeOptions()[self::typeKey($link)] ?? self::typeKey($link);
+        return self::allTypeLabels()[self::typeKey($link)] ?? self::typeKey($link);
     }
 
     public static function label(Content $link): string

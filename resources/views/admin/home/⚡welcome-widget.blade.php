@@ -59,58 +59,64 @@
                     </p>
                 </div>
 
-                <div class="flex shrink-0 items-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
-                    <div class="relative size-20 shrink-0">
-                        <svg class="size-20 -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
-                            <circle cx="18" cy="18" r="15.5" fill="none" class="stroke-white/20" stroke-width="3" />
-                            <circle
-                                cx="18"
-                                cy="18"
-                                r="15.5"
-                                fill="none"
-                                class="stroke-amber-300 transition-all duration-700 ease-out"
-                                stroke-width="3"
-                                stroke-linecap="round"
-                                stroke-dasharray="{{ $percentage }}, 100"
-                            />
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span class="text-2xl font-bold leading-none">{{ $percentage }}%</span>
-                            <span class="mt-0.5 text-[10px] text-primary-100">اكتمال</span>
+                @if ($percentage < 100)
+                    <div class="flex shrink-0 items-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
+                        <div class="relative size-20 shrink-0">
+                            <svg class="size-20 -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
+                                <circle cx="18" cy="18" r="15.5" fill="none" class="stroke-white/20" stroke-width="3" />
+                                <circle
+                                    cx="18"
+                                    cy="18"
+                                    r="15.5"
+                                    fill="none"
+                                    class="stroke-amber-300 transition-all duration-700 ease-out"
+                                    stroke-width="3"
+                                    stroke-linecap="round"
+                                    stroke-dasharray="{{ $percentage }}, 100"
+                                />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-2xl font-bold leading-none">{{ $percentage }}%</span>
+                                <span class="mt-0.5 text-[10px] text-primary-100">اكتمال</span>
+                            </div>
+                        </div>
+
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold">
+                                {{ $completedSteps }}/{{ $totalSteps }} خطوات
+                            </p>
+                            @if ($nextStep)
+                                <button
+                                    type="button"
+                                    x-on:click="$dispatch('openmodal', { modal: @js($nextStep['modal']) })"
+                                    class="mt-1 block text-start text-xs leading-relaxed text-amber-200 transition hover:text-white"
+                                >
+                                    التالي: {{ $nextStep['label'] }} ←
+                                </button>
+                            @endif
                         </div>
                     </div>
-
-                    <div class="min-w-0">
-                        <p class="text-sm font-semibold">
-                            {{ $completedSteps }}/{{ $totalSteps }} خطوات
-                        </p>
-                        @if ($nextStep)
-                            <a
-                                href="{{ $nextStep['url'] }}"
-                                wire:navigate
-                                class="mt-1 block text-xs leading-relaxed text-amber-200 hover:text-white transition"
-                            >
-                                التالي: {{ $nextStep['label'] }} ←
-                            </a>
-                        @else
-                            <p class="mt-1 text-xs text-emerald-200">كل الخطوات مكتملة</p>
-                        @endif
-                    </div>
-                </div>
+                @endif
             </div>
 
             @if ($percentage < 100)
                 <div class="mt-5 flex flex-wrap gap-2">
-                    @foreach ($pendingSteps as $step)
-                        <a
-                            href="{{ $step['url'] }}"
-                            wire:navigate
-                            class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white ring-1 ring-white/15 transition hover:bg-white/20"
+                    @foreach ($steps as $index => $step)
+                        <button
+                            type="button"
+                            x-on:click="$dispatch('openmodal', { modal: @js($step['modal']) })"
+                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition {{ $step['done'] ? 'bg-emerald-400/15 text-emerald-100 ring-emerald-300/25 hover:bg-emerald-400/25' : 'bg-white/10 text-white ring-white/15 hover:bg-white/20' }}"
                             title="{{ $step['hint'] }}"
                         >
-                            <iconify-icon icon="solar:add-circle-linear" class="text-sm text-amber-300"></iconify-icon>
+                            @if ($step['done'])
+                                <iconify-icon icon="solar:check-circle-bold" class="text-sm text-emerald-300"></iconify-icon>
+                            @else
+                                <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-300/20 text-[10px] font-bold text-amber-200">
+                                    {{ $index + 1 }}
+                                </span>
+                            @endif
                             {{ $step['label'] }}
-                        </a>
+                        </button>
                     @endforeach
                 </div>
             @endif
@@ -242,6 +248,28 @@
         </div>
     </ui:modal>
 
+    @if ($headerBlockId)
+        <ui:modal title="البيانات الأساسية" size="lg" name="home-step-basic-info">
+            <livewire:admin::home.completion-basic-info :headerBlockId="$headerBlockId" :key="'completion-basic-'.$headerBlockId" />
+        </ui:modal>
+
+        <ui:modal title="بيانات الاتصال" size="lg" name="home-step-contact">
+            <livewire:admin::home.completion-contact :headerBlockId="$headerBlockId" :key="'completion-contact-'.$headerBlockId" />
+        </ui:modal>
+
+        <ui:modal title="السوشال ميديا" size="lg" name="home-step-social">
+            <livewire:admin::home.completion-social :headerBlockId="$headerBlockId" :key="'completion-social-'.$headerBlockId" />
+        </ui:modal>
+    @endif
+
+    <ui:modal title="إضافة محتوى" size="2xl" name="home-step-content">
+        <livewire:admin::home.completion-content />
+    </ui:modal>
+
+    <ui:modal title="توثيق الحساب" size="2xl" name="home-step-verification">
+        <livewire:admin::settings.info.verification />
+    </ui:modal>
+
     <ui:modal title="رمز QR للصفحة" size="md" name="home-page-qr">
         <div class="space-y-4 p-4 text-center" dir="rtl">
             <p class="text-sm text-gray-600">امسح الرمز لمشاركة صفحتك بسرعة.</p>
@@ -271,7 +299,10 @@
 
 <?php
 
+use App\Models\Block;
+use App\Models\Tenant;
 use App\Support\PageCompletion;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
@@ -290,10 +321,12 @@ new class extends Component
 
     public int $totalSteps = 0;
 
-    /** @var array<int, array{key: string, label: string, hint: string, done: bool, url: string}> */
-    public array $pendingSteps = [];
+    public ?int $headerBlockId = null;
 
-    /** @var array{key: string, label: string, hint: string, done: bool, url: string}|null */
+    /** @var array<int, array{key: string, label: string, hint: string, done: bool, modal: string}> */
+    public array $steps = [];
+
+    /** @var array{key: string, label: string, hint: string, done: bool, modal: string}|null */
     public ?array $nextStep = null;
 
     public function mount(PageCompletion $pageCompletion): void
@@ -305,13 +338,34 @@ new class extends Component
         $this->pageUrl = (string) ($tenant?->url ?? url('/'));
         $this->shareText = 'شاهد صفحة '.(string) ($tenant?->name ?? config('app.name'));
         $this->greeting = $this->resolveGreeting();
+        $this->headerBlockId = Block::findSingleton('header')?->id;
 
+        $this->refreshCompletion($pageCompletion, $tenant);
+    }
+
+    #[On('page-completion-updated')]
+    public function onPageCompletionUpdated(PageCompletion $pageCompletion): void
+    {
+        $this->refreshCompletion($pageCompletion, currentTenant());
+    }
+
+    #[On('openContentItem')]
+    public function openContentItem(string $tab, string $item): void
+    {
+        $this->redirect(route('admin.page.home', [
+            'tab' => $tab,
+            'item' => $item,
+        ]), navigate: true);
+    }
+
+    protected function refreshCompletion(PageCompletion $pageCompletion, ?Tenant $tenant): void
+    {
         $completion = $pageCompletion->forTenant($tenant);
 
         $this->percentage = $completion['percentage'];
         $this->completedSteps = $completion['completed'];
         $this->totalSteps = $completion['total'];
-        $this->pendingSteps = $completion['steps']->where('done', false)->take(3)->values()->all();
+        $this->steps = $completion['steps']->values()->all();
         $this->nextStep = $completion['steps']->firstWhere('done', false);
     }
 

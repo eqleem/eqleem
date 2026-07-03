@@ -218,6 +218,7 @@
                                             'key' => $key,
                                             'field' => $field,
                                             'value' => $themeOptions[$key] ?? ($field['default'] ?? ''),
+                                            'upload' => $themeOptionUploads[$key] ?? null,
                                         ])
                                     @endforeach
                                 </div>
@@ -242,6 +243,7 @@
 
 use App\Models\Theme;
 use Illuminate\Support\Collection;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 new class extends \Livewire\Component
@@ -312,7 +314,7 @@ new class extends \Livewire\Component
                 continue;
             }
 
-            if (! isset($this->themeOptionUploads[$key])) {
+            if (! ($this->themeOptionUploads[$key] ?? null) instanceof TemporaryUploadedFile) {
                 continue;
             }
 
@@ -328,12 +330,15 @@ new class extends \Livewire\Component
                 continue;
             }
 
-            if (! isset($this->themeOptionUploads[$key])) {
+            if (! ($this->themeOptionUploads[$key] ?? null) instanceof TemporaryUploadedFile) {
                 continue;
             }
 
-            $this->themeOptions[$key] = $this->themeOptionUploads[$key]
-                ->storePublicly('tenant-media/'.$tenant->uuid.'/theme', 'spaces');
+            $this->themeOptions[$key] = $tenant->uploadThemeOptionMedia(
+                $this->selectedThemeId,
+                $key,
+                $this->themeOptionUploads[$key],
+            );
 
             unset($this->themeOptionUploads[$key]);
         }
@@ -465,6 +470,7 @@ new class extends \Livewire\Component
             'selectedTheme' => $themes->firstWhere('id', $this->selectedThemeId),
             'themeOptionsSchema' => $this->themeOptionsSchema,
             'themeOptions' => $this->themeOptions,
+            'themeOptionUploads' => $this->themeOptionUploads,
         ]);
     }
 }; ?>

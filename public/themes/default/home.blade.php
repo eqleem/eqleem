@@ -3,7 +3,7 @@
         @livewire('tenant.blocks.header')
         @livewire('tenant.blocks.cta')
 
-        <section class="w-full mb-5 mt-10 flex flex-col gap-y-3">
+        <section class="w-full mb-5  flex flex-col gap-y-3 p-4">
             @foreach ($pageBlocks as $block)
                 @if (in_array($block->type, ['block-link', 'link'], true))
                     <livewire:tenant.blocks.block-link :block-id="$block->id" :key="'page-block-'.$block->id" />

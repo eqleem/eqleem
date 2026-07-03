@@ -126,6 +126,8 @@ new class extends Livewire\Component {
     
 
         $this->dispatch('notify', text: __('Identity updated successfully.'));
+        $this->dispatch('page-completion-updated');
+        $this->dispatch('closemodal', modal: 'home-step-verification');
         $this->mount();
   
     }

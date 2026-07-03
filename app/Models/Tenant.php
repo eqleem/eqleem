@@ -10,8 +10,10 @@ use Illuminate\Database\Eloquent\Attributes\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -79,10 +81,45 @@ class Tenant extends Model implements HasMedia
         ]);
     }
 
+    public function uploadThemeOptionMedia(int $themeId, string $optionKey, UploadedFile $file): string
+    {
+        $this->getMedia('theme-options')
+            ->filter(fn (Media $media): bool => (int) $media->getCustomProperty('theme_id') === $themeId
+                && (string) $media->getCustomProperty('option_key') === $optionKey)
+            ->each->delete();
+
+        $mediaDisk = config('media-library.disk_name');
+        $fileName = md5($file->getClientOriginalName()).'.'.$file->getClientOriginalExtension();
+        $customProperties = [
+            'theme_id' => $themeId,
+            'option_key' => $optionKey,
+        ];
+
+        if ($file instanceof TemporaryUploadedFile) {
+            $path = $file->storePublicly('tenant-media/'.$this->uuid.'/theme-options', $mediaDisk);
+
+            $media = $this->addMediaFromDisk($path, $mediaDisk)
+                ->usingFileName($fileName)
+                ->withCustomProperties($customProperties)
+                ->preservingOriginal()
+                ->toMediaCollection('theme-options');
+        } else {
+            $media = $this->addMedia($file)
+                ->usingFileName($fileName)
+                ->withCustomProperties($customProperties)
+                ->toMediaCollection('theme-options');
+        }
+
+        return $media->getPathRelativeToRoot();
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo')
             ->singleFile()
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('theme-options')
             ->useDisk(config('media-library.disk_name'));
     }
 

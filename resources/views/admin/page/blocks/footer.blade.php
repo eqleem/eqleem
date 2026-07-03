@@ -128,83 +128,17 @@
             </div>
 
             <div class="space-y-3 p-4">
-                <ui:select name="linkType" label="نوع الرابط" :options="$linkTypeOptions" live />
-
-                <ui:input
-                    name="label"
-                    label="اسم الرابط"
-                    placeholder="{{ $this->labelPlaceholder() }}"
-                    info="{{ $this->labelHint() }}"
+                <ui:link-fields
+                    profile="nav"
+                    content-key="footer"
+                    :link-type="$linkType"
+                    :content-id="$contentId"
+                    :content-search="$contentSearch"
+                    :selected-content-title="$selectedContentTitle"
+                    :show-content-results="$showContentResults"
+                    :link-type-options="$linkTypeOptions"
+                    :content-results="$contentResults"
                 />
-
-                @if ($this->isExternalLink())
-                    <ui:input name="url" label="الرابط" placeholder="https://..." dir="ltr" />
-                    <ui:input
-                        name="icon"
-                        label="الأيقونة"
-                        placeholder="hugeicons:calendar-add-01"
-                        dir="ltr"
-                        info="اسم أيقونة من مكتبة iconify"
-                    />
-                @endif
-
-                @if ($this->needsContentPicker())
-                    <div class="space-y-2">
-                        @if ($contentId && $selectedContentTitle)
-                            <ui:field name="contentId" label="{{ $this->contentPickerLabel() }} *">
-                                <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                    <p class="text-sm font-medium text-gray-800">{{ $selectedContentTitle }}</p>
-                                    <button
-                                        type="button"
-                                        wire:click="clearContentSelection"
-                                        class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50"
-                                    >
-                                        تغيير
-                                    </button>
-                                </div>
-                            </ui:field>
-                        @else
-                            <div class="relative">
-                                <ui:field name="contentSearch" label="{{ $this->contentPickerLabel() }} *">
-                                    <div class="relative">
-                                        <div class="absolute ps-2 right-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500">
-                                            <ui:icon name="search" class="text-gray-400" />
-                                        </div>
-                                        <input
-                                            wire:model.live.debounce.300ms="contentSearch"
-                                            type="text"
-                                            placeholder="ابحث بالاسم..."
-                                            class="block w-full rounded-lg py-2 ps-10 text-gray-800 border border-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm @error('contentId') border-red-300 @enderror"
-                                        >
-                                    </div>
-                                </ui:field>
-
-                                @if ($showContentResults && $contentResults->isNotEmpty())
-                                    <div class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                                        @foreach ($contentResults as $result)
-                                            <button
-                                                type="button"
-                                                wire:click="selectContent({{ $result->id }})"
-                                                wire:key="footer-content-{{ $result->id }}"
-                                                class="w-full text-start px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0"
-                                            >
-                                                <p class="text-sm font-semibold text-gray-800">{{ $result->title }}</p>
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                @elseif ($showContentResults && mb_strlen(trim($contentSearch)) >= 2)
-                                    <div class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm text-gray-500">
-                                        لا توجد نتائج.
-                                    </div>
-                                @endif
-
-                                @error('contentId')
-                                    <small class="text-red-600 text-xs px-1">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        @endif
-                    </div>
-                @endif
             </div>
 
             <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4 sticky bottom-0 bg-white">
@@ -218,6 +152,7 @@
 <?php
 
 use App\Livewire\Concerns\EditsBlock;
+use App\Livewire\Concerns\ManagesCtaLinkFields;
 use App\Models\Content;
 use App\Support\BusinessDocuments;
 use App\Support\CtaLink;
@@ -226,6 +161,7 @@ use Illuminate\Support\Str;
 new class extends \Livewire\Component
 {
     use EditsBlock;
+    use ManagesCtaLinkFields;
 
     public bool $showDocumentsWarranties = true;
 
@@ -236,25 +172,20 @@ new class extends \Livewire\Component
 
     public ?int $editingLinkId = null;
 
-    public string $linkType = 'external';
-
     public string $label = '';
 
     public string $url = '';
 
     public string $icon = 'hugeicons:link-04';
 
-    public ?int $contentId = null;
-
-    public string $contentSearch = '';
-
-    public string $selectedContentTitle = '';
-
-    public bool $showContentResults = false;
-
     protected function blockType(): string
     {
         return 'footer';
+    }
+
+    protected function ctaLinkProfile(): string
+    {
+        return 'nav';
     }
 
     protected function linkContentType(): string
@@ -290,151 +221,20 @@ new class extends \Livewire\Component
         $data = $link->data ?? [];
 
         $this->editingLinkId = $link->id;
-        $this->linkType = CtaLink::typeKey($link);
+        $this->loadCtaLinkFieldsFromData($data, $link);
         $this->label = (string) ($data['label'] ?? '');
         $this->url = (string) ($data['url'] ?? '');
         $this->icon = (string) ($data['icon'] ?? 'hugeicons:link-04');
-        $this->contentId = filled($data['content_id'] ?? null) ? (int) $data['content_id'] : null;
-        $this->selectedContentTitle = $this->contentId
-            ? (Content::query()->find($this->contentId)?->title ?? '')
-            : '';
-        $this->contentSearch = $this->selectedContentTitle;
-        $this->showContentResults = false;
-    }
-
-    public function updatedContentSearch(): void
-    {
-        $this->contentId = null;
-        $this->selectedContentTitle = '';
-        $this->showContentResults = mb_strlen(trim($this->contentSearch)) >= 2;
-        $this->resetErrorBag('contentId');
-    }
-
-    public function updatedLinkType(): void
-    {
-        $this->contentId = null;
-        $this->contentSearch = '';
-        $this->selectedContentTitle = '';
-        $this->showContentResults = false;
-        $this->resetErrorBag('contentId');
-    }
-
-    public function selectContent(int $id): void
-    {
-        $content = $this->findPickableContent($id);
-
-        if (! $content) {
-            return;
-        }
-
-        $this->contentId = $content->id;
-        $this->selectedContentTitle = $content->title;
-        $this->contentSearch = $content->title;
-        $this->showContentResults = false;
-        $this->resetErrorBag('contentId');
-    }
-
-    public function clearContentSelection(): void
-    {
-        $this->contentId = null;
-        $this->contentSearch = '';
-        $this->selectedContentTitle = '';
-        $this->showContentResults = false;
-        $this->resetErrorBag('contentId');
-    }
-
-    public function isExternalLink(): bool
-    {
-        return $this->linkType === 'external';
-    }
-
-    public function needsContentPicker(): bool
-    {
-        return str_starts_with($this->linkType, 'item:') || $this->linkType === 'form';
-    }
-
-    public function labelPlaceholder(): string
-    {
-        if ($this->isExternalLink()) {
-            return 'مثال: تواصل معنا';
-        }
-
-        if ($this->linkType === 'form') {
-            return 'اتركه فارغاً لاستخدام اسم النموذج';
-        }
-
-        if (str_starts_with($this->linkType, 'section:')) {
-            $contentType = Str::after($this->linkType, 'section:');
-
-            return config('content-types.'.$contentType.'.name', 'اسم الرابط');
-        }
-
-        if (str_starts_with($this->linkType, 'item:')) {
-            return 'اتركه فارغاً لاستخدام عنوان المحتوى';
-        }
-
-        return 'اسم الرابط';
-    }
-
-    public function labelHint(): string
-    {
-        if ($this->isExternalLink()) {
-            return 'مطلوب للروابط الخارجية.';
-        }
-
-        return 'اختياري — يُستخدم اسم المحتوى أو القسم تلقائياً إذا تُرك فارغاً.';
-    }
-
-    public function contentPickerLabel(): string
-    {
-        if ($this->linkType === 'form') {
-            return 'اختر النموذج';
-        }
-
-        $contentType = Str::after($this->linkType, 'item:');
-
-        return config('cta-link-types.item_labels.'.$contentType, 'اختر المحتوى');
     }
 
     public function saveLink(): void
     {
-        $rules = [
-            'linkType' => 'required|in:'.implode(',', array_keys(CtaLink::typeOptions())),
-            'label' => 'nullable|string|max:100',
-        ];
-
-        if ($this->isExternalLink()) {
-            $rules['label'] = 'required|string|max:100';
-            $rules['url'] = 'required|url|max:500';
-            $rules['icon'] = 'required|string|max:100';
-        }
-
-        if ($this->needsContentPicker()) {
-            $rules['contentId'] = 'required|integer';
-        }
-
-        $messages = [
-            'contentId.required' => 'يرجى اختيار '.($this->linkType === 'form' ? 'نموذج' : 'محتوى').' من نتائج البحث.',
-        ];
-
-        $this->validate($rules, $messages);
-
-        if ($this->needsContentPicker() && ! $this->findPickableContent((int) $this->contentId)) {
-            $this->addError('contentId', 'يرجى اختيار عنصر صالح من القائمة.');
-
+        if (! $this->validateCtaLinkFields()) {
             return;
         }
 
         $parsed = CtaLink::parseTypeKey($this->linkType);
-
-        $data = [
-            'link_type' => $parsed['link_type'],
-            'content_type' => $parsed['content_type'],
-            'label' => $this->label,
-            'url' => $this->isExternalLink() ? $this->url : null,
-            'icon' => $this->isExternalLink() ? $this->icon : null,
-            'content_id' => $this->needsContentPicker() ? $this->contentId : null,
-        ];
+        $data = $this->buildCtaLinkData();
 
         if ($this->editingLinkId) {
             $link = $this->findLink($this->editingLinkId);
@@ -524,14 +324,10 @@ new class extends \Livewire\Component
 
     protected function resetLinkForm(): void
     {
-        $this->linkType = 'external';
+        $this->resetCtaLinkFields();
         $this->label = '';
         $this->url = '';
         $this->icon = 'hugeicons:link-04';
-        $this->contentId = null;
-        $this->contentSearch = '';
-        $this->selectedContentTitle = '';
-        $this->showContentResults = false;
         $this->resetErrorBag();
     }
 
@@ -544,21 +340,6 @@ new class extends \Livewire\Component
             ->first();
     }
 
-    protected function findPickableContent(int $id): ?Content
-    {
-        if ($this->linkType === 'form') {
-            return Content::query()->type(contentTypeModel('forms'))->whereKey($id)->first();
-        }
-
-        if (str_starts_with($this->linkType, 'item:')) {
-            $contentType = Str::after($this->linkType, 'item:');
-
-            return Content::query()->type(CtaLink::modelType($contentType))->whereKey($id)->first();
-        }
-
-        return null;
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -566,15 +347,13 @@ new class extends \Livewire\Component
     {
         return [
             'businessDocuments' => BusinessDocuments::definitions(),
-            'linkTypeOptions' => CtaLink::typeOptions(),
+            'linkTypeOptions' => $this->ctaLinkTypeOptions(),
             'footerLinks' => Content::query()
                 ->where('block_id', $this->blockId)
                 ->type($this->linkContentType())
                 ->orderBy('sort_order')
                 ->get(),
-            'contentResults' => $this->needsContentPicker() && $this->showContentResults
-                ? CtaLink::searchContents($this->linkType, $this->contentSearch)
-                : collect(),
+            'contentResults' => $this->ctaLinkContentResults(),
         ];
     }
 }; ?>

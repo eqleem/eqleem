@@ -45,7 +45,9 @@ trait ResolvesTenantBlockView
         $type = $block?->type ?? $this->blockType();
 
         $candidates = array_values(array_filter([
-            $block?->variant,
+
+            'tenant-theme::blocks.'.$type.'.'.$block?->variant,
+            'tenant-theme::blocks.'.$type.'.'.$type,
             'tenant-theme::blocks.'.$type,
             'default-tenant-theme::blocks.'.$type,
         ]));

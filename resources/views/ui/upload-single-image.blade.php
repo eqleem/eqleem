@@ -4,13 +4,26 @@
     'uploadName' => null,
     'label' => null,
     'info' => '',
+    'pendingUpload' => null,
 ])
 
 @php
+    use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+
     $uploadField = $uploadName ?? $name;
-    $imageUrl = filled($value)
-        ? (str_starts_with((string) $value, 'http') ? $value : \Illuminate\Support\Facades\Storage::url((string) $value))
-        : null;
+    $imageUrl = null;
+
+    if ($pendingUpload instanceof TemporaryUploadedFile) {
+        try {
+            $imageUrl = $pendingUpload->temporaryUrl();
+        } catch (\Throwable) {
+            $imageUrl = null;
+        }
+    } elseif (filled($value)) {
+        $imageUrl = str_starts_with((string) $value, 'http')
+            ? $value
+            : \Illuminate\Support\Facades\Storage::url((string) $value);
+    }
 @endphp
 
 <ui:field name="{{ $uploadField }}" :info="$info" :label="__($label)">

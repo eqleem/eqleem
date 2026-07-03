@@ -14,7 +14,7 @@ class PageCompletion
      *     percentage: int,
      *     completed: int,
      *     total: int,
-     *     steps: Collection<int, array{key: string, label: string, hint: string, done: bool, url: string}>
+     *     steps: Collection<int, array{key: string, label: string, hint: string, done: bool, modal: string}>
      * }
      */
     public function forTenant(?Tenant $tenant): array
@@ -28,58 +28,60 @@ class PageCompletion
             ];
         }
 
-        $locale = app()->getLocale();
+        $headerBlock = Block::findSingleton('header');
+        $headerData = $headerBlock?->data ?? [];
+
         $steps = collect([
             $this->step(
-                key: 'logo',
-                label: 'شعار الصفحة',
-                hint: 'ارفع شعاراً يميّز علامتك ويظهر في أعلى صفحتك.',
-                done: filled(data_get($tenant->meta, 'logo')) || filled(data_get($tenant->data, 'logo')),
-                url: route('admin.settings.detail', 'general-info'),
-            ),
-            $this->step(
-                key: 'slogan',
-                label: 'الشعار النصّي',
-                hint: 'أضف جملة قصيرة تعبّر عن نشاطك وتجذب الزوار.',
-                done: filled(data_get($tenant->meta, "slogan.{$locale}")) || filled(data_get($tenant->meta, 'slogan')),
-                url: route('admin.settings.detail', 'general-info'),
-            ),
-            $this->step(
-                key: 'theme',
-                label: 'قالب التصميم',
-                hint: 'اختر قالباً يناسب هويتك ويُبرز محتواك.',
-                done: filled($tenant->theme_id),
-                url: route('admin.page.home', ['tab' => 'design']),
-            ),
-            $this->step(
-                key: 'blocks',
-                label: 'أقسام الصفحة',
-                hint: 'أضف بلوكاً واحداً على الأقل لعرض خدماتك أو منتجاتك.',
-                done: Block::query()
-                    ->where('tenant_id', $tenant->id)
-                    ->whereNull('parent_id')
-                    ->where('is_default', false)
-                    ->where('active', true)
-                    ->exists(),
-                url: route('admin.page.home', ['tab' => 'structure']),
+                key: 'basic-info',
+                label: 'البيانات الأساسية',
+                hint: 'أضف اسم الصفحة وشعارها ونبذة تعريفية.',
+                done: filled($tenant->name)
+                    && $this->hasLogo($tenant)
+                    && filled(data_get($headerData, 'bio')),
+                modal: 'home-step-basic-info',
             ),
             $this->step(
                 key: 'contact',
-                label: 'بيانات التواصل',
-                hint: 'أضف رقم هاتف أو بريداً إلكترونياً ليتمكن العملاء من الوصول إليك.',
-                done: filled($tenant->phone) || filled($tenant->email),
-                url: route('admin.settings.detail', 'general-info'),
+                label: 'بيانات الاتصال',
+                hint: 'أضف رقم الجوال والبريد الإلكتروني والموقع.',
+                done: filled($tenant->phone)
+                    && filled($tenant->email)
+                    && filled(data_get($headerData, 'country'))
+                    && filled(data_get($headerData, 'city')),
+                modal: 'home-step-contact',
+            ),
+            $this->step(
+                key: 'social',
+                label: 'السوشال ميديا',
+                hint: 'أضف حساباً واحداً على الأقل في منصات التواصل.',
+                done: $headerBlock && Content::query()
+                    ->where('block_id', $headerBlock->id)
+                    ->type('social-link')
+                    ->get()
+                    ->contains(fn (Content $link): bool => filled($link->data['url'] ?? null)),
+                modal: 'home-step-social',
             ),
             $this->step(
                 key: 'content',
-                label: 'محتوى منشور',
-                hint: 'انشر أول مقال أو منتج ليظهر نشاطك للزوار.',
+                label: 'إضافة محتوى',
+                hint: 'انشر منتجاً أو تدوينة أو دورة ليظهر نشاطك.',
                 done: Content::query()
                     ->withoutGlobalScopes()
                     ->where('tenant_id', $tenant->id)
                     ->where('status', 'published')
+                    ->where('type', '!=', 'social-link')
                     ->exists(),
-                url: route('admin.page.home', ['tab' => 'blog']),
+                modal: 'home-step-content',
+            ),
+            $this->step(
+                key: 'verification',
+                label: 'التوثيق',
+                hint: 'ارفع مستندات التوثيق الرسمية لحسابك.',
+                done: filled(data_get($tenant->meta, 'identity_file'))
+                    || data_get($tenant->meta, 'confirm_status') === 'pending'
+                    || (bool) data_get($tenant->meta, 'is_confirmed'),
+                modal: 'home-step-verification',
             ),
         ]);
 
@@ -95,11 +97,16 @@ class PageCompletion
         ];
     }
 
-    /**
-     * @return array{key: string, label: string, hint: string, done: bool, url: string}
-     */
-    protected function step(string $key, string $label, string $hint, bool $done, string $url): array
+    protected function hasLogo(Tenant $tenant): bool
     {
-        return compact('key', 'label', 'hint', 'done', 'url');
+        return filled(data_get($tenant->meta, 'logo')) || filled(data_get($tenant->data, 'logo'));
+    }
+
+    /**
+     * @return array{key: string, label: string, hint: string, done: bool, modal: string}
+     */
+    protected function step(string $key, string $label, string $hint, bool $done, string $modal): array
+    {
+        return compact('key', 'label', 'hint', 'done', 'modal');
     }
 }

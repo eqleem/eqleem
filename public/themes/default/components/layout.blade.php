@@ -11,7 +11,7 @@
         {{-- <x-tenant-theme::top-nav /> --}}
     </div>
  
-    <main class="{{ $width }} ring ring-stone-300/10 pb-12 mt-3 md:mt-4 min-h-[99.2vh]x xmd:min-h-[50vh]  mx-auto flex-grow px-3 py-1 flex flex-col relative w-full bg-white/80 Xbackdrop-blur-2xl border border-white/60 Xshadow-[0_30px_60px_-12px_rgba(0,0,0,0.08),0_10px_20px_-10px_rgba(0,0,0,0.04)] rounded-2xl md:rounded-[32px] overflow-hidden animate-card transform-style-3d">
+    <main class="{{ $width }}  pb-12 mt-3 md:mt-4 min-h-[99.2vh]x xmd:min-h-[50vh]  mx-auto flex-grow Xpx-3 Xpy-1 flex flex-col relative w-full bg-white/80 Xbackdrop-blur-2xl rounded-3xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
         {{ $slot }}
     </main>
 

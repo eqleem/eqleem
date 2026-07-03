@@ -23,7 +23,9 @@
             <ui:input name="country" label="الدولة" placeholder="السعودية" />
             <ui:input name="city" label="المدينة" placeholder="الرياض" />
 
-             
+            @if ($variantOptions !== [])
+                <ui:select name="variant" label="تنسيق الهيدر" :options="$variantOptions" />
+            @endif
 
             <div class="space-y-2">
                 <div class="flex items-center justify-between my-4 border-b border-gray-100 pb-2 border-dotted">
@@ -118,7 +120,9 @@
 
 use App\Livewire\Concerns\EditsBlock;
 use App\Models\Content;
+use App\Support\BlockVariants;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 
 new class extends \Livewire\Component
@@ -141,6 +145,8 @@ new class extends \Livewire\Component
 
     public string $city = '';
 
+    public string $variant = '';
+
     public string $newNetwork = 'twitter';
 
     public string $newUrl = '';
@@ -155,7 +161,9 @@ new class extends \Livewire\Component
         $this->blockId = $blockId;
 
         $tenant = currentTenant();
-        $data = $this->block()->data ?? [];
+        $block = $this->block();
+        $data = $block->data ?? [];
+        $variantOptions = app(BlockVariants::class)->optionsFor($this->blockType());
 
         $this->name = (string) ($tenant?->name ?? '');
         $this->currentLogo = (string) ($tenant?->logo ?? '');
@@ -164,6 +172,7 @@ new class extends \Livewire\Component
         $this->bio = (string) ($data['bio'] ?? '');
         $this->country = (string) ($data['country'] ?? '');
         $this->city = (string) ($data['city'] ?? '');
+        $this->variant = (string) ($block->variant ?: array_key_first($variantOptions) ?: $this->blockType());
     }
 
     /**
@@ -179,12 +188,21 @@ new class extends \Livewire\Component
      */
     protected function rules(): array
     {
+        $variantOptions = app(BlockVariants::class)->optionsFor($this->blockType());
+
         return [
             'name' => 'required|string|min:2|max:255',
             'bio' => 'nullable|string|max:250',
             'country' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'logo' => 'nullable|image|max:15024',
+            ...($variantOptions !== [] ? [
+                'variant' => [
+                    'required',
+                    'string',
+                    Rule::in(array_keys($variantOptions)),
+                ],
+            ] : []),
         ];
     }
 
@@ -264,13 +282,24 @@ new class extends \Livewire\Component
             $this->reset('logo');
         }
 
-        $this->saveData([
-            'show_avatar' => $this->showAvatar,
-            'show_verified_badge' => $this->showVerifiedBadge,
-            'bio' => $this->bio,
-            'country' => $this->country,
-            'city' => $this->city,
-        ]);
+        $attributes = [
+            'data' => [
+                'show_avatar' => $this->showAvatar,
+                'show_verified_badge' => $this->showVerifiedBadge,
+                'bio' => $this->bio,
+                'country' => $this->country,
+                'city' => $this->city,
+            ],
+        ];
+
+        if (app(BlockVariants::class)->optionsFor($this->blockType()) !== []) {
+            $attributes['variant'] = $this->variant;
+        }
+
+        $this->block()->update($attributes);
+
+        $this->notifyStructureChanged();
+        $this->dispatch('closemodal');
     }
 
     /**
@@ -279,6 +308,7 @@ new class extends \Livewire\Component
     public function with(): array
     {
         return [
+            'variantOptions' => app(BlockVariants::class)->optionsFor($this->blockType()),
             'networks' => $this->networks(),
             'networkOptions' => collect($this->networks())
                 ->map(fn (array $network): string => $network['label'])

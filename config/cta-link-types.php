@@ -42,6 +42,10 @@ return [
             'index' => 'tenant.digital-services.index',
             'detail' => 'tenant.digital-services.detail',
         ],
+        'pages' => [
+            'index' => null,
+            'detail' => 'tenant.page.detail',
+        ],
     ],
 
     'icons' => [
@@ -55,6 +59,7 @@ return [
         'courses' => 'hugeicons:presentation-06',
         'digital-products' => 'hugeicons:file-download',
         'digital-services' => 'hugeicons:customer-service-01',
+        'pages' => 'hugeicons:file-01',
         'form' => 'hugeicons:file-01',
         'external' => 'hugeicons:link-04',
     ],
@@ -70,6 +75,7 @@ return [
         'courses' => 'دورة محددة',
         'digital-products' => 'منتج رقمي محدد',
         'digital-services' => 'خدمة رقمية محددة',
+        'pages' => 'صفحة داخلية',
     ],
 
     'block_link' => [
@@ -155,6 +161,10 @@ return [
             'digital-services' => [
                 'title' => '',
                 'description' => 'تعرّف على خدمة رقمية محددة بالتفصيل.',
+            ],
+            'pages' => [
+                'title' => '',
+                'description' => 'انتقل إلى صفحة داخلية من صفحات الموقع.',
             ],
         ],
     ],
