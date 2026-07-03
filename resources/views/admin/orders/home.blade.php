@@ -14,10 +14,16 @@
         <ui:tab.group
             :active="$activeOrdersTab"
             url-key="tab"
-            :valid-tabs="['orders', 'form-submissions']"
+            :valid-tabs="['orders', 'payments', 'form-submissions']"
         >
             <x-slot name="nav" class="border-b border-stone-200 px-px">
                 <ui:tab.nav name="orders" label="الطلبات" icon="message-2" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav
+                    name="payments"
+                    label="المبيعات"
+                    icon="receipt"
+                    activeClass="border-b-2 !border-primary-500 text-stone-900"
+                />
                 <ui:tab.nav
                     name="form-submissions"
                     label="ردود النماذج"
@@ -36,6 +42,10 @@
                     </ui:modal>
                 </ui:tab.content>
 
+                <ui:tab.content name="payments" class="!p-0 !rounded-none">
+                    <livewire:admin::orders.payments-table lazy />
+                </ui:tab.content>
+
                 <ui:tab.content name="form-submissions" class="!p-0 !rounded-none">
                     <livewire:admin::orders.form-submissions-table lazy />
                 </ui:tab.content>
@@ -52,7 +62,7 @@ new class extends \Livewire\Component {
     public string $activeOrdersTab = 'orders';
 
     /** @var list<string> */
-    private const ORDERS_TABS = ['orders', 'form-submissions'];
+    private const ORDERS_TABS = ['orders', 'payments', 'form-submissions'];
 
     public function mount(): void
     {

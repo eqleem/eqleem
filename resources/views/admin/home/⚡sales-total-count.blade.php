@@ -1,11 +1,11 @@
 <div class="relative col-span-1 flex rounded-xl shadow-sm group">
-    <a href="{{ route('admin.orders.home') }}" wire:navigate.hover
+    <a href="{{ route('admin.orders.home', ['tab' => 'payments']) }}" wire:navigate.hover
         class="flex w-16 flex-shrink-0 items-center justify-center bg-pgray-100 group-hover:bg-opacity-75 rounded-s-xl text-sm font-medium text-white">
         <img class="h-10" src="{{ asset('assets/icons/business/044-banknote.svg') }}" alt="">
     </a>
 
     <div class="flex flex-1 items-center justify-between truncate rounded-e-xl border-stone-200 bg-white">
-        <a href="{{ route('admin.orders.home') }}" wire:navigate.hover class="flex-1 truncate px-3 py-3 text-sm">
+        <a href="{{ route('admin.orders.home', ['tab' => 'payments']) }}" wire:navigate.hover class="flex-1 truncate px-3 py-3 text-sm">
             <span class="font-semibold text-stone-700 hover:text-stone-600"> المبيعات </span>
             <p class="text-stone-400 mt-1">
                 <b class="text-2xl font-bold text-pgray-800 me-1">{{ money_format($value) }}</b>
