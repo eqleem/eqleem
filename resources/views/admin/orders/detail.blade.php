@@ -35,6 +35,13 @@
                             <ui:badge color="{{ $order->paymentStatusBadgeColor() }}" size="sm">
                                 {{ $order->paymentStatusLabel() }}
                             </ui:badge>
+                            <ui:button
+                                wire:click="openChangeStatusModal"
+                                label="تغيير الحالة"
+                                icon="refresh"
+                                variant="outline"
+                                class="!h-8 !px-3 !text-xs"
+                            />
                         </div>
 
                         <div>
@@ -203,6 +210,80 @@
                     </div>
                 </ui:box>
 
+                <ui:box title="المدفوعات" class="">
+                    <x-slot:rightAction>
+                        <div class="flex items-center gap-2">
+                            @if ($order->due_total > 0)
+                                <ui:button
+                                    wire:click="openAddPaymentModal"
+                                    label="تسجيل دفعة"
+                                    icon="plus"
+                                    variant="outline"
+                                    class="!h-8 !px-3 !text-xs"
+                                />
+                            @endif
+                            <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
+                                {{ $this->orderPayments->count() }} {{ $this->orderPayments->count() === 1 ? 'دفعة' : 'دفعات' }}
+                            </span>
+                        </div>
+                    </x-slot:rightAction>
+
+                    <div class="p-4 sm:p-5">
+                        @if ($this->orderPayments->isEmpty())
+                            <ui:empty subtitle="سجّل دفعة لإنشاء فاتورة وربطها بهذا الطلب.">
+                                لا توجد مدفوعات بعد.
+                                <x-slot:icon>
+                                    <ui:icon name="coin" class="!h-12 !w-12 p-0.5 text-gray-400" />
+                                </x-slot:icon>
+                            </ui:empty>
+                        @else
+                            <div class="space-y-3">
+                                @foreach ($this->orderPayments as $payment)
+                                    <div wire:key="payment-{{ $payment->id }}"
+                                        class="flex flex-col gap-3 rounded-xl border border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+                                        <div class="flex min-w-0 items-start gap-3">
+                                            <div
+                                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-500 ring-1 ring-gray-100">
+                                                <ui:icon name="coin" class="h-5 w-5" />
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <a href="{{ route('admin.orders.payments.detail', ['uuid' => $payment->uuid]) }}"
+                                                        wire:navigate
+                                                        class="font-semibold text-gray-800 transition hover:text-primary-600">
+                                                        دفعة #{{ $payment->id }}
+                                                    </a>
+                                                    <ui:badge color="{{ $payment->statusBadgeColor() }}" size="sm">
+                                                        {{ $payment->statusLabel() }}
+                                                    </ui:badge>
+                                                    @if ($payment->invoice)
+                                                        <span class="text-xs text-gray-400">{{ $payment->invoice->s_number }}</span>
+                                                    @endif
+                                                </div>
+                                                <p class="mt-1 text-sm text-gray-500">
+                                                    {{ Order::paymentMethodOptions()[$payment->source_type] ?? $payment->sourceTypeLabel() }}
+                                                    @if ($payment->resolvedDescription())
+                                                        · {{ $payment->resolvedDescription() }}
+                                                    @endif
+                                                </p>
+                                                <p class="mt-1 text-xs text-gray-400">
+                                                    {{ $payment->created_at->translatedFormat('d M Y h:i A') }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="shrink-0 text-end">
+                                            <p class="text-lg font-bold text-emerald-700" dir="ltr">
+                                                {{ $payment->formattedAmount() }} {{ $payment->currency }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </ui:box>
+
                 @if ($order->notes)
                     <ui:box title="ملاحظات" class="">
                         <div class="p-4 sm:p-5">
@@ -213,6 +294,87 @@
                         </div>
                     </ui:box>
                 @endif
+
+                <ui:box title="سجل النشاط" class="">
+                    <x-slot:rightAction>
+                        <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
+                            {{ $this->activityTimeline->count() }} {{ $this->activityTimeline->count() === 1 ? 'حدث' : 'أحداث' }}
+                        </span>
+                    </x-slot:rightAction>
+
+                    <div class="p-4 sm:p-5">
+                        @if ($this->activityTimeline->isEmpty())
+                            <ui:empty subtitle="ستظهر تغييرات الحالة والنشاطات هنا.">
+                                لا يوجد سجل نشاط بعد.
+                                <x-slot:icon>
+                                    <ui:icon name="history" class="!h-12 !w-12 p-0.5 text-gray-400" />
+                                </x-slot:icon>
+                            </ui:empty>
+                        @else
+                            <div class="relative space-y-0">
+                                @foreach ($this->activityTimeline as $entry)
+                                    <div wire:key="activity-{{ $entry['key'] }}"
+                                        class="relative flex gap-4 pb-6 last:pb-0">
+                                        @if (! $loop->last)
+                                            <span
+                                                class="absolute top-10 bottom-0 w-px bg-gray-200"
+                                                style="inset-inline-start: 1.25rem;"></span>
+                                        @endif
+
+                                        <div
+                                            class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-4 ring-white {{ $entry['type'] === 'status' ? 'bg-primary-50 text-primary-600' : 'bg-gray-100 text-gray-500' }}">
+                                            <ui:icon name="{{ $entry['type'] === 'status' ? 'refresh' : 'history' }}"
+                                                class="h-5 w-5" />
+                                        </div>
+
+                                        <div class="min-w-0 flex-1 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+                                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                                <div class="min-w-0 space-y-1">
+                                                    <p class="text-sm font-semibold text-gray-800">
+                                                        {{ $entry['title'] }}
+                                                    </p>
+                                                    @if ($entry['type'] === 'status')
+                                                        <ui:badge color="{{ Order::statusBadgeColorFor($entry['status']) }}"
+                                                            size="sm">
+                                                            {{ Order::statusLabelFor($entry['status']) }}
+                                                        </ui:badge>
+                                                    @endif
+                                                </div>
+                                                <div class="shrink-0 text-end">
+                                                    <p class="text-xs font-medium text-gray-500">
+                                                        {{ $entry['date']->translatedFormat('d M Y') }}
+                                                    </p>
+                                                    <p class="text-[11px] text-gray-400" dir="ltr">
+                                                        {{ $entry['date']->translatedFormat('h:i A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            @if (filled($entry['reason'] ?? null))
+                                                <p class="mt-3 rounded-lg bg-white px-3 py-2 text-sm leading-relaxed text-gray-600 ring-1 ring-gray-100">
+                                                    {{ $entry['reason'] }}
+                                                </p>
+                                            @endif
+
+                                            @if (filled($entry['details'] ?? null))
+                                                <p class="mt-3 text-sm text-gray-500">
+                                                    {{ $entry['details'] }}
+                                                </p>
+                                            @endif
+
+                                            @if ($entry['causer'])
+                                                <p class="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
+                                                    <ui:icon name="user" class="h-3.5 w-3.5" />
+                                                    {{ $entry['causer']->name }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </ui:box>
             </div>
 
             {{-- الشريط الجانبي --}}
@@ -319,6 +481,20 @@
                                     {{ $order->formattedGrandTotal() }}
                                 </span>
                             </div>
+
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">المدفوع</span>
+                                <span class="font-medium text-emerald-700" dir="ltr">
+                                    {{ $order->formatAmount($order->paid_total) }} {{ $order->currency_code }}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">المتبقي</span>
+                                <span class="font-medium {{ $order->due_total > 0 ? 'text-amber-700' : 'text-gray-800' }}"
+                                    dir="ltr">
+                                    {{ $order->formatAmount($order->due_total) }} {{ $order->currency_code }}
+                                </span>
+                            </div>
                         </div>
 
                         <div class="mt-5 grid grid-cols-2 gap-2">
@@ -346,19 +522,119 @@
         </div>
     </div>
 
+    <ui:modal title="تسجيل دفعة" size="lg" name="add-order-payment">
+        <ui:form wire:submit="recordPayment" class="!p-5 !py-6">
+            <div class="mb-4 rounded-xl bg-gray-50 px-4 py-3">
+                <p class="text-xs text-gray-400">المبلغ المتبقي</p>
+                <p class="mt-1 text-lg font-bold text-amber-700" dir="ltr">
+                    {{ $order->formatAmount($order->due_total) }} {{ $order->currency_code }}
+                </p>
+            </div>
+
+            <ui:input
+                name="paymentAmount"
+                label="المبلغ"
+                type="number"
+                step="0.01"
+                min="0.01"
+                :max="Order::fromMinor($order->due_total)"
+                placeholder="0.00"
+                dir="ltr"
+                suffix="{{ $order->currency_code }}"
+            />
+
+            <ui:select
+                name="paymentMethod"
+                label="طريقة الدفع"
+                :options="Order::paymentMethodOptions()"
+            />
+
+            <ui:textarea
+                name="paymentNotes"
+                label="ملاحظات"
+                placeholder="ملاحظات اختيارية..."
+                rows="3"
+            />
+
+            <x-slot:footer>
+                <div class="flex items-center justify-end gap-2">
+                    <ui:button
+                        type="button"
+                        label="إلغاء"
+                        variant="ghost"
+                        @click.prevent="$dispatch('closemodal', { modal: 'add-order-payment' })"
+                    />
+                    <ui:button target="recordPayment" label="تسجيل الدفعة" icon="check" />
+                </div>
+            </x-slot:footer>
+        </ui:form>
+    </ui:modal>
+
+    <ui:modal title="تغيير حالة الطلب" size="lg" name="change-order-status">
+        <ui:form wire:submit="updateStatus" class="!p-5 !py-6">
+            <div class="mb-4 rounded-xl bg-gray-50 px-4 py-3">
+                <p class="text-xs text-gray-400">الحالة الحالية</p>
+                <div class="mt-1">
+                    <ui:badge color="{{ $order->statusBadgeColor() }}" size="sm">
+                        {{ $order->statusLabel() }}
+                    </ui:badge>
+                </div>
+            </div>
+
+            <ui:select
+                name="newStatus"
+                label="الحالة الجديدة"
+                :options="Order::statusOptions()"
+            />
+
+            <ui:textarea
+                name="statusReason"
+                label="سبب التغيير"
+                placeholder="اكتب سبب تغيير الحالة..."
+                rows="4"
+            />
+
+            <x-slot:footer>
+                <div class="flex items-center justify-end gap-2">
+                    <ui:button
+                        type="button"
+                        label="إلغاء"
+                        variant="ghost"
+                        @click.prevent="$dispatch('closemodal', { modal: 'change-order-status' })"
+                    />
+                    <ui:button target="updateStatus" label="حفظ التغيير" icon="check" />
+                </div>
+            </x-slot:footer>
+        </ui:form>
+    </ui:modal>
+
 </ui:container>
 
 <?php
 
+use App\Actions\RecordOrderPayment;
+use App\Models\ActivityLog;
 use App\Models\Order;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 
 new class extends \Livewire\Component {
     public Order $order;
 
     /** @var \Illuminate\Support\Collection<int, object> */
     public Collection $items;
+
+    public string $newStatus = '';
+
+    public string $statusReason = '';
+
+    public string $paymentAmount = '';
+
+    public string $paymentMethod = 'cash';
+
+    public string $paymentNotes = '';
 
     public function mount(): void
     {
@@ -374,6 +650,161 @@ new class extends \Livewire\Component {
             ->where('order_id', $this->order->id)
             ->orderBy('id')
             ->get();
+
+        $this->newStatus = $this->order->statusValue();
+    }
+
+    #[Computed]
+    public function orderPayments(): Collection
+    {
+        return $this->order->payments()
+            ->with('invoice')
+            ->latest('id')
+            ->get();
+    }
+
+    #[Computed]
+    public function activityTimeline(): Collection
+    {
+        $statusEntries = $this->order->statuses()
+            ->latest('id')
+            ->get()
+            ->map(fn ($status): array => [
+                'key' => 'status-'.$status->id,
+                'type' => 'status',
+                'title' => 'تغيير حالة الطلب',
+                'status' => $status->name,
+                'reason' => $status->reason,
+                'details' => null,
+                'causer' => null,
+                'date' => $status->created_at,
+            ]);
+
+        $activityEntries = $this->order->activitiesAsSubject()
+            ->with('causer')
+            ->latest('id')
+            ->get()
+            ->map(function (ActivityLog $activity): array {
+                return [
+                    'key' => 'activity-'.$activity->id,
+                    'type' => 'activity',
+                    'title' => $this->activityTitle($activity),
+                    'status' => null,
+                    'reason' => null,
+                    'details' => $this->activityDetails($activity),
+                    'causer' => $activity->causer,
+                    'date' => $activity->created_at,
+                ];
+            });
+
+        return $statusEntries
+            ->concat($activityEntries)
+            ->sortByDesc(fn (array $entry) => $entry['date'])
+            ->values();
+    }
+
+    public function openAddPaymentModal(): void
+    {
+        $this->paymentAmount = $this->order->due_total > 0
+            ? (string) Order::fromMinor($this->order->due_total)
+            : '';
+        $this->paymentMethod = data_get($this->order->meta, 'payment_method', 'cash');
+        $this->paymentNotes = '';
+        $this->resetValidation();
+        $this->dispatch('openmodal', modal: 'add-order-payment');
+    }
+
+    public function recordPayment(): void
+    {
+        $maxAmount = Order::fromMinor($this->order->due_total);
+
+        $this->validate([
+            'paymentAmount' => ['required', 'numeric', 'min:0.01', 'max:'.$maxAmount],
+            'paymentMethod' => ['required', 'string', Rule::in(array_keys(Order::paymentMethodOptions()))],
+            'paymentNotes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $amountMinor = Order::minorFromDecimal($this->paymentAmount);
+
+        RecordOrderPayment::run(
+            $this->order,
+            $amountMinor,
+            $this->paymentMethod,
+            filled($this->paymentNotes) ? $this->paymentNotes : null,
+        );
+
+        $this->order->refresh();
+        unset($this->orderPayments, $this->activityTimeline);
+        $this->paymentNotes = '';
+        $this->resetValidation();
+        $this->dispatch('closemodal', modal: 'add-order-payment');
+        $this->dispatch('notify', text: 'تم تسجيل الدفعة وإنشاء الفاتورة بنجاح.', type: 'success');
+    }
+
+    public function openChangeStatusModal(): void
+    {
+        $this->newStatus = $this->order->statusValue();
+        $this->statusReason = '';
+        $this->resetValidation();
+        $this->dispatch('openmodal', modal: 'change-order-status');
+    }
+
+    public function updateStatus(): void
+    {
+        $this->validate([
+            'newStatus' => ['required', 'string', Rule::in(array_keys(Order::statusOptions()))],
+            'statusReason' => ['required', 'string', 'min:3', 'max:1000'],
+        ]);
+
+        if ($this->newStatus === $this->order->statusValue()) {
+            $this->addError('newStatus', 'الحالة المختارة هي الحالة الحالية.');
+
+            return;
+        }
+
+        DB::transaction(function (): void {
+            $this->order->changeStatus($this->newStatus, $this->statusReason);
+        });
+
+        $this->order->refresh();
+        unset($this->activityTimeline);
+        $this->statusReason = '';
+        $this->resetValidation();
+        $this->dispatch('closemodal', modal: 'change-order-status');
+        $this->dispatch('notify', text: 'تم تحديث حالة الطلب بنجاح.', type: 'success');
+    }
+
+    protected function activityTitle(ActivityLog $activity): string
+    {
+        return match ($activity->event) {
+            'created' => 'إنشاء الطلب',
+            'updated' => 'تحديث الطلب',
+            'deleted' => 'حذف الطلب',
+            'restored' => 'استعادة الطلب',
+            default => $activity->description ?: 'نشاط على الطلب',
+        };
+    }
+
+    protected function activityDetails(ActivityLog $activity): ?string
+    {
+        $changes = $activity->attribute_changes;
+
+        if (! $changes instanceof Collection || $changes->isEmpty()) {
+            return null;
+        }
+
+        $attributes = collect($changes->get('attributes', []))
+            ->except(['updated_at'])
+            ->map(function (mixed $value, string $key): string {
+                if ($key === 'status') {
+                    return 'الحالة: '.Order::statusLabelFor((string) $value);
+                }
+
+                return "{$key}: {$value}";
+            })
+            ->values();
+
+        return $attributes->isEmpty() ? null : $attributes->implode(' · ');
     }
 
     public function rendering($view): void

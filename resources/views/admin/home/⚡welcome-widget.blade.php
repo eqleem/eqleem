@@ -57,6 +57,17 @@
                             أكمل إعداد صفحتك خطوة بخطوة لتبدو احترافية وتجذب المزيد من الزوار.
                         @endif
                     </p>
+
+                    @if ($percentage >= 100)
+                        <button
+                            type="button"
+                            x-on:click="$dispatch('openmodal', { modal: 'home-step-content' })"
+                            class="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
+                        >
+                            <iconify-icon icon="solar:add-circle-bold" class="text-lg"></iconify-icon>
+                            إضافة محتوى
+                        </button>
+                    @endif
                 </div>
 
                 @if ($percentage < 100)

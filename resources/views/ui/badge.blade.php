@@ -25,7 +25,7 @@ $color = match ($color) {
     default => 'bg-gray-50 text-gray-500',
 };
 
-$classes = 'text-gray-500 [*+&]:mt-2 dark:text-white/70 bg-gray-100 rounded-lg  inline-block ' . $classes . ' ' . $color;
+$classes = 'text-gray-500 XX[*+&]:mt-2 dark:text-white/70 bg-gray-100 rounded-lg  inline-block ' . $classes . ' ' . $color;
 @endphp
 
 <span {{ $attributes->class($classes) }}>

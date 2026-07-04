@@ -4,19 +4,14 @@
         <div class="space-y-2">
             <ui:input name="name" label="اسم الصفحة" placeholder="اسم الصفحة" />
 
-            <ui:toggle name="showAvatar" label="عرض الشعار" live />
-
-            @if ($showAvatar)
-                <ui:file name="logo" label="الشعار" uploadLabel="رفع شعار">
-                    @if ($logo)
-                        <img src="{{ $logo->temporaryUrl() }}" class="w-20 h-20 rounded-full object-cover mb-1">
-                    @elseif ($currentLogo)
-                        <img src="{{ $currentLogo }}" class="w-20 h-20 rounded-full object-cover mb-1">
-                    @endif
-                </ui:file>
-
-                <ui:toggle name="showVerifiedBadge" label="شارة التوثيق" />
-            @endif
+            <ui:file-crop
+                name="logo"
+                label="الشعار"
+                uploadLabel="رفع شعار"
+                shape="square"
+                previewClass="mb-1 size-20 rounded-lg object-cover"
+                :preview="$logo ?: ($currentLogo ?: null)"
+            />
 
             <ui:textarea name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" maxlength="250" rows="3" />
 

@@ -7,11 +7,18 @@ use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\ModelStatus\HasStatuses;
 
 class Order extends Model
 {
-    use BelongsToTenant, HasUuid, SoftDeletes;
+    use BelongsToTenant, HasStatuses, HasUuid, LogsActivity, SoftDeletes;
+
+    public bool $logEmptyChanges = false;
 
     protected $fillable = [
         'tenant_id',
@@ -53,9 +60,29 @@ class Order extends Model
         ];
     }
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logOnlyDirty();
+    }
+
+    public function tapActivity($activity, $eventName)
+    {
+        $activity->tenant_id = $this->tenant_id;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function invoices(): MorphMany
+    {
+        return $this->morphMany(Invoice::class, 'invoicable');
     }
 
     public static function walkingClientLabel(): string
@@ -66,6 +93,11 @@ class Order extends Model
     public static function minorFromDecimal(float|string|null $amount): int
     {
         return Money::toMinor($amount);
+    }
+
+    public static function fromMinor(int|string|null $amount): float
+    {
+        return Money::fromMinor($amount);
     }
 
     public static function formatMinor(int|string|null $amount): string
@@ -151,9 +183,14 @@ class Order extends Model
         return $this->formatAmount($this->grand_total).' '.$this->currency_code;
     }
 
-    public function statusLabel(): string
+    public function statusValue(): string
     {
-        return match ($this->status) {
+        return (string) ($this->getAttributes()['status'] ?? '');
+    }
+
+    public static function statusLabelFor(string $status): string
+    {
+        return match ($status) {
             'draft' => 'مسودة',
             'open' => 'مفتوح',
             'confirmed' => 'مؤكد',
@@ -162,8 +199,21 @@ class Order extends Model
             'void' => 'ملغي',
             'cancelled' => 'ملغى',
             'completed' => 'مكتمل',
-            default => $this->status,
+            default => $status,
         };
+    }
+
+    public function statusLabel(): string
+    {
+        return self::statusLabelFor($this->statusValue());
+    }
+
+    public function changeStatus(string $status, ?string $reason = null): self
+    {
+        $this->update(['status' => $status]);
+        $this->setStatus($status, $reason);
+
+        return $this;
     }
 
     public function paymentStatusLabel(): string
@@ -197,7 +247,12 @@ class Order extends Model
 
     public function statusBadgeColor(): string
     {
-        return match ($this->status) {
+        return self::statusBadgeColorFor($this->statusValue());
+    }
+
+    public static function statusBadgeColorFor(string $status): string
+    {
+        return match ($status) {
             'completed', 'paid', 'confirmed' => 'green',
             'cancelled', 'void' => 'red',
             'draft', 'open' => 'gray',

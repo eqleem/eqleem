@@ -1,14 +1,15 @@
 <div>
     <ui:form class="!p-0 !gap-0 max-h-[75vh] overflow-y-auto" novalidate>
         <div class="space-y-4 p-5">
-            <ui:box title="معلومات العميل" class="border border-gray-100 shadow-sm">
-                <x-slot:action>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-gray-500">العميل</p>
                     @if (! $client_id && ! $isWalkingClient)
                         <ui:button type="button" wire:click="openCreateClientModal" icon="plus" variant="outline"
                             label="عميل جديد" />
                     @endif
-                </x-slot:action>
-                <div class="p-4 space-y-3">
+                </div>
+                <div class="space-y-3">
                     @if ($client_id)
                         <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
                             <div>
@@ -96,75 +97,63 @@
                         </div>
                     @endif
                 </div>
-            </ui:box>
-
-        <ui:box title="معلومات الطلب" class="border border-gray-100 shadow-sm">
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <ui:select name="status" label="حالة الطلب" :options="$statusOptions" live />
-                <ui:select name="payment_status" label="{{ __('Payment status') }}" :options="$paymentStatusOptions"
-                    live />
-                <ui:select name="payment_method" label="طريقة الدفع" :options="$paymentMethodOptions" live />
-                <div>
-                    <label class="text-sm text-gray-600 mb-1 block">العملة</label>
-                    <input type="text" value="SAR" disabled
-                        class="block w-full rounded-md text-sm border-2 bg-gray-50 py-2 px-3 text-gray-500 border-transparent">
-                </div>
-                <div class="sm:col-span-2">
-                    <ui:textarea name="notes" label="ملاحظات" placeholder="ملاحظات إضافية (اختياري)" rows="2" />
-                </div>
             </div>
-        </ui:box>
 
         <ui:box title="العناصر" class="border border-gray-100 shadow-sm">
             <x-slot:action>
-                <ui:button type="button" wire:click="addItem" icon="plus" variant="outline" label="إضافة عنصر" />
+                <div x-data="{ open: false }" class="relative">
+                    <button type="button" @click="open = !open"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <ui:icon name="plus" class="h-4 w-4" />
+                        <span>إضافة عنصر</span>
+                        <ui:icon name="chevron-down" class="h-4 w-4 text-gray-400" />
+                    </button>
+                    <div x-show="open" x-cloak @click.outside="open = false"
+                        class="absolute z-50 mt-1 min-w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-lg ltr:right-0 rtl:left-0"
+                        x-transition.scale.origin.top>
+                        @foreach ($addItemTypeOptions as $typeKey => $typeLabel)
+                            <button type="button" wire:click="addItem('{{ $typeKey }}')" @click="open = false"
+                                class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-start text-sm text-gray-700 hover:bg-gray-50">
+                                {{ $typeLabel }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
             </x-slot:action>
             <div class="p-4 space-y-4">
                 @error('items')
                     <p class="text-red-500 text-xs">{{ $message }}</p>
                 @enderror
 
+                @if (count($items) === 0)
+                    <p class="text-center text-sm text-gray-400 py-6">اختر نوع العنصر من القائمة لبدء إضافة الطلب.</p>
+                @endif
+
                 @foreach ($items as $index => $item)
                     <div wire:key="item-{{ $item['key'] }}"
                         class="bg-gray-50 rounded-lg p-3 space-y-3 relative border border-gray-100">
-                        @if (count($items) > 1)
-                            <button type="button" wire:click="removeItem({{ $index }})"
-                                class="absolute top-2 left-2 text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50">
-                                <ui:icon name="trash" class="w-4 h-4" />
-                            </button>
-                        @endif
+                        <button type="button" wire:click="removeItem({{ $index }})"
+                            class="absolute top-2 left-2 text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50">
+                            <ui:icon name="trash" class="w-4 h-4" />
+                        </button>
 
-                        <div>
-                            <label class="text-xs text-gray-500 mb-1 block">النوع</label>
-                            <select wire:model.live="items.{{ $index }}.type"
-                                class="block w-full rounded-lg py-2 px-3 text-sm text-gray-800 border border-gray-200 focus:border-primary-500 focus:outline-none">
-                                <option value="">اختر النوع ..</option>
-                                @foreach ($itemTypeOptions as $typeKey => $typeLabel)
-                                    <option value="{{ $typeKey }}">{{ $typeLabel }}</option>
-                                @endforeach
-                            </select>
-                            @error('items.'.$index.'.type')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <p class="text-xs font-semibold text-gray-500 pe-8">
+                            {{ $itemTypeOptions[$item['type']] ?? $item['type'] }}
+                        </p>
 
                         @if ($item['type'] === 'other')
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">الوصف</label>
                                 <textarea wire:model="items.{{ $index }}.description" rows="2"
-                                    placeholder="وصف العنصر .."
+                                    placeholder="{{ $itemSearchPlaceholders['other'] ?? 'أضف وصف العنصر المخصص ..' }}"
                                     class="block w-full rounded-lg py-2 px-3 text-sm text-gray-800 border border-gray-200 focus:border-primary-500 focus:outline-none"></textarea>
                                 @error('items.'.$index.'.description')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                        @elseif ($item['type'] !== '')
+                        @else
                             <div class="relative">
-                                <label class="text-xs text-gray-500 mb-1 block">
-                                    {{ $itemTypeOptions[$item['type']] ?? 'العنصر' }}
-                                </label>
                                 <input wire:model.live.debounce.300ms="items.{{ $index }}.search" type="text"
-                                    placeholder="ابحث أو أدخل الاسم .."
+                                    placeholder="{{ $itemSearchPlaceholders[$item['type']] ?? 'ابحث أو أدخل الاسم ..' }}"
                                     class="block w-full rounded-lg py-2 px-3 text-sm text-gray-800 border border-gray-200 focus:border-primary-500 focus:outline-none">
                                 @error('items.'.$index.'.name')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -196,8 +185,7 @@
                             </div>
                         @endif
 
-                        @if ($item['type'] !== '')
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div>
                                     <label class="text-xs text-gray-500 mb-1 block">الكمية</label>
                                     <input wire:model.live="items.{{ $index }}.qty" type="number" min="1"
@@ -231,8 +219,7 @@
                                         {{ \App\Models\Order::formatMinor($item['line_total']) }} SAR
                                     </div>
                                 </div>
-                            </div>
-                        @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -306,6 +293,7 @@
 <?php
 
 use App\Models\Client;
+use App\Models\Content;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -334,32 +322,15 @@ new class extends Livewire\Component {
 
     public bool $showCreateClientModal = false;
 
-    public string $status = 'confirmed';
-
-    public string $payment_status = 'unpaid';
-
-    public string $payment_method = 'cash';
-
     public string $currency_code = 'SAR';
-
-    public ?string $notes = null;
 
     /** @var array<int, array{key: string, type: string, product_id: ?int, name: string, search: string, description: string, qty: int, unit_price: string, discount: string, line_total: int}> */
     public array $items = [];
-
-    public function mount(): void
-    {
-        $this->addItem();
-    }
 
     protected function rules(): array
     {
         return [
             'client_id' => 'nullable|exists:clients,id',
-            'status' => ['required', Rule::in(array_keys(Order::statusOptions()))],
-            'payment_status' => ['required', Rule::in(array_keys(Order::paymentStatusOptions()))],
-            'payment_method' => ['required', Rule::in(array_keys(Order::paymentMethodOptions()))],
-            'notes' => 'nullable|string|max:2000',
             'items' => 'required|array|min:1',
             'items.*.type' => ['required', Rule::in(array_keys(Order::itemTypeOptions()))],
             'items.*.qty' => 'required|integer|min:1',
@@ -377,8 +348,6 @@ new class extends Livewire\Component {
             'items.*.name.required' => 'يجب اختيار أو إدخال اسم العنصر.',
             'items.*.description.required' => 'الوصف مطلوب.',
             'items.*.qty.min' => 'الكمية يجب أن تكون أكبر من صفر.',
-            'status.required' => 'حالة الطلب مطلوبة.',
-            'payment_status.required' => 'حالة الدفع مطلوبة.',
         ];
     }
 
@@ -508,14 +477,20 @@ new class extends Livewire\Component {
         $this->dispatch('notify', text: 'تم إضافة العميل واختياره.', type: 'success');
     }
 
-    public function addItem(): void
+    public function addItem(string $type): void
     {
-        $this->items[] = $this->blankItem();
+        if (! array_key_exists($type, Order::itemTypeOptions())) {
+            return;
+        }
+
+        $item = $this->blankItem();
+        $item['type'] = $type;
+        $this->items[] = $item;
     }
 
     public function removeItem(int $index): void
     {
-        if (count($this->items) <= 1) {
+        if (! isset($this->items[$index])) {
             return;
         }
 
@@ -542,19 +517,26 @@ new class extends Livewire\Component {
             return;
         }
 
-        $this->items[$index]['product_id'] = null;
-        $this->items[$index]['name'] = $this->items[$index]['search'];
+        $name = trim($this->items[$index]['search'] ?? '');
+
+        if ($name === '') {
+            return;
+        }
+
+        $content = $this->findOrCreateContentForItem(
+            $this->items[$index]['type'],
+            $name,
+            $this->items[$index]['unit_price'] ?? '0',
+        );
+
+        $this->items[$index]['product_id'] = $content?->id;
+        $this->items[$index]['name'] = $name;
+        $this->items[$index]['search'] = $name;
         $this->recalculateLineTotal($index);
     }
 
     public function updated($property): void
     {
-        if (preg_match('/^items\.(\d+)\.type$/', $property, $matches)) {
-            $this->resetItemFields((int) $matches[1]);
-
-            return;
-        }
-
         if (preg_match('/^items\.(\d+)\.search$/', $property, $matches)) {
             $index = (int) $matches[1];
 
@@ -576,22 +558,40 @@ new class extends Livewire\Component {
         }
     }
 
-    protected function resetItemFields(int $index): void
+    protected function blankItem(): array
     {
-        if (! isset($this->items[$index])) {
-            return;
-        }
+        return [
+            'key' => Str::uuid()->toString(),
+            'type' => '',
+            'product_id' => null,
+            'name' => '',
+            'search' => '',
+            'description' => '',
+            'qty' => 1,
+            'unit_price' => '0',
+            'discount' => '0',
+            'line_total' => 0,
+        ];
+    }
 
-        $type = $this->items[$index]['type'] ?? '';
+    public static function addItemTypeOptions(): array
+    {
+        return [
+            'product' => 'أضف منتج',
+            'service' => 'أضف خدمة',
+            'course' => 'أضف دورة',
+            'other' => 'أضف عنصر مخصص',
+        ];
+    }
 
-        $this->items[$index]['product_id'] = null;
-        $this->items[$index]['name'] = '';
-        $this->items[$index]['search'] = '';
-        $this->items[$index]['description'] = '';
-        $this->items[$index]['unit_price'] = '0';
-        $this->items[$index]['discount'] = '0';
-        $this->items[$index]['line_total'] = 0;
-        $this->items[$index]['type'] = $type;
+    public static function itemSearchPlaceholders(): array
+    {
+        return [
+            'product' => 'ابحث باسم المنتج أو أضف منتج جديد',
+            'service' => 'ابحث باسم الخدمة أو أضف خدمة جديدة',
+            'course' => 'ابحث باسم الدورة التدريبية أو أضف دورة جديدة',
+            'other' => 'أضف وصف العنصر المخصص ..',
+        ];
     }
 
     public function submit()
@@ -614,15 +614,14 @@ new class extends Livewire\Component {
         }
 
         $totals = Order::calculateTotalsMinor($this->items);
-        $paidTotal = $this->payment_status === 'paid' ? $totals['grand_total'] : 0;
 
-        $order = DB::transaction(function () use ($tenantId, $totals, $paidTotal) {
+        $order = DB::transaction(function () use ($tenantId, $totals) {
             $number = $this->generateOrderNumber($tenantId);
 
             $order = Order::create([
                 'tenant_id' => $tenantId,
                 'type' => 'order',
-                'status' => $this->status,
+                'status' => 'draft',
                 'channel' => 'manual',
                 'number' => $number,
                 'client_id' => $this->client_id,
@@ -631,16 +630,16 @@ new class extends Livewire\Component {
                 'discount_total' => $totals['discount_total'],
                 'tax_total' => $totals['tax_total'],
                 'grand_total' => $totals['grand_total'],
-                'paid_total' => $paidTotal,
-                'due_total' => max(0, $totals['grand_total'] - $paidTotal),
-                'payment_status' => $this->payment_status,
+                'paid_total' => 0,
+                'due_total' => $totals['grand_total'],
+                'payment_status' => 'unpaid',
                 'issued_at' => now(),
                 'created_by' => auth()->id(),
-                'notes' => $this->notes,
+                'notes' => null,
                 'financial_status' => 'draft',
                 'fulfillment_status' => 'unfulfilled',
                 'meta' => [
-                    'payment_method' => $this->payment_method,
+                    'payment_method' => 'cash',
                 ],
             ]);
 
@@ -695,6 +694,22 @@ new class extends Livewire\Component {
             if (blank($this->items[$index]['unit_price'] ?? '')) {
                 $this->items[$index]['unit_price'] = '0';
             }
+
+            if (
+                ($item['type'] ?? '') !== 'other'
+                && blank($this->items[$index]['product_id'] ?? null)
+                && filled($this->items[$index]['name'] ?? '')
+            ) {
+                $content = $this->findOrCreateContentForItem(
+                    $item['type'],
+                    $this->items[$index]['name'],
+                    $this->items[$index]['unit_price'] ?? '0',
+                );
+
+                if ($content) {
+                    $this->items[$index]['product_id'] = $content->id;
+                }
+            }
         }
     }
 
@@ -725,22 +740,6 @@ new class extends Livewire\Component {
             ->value('id');
 
         return str_pad((string) (($lastId ?? 0) + 1), 6, '0', STR_PAD_LEFT);
-    }
-
-    protected function blankItem(): array
-    {
-        return [
-            'key' => Str::uuid()->toString(),
-            'type' => '',
-            'product_id' => null,
-            'name' => '',
-            'search' => '',
-            'description' => '',
-            'qty' => 1,
-            'unit_price' => '0',
-            'discount' => '0',
-            'line_total' => 0,
-        ];
     }
 
     protected function recalculateLineTotal(int $index): void
@@ -776,21 +775,54 @@ new class extends Livewire\Component {
             ->toArray();
     }
 
+    protected function orderItemContentType(string $type): ?string
+    {
+        return match ($type) {
+            'product' => contentTypeModel('store'),
+            'service' => contentTypeModel('services'),
+            'course' => contentTypeModel('courses'),
+            default => null,
+        };
+    }
+
     protected function searchProducts(string $term, string $type): array
     {
         if ($term === '' || $type === '' || $type === 'other') {
             return [];
         }
 
+        $contentType = $this->orderItemContentType($type);
+
+        if ($contentType === null) {
+            return [];
+        }
+
+        $search = '%'.$term.'%';
+        $results = Content::query()
+            ->where('type', $contentType)
+            ->where('title', 'like', $search)
+            ->orderBy('title')
+            ->limit(8)
+            ->get(['id', 'title', 'data'])
+            ->map(fn (Content $content): array => [
+                'name' => $content->title,
+                'product_id' => $content->id,
+                'unit_price' => (int) data_get($content->data, 'price', 0),
+            ])
+            ->all();
+
+        if ($results !== []) {
+            return $results;
+        }
+
         return DB::table('order_items')
             ->select('name', DB::raw('MAX(product_id) as product_id'), DB::raw('MAX(unit_price) as unit_price'))
-            ->where('name', 'ilike', '%'.$term.'%')
+            ->where('name', 'like', $search)
             ->where(function ($query) use ($type) {
-                $query->whereRaw("meta->>'type' = ?", [$type]);
+                $query->where('meta->type', $type);
 
                 if ($type === 'product') {
-                    $query->orWhereNull('meta')
-                        ->orWhereRaw("meta->>'type' IS NULL");
+                    $query->orWhereNull('meta');
                 }
             })
             ->groupBy('name')
@@ -803,6 +835,79 @@ new class extends Livewire\Component {
                 'unit_price' => (int) $row->unit_price,
             ])
             ->all();
+    }
+
+    protected function findOrCreateContentForItem(string $orderItemType, string $title, string $unitPriceDecimal = '0'): ?Content
+    {
+        $contentType = $this->orderItemContentType($orderItemType);
+
+        if ($contentType === null) {
+            return null;
+        }
+
+        $tenantId = currentTenantId();
+
+        if (! $tenantId) {
+            return null;
+        }
+
+        $title = trim($title);
+
+        if ($title === '') {
+            return null;
+        }
+
+        $existing = Content::query()
+            ->where('type', $contentType)
+            ->where('title', $title)
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        $data = [
+            'price' => Order::minorFromDecimal($unitPriceDecimal),
+        ];
+
+        if ($orderItemType === 'course') {
+            $data = array_merge($data, [
+                'level' => 'beginner',
+                'course_type' => 'recorded',
+                'hours' => 0,
+                'chapters' => [],
+            ]);
+        }
+
+        return Content::query()->create([
+            'tenant_id' => $tenantId,
+            'type' => $contentType,
+            'title' => $title,
+            'slug' => $this->uniqueContentSlug($title, $orderItemType),
+            'status' => 'draft',
+            'active' => true,
+            'data' => $data,
+        ]);
+    }
+
+    protected function uniqueContentSlug(string $title, string $orderItemType): string
+    {
+        $baseSlug = Str::slug($title);
+        $fallback = match ($orderItemType) {
+            'product' => 'product',
+            'service' => 'service',
+            'course' => 'course',
+            default => 'item',
+        };
+        $slug = $baseSlug !== '' ? $baseSlug : $fallback;
+        $counter = 1;
+
+        while (Content::query()->where('slug', $slug)->exists()) {
+            $slug = ($baseSlug !== '' ? $baseSlug : $fallback).'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     protected function buildTotals(): array
@@ -840,9 +945,8 @@ new class extends Livewire\Component {
             'clientResults' => $this->searchClients(),
             'productSearchResults' => $productSearchResults,
             'itemTypeOptions' => Order::itemTypeOptions(),
-            'statusOptions' => Order::statusOptions(),
-            'paymentStatusOptions' => Order::paymentStatusOptions(),
-            'paymentMethodOptions' => Order::paymentMethodOptions(),
+            'addItemTypeOptions' => self::addItemTypeOptions(),
+            'itemSearchPlaceholders' => self::itemSearchPlaceholders(),
             'totals' => $this->buildTotals(),
         ];
     }

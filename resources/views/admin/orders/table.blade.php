@@ -1,14 +1,19 @@
-<div class=" divide-y divide-gray-200 divide-dotted">
+<div class="divide-y divide-gray-200 divide-dotted">
 
     <div class="bg-gray-100 p-3 flex items-center gap-x-4 w-full">
+        <div class="ps-1" x-cloak>
+            <div class="flex items-center">
+                <ui:check-all />
+            </div>
+        </div>
         <div class="flex-grow">
             <div class="relative text-sm text-gray-800 col-span-3">
                 <div class="absolute ps-2 right-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500">
-                    <ui:icon name="search" class="  text-gray-400" />
+                    <ui:icon name="search" class="text-gray-400" />
                 </div>
 
                 <input wire:model.live="search" type="text" placeholder="ابحث .."
-                    class="block w-full rounded-lg   py-1.5 ps-10 text-gray-800 ring-0 ring-inset border-transparent border ring-gray-200 placeholder:text-gray-400 focus:border focus:outline-none focus:border-primary-500 sm:text-sm sm:leading-6">
+                    class="block w-full rounded-lg py-1.5 ps-10 text-gray-800 ring-0 ring-inset border-transparent border ring-gray-200 placeholder:text-gray-400 focus:border focus:outline-none focus:border-primary-500 sm:text-sm sm:leading-6">
             </div>
         </div>
         <div>
@@ -33,59 +38,77 @@
         @else
             <div class="pb-4">
                 @foreach ($results as $item)
+                    @php
+                        $issuedAt = $item->issued_at ?? $item->created_at;
+                        $paymentBadgeColor = match ($item->payment_status) {
+                            'paid' => 'gray',
+                            'unpaid' => 'yellow',
+                            'partial' => 'yellow',
+                            default => 'gray',
+                        };
+                        $paymentBadgeLabel = match ($item->payment_status) {
+                            'paid' => 'حالة الدفع: مدفوع',
+                            'unpaid' => 'حالة الدفع: لم تتم',
+                            'partial' => 'حالة الدفع: مدفوع جزئياً',
+                            'refunded' => 'حالة الدفع: مسترجع',
+                            default => 'حالة الدفع: '.$item->paymentStatusLabel(),
+                        };
+                    @endphp
                     <div wire:key="{{ $item->id }}"
-                        class="flex items-center justify-between gap-x-4 w-full hover:bg-gray-50 last:rounded-b-2xl px-4 sm:px-6">
-                        <div class="py-3 flex-1 min-w-0">
-                            <a href="{{ route('admin.orders.detail', ['id' => $item->uuid]) }}" wire:navigate
-                                class="block">
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    <h2 class="text-lg text-gray-700 font-semibold">
-                                        #{{ $item->number ?? $item->id }}
-                                    </h2>
+                        class="flex items-center gap-x-4 w-full hover:bg-gray-50 last:rounded-b-2xl px-4 sm:px-6 py-3">
+                        <div class="shrink-0">
+                            <input wire:model="selectedIds" value="{{ $item->id }}" type="checkbox"
+                                class="rounded-xl border-gray-300 shadow-sm w-4 h-4">
+                        </div>
+
+                        <a href="{{ route('admin.orders.detail', ['id' => $item->uuid]) }}" wire:navigate
+                            class="flex min-w-0 flex-1 items-start gap-x-3">
+                            <div
+                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-green-500">
+                                <ui:icon name="message-2" class="h-5 w-5" />
+                            </div>
+
+                            <div class="min-w-0 flex-1">
+                                <h2 class="text-sm font-bold text-gray-800">
+                                    #{{ $item->number ?? $item->id }}
+                                </h2>
+
+                                <div class="mt-1.5 flex flex-wrap items-center gap-x-1.5">
+                                    {{-- <ui:badge color="green" size="sm" class="inline-flex items-center gap-1">
+                                        <ui:icon name="folder" class="!h-3.5 !w-3.5" />
+                                        الطلبات
+                                    </ui:badge> --}}
+
+                                    <ui:badge color="gray" size="sm">
+                                        {{ $issuedAt->locale(app()->getLocale())->diffForHumans() }}
+                                    </ui:badge>
+
                                     <ui:badge color="{{ $item->statusBadgeColor() }}" size="sm">
                                         {{ $item->statusLabel() }}
                                     </ui:badge>
-                                    <ui:badge color="{{ $item->paymentStatusBadgeColor() }}" size="sm">
-                                        {{ $item->paymentStatusLabel() }}
+
+                                    <ui:badge color="{{ $paymentBadgeColor }}" size="sm">
+                                        {{ $paymentBadgeLabel }}
+                                    </ui:badge>
+
+                                    <ui:badge color="gray" size="sm" dir="ltr">
+                                        {{ money_format($item->grand_total, currency: $item->currency_code) }}
+                                    </ui:badge>
+
+                                    <ui:badge color="blue" size="sm">
+                                        {{ $item->client?->name ?? \App\Models\Order::walkingClientLabel() }}
                                     </ui:badge>
                                 </div>
-                                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-                                    @if ($item->client)
-                                        <span class="truncate">{{ $item->client->name }}</span>
-                                    @else
-                                        <span class="text-gray-400">{{ \App\Models\Order::walkingClientLabel() }}</span>
-                                    @endif
-                                    @if ($item->client?->email)
-                                        <span
-                                            class="truncate inline-flex items-center gap-x-1 bg-gray-100 p-1 px-2 rounded-md text-xs">{{ $item->client->email }}</span>
-                                    @endif
-                                    @if ($item->client?->phone)
-                                        <span class="inline-block text-xs" dir="ltr">{{ $item->client->phone }}</span>
-                                    @endif
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="hidden sm:flex items-center gap-x-6 text-sm text-gray-600 shrink-0">
-                            <div class="text-end">
-                                <div class="font-bold text-gray-800">{{ $item->formattedGrandTotal() }}</div>
-                                <div class="text-xs text-gray-400 mt-0.5">{{ $item->items_count }} منتج</div>
                             </div>
-                            <div class="text-end min-w-24">
-                                <div>{{ $item->issued_at?->translatedFormat('d M Y') ?? $item->created_at->translatedFormat('d M Y') }}</div>
-                                <div class="text-xs text-gray-400 mt-0.5">
-                                    {{ $item->issued_at?->translatedFormat('h:i A') ?? $item->created_at->translatedFormat('h:i A') }}
-                                </div>
-                            </div>
-                        </div>
+                        </a>
 
-                        <div class="pe-2 shrink-0">
+                        <div class="shrink-0 pe-1">
                             <div x-data="{ dropdownMenu: false }">
                                 <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
                                     <button @click="dropdownMenu = ! dropdownMenu" type="button"
                                         class="hover:bg-gray-200 p-1 rounded-lg inline-block" aria-expanded="false"
                                         aria-haspopup="true">
-                                        <ui:icon name="dots" class="  text-gray-400" />
+                                        <ui:icon name="dots" class="text-gray-400" />
                                     </button>
 
                                     <div x-show="dropdownMenu"
@@ -93,7 +116,7 @@
                                         role="menu" aria-orientation="vertical" tabindex="-1"
                                         x-transition.scale.origin.top>
                                         <a href="{{ route('admin.orders.detail', ['id' => $item->uuid]) }}"
-                                            wire:navigate
+                                            wire:navigate @click="dropdownMenu = false"
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
                                             {{ __('View') }}
                                         </a>
@@ -137,6 +160,10 @@ new class extends Livewire\Component {
     use WithPagination;
 
     public $search;
+
+    public $selectedIds = [];
+
+    public $allIdsOnPage = [];
 
     public function placeholder()
     {
@@ -194,8 +221,12 @@ new class extends Livewire\Component {
 
         $query = $this->applySearch($query);
 
+        $results = $query->paginate(20);
+
+        $this->allIdsOnPage = $results->map(fn ($item) => (string) $item->id)->toArray();
+
         return [
-            'results' => $query->paginate(20),
+            'results' => $results,
         ];
     }
 }; ?>

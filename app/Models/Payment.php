@@ -21,15 +21,34 @@ class Payment extends Model
         'order_id',
         'purchased_id',
         'purchased_type',
+        'paymentable_type',
+        'paymentable_id',
         'from_id',
         'from_type',
         'to_id',
         'to_type',
+        'reason',
+        'payment_id',
         'amount',
+        'invoice_id',
+        'ip',
+        'type',
+        'captured',
+        'gateway_id',
+        'gateway',
+        'initial_status',
         'currency',
-        'status',
+        'description',
+        'source_number',
+        'source_name',
+        'source_expiry_year',
+        'source_expiry_month',
+        'source_last_four',
+        'source_type',
+        'source_company',
         'meta',
-        'notes',
+        'refunded_at',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -55,6 +74,11 @@ class Payment extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function purchased()

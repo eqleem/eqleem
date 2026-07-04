@@ -9,8 +9,6 @@ import "@uppy/image-editor/dist/style.min.css";
 import Form from "@uppy/form";
 import DragDrop from "@uppy/drag-drop";
 
-// import { Cropt } from "cropt";
-
 window.Uppy = Uppy;
 window.Dashboard = Dashboard;
 window.XHR = XHR;
@@ -19,7 +17,7 @@ window.ImageEditor = ImageEditor;
 window.Form = Form;
 window.DragDrop = DragDrop;
 
-// window.Cropt = Cropt;
+import "./file-crop.js";
 
 // import {
 //     Livewire,

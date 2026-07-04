@@ -8,8 +8,8 @@
 
     <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200">
         <h2 class="text-xl font-bold text-stone-900">إتمام الدفع — {{ $plan->label }}</h2>
-        <p class="mt-2 text-sm text-stone-500">
-            {{ $plan->formattedPrice() }} ر.س — {{ $plan->billingLabel() }}
+        <p class="mt-2 text-sm text-stone-500" dir="ltr">
+            {{ money_format($plan->price) }} — {{ $plan->billingLabel() }}
         </p>
 
         @if (blank(config('services.moyasar.publishable_key')))

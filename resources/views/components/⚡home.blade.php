@@ -77,7 +77,8 @@
         </div>
 
                 <h1 class="text-4xl sm:text-5xl md:text-6xl text-base-900 font-semibold leading-12 !lg:leading-[4.5rem] max-w-sm sm:max-w-xl xl:max-w-2xl mx-auto">
-                     أنشئ صفحة أعمال مُركّزة،   
+                     أنشئ صفحة أعمال 
+                     تحوّل زوّارك إلى عملاء،   
                     {{-- <div class="relative inline-flex">
                         <span class="absolute inset-x-0 bottom-0 border-b-[12px] border-amber-400"></span>
                         <h1 class="relative text-4xl font-semibold text-black sm:text-6xl  "> تحقق أهدافك </h1>
@@ -88,11 +89,12 @@
                 </h1>
                 <p class="mt-8 text-gray-500 max-w-sm lg:max-w-xl mx-auto text-base lg:text-xl">
                     {{-- <b>صفحة أعمال</b> --}}
-                    <img src="{{ asset('assets/images/t1.png') }}" class="inline-block h-6 md:h-9" alt="" />
+                    <img src="{{ asset('assets/images/logo-text-black.webp') }}" class="inline-block h-6 md:h-9" alt="" />
                     يساعدك تنشئ
 
-                    صفحات لتسويق أعمالك ومشاريعك
+                    صفحة أعمال لنشاطك التجاري لتحويل الزوار إلى عملاء
                     خلال دقائق،
+                    تتمم عمليات البيع،
                     تستقبل طلبات العملاء عنّك، تجاوب على أسئلتهم، وتوصلهم بك 24/7 على مدار الساعة.
                 </p>
             </div>

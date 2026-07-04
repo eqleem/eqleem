@@ -17,11 +17,12 @@
         "league/flysystem-aws-s3-v3": "^3.35",
         "livewire/livewire": "^4.3",
         "lorisleiva/laravel-actions": "^2.10",
+        "lucasdotvin/laravel-soulbscription": "@dev",
         "sakanjo/laravel-easy-metrics": "^1.1",
+        "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-medialibrary": "*",
         "spatie/laravel-model-status": "^1.20",
-        "spatie/laravel-schemaless-attributes": "^2.6",
-        "lucasdotvin/laravel-soulbscription": "@dev"
+        "spatie/laravel-schemaless-attributes": "^2.6"
     },
     "repositories": [
         {

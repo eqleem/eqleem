@@ -9,7 +9,7 @@
 
 <div {{ $attributes->class('bg-white rounded-xl w-full') }}>
     @if ($title)
-        <div class=" p-4  text-gray-600 border-b-2 border-gray-100 flex items-center justify-between">
+        <div class=" p-4 bg-gray-50 rounded-t-xl text-gray-600 border-b-2 border-gray-100 flex items-center justify-between">
             <div>
                 <div class=" flex items-center gap-x-2">
                     {{ $rightAction ?? '' }}
