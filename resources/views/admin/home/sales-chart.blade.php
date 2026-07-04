@@ -11,13 +11,14 @@ new class extends \Livewire\Component {
 
     public $chartTitle = 'المبيعات ';
     public $options = [];
-    public $label = 'العدد';
+    public $label = 'المبيعات';
 
     function mount()
     {
-        $data = Metrics\Trend::make(Payment::class)
+        $query = Payment::query()->forTenant() ;
+        $data = Metrics\Trend::make($query)
             ->ranges($this->range)
-            ->countByDays();
+            ->sumByDays('amount') ;
 
         $this->runChart($data);
     }

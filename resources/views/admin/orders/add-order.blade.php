@@ -4,10 +4,10 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <p class="text-sm font-semibold text-gray-500">العميل</p>
-                    @if (! $client_id && ! $isWalkingClient)
-                        <ui:button type="button" wire:click="openCreateClientModal" icon="plus" variant="outline"
-                            label="عميل جديد" />
-                    @endif
+                    
+                    <ui:button type="button" wire:click="openCreateClientModal" icon="plus" variant="outline"
+                        label="عميل جديد" />
+                    
                 </div>
                 <div class="space-y-3">
                     @if ($client_id)
@@ -56,8 +56,8 @@
                                         placeholder="ابحث بالاسم أو البريد أو الهاتف .."
                                         class="block w-full rounded-lg py-2 ps-10 text-gray-800 border border-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm">
                                 </div>
-                                <ui:button type="button" wire:click="openCreateClientModal" icon="plus"
-                                    variant="outline" label="جديد" class="shrink-0" />
+                                {{-- <ui:button type="button" wire:click="openCreateClientModal" icon="plus"
+                                    variant="outline" label="جديد" class="shrink-0" /> --}}
                             </div>
                             @error('client_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -250,8 +250,8 @@
         </ui:box>
     </div>
 
-    <x-slot:footer>
-        <ui:button type="button" wire:click="submit" wire:target="submit" label="حفظ الطلب" />
+    <x-slot:footer class="p-5">
+        <ui:button type="button" wire:click="submit" wire:target="submit" label="أنشئ الطلب" />
     </x-slot:footer>
     </ui:form>
 

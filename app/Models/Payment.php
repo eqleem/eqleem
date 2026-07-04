@@ -431,4 +431,10 @@ class Payment extends Model
     {
         return Money::format($this->amount);
     }
+
+    // scope for payments for a tenant
+    public function scopeForTenant($query)
+    {
+        return $query->whereNotNull('paymentable_id');
+    }
 }

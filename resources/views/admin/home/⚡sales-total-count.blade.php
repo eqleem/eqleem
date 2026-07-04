@@ -33,7 +33,7 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        $query = Payment::query()->where('tenant_id', tenant('id')) ;
+        $query = Payment::query()->forTenant()->where('tenant_id', tenant('id')) ;
 
         [$this->value, $this->growth] = Value::make($query)
             ->withGrowthRate()

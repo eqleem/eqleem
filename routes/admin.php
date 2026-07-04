@@ -20,6 +20,7 @@ Route::as('admin.')
         Route::livewire('/account', 'admin::account.home')->name('account.home');
         Route::livewire('/orders', 'admin::orders.home')->name('orders.home');
         Route::livewire('/orders/payments/{uuid}', 'admin::orders.payment-detail')->name('orders.payments.detail');
+        Route::livewire('/orders/invoices/{uuid}', 'admin::orders.invoice-detail')->name('orders.invoices.detail');
         Route::livewire('/orders/form-submissions/{id}', 'admin::orders.form-submission-detail')->name('orders.form-submissions.detail');
         Route::livewire('/orders/{id}', 'admin::orders.detail')->name('orders.detail');
         Route::livewire('/clients', 'admin::clients.home')->name('clients.home');

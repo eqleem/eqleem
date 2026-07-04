@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\ModelStatus\HasStatuses;
@@ -67,18 +68,74 @@ class Invoice extends Model
         return $this->morphTo();
     }
 
-    public function client()
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
 
-    public function getSNumberAttribute()
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function getSNumberAttribute(): string
     {
         return 'INV-'.$this->number;
     }
 
-    public function getCurrentStatusAttribute()
+    public function getCurrentStatusAttribute(): ?string
     {
         return $this->status() ? $this->status : $this->initial_status;
+    }
+
+    public function resolvedStatus(): ?string
+    {
+        return $this->status() ?: $this->initial_status;
+    }
+
+    public function statusLabel(): string
+    {
+        return match ($this->resolvedStatus()) {
+            'paid' => 'مدفوعة',
+            'issued' => 'صادرة',
+            'draft' => 'مسودة',
+            'cancelled' => 'ملغاة',
+            'partial' => 'مدفوعة جزئياً',
+            default => $this->resolvedStatus() ?? '-',
+        };
+    }
+
+    public function statusBadgeColor(): string
+    {
+        return match ($this->resolvedStatus()) {
+            'paid' => 'green',
+            'issued', 'partial' => 'yellow',
+            'cancelled' => 'red',
+            'draft' => 'gray',
+            default => 'gray',
+        };
+    }
+
+    public function typeLabel(): string
+    {
+        return match ($this->type) {
+            'sell' => 'مبيعات',
+            'purchase' => 'مشتريات',
+            default => $this->type ?: '-',
+        };
+    }
+
+    public function dueAmount(): int
+    {
+        return max(0, $this->total_after_vat - $this->amount_paid);
+    }
+
+    public function invoicableLabel(): ?string
+    {
+        if ($this->invoicable_type === Order::class && $this->invoicable) {
+            return 'طلب #'.($this->invoicable->number ?? $this->invoicable->id);
+        }
+
+        return null;
     }
 }
