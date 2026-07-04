@@ -31,7 +31,7 @@
                             <ui:button variant="primary" href="{{ route('admin.home') }}" label="لوحة التحكم" class="!rounded-full text-base font-tsh !p-6" rounded="full" icon="settings" />
                         @else
                             <ui:button variant="primary" href="{{ route('auth.register') }}" label="أنشئ صفحة أعمال" wire:navigate rounded="full" icon="plus" class="!rounded-full !bg-primary-600 !hover:bg-primary-700 " />
-                            <ui:button variant="ghost" href="{{ route('auth.login') }}" label="دخول" wire:navigate class="text-white hover:text-white/70 !hover:bg-black/5 !font-normal" icon:trailing="arrow-left" />
+                            <ui:button variant="ghost" href="{{ route('auth.login') }}" label="دخول" wire:navigate class="!rounded-full" icon:trailing="arrow-left" />
                         @endauth   
                     </div>
                 </div>

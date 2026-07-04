@@ -12,6 +12,8 @@ use App\Support\PageTabRegistry;
 use App\Support\TenantThemeOptions;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use MeShaon\RequestAnalytics\Models\RequestAnalytics;
+use App\Observers\RequestAnalyticsObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +39,8 @@ class AppServiceProvider extends ServiceProvider
             ResolveTenantFromPath::class,
             SetTenantTheme::class,
         ]);
+
+        RequestAnalytics::observe(RequestAnalyticsObserver::class);
+
     }
 }
