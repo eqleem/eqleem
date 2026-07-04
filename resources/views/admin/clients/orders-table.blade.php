@@ -23,7 +23,7 @@
                 </x-slot:icon>
             </ui:empty>
         @else
-            <div class="pb-4">
+            <div class="">
                 @foreach ($results as $item)
                     <div wire:key="{{ $item->id }}"
                         class="flex items-center justify-between gap-x-4 w-full hover:bg-gray-50 last:rounded-b-2xl px-4 sm:px-6">

@@ -23,7 +23,7 @@
                 </x-slot:icon>
             </ui:empty>
         @else
-            <div class="pb-4">
+            <div class="">
                 @foreach ($results as $item)
                     @php
                         $isUnread = $item->isUnread();

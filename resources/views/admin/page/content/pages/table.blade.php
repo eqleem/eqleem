@@ -39,7 +39,7 @@
         </ui:modal>
     </div>
 
-    <div class="relative last-child:rounded-b-2xl pb-4X p-1">
+    <div class="relative last-child:rounded-b-2xl  p-1">
         @if ($results->count() === 0)
             <ui:empty subtitle="سيتم عرض الصفحات هنا بعد إضافتها.">
                 لا توجد صفحات.
@@ -48,7 +48,7 @@
                 </x-slot:icon>
             </ui:empty>
         @else
-            <div class="pb-4">
+            <div class="pb-4x">
                 @foreach ($results as $item)
                     <div wire:key="page-{{ $item->uuid }}"
                         class="flex items-center justify-between gap-x-7 w-full hover:bg-gray-50 last:rounded-b-2xl">

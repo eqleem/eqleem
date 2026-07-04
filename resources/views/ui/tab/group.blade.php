@@ -47,7 +47,7 @@
             history.pushState({ [this.urlKey]: id }, '', url);
         },
     }"
-    {{ $attributes->class(['mb-5']) }}
+    {{ $attributes->class(['mb-5x rounded-b-2xl']) }}
 >
     <div {{ $nav->attributes->class(['whitespace-nowrap text-sm  rounded-t-lg text-gray-600 overflow-x-auto']) }}>
         {{ $nav }}
@@ -57,7 +57,7 @@
             {{ $content }}
         </div>
     @else
-        <div class="[&>*:first-child]:rounded-ts-none ">
+        <div class="[&>*:first-child]:rounded-ts-none rounded-b-2xl">
             {{ $slot }}
         </div>
     @endif

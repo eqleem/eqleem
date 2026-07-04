@@ -36,7 +36,7 @@
                 </x-slot:icon>
             </ui:empty>
         @else
-            <div class="pb-4">
+            <div class="">
                 @foreach ($results as $item)
                     @php
                         $issuedAt = $item->issued_at ?? $item->created_at;

@@ -50,7 +50,7 @@
                 </x-slot:icon>
             </ui:empty>
         @else
-            <div class="pb-4">
+            <div class="">
                 @foreach ($results as $item)
                     <div wire:key="blog-post-{{ $item->uuid }}"
                         class="flex items-center justify-between gap-x-7 w-full hover:bg-gray-50 last:rounded-b-2xl">
