@@ -19,6 +19,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[Fillable([
     'tenant_id',
+    'user_id',
     'block_id',
     'parent_id',
     'type',
@@ -50,6 +51,26 @@ class Content extends Model implements HasMedia
         static::addGlobalScope('tenant', function (Builder $builder): void {
             if ($tenantId = currentTenantId()) {
                 $builder->where('tenant_id', $tenantId);
+            }
+        });
+
+        static::creating(function (Content $content): void {
+            if (filled($content->user_id)) {
+                return;
+            }
+
+            $userId = auth()->id();
+
+            if ($userId) {
+                $content->user_id = $userId;
+
+                return;
+            }
+
+            if ($content->tenant_id) {
+                $content->user_id = Tenant::query()
+                    ->whereKey($content->tenant_id)
+                    ->value('user_id');
             }
         });
     }
@@ -444,6 +465,45 @@ class Content extends Model implements HasMedia
     public function newsletterRecipientsCount(): int
     {
         return (int) data_get($this->data, 'recipients_count', 0);
+    }
+
+    public function orderItemType(): string
+    {
+        return self::orderItemTypeFor((string) $this->type);
+    }
+
+    public static function orderItemTypeFor(string $contentType): string
+    {
+        return match ($contentType) {
+            'product' => 'product',
+            'service' => 'service',
+            'course' => 'course',
+            'digital-product' => 'digital_product',
+            'digital-service' => 'digital_service',
+            'menu' => 'menu',
+            'unit' => 'unit_rental',
+            default => 'other',
+        };
+    }
+
+    public function cartImageUrl(): ?string
+    {
+        $url = match ($this->type) {
+            'product' => $this->getFirstMediaUrl('store-media'),
+            'service' => $this->getFirstMediaUrl('service-media'),
+            'course' => $this->getFirstMediaUrl('course-media'),
+            'digital-product' => $this->getFirstMediaUrl('digital-product-media'),
+            'digital-service' => $this->getFirstMediaUrl('digital-service-media'),
+            'menu' => $this->getFirstMediaUrl('menu-media'),
+            'unit' => $this->getFirstMediaUrl('unit-media'),
+            default => null,
+        };
+
+        if (filled($url)) {
+            return $url;
+        }
+
+        return contentImageUrl($this->avatar);
     }
 
     /**

@@ -13,8 +13,7 @@
 
 <?php
 
-use App\Models\Content;
-use Illuminate\Support\Str;
+use App\Services\TenantProfileService;
 
 new class extends Livewire\Component
 {
@@ -52,27 +51,11 @@ new class extends Livewire\Component
     {
         $this->validate();
 
-        $networks = $this->networks();
-        $maxOrder = Content::query()
-            ->where('block_id', $this->headerBlockId)
-            ->type('social-link')
-            ->max('sort_order') ?? 0;
+        $tenant = currentTenant();
 
-        Content::create([
-            'tenant_id' => currentTenantId(),
-            'block_id' => $this->headerBlockId,
-            'type' => 'social-link',
-            'title' => $networks[$this->network]['label'] ?? $this->network,
-            'slug' => $this->network.'-'.Str::lower(Str::random(8)),
-            'data' => [
-                'network' => $this->network,
-                'url' => $this->url,
-            ],
-            'sort_order' => $maxOrder + 1,
-            'active' => true,
-            'status' => 'published',
-            'published_at' => now(),
-        ]);
+        if ($tenant) {
+            app(TenantProfileService::class)->addSocialLink($tenant, $this->network, $this->url);
+        }
 
         $this->reset('url');
         $this->network = 'twitter';

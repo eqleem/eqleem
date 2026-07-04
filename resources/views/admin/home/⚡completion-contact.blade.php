@@ -15,7 +15,7 @@
 
 <?php
 
-use App\Models\Block;
+use App\Services\TenantProfileService;
 
 new class extends Livewire\Component
 {
@@ -34,13 +34,16 @@ new class extends Livewire\Component
         $this->headerBlockId = $headerBlockId;
 
         $tenant = currentTenant();
-        $headerBlock = Block::queryForTenantRoots()->find($headerBlockId);
-        $data = $headerBlock?->data ?? [];
 
-        $this->phone = (string) ($tenant?->phone ?? '');
-        $this->email = (string) ($tenant?->email ?? '');
-        $this->country = (string) ($data['country'] ?? '');
-        $this->city = (string) ($data['city'] ?? '');
+        if (! $tenant) {
+            return;
+        }
+
+        $contact = app(TenantProfileService::class)->contact($tenant);
+        $this->phone = $contact['phone'];
+        $this->email = $contact['email'];
+        $this->country = $contact['country'];
+        $this->city = $contact['city'];
     }
 
     /**
@@ -61,20 +64,13 @@ new class extends Livewire\Component
         $this->validate();
 
         $tenant = currentTenant();
-        $headerBlock = Block::queryForTenantRoots()->find($this->headerBlockId);
 
         if ($tenant) {
-            $tenant->phone = $this->phone;
-            $tenant->email = $this->email;
-            $tenant->save();
-        }
-
-        if ($headerBlock) {
-            $headerBlock->update([
-                'data' => array_merge($headerBlock->data ?? [], [
-                    'country' => $this->country,
-                    'city' => $this->city,
-                ]),
+            app(TenantProfileService::class)->saveContact($tenant, [
+                'phone' => $this->phone,
+                'email' => $this->email,
+                'country' => $this->country,
+                'city' => $this->city,
             ]);
         }
 

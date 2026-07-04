@@ -41,4 +41,14 @@ return [
             'index' => 'admin::settings.info.verification',
         ],
     ],
+    'branches' => [
+        'order' => 7,
+        'slug' => 'branches',
+        'name' => 'الفروع',
+        'description' => 'الفروع والمستودعات.',
+        'icon' => 'assets/icons/business/010-location.svg',
+        'components' => [
+            'index' => 'admin::settings.branches.branches',
+        ],
+    ],
 ];

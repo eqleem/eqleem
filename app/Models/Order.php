@@ -167,9 +167,43 @@ class Order extends Model
     {
         return [
             'product' => 'منتج',
-            'service' => 'خدمة',
+            'digital_product' => 'منتج رقمي',
             'course' => 'دورة',
+            'digital_service' => 'خدمة رقمية',
+            'menu' => 'صنف طعام',
+            'service' => 'خدمة',
+            'unit_rental' => 'وحدة تأجير',
             'other' => 'أخرى',
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function bookingItemTypes(): array
+    {
+        return ['service', 'unit_rental'];
+    }
+
+    public static function isBookingItemType(string $type): bool
+    {
+        return in_array($type, self::bookingItemTypes(), true);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function itemTypeIcons(): array
+    {
+        return [
+            'product' => 'shopping-cart',
+            'digital_product' => 'file-download',
+            'course' => 'school-bell',
+            'digital_service' => 'cloud-computing',
+            'menu' => 'chef-hat',
+            'service' => 'hotel-service',
+            'unit_rental' => 'building-estate',
+            'other' => 'square-rounded-plus',
         ];
     }
 

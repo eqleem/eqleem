@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
+use App\Services\TenantProfileService;
 use Illuminate\Support\Collection;
 
 class PageCompletion
@@ -30,6 +31,8 @@ class PageCompletion
 
         $headerBlock = Block::findSingleton('header');
         $headerData = $headerBlock?->data ?? [];
+        $contact = app(TenantProfileService::class)->contact($tenant);
+        $socialLinks = app(TenantProfileService::class)->socialLinks($tenant);
 
         $steps = collect([
             $this->step(
@@ -45,21 +48,17 @@ class PageCompletion
                 key: 'contact',
                 label: 'بيانات الاتصال',
                 hint: 'أضف رقم الجوال والبريد الإلكتروني والموقع.',
-                done: filled($tenant->phone)
-                    && filled($tenant->email)
-                    && filled(data_get($headerData, 'country'))
-                    && filled(data_get($headerData, 'city')),
+                done: filled($contact['phone'])
+                    && filled($contact['email'])
+                    && filled($contact['country'])
+                    && filled($contact['city']),
                 modal: 'home-step-contact',
             ),
             $this->step(
                 key: 'social',
                 label: 'السوشال ميديا',
                 hint: 'أضف حساباً واحداً على الأقل في منصات التواصل.',
-                done: $headerBlock && Content::query()
-                    ->where('block_id', $headerBlock->id)
-                    ->type('social-link')
-                    ->get()
-                    ->contains(fn (Content $link): bool => filled($link->data['url'] ?? null)),
+                done: $socialLinks->contains(fn (array $link): bool => filled($link['url'] ?? null)),
                 modal: 'home-step-social',
             ),
             $this->step(

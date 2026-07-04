@@ -11,7 +11,7 @@
         {{-- <x-tenant-theme::top-nav /> --}}
     </div>
  
-    <main class="{{ $width }}  pb-12 mt-3 md:mt-4 min-h-[99.2vh]x xmd:min-h-[50vh]  mx-auto flex-grow Xpx-3 Xpy-1 flex flex-col relative w-full bg-white/80 Xbackdrop-blur-2xl rounded-3xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
+    <main class="{{ $width }} pb-12 mt-3 md:mt-4   mx-auto flex-grow Xpx-3 Xpy-1 flex flex-col relative w-full bg-white/80 Xbackdrop-blur-2xl rounded-3xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
         {{ $slot }}
     </main>
 

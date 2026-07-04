@@ -109,12 +109,14 @@
                         <ui:icon name="chevron-down" class="h-4 w-4 text-gray-400" />
                     </button>
                     <div x-show="open" x-cloak @click.outside="open = false"
-                        class="absolute z-50 mt-1 min-w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-lg ltr:right-0 rtl:left-0"
+                        class="absolute z-50 mt-1 min-w-52 rounded-lg border border-gray-200 bg-white p-1 shadow-lg ltr:right-0 rtl:left-0"
                         x-transition.scale.origin.top>
                         @foreach ($addItemTypeOptions as $typeKey => $typeLabel)
                             <button type="button" wire:click="addItem('{{ $typeKey }}')" @click="open = false"
-                                class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-start text-sm text-gray-700 hover:bg-gray-50">
-                                {{ $typeLabel }}
+                                class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-start text-sm text-gray-700 hover:bg-gray-50">
+                                <ui:icon name="{{ $addItemTypeIcons[$typeKey] ?? 'square-rounded-plus' }}"
+                                    class="h-4 w-4 shrink-0 text-gray-400" />
+                                <span>{{ $typeLabel }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -182,9 +184,105 @@
                                 @if ($item['name'])
                                     <p class="text-xs text-green-600 mt-1">المحدد: {{ $item['name'] }}</p>
                                 @endif
+                                @if (\App\Models\Order::isBookingItemType($item['type']) && $item['name'] && empty($item['calendars']))
+                                    <p class="text-xs text-amber-600 mt-1">لا يوجد تقويم مرتبط بهذه الخدمة. اربط تقويماً من إعدادات المحتوى أولاً.</p>
+                                @endif
                             </div>
                         @endif
 
+                        @if (\App\Models\Order::isBookingItemType($item['type']))
+                            @if (! empty($item['calendars']))
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">التقويم</label>
+                                    <select wire:model.live="items.{{ $index }}.calendar_id"
+                                        class="block w-full rounded-lg py-2 px-3 text-sm border border-gray-200 focus:border-primary-500 focus:outline-none">
+                                        <option value="">اختر التقويم ..</option>
+                                        @foreach ($item['calendars'] as $calendar)
+                                            <option value="{{ $calendar['id'] }}">{{ $calendar['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('items.'.$index.'.calendar_id')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
+
+                            @if (! empty($item['calendar_id']) && ! empty($item['available_dates']))
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">تاريخ الحجز</label>
+                                    <select wire:model.live="items.{{ $index }}.booking_date"
+                                        class="block w-full rounded-lg py-2 px-3 text-sm border border-gray-200 focus:border-primary-500 focus:outline-none"
+                                        dir="ltr">
+                                        <option value="">اختر التاريخ ..</option>
+                                        @foreach ($item['available_dates'] as $availableDate)
+                                            <option value="{{ $availableDate }}">
+                                                {{ \Carbon\Carbon::parse($availableDate)->translatedFormat('l j F Y') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('items.'.$index.'.booking_date')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @elseif (! empty($item['calendar_id']))
+                                <p class="text-xs text-amber-600">لا توجد تواريخ متاحة في التقويم المحدد.</p>
+                            @endif
+
+                            @if (! empty($item['booking_date']) && ! empty($item['time_slots']))
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">وقت الحجز</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach ($item['time_slots'] as $slot)
+                                            @if ($slot['available'] ?? false)
+                                                <button type="button"
+                                                    wire:click="selectTimeSlot({{ $index }}, {{ json_encode($slot['start_at']) }}, {{ json_encode($slot['end_at']) }})"
+                                                    class="rounded-lg border px-3 py-1.5 text-sm transition {{ ($item['booking_start_at'] ?? '') === $slot['start_at'] ? 'border-primary-500 bg-primary-50 text-primary-700 font-semibold' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50' }}"
+                                                    dir="ltr">
+                                                    {{ $slot['label'] }}
+                                                </button>
+                                            @else
+                                                <span
+                                                    title="{{ ($slot['unavailable_reason'] ?? '') === 'booked' ? 'محجوز' : 'غير متاح' }}"
+                                                    class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-1.5 text-sm text-gray-300 line-through cursor-not-allowed select-none"
+                                                    dir="ltr">
+                                                    {{ $slot['label'] }}
+                                                </span>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    @error('items.'.$index.'.booking_time')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @elseif (! empty($item['booking_date']))
+                                <p class="text-xs text-amber-600">لا توجد فترات في هذا التاريخ.</p>
+                            @endif
+
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">السعر</label>
+                                    <div class="py-2 px-3 text-sm font-semibold text-gray-800 bg-white rounded-lg border border-gray-100"
+                                        dir="ltr">
+                                        {{ \App\Models\Order::formatMinor(\App\Models\Order::minorFromDecimal($item['unit_price'])) }}
+                                        SAR
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">الخصم</label>
+                                    <input wire:model.live="items.{{ $index }}.discount" type="number"
+                                        min="0" step="0.01"
+                                        class="block w-full rounded-lg py-2 px-3 text-sm border border-gray-200 focus:border-primary-500 focus:outline-none"
+                                        dir="ltr">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">الإجمالي</label>
+                                    <div class="py-2 px-3 text-sm font-bold text-gray-800 bg-white rounded-lg border border-gray-100"
+                                        dir="ltr">
+                                        {{ \App\Models\Order::formatMinor($item['line_total']) }} SAR
+                                    </div>
+                                </div>
+                            </div>
+                        @else
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div>
                                     <label class="text-xs text-gray-500 mb-1 block">الكمية</label>
@@ -220,6 +318,7 @@
                                     </div>
                                 </div>
                         </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -292,9 +391,13 @@
 
 <?php
 
+use App\Models\Booking;
+use App\Models\Calendar;
 use App\Models\Client;
 use App\Models\Content;
 use App\Models\Order;
+use App\Services\CalendarSlotService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -324,7 +427,7 @@ new class extends Livewire\Component {
 
     public string $currency_code = 'SAR';
 
-    /** @var array<int, array{key: string, type: string, product_id: ?int, name: string, search: string, description: string, qty: int, unit_price: string, discount: string, line_total: int}> */
+    /** @var array<int, array{key: string, type: string, product_id: ?int, name: string, search: string, description: string, qty: int, unit_price: string, discount: string, line_total: int, calendar_id: ?int, calendars: array<int, array{id: int, name: string}>, available_dates: array<int, string>, booking_date: string, booking_time: string, booking_start_at: ?string, booking_end_at: ?string, duration_minutes: int, time_slots: array<int, array{start: string, end: string, label: string, start_at: string, end_at: string}>}> */
     public array $items = [];
 
     protected function rules(): array
@@ -508,7 +611,141 @@ new class extends Livewire\Component {
         $this->items[$index]['name'] = $product['name'];
         $this->items[$index]['search'] = $product['name'];
         $this->items[$index]['unit_price'] = Order::formatMinor($product['unit_price']);
+        $this->items[$index]['duration_minutes'] = (int) ($product['duration_minutes'] ?? 60);
+
+        if (Order::isBookingItemType($this->items[$index]['type'])) {
+            $this->items[$index]['qty'] = 1;
+            $this->loadBookingCalendars($index);
+        }
+
         $this->recalculateLineTotal($index);
+    }
+
+    public function loadBookingAvailability(int $index): void
+    {
+        if (! isset($this->items[$index])) {
+            return;
+        }
+
+        $calendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
+
+        if ($calendarId <= 0) {
+            $this->items[$index]['available_dates'] = [];
+            $this->items[$index]['booking_date'] = '';
+            $this->items[$index]['booking_time'] = '';
+            $this->items[$index]['booking_start_at'] = null;
+            $this->items[$index]['booking_end_at'] = null;
+            $this->items[$index]['time_slots'] = [];
+
+            return;
+        }
+
+        $calendar = Calendar::query()->find($calendarId);
+
+        if (! $calendar) {
+            return;
+        }
+
+        $this->items[$index]['available_dates'] = app(CalendarSlotService::class)->availableDates($calendar);
+        $this->items[$index]['booking_date'] = '';
+        $this->items[$index]['booking_time'] = '';
+        $this->items[$index]['booking_start_at'] = null;
+        $this->items[$index]['booking_end_at'] = null;
+        $this->items[$index]['time_slots'] = [];
+    }
+
+    public function loadBookingTimeSlots(int $index): void
+    {
+        if (! isset($this->items[$index])) {
+            return;
+        }
+
+        $calendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
+        $bookingDate = (string) ($this->items[$index]['booking_date'] ?? '');
+
+        $this->items[$index]['booking_time'] = '';
+        $this->items[$index]['booking_start_at'] = null;
+        $this->items[$index]['booking_end_at'] = null;
+        $this->items[$index]['time_slots'] = [];
+
+        if ($calendarId <= 0 || $bookingDate === '') {
+            return;
+        }
+
+        $calendar = Calendar::query()->find($calendarId);
+
+        if (! $calendar) {
+            return;
+        }
+
+        $durationMinutes = max(1, (int) ($this->items[$index]['duration_minutes'] ?? 60));
+        $mode = ($this->items[$index]['type'] ?? '') === 'unit_rental' ? 'day' : 'slot';
+
+        $this->items[$index]['time_slots'] = app(CalendarSlotService::class)->availableTimeSlots(
+            $calendar,
+            $bookingDate,
+            $durationMinutes,
+            $mode,
+        );
+    }
+
+    public function selectTimeSlot(int $index, string $startAt, string $endAt): void
+    {
+        if (! isset($this->items[$index])) {
+            return;
+        }
+
+        $slot = collect($this->items[$index]['time_slots'] ?? [])
+            ->first(fn (array $candidate): bool => ($candidate['start_at'] ?? '') === $startAt
+                && ($candidate['end_at'] ?? '') === $endAt);
+
+        if (! is_array($slot) || ! ($slot['available'] ?? false)) {
+            return;
+        }
+
+        $this->items[$index]['booking_start_at'] = $startAt;
+        $this->items[$index]['booking_end_at'] = $endAt;
+        $this->items[$index]['booking_time'] = Carbon::parse($startAt)->format('H:i');
+        $this->items[$index]['qty'] = 1;
+        $this->recalculateLineTotal($index);
+    }
+
+    protected function loadBookingCalendars(int $index): void
+    {
+        $productId = (int) ($this->items[$index]['product_id'] ?? 0);
+
+        if ($productId <= 0) {
+            $this->items[$index]['calendars'] = [];
+
+            return;
+        }
+
+        $content = Content::query()
+            ->with(['calendars' => fn ($query) => $query->where('calendars.active', true)])
+            ->find($productId);
+
+        $this->items[$index]['calendars'] = $content?->calendars
+            ->map(fn (Calendar $calendar): array => [
+                'id' => (int) $calendar->id,
+                'name' => $calendar->name,
+            ])
+            ->values()
+            ->all() ?? [];
+
+        if (count($this->items[$index]['calendars']) === 1) {
+            $this->items[$index]['calendar_id'] = $this->items[$index]['calendars'][0]['id'];
+            $this->loadBookingAvailability($index);
+
+            return;
+        }
+
+        $this->items[$index]['calendar_id'] = null;
+        $this->items[$index]['available_dates'] = [];
+        $this->items[$index]['booking_date'] = '';
+        $this->items[$index]['booking_time'] = '';
+        $this->items[$index]['booking_start_at'] = null;
+        $this->items[$index]['booking_end_at'] = null;
+        $this->items[$index]['time_slots'] = [];
     }
 
     public function useCustomProduct(int $index): void
@@ -532,6 +769,13 @@ new class extends Livewire\Component {
         $this->items[$index]['product_id'] = $content?->id;
         $this->items[$index]['name'] = $name;
         $this->items[$index]['search'] = $name;
+
+        if (Order::isBookingItemType($this->items[$index]['type'])) {
+            $this->items[$index]['qty'] = 1;
+            $this->items[$index]['duration_minutes'] = (int) data_get($content?->data, 'duration_minutes', 60);
+            $this->loadBookingCalendars($index);
+        }
+
         $this->recalculateLineTotal($index);
     }
 
@@ -549,6 +793,18 @@ new class extends Livewire\Component {
             ) {
                 $this->items[$index]['name'] = '';
             }
+
+            return;
+        }
+
+        if (preg_match('/^items\.(\d+)\.calendar_id$/', $property, $matches)) {
+            $this->loadBookingAvailability((int) $matches[1]);
+
+            return;
+        }
+
+        if (preg_match('/^items\.(\d+)\.booking_date$/', $property, $matches)) {
+            $this->loadBookingTimeSlots((int) $matches[1]);
 
             return;
         }
@@ -571,6 +827,15 @@ new class extends Livewire\Component {
             'unit_price' => '0',
             'discount' => '0',
             'line_total' => 0,
+            'calendar_id' => null,
+            'calendars' => [],
+            'available_dates' => [],
+            'booking_date' => '',
+            'booking_time' => '',
+            'booking_start_at' => null,
+            'booking_end_at' => null,
+            'duration_minutes' => 60,
+            'time_slots' => [],
         ];
     }
 
@@ -578,8 +843,12 @@ new class extends Livewire\Component {
     {
         return [
             'product' => 'أضف منتج',
-            'service' => 'أضف خدمة',
+            'digital_product' => 'أضف منتج رقمي',
             'course' => 'أضف دورة',
+            'digital_service' => 'أضف خدمة رقمية',
+            'menu' => 'أضف صنف طعام',
+            'service' => 'أضف خدمة',
+            'unit_rental' => 'أضف وحدة تأجير',
             'other' => 'أضف عنصر مخصص',
         ];
     }
@@ -588,8 +857,12 @@ new class extends Livewire\Component {
     {
         return [
             'product' => 'ابحث باسم المنتج أو أضف منتج جديد',
-            'service' => 'ابحث باسم الخدمة أو أضف خدمة جديدة',
+            'digital_product' => 'ابحث باسم المنتج الرقمي أو أضف منتجاً جديداً',
             'course' => 'ابحث باسم الدورة التدريبية أو أضف دورة جديدة',
+            'digital_service' => 'ابحث باسم الخدمة الرقمية أو أضف خدمة جديدة',
+            'menu' => 'ابحث باسم الصنف أو أضف صنفاً جديداً',
+            'service' => 'ابحث باسم الخدمة أو أضف خدمة جديدة',
+            'unit_rental' => 'ابحث باسم الوحدة أو أضف وحدة جديدة',
             'other' => 'أضف وصف العنصر المخصص ..',
         ];
     }
@@ -648,6 +921,26 @@ new class extends Livewire\Component {
                 $unitPrice = Order::minorFromDecimal($item['unit_price']);
                 $discount = Order::minorFromDecimal($item['discount'] ?? 0);
                 $lineTotal = max(0, ($qty * $unitPrice) - $discount);
+                $bookingId = null;
+
+                if (Order::isBookingItemType($item['type']) && filled($item['booking_start_at'] ?? null)) {
+                    $booking = Booking::query()->create([
+                        'tenant_id' => $tenantId,
+                        'client_id' => $this->client_id,
+                        'content_id' => $item['product_id'],
+                        'calendar_id' => $item['calendar_id'],
+                        'start_at' => $item['booking_start_at'],
+                        'end_at' => $item['booking_end_at'],
+                        'status' => 'pending',
+                        'price_snapshot' => Order::fromMinor($unitPrice),
+                        'currency' => $this->currency_code,
+                        'meta' => [
+                            'order_channel' => 'manual',
+                        ],
+                    ]);
+
+                    $bookingId = $booking->id;
+                }
 
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
@@ -661,6 +954,10 @@ new class extends Livewire\Component {
                     'meta' => json_encode([
                         'type' => $item['type'],
                         'description' => $item['type'] === 'other' ? ($item['description'] ?? null) : null,
+                        'booking_id' => $bookingId,
+                        'calendar_id' => $item['calendar_id'] ?? null,
+                        'booking_start_at' => $item['booking_start_at'] ?? null,
+                        'booking_end_at' => $item['booking_end_at'] ?? null,
                     ]),
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -695,6 +992,10 @@ new class extends Livewire\Component {
                 $this->items[$index]['unit_price'] = '0';
             }
 
+            if (Order::isBookingItemType($item['type'] ?? '')) {
+                $this->items[$index]['qty'] = 1;
+            }
+
             if (
                 ($item['type'] ?? '') !== 'other'
                 && blank($this->items[$index]['product_id'] ?? null)
@@ -726,6 +1027,24 @@ new class extends Livewire\Component {
 
             if (blank($item['name'] ?? '')) {
                 $this->addError("items.{$index}.name", 'يجب اختيار أو إدخال اسم العنصر.');
+
+                continue;
+            }
+
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            if (blank($item['calendar_id'] ?? null)) {
+                $this->addError("items.{$index}.calendar_id", 'يجب اختيار التقويم.');
+            }
+
+            if (blank($item['booking_date'] ?? '')) {
+                $this->addError("items.{$index}.booking_date", 'يجب اختيار تاريخ الحجز.');
+            }
+
+            if (blank($item['booking_start_at'] ?? null) || blank($item['booking_end_at'] ?? null)) {
+                $this->addError("items.{$index}.booking_time", 'يجب اختيار وقت الحجز.');
             }
         }
     }
@@ -779,8 +1098,12 @@ new class extends Livewire\Component {
     {
         return match ($type) {
             'product' => contentTypeModel('store'),
+            'digital_product' => contentTypeModel('digital-products'),
             'service' => contentTypeModel('services'),
             'course' => contentTypeModel('courses'),
+            'digital_service' => contentTypeModel('digital-services'),
+            'menu' => contentTypeModel('menu'),
+            'unit_rental' => contentTypeModel('unit-rental'),
             default => null,
         };
     }
@@ -808,6 +1131,7 @@ new class extends Livewire\Component {
                 'name' => $content->title,
                 'product_id' => $content->id,
                 'unit_price' => (int) data_get($content->data, 'price', 0),
+                'duration_minutes' => (int) (data_get($content->data, 'duration_minutes') ?: 60),
             ])
             ->all();
 
@@ -879,6 +1203,10 @@ new class extends Livewire\Component {
             ]);
         }
 
+        if ($orderItemType === 'digital_service') {
+            $data['delivery_days'] = null;
+        }
+
         return Content::query()->create([
             'tenant_id' => $tenantId,
             'type' => $contentType,
@@ -895,8 +1223,12 @@ new class extends Livewire\Component {
         $baseSlug = Str::slug($title);
         $fallback = match ($orderItemType) {
             'product' => 'product',
+            'digital_product' => 'digital-product',
             'service' => 'service',
             'course' => 'course',
+            'digital_service' => 'digital-service',
+            'menu' => 'menu-item',
+            'unit_rental' => 'unit',
             default => 'item',
         };
         $slug = $baseSlug !== '' ? $baseSlug : $fallback;
@@ -946,6 +1278,7 @@ new class extends Livewire\Component {
             'productSearchResults' => $productSearchResults,
             'itemTypeOptions' => Order::itemTypeOptions(),
             'addItemTypeOptions' => self::addItemTypeOptions(),
+            'addItemTypeIcons' => Order::itemTypeIcons(),
             'itemSearchPlaceholders' => self::itemSearchPlaceholders(),
             'totals' => $this->buildTotals(),
         ];

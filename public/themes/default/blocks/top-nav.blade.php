@@ -74,14 +74,41 @@
             @endif
 
             @if ($showClientLogin)
-                <button
-                    type="button"
-                    class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
-                    x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
-                >
-                    <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
-                    <span class="hidden md:inline">{{ $clientLoginLabel }}</span>
-                </button>
+                @if (authClient())
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button
+                            type="button"
+                            class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
+                            x-on:click="open = !open"
+                        >
+                            <img src="{{ authClient()->avatar }}" alt="{{ authClient()->displayName() }}" class="h-7 w-7 rounded-full object-cover">
+                            <span class="hidden md:inline">{{ authClient()->displayName() }}</span>
+                        </button>
+
+                        <div
+                            x-show="open"
+                            x-transition
+                            x-cloak
+                            class="absolute end-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-xl border border-stone-200/80 bg-white/95 py-1 shadow-lg backdrop-blur-md"
+                        >
+                            <form method="POST" action="{{ route('tenant.client.logout', ['tenant' => tenant('handle')]) }}">
+                                @csrf
+                                <button type="submit" class="block w-full px-4 py-2.5 text-start text-sm text-stone-700 transition hover:bg-stone-100">
+                                    تسجيل الخروج
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <button
+                        type="button"
+                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
+                        x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
+                    >
+                        <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
+                        <span class="hidden md:inline">{{ $clientLoginLabel }}</span>
+                    </button>
+                @endif
             @endif
         </div>
     </nav>
@@ -200,69 +227,7 @@
         <x-tenant-theme::modal name="customer-login-modal" maxWidth="md">
             <x-slot:title>تسجيل دخول العملاء</x-slot:title>
 
-            <div class="space-y-5" dir="rtl" x-data="{ otpStep: false }">
-                <button
-                    type="button"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
-                >
-                    <iconify-icon icon="flat-color-icons:google" class="text-xl"></iconify-icon>
-                    المتابعة باستخدام Google
-                </button>
-
-                <div class="relative py-1">
-                    <div class="absolute inset-0 flex items-center">
-                        <span class="w-full border-t border-stone-200"></span>
-                    </div>
-                    <div class="relative flex justify-center">
-                        <span class="bg-white px-3 text-xs text-stone-400">أو</span>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-stone-700">رقم الجوال</label>
-                        <input
-                            type="tel"
-                            placeholder="05xxxxxxxx"
-                            dir="ltr"
-                            class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none"
-                        >
-                    </div>
-
-                    <template x-if="otpStep">
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-stone-700">كود التحقق OTP</label>
-                            <div class="grid grid-cols-6 gap-2" dir="ltr">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                                <input type="text" maxlength="1" class="h-12 rounded-xl border border-stone-200 text-center text-lg font-semibold focus:border-primary-300 focus:outline-none">
-                            </div>
-                        </div>
-                    </template>
-
-                    <button
-                        type="button"
-                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700"
-                        x-show="!otpStep"
-                        x-on:click="otpStep = true"
-                    >
-                        <iconify-icon icon="hugeicons:message-lock-01" class="text-xl"></iconify-icon>
-                        إرسال كود التحقق
-                    </button>
-
-                    <button
-                        type="button"
-                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700"
-                        x-show="otpStep"
-                    >
-                        <iconify-icon icon="hugeicons:checkmark-circle-02" class="text-xl"></iconify-icon>
-                        تأكيد الدخول
-                    </button>
-                </div>
-            </div>
+            <livewire:tenant.client-login />
         </x-tenant-theme::modal>
     @endif
 </div>

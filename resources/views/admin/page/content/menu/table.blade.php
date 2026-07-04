@@ -107,7 +107,7 @@
                                         <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
-                                            {{ __('View') }}
+                                            {{ __('Edit') }}
                                         </a>
                                     </div>
                                 </div>

@@ -118,7 +118,7 @@
                                         <a href="{{ route('admin.orders.detail', ['id' => $item->uuid]) }}"
                                             wire:navigate @click="dropdownMenu = false"
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
-                                            {{ __('View') }}
+                                            {{ __('Edit') }}
                                         </a>
                                     </div>
                                 </div>

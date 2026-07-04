@@ -101,7 +101,7 @@
                                         <a href="{{ route('admin.orders.form-submissions.detail', ['id' => $item->id]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
-                                            {{ __('View') }}
+                                            {{ __('Edit') }}
                                         </a>
                                     </div>
                                 </div>

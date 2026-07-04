@@ -3,8 +3,8 @@
 namespace App\Livewire\Tenant\Blocks;
 
 use App\Livewire\Concerns\ResolvesTenantBlockView;
-use App\Models\Block;
-use App\Models\Content;
+use App\Models\Tenant;
+use App\Services\TenantProfileService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -22,53 +22,57 @@ class Header extends Component
     {
         $block = $this->resolveSingletonBlock();
         $data = $block?->data ?? [];
+        $tenant = tenant();
+        $profile = app(TenantProfileService::class);
+        $contact = $tenant ? $profile->contact($tenant) : [];
 
         return $this->renderTenantBlockView($block, [
-            'tenantName' => (string) (tenant()?->name ?? ''),
+            'tenantName' => (string) ($tenant?->name ?? ''),
             'showAvatar' => (bool) ($data['show_avatar'] ?? true),
-            'avatarUrl' => (string) (tenant()?->logo ?? ''),
+            'avatarUrl' => (string) ($tenant?->logo ?? ''),
             'showVerifiedBadge' => (bool) ($data['show_verified_badge'] ?? true),
             'bio' => (string) ($data['bio'] ?? ''),
-            'location' => $this->locationLabel($data),
-            'socialLinks' => $this->socialLinks($block),
+            'location' => $this->locationLabel($contact),
+            'socialLinks' => $this->socialLinks($tenant),
         ]);
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array{country?: string, city?: string}  $contact
      */
-    protected function locationLabel(array $data): string
+    protected function locationLabel(array $contact): string
     {
         $parts = array_values(array_filter([
-            $data['city'] ?? null,
-            $data['country'] ?? null,
+            $contact['city'] ?? null,
+            $contact['country'] ?? null,
         ], fn (mixed $part): bool => filled($part)));
 
         return implode('، ', $parts);
     }
 
     /**
-     * @return Collection<int, array{id: int, url: string, icon: string}>
+     * @return Collection<int, array{id: string, url: string, icon: string}>
      */
-    protected function socialLinks(?Block $block): Collection
+    protected function socialLinks(?Tenant $tenant): Collection
     {
-        if (! $block) {
+        if (! $tenant) {
             return collect();
         }
 
         $networks = config('social-networks', []);
 
-        return $block->activeContents('social-link')
-            ->map(function (Content $link) use ($networks): ?array {
-                $network = $networks[$link->data['network'] ?? ''] ?? null;
-                $url = (string) ($link->data['url'] ?? '');
+        return app(TenantProfileService::class)
+            ->socialLinks($tenant)
+            ->map(function (array $link) use ($networks): ?array {
+                $network = $networks[$link['network'] ?? ''] ?? null;
+                $url = (string) ($link['url'] ?? '');
 
                 if (! $network || $url === '') {
                     return null;
                 }
 
                 return [
-                    'id' => $link->id,
+                    'id' => $link['id'],
                     'url' => $url,
                     'icon' => $network['icon'],
                 ];

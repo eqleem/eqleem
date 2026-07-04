@@ -11,12 +11,37 @@ class Detail extends Component
 
     public function mount(string $slug): void
     {
+        if ($this->isPreviewRequest()) {
+            $post = Content::query()
+                ->type(contentTypeModel('blog'))
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            abort_unless($this->canPreviewPost($post), 404);
+
+            $this->post = $post;
+
+            return;
+        }
+
         $this->post = Content::query()
             ->type(contentTypeModel('blog'))
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
             ->firstOrFail();
+    }
+
+    private function isPreviewRequest(): bool
+    {
+        return request()->query('mod') === 'preview';
+    }
+
+    private function canPreviewPost(Content $post): bool
+    {
+        $userId = auth()->id();
+
+        return $userId !== null && (int) $post->user_id === (int) $userId;
     }
 
     public function render()

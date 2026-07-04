@@ -16,6 +16,13 @@
         </div>
     </div>
 
+    @if ($addedToCart)
+        <div class="mx-3 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تمت إضافة المنتج إلى السلة.
+            <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="font-semibold underline ms-1">عرض السلة</a>
+        </div>
+    @endif
+
     <section class="px-3 mb-8 w-full">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             @if ($images !== [])
@@ -83,18 +90,25 @@
 
                 <div class="flex items-center justify-between gap-4 mb-8 mt-5">
                     <div class="flex items-center border border-stone-200 rounded-[12px] h-12 px-2">
-                        <button type="button" class="w-8 h-full flex items-center justify-center text-stone-500 hover:text-stone-900" aria-label="تقليل الكمية">
+                        <button type="button" wire:click="decrementQuantity" class="w-8 h-full flex items-center justify-center text-stone-500 hover:text-stone-900" aria-label="تقليل الكمية">
                             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg>
                         </button>
-                        <span class="w-8 text-center text-sm font-medium">1</span>
-                        <button type="button" class="w-8 h-full flex items-center justify-center text-stone-500 hover:text-stone-900" aria-label="زيادة الكمية">
+                        <span class="w-8 text-center text-sm font-medium">{{ $quantity }}</span>
+                        <button type="button" wire:click="incrementQuantity" class="w-8 h-full flex items-center justify-center text-stone-500 hover:text-stone-900" aria-label="زيادة الكمية">
                             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7v14"></path></svg>
                         </button>
                     </div>
 
-                    <button type="button" class="flex-1 inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-8 py-2.5 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-300 font-geist">
+                    <button
+                        type="button"
+                        wire:click="addToCart"
+                        wire:loading.attr="disabled"
+                        wire:target="addToCart"
+                        class="flex-1 inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-8 py-2.5 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-300 font-geist disabled:opacity-70"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
-                        أضف للسلة
+                        <span wire:loading.remove wire:target="addToCart">أضف للسلة</span>
+                        <span wire:loading wire:target="addToCart">جاري الإضافة...</span>
                     </button>
                 </div>
 

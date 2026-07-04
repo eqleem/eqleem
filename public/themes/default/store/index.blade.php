@@ -1,4 +1,10 @@
 <x-tenant-theme::store.layout>
+    @if (session('order_placed'))
+        <div class="mx-2 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تم استلام طلبك بنجاح. رقم الطلب: <span class="font-semibold" dir="ltr">#{{ session('order_placed') }}</span>
+        </div>
+    @endif
+
     <section class="px-1 mb-5 w-full flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 rounded-2xl p-1 whitespace-nowrap w-full">
             <a

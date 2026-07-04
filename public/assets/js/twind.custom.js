@@ -509,7 +509,7 @@
                     : void 0;
             }
         };
-    })(twind.core));
+    })(twind.core ?? { toColorValue: (value) => value }));
 //# sourceMappingURL=/sm/8cffc635e3df04aaa67e21d3092d5bc5b5b9d606e1f5e1589c6b9d1db06e50ed.map
 
 let customTwindconf = {

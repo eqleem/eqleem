@@ -98,6 +98,19 @@ if (! function_exists('user')) {
     }
 }
 
+if (! function_exists('authClient')) {
+    function authClient(?string $key = null): mixed
+    {
+        $client = auth('client')->user();
+
+        if ($key) {
+            return data_get($client, $key);
+        }
+
+        return $client;
+    }
+}
+
 if (! function_exists('generateKey')) {
     function generateKey($count = 16)
     {

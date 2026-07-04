@@ -37,10 +37,10 @@
                         class="space-y-1.5"
                     >
                         @foreach ($socialLinks as $link)
-                            @php $network = $networks[$link->data['network'] ?? ''] ?? null; @endphp
+                            @php $network = $networks[$link['network'] ?? ''] ?? null; @endphp
                             <li
-                                wire:sortable.item="{{ $link->id }}"
-                                wire:key="social-link-{{ $link->id }}"
+                                wire:sortable.item="{{ $link['id'] }}"
+                                wire:key="social-link-{{ $link['id'] }}"
                                 class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 hover:border-gray-200 transition"
                             >
                                 <button
@@ -55,16 +55,16 @@
                                 <iconify-icon icon="{{ $network['icon'] ?? 'ri:link' }}" class="text-xl text-gray-500 shrink-0"></iconify-icon>
 
                                 <div class="flex flex-1 flex-col items-center justify-start">
-                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $network['label'] ?? ($link->data['network'] ?? '') }}</span>
-                                    <span class="text-xs text-gray-400 truncate" dir="ltr">{{ $link->data['url'] ?? '' }}</span>
+                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $network['label'] ?? ($link['network'] ?? '') }}</span>
+                                    <span class="text-xs text-gray-400 truncate" dir="ltr">{{ $link['url'] ?? '' }}</span>
                                 </div>
 
                                 <button
                                     type="button"
-                                    wire:click="deleteSocialLink({{ $link->id }})"
+                                    wire:click="deleteSocialLink('{{ $link['id'] }}')"
                                     wire:confirm="هل أنت متأكد من حذف هذا الرابط؟"
                                     wire:loading.attr="disabled"
-                                    wire:target="deleteSocialLink({{ $link->id }})"
+                                    wire:target="deleteSocialLink('{{ $link['id'] }}')"
                                     class="shrink-0 rounded-lg p-1 text-red-400/80 hover:bg-red-50 hover:text-red-500 transition"
                                     aria-label="حذف الرابط"
                                 >
@@ -114,9 +114,8 @@
 <?php
 
 use App\Livewire\Concerns\EditsBlock;
-use App\Models\Content;
+use App\Services\TenantProfileService;
 use App\Support\BlockVariants;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 
@@ -165,8 +164,11 @@ new class extends \Livewire\Component
         $this->showAvatar = (bool) ($data['show_avatar'] ?? true);
         $this->showVerifiedBadge = (bool) ($data['show_verified_badge'] ?? true);
         $this->bio = (string) ($data['bio'] ?? '');
-        $this->country = (string) ($data['country'] ?? '');
-        $this->city = (string) ($data['city'] ?? '');
+
+        $contact = app(TenantProfileService::class)->contact($tenant);
+        $this->country = $contact['country'];
+        $this->city = $contact['city'];
+
         $this->variant = (string) ($block->variant ?: array_key_first($variantOptions) ?: $this->blockType());
     }
 
@@ -208,25 +210,11 @@ new class extends \Livewire\Component
             'newUrl' => 'required|url|max:500',
         ]);
 
-        $maxOrder = Content::query()
-            ->where('block_id', $this->blockId)
-            ->type('social-link')
-            ->max('sort_order') ?? 0;
+        $tenant = currentTenant();
 
-        Content::create([
-            'block_id' => $this->blockId,
-            'type' => 'social-link',
-            'title' => $this->networks()[$this->newNetwork]['label'] ?? $this->newNetwork,
-            'slug' => $this->newNetwork.'-'.Str::lower(Str::random(8)),
-            'data' => [
-                'network' => $this->newNetwork,
-                'url' => $this->newUrl,
-            ],
-            'sort_order' => $maxOrder + 1,
-            'active' => true,
-            'status' => 'published',
-            'published_at' => now(),
-        ]);
+        if ($tenant) {
+            app(TenantProfileService::class)->addSocialLink($tenant, $this->newNetwork, $this->newUrl);
+        }
 
         $this->reset('newNetwork', 'newUrl');
         $this->newNetwork = 'twitter';
@@ -234,13 +222,13 @@ new class extends \Livewire\Component
         $this->dispatch('social-link-saved');
     }
 
-    public function deleteSocialLink(int $id): void
+    public function deleteSocialLink(string $id): void
     {
-        Content::query()
-            ->where('block_id', $this->blockId)
-            ->type('social-link')
-            ->whereKey($id)
-            ->first()?->delete();
+        $tenant = currentTenant();
+
+        if ($tenant) {
+            app(TenantProfileService::class)->deleteSocialLink($tenant, $id);
+        }
     }
 
     /**
@@ -248,12 +236,10 @@ new class extends \Livewire\Component
      */
     public function updateSocialOrder(array $items): void
     {
-        foreach ($items as $item) {
-            Content::query()
-                ->where('block_id', $this->blockId)
-                ->type('social-link')
-                ->whereKey($item['value'])
-                ->update(['sort_order' => $item['order']]);
+        $tenant = currentTenant();
+
+        if ($tenant) {
+            app(TenantProfileService::class)->updateSocialOrder($tenant, $items);
         }
     }
 
@@ -277,13 +263,18 @@ new class extends \Livewire\Component
             $this->reset('logo');
         }
 
+        if ($tenant) {
+            app(TenantProfileService::class)->saveContact($tenant, [
+                'country' => $this->country,
+                'city' => $this->city,
+            ]);
+        }
+
         $attributes = [
             'data' => [
                 'show_avatar' => $this->showAvatar,
                 'show_verified_badge' => $this->showVerifiedBadge,
                 'bio' => $this->bio,
-                'country' => $this->country,
-                'city' => $this->city,
             ],
         ];
 
@@ -308,11 +299,9 @@ new class extends \Livewire\Component
             'networkOptions' => collect($this->networks())
                 ->map(fn (array $network): string => $network['label'])
                 ->all(),
-            'socialLinks' => Content::query()
-                ->where('block_id', $this->blockId)
-                ->type('social-link')
-                ->orderBy('sort_order')
-                ->get(),
+            'socialLinks' => currentTenant()
+                ? app(TenantProfileService::class)->socialLinks(currentTenant())
+                : collect(),
         ];
     }
 }; ?>

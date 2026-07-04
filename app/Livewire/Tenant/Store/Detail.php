@@ -3,11 +3,16 @@
 namespace App\Livewire\Tenant\Store;
 
 use App\Models\Content;
+use App\Services\CartService;
 use Livewire\Component;
 
 class Detail extends Component
 {
     public Content $product;
+
+    public int $quantity = 1;
+
+    public bool $addedToCart = false;
 
     public function mount(string $slug): void
     {
@@ -17,6 +22,26 @@ class Detail extends Component
             ->where('active', true)
             ->where('slug', $slug)
             ->firstOrFail();
+    }
+
+    public function incrementQuantity(): void
+    {
+        $this->quantity++;
+    }
+
+    public function decrementQuantity(): void
+    {
+        if ($this->quantity > 1) {
+            $this->quantity--;
+        }
+    }
+
+    public function addToCart(CartService $cart): void
+    {
+        $cart->addProduct($this->product, $this->quantity);
+
+        $this->addedToCart = true;
+        $this->dispatch('cart-updated');
     }
 
     public function render()
