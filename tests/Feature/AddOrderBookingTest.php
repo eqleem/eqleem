@@ -143,6 +143,256 @@ it('requires booking date and time for service items', function () {
         ->assertHasErrors(['items.0.booking_date', 'items.0.booking_time']);
 });
 
+it('prevents booking the same time slot twice for service items in one order', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$service, $calendar] = createServiceWithCalendar($tenant);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $service->id,
+            'name' => $service->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->call('selectTimeSlot', 0, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 1, [
+            'product_id' => $service->id,
+            'name' => $service->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.1.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 1)
+        ->assertSet('items.1.time_slots', fn (array $slots): bool => collect($slots)
+            ->firstWhere('start', '09:00')['available'] === false)
+        ->call('selectTimeSlot', 1, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->assertSet('items.1.booking_start_at', null)
+        ->call('submit')
+        ->assertHasErrors(['items.1.booking_time']);
+
+    expect(Booking::query()->count())->toBe(0);
+});
+
+it('prevents booking the same time slot for different services sharing a calendar', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$serviceA, $calendar] = createServiceWithCalendar($tenant);
+
+    $serviceB = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('services'),
+        'title' => 'خدمة تجميل',
+        'slug' => 'beauty-service',
+        'status' => 'published',
+        'active' => true,
+        'data' => [
+            'price' => 20000,
+            'duration_minutes' => 60,
+        ],
+    ]);
+
+    $serviceB->calendars()->attach($calendar->id, ['type' => 'service-provider', 'active' => true]);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $serviceA->id,
+            'name' => $serviceA->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->call('selectTimeSlot', 0, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 1, [
+            'product_id' => $serviceB->id,
+            'name' => $serviceB->title,
+            'unit_price' => 20000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.1.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 1)
+        ->assertSet('items.1.time_slots', fn (array $slots): bool => collect($slots)
+            ->firstWhere('start', '09:00')['available'] === false)
+        ->call('selectTimeSlot', 1, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->assertSet('items.1.booking_start_at', null);
+});
+
+it('marks existing calendar bookings as unavailable for a different service', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$serviceA, $calendar] = createServiceWithCalendar($tenant);
+
+    $serviceB = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('services'),
+        'title' => 'خدمة تجميل',
+        'slug' => 'beauty-service',
+        'status' => 'published',
+        'active' => true,
+        'data' => [
+            'price' => 20000,
+            'duration_minutes' => 60,
+        ],
+    ]);
+
+    $serviceB->calendars()->attach($calendar->id, ['type' => 'service-provider', 'active' => true]);
+
+    Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'content_id' => $serviceA->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-07-06 09:00:00',
+        'end_at' => '2026-07-06 10:00:00',
+        'status' => 'confirmed',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $serviceB->id,
+            'name' => $serviceB->title,
+            'unit_price' => 20000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->assertSet('items.0.time_slots', fn (array $slots): bool => collect($slots)
+            ->firstWhere('start', '09:00')['available'] === false);
+});
+
+it('refreshes earlier items when a later item books a slot on the same calendar', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$serviceA, $calendar] = createServiceWithCalendar($tenant);
+
+    $serviceB = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('services'),
+        'title' => 'خدمة تجميل',
+        'slug' => 'beauty-service',
+        'status' => 'published',
+        'active' => true,
+        'data' => [
+            'price' => 20000,
+            'duration_minutes' => 60,
+        ],
+    ]);
+
+    $serviceB->calendars()->attach($calendar->id, ['type' => 'service-provider', 'active' => true]);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $serviceA->id,
+            'name' => $serviceA->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->call('addItem', 'service')
+        ->call('selectProduct', 1, [
+            'product_id' => $serviceB->id,
+            'name' => $serviceB->title,
+            'unit_price' => 20000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.1.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 1)
+        ->call('selectTimeSlot', 1, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->assertSet('items.0.time_slots', fn (array $slots): bool => collect($slots)
+            ->firstWhere('start', '09:00')['available'] === false);
+});
+
+it('reloads time slots when switching to a different service on the same calendar', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$serviceA, $calendar] = createServiceWithCalendar($tenant);
+
+    $serviceB = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('services'),
+        'title' => 'خدمة تجميل',
+        'slug' => 'beauty-service',
+        'status' => 'published',
+        'active' => true,
+        'data' => [
+            'price' => 20000,
+            'duration_minutes' => 60,
+        ],
+    ]);
+
+    $serviceB->calendars()->attach($calendar->id, ['type' => 'service-provider', 'active' => true]);
+
+    Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'content_id' => $serviceA->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-07-06 10:00:00',
+        'end_at' => '2026-07-06 11:00:00',
+        'status' => 'confirmed',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $serviceA->id,
+            'name' => $serviceA->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->call('selectProduct', 0, [
+            'product_id' => $serviceB->id,
+            'name' => $serviceB->title,
+            'unit_price' => 20000,
+            'duration_minutes' => 60,
+        ])
+        ->assertSet('items.0.booking_date', '2026-07-06')
+        ->assertSet('items.0.time_slots', fn (array $slots): bool => collect($slots)
+            ->firstWhere('start', '10:00')['available'] === false);
+});
+
+it('creates two bookings when two service items use different time slots', function () {
+    [$user, $tenant] = createTenantWithUserForAddOrder();
+    [$service, $calendar] = createServiceWithCalendar($tenant);
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 0, [
+            'product_id' => $service->id,
+            'name' => $service->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.0.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 0)
+        ->call('selectTimeSlot', 0, '2026-07-06 09:00:00', '2026-07-06 10:00:00')
+        ->call('addItem', 'service')
+        ->call('selectProduct', 1, [
+            'product_id' => $service->id,
+            'name' => $service->title,
+            'unit_price' => 15000,
+            'duration_minutes' => 60,
+        ])
+        ->set('items.1.booking_date', '2026-07-06')
+        ->call('loadBookingTimeSlots', 1)
+        ->call('selectTimeSlot', 1, '2026-07-06 10:00:00', '2026-07-06 11:00:00')
+        ->call('submit')
+        ->assertHasNoErrors();
+
+    expect(Booking::query()->count())->toBe(2);
+});
+
 it('still uses quantity flow for product items', function () {
     [$user, $tenant] = createTenantWithUserForAddOrder();
 

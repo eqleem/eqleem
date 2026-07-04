@@ -54,13 +54,15 @@
             <ui:tab.group
                 :active="$activeTab"
                 url-key="tab"
-                :valid-tabs="['info', 'orders']"
+                :valid-tabs="['info', 'orders', 'invoices']"
                 class="mt-6"
             >
                 <x-slot name="nav" class="border-b">
                     <ui:tab.nav name="info" label="{{ __('Personal info') }}"
                         activeClass="border-b-2 !border-blue-800" />
                     <ui:tab.nav name="orders" label="{{ __('Orders') }}"
+                        activeClass="border-b-2 !border-blue-800" />
+                    <ui:tab.nav name="invoices" label="الفواتير"
                         activeClass="border-b-2 !border-blue-800" />
                 </x-slot>
                 <x-slot name="content">
@@ -91,6 +93,9 @@
                     <ui:tab.content name="orders" class="!p-0 !rounded-none">
                         <livewire:admin::clients.orders-table :client="$client" lazy />
                     </ui:tab.content>
+                    <ui:tab.content name="invoices" class="!p-0 !rounded-none">
+                        <livewire:admin::clients.invoices-table :client="$client" lazy />
+                    </ui:tab.content>
                 </x-slot>
             </ui:tab.group>
 
@@ -109,7 +114,7 @@ new class extends \Livewire\Component {
     public string $activeTab = 'info';
 
     /** @var list<string> */
-    private const TABS = ['info', 'orders'];
+    private const TABS = ['info', 'orders', 'invoices'];
 
     public function mount(): void
     {

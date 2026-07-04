@@ -599,6 +599,7 @@ new class extends Livewire\Component {
 
         unset($this->items[$index]);
         $this->items = array_values($this->items);
+        $this->refreshAllTimeSlots();
     }
 
     public function selectProduct(int $index, array $product): void
@@ -606,6 +607,8 @@ new class extends Livewire\Component {
         if (! isset($this->items[$index])) {
             return;
         }
+
+        $previousCalendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
 
         $this->items[$index]['product_id'] = $product['product_id'];
         $this->items[$index]['name'] = $product['name'];
@@ -615,13 +618,13 @@ new class extends Livewire\Component {
 
         if (Order::isBookingItemType($this->items[$index]['type'])) {
             $this->items[$index]['qty'] = 1;
-            $this->loadBookingCalendars($index);
+            $this->loadBookingCalendars($index, $previousCalendarId > 0 ? $previousCalendarId : null);
         }
 
         $this->recalculateLineTotal($index);
     }
 
-    public function loadBookingAvailability(int $index): void
+    public function loadBookingAvailability(int $index, bool $preserveBookingDate = false): void
     {
         if (! isset($this->items[$index])) {
             return;
@@ -636,6 +639,7 @@ new class extends Livewire\Component {
             $this->items[$index]['booking_start_at'] = null;
             $this->items[$index]['booking_end_at'] = null;
             $this->items[$index]['time_slots'] = [];
+            $this->refreshTimeSlotsForOtherItems($index);
 
             return;
         }
@@ -647,11 +651,18 @@ new class extends Livewire\Component {
         }
 
         $this->items[$index]['available_dates'] = app(CalendarSlotService::class)->availableDates($calendar);
-        $this->items[$index]['booking_date'] = '';
         $this->items[$index]['booking_time'] = '';
         $this->items[$index]['booking_start_at'] = null;
         $this->items[$index]['booking_end_at'] = null;
         $this->items[$index]['time_slots'] = [];
+
+        if ($preserveBookingDate && filled($this->items[$index]['booking_date'] ?? '')) {
+            $this->reloadTimeSlotsOnly($index);
+        } else {
+            $this->items[$index]['booking_date'] = '';
+        }
+
+        $this->refreshTimeSlotsForOtherItems($index);
     }
 
     public function loadBookingTimeSlots(int $index): void
@@ -669,24 +680,13 @@ new class extends Livewire\Component {
         $this->items[$index]['time_slots'] = [];
 
         if ($calendarId <= 0 || $bookingDate === '') {
+            $this->refreshTimeSlotsForOtherItems($index);
+
             return;
         }
 
-        $calendar = Calendar::query()->find($calendarId);
-
-        if (! $calendar) {
-            return;
-        }
-
-        $durationMinutes = max(1, (int) ($this->items[$index]['duration_minutes'] ?? 60));
-        $mode = ($this->items[$index]['type'] ?? '') === 'unit_rental' ? 'day' : 'slot';
-
-        $this->items[$index]['time_slots'] = app(CalendarSlotService::class)->availableTimeSlots(
-            $calendar,
-            $bookingDate,
-            $durationMinutes,
-            $mode,
-        );
+        $this->reloadTimeSlotsOnly($index);
+        $this->refreshTimeSlotsForOtherItems($index);
     }
 
     public function selectTimeSlot(int $index, string $startAt, string $endAt): void
@@ -708,9 +708,154 @@ new class extends Livewire\Component {
         $this->items[$index]['booking_time'] = Carbon::parse($startAt)->format('H:i');
         $this->items[$index]['qty'] = 1;
         $this->recalculateLineTotal($index);
+        $this->refreshTimeSlotsForOtherItems($index);
     }
 
-    protected function loadBookingCalendars(int $index): void
+    /**
+     * @return list<array{start_at: string, end_at: string, calendar_id: int}>
+     */
+    protected function pendingReservedSlots(int $excludeIndex): array
+    {
+        $reserved = [];
+
+        foreach ($this->items as $index => $item) {
+            if ($index === $excludeIndex) {
+                continue;
+            }
+
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            if (blank($item['booking_start_at'] ?? null) || blank($item['booking_end_at'] ?? null)) {
+                continue;
+            }
+
+            $reserved[] = [
+                'start_at' => (string) $item['booking_start_at'],
+                'end_at' => (string) $item['booking_end_at'],
+                'calendar_id' => (int) ($item['calendar_id'] ?? 0),
+            ];
+        }
+
+        return $reserved;
+    }
+
+    /**
+     * @return list<array{start_at: string, end_at: string}>
+     */
+    protected function reservedSlotsForItem(int $index): array
+    {
+        $calendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
+        $bookingDate = (string) ($this->items[$index]['booking_date'] ?? '');
+
+        if ($calendarId <= 0 || $bookingDate === '') {
+            return [];
+        }
+
+        return collect($this->pendingReservedSlots($index))
+            ->filter(fn (array $slot): bool => $slot['calendar_id'] === $calendarId
+                && Carbon::parse($slot['start_at'])->toDateString() === $bookingDate)
+            ->map(fn (array $slot): array => [
+                'start_at' => $slot['start_at'],
+                'end_at' => $slot['end_at'],
+            ])
+            ->values()
+            ->all();
+    }
+
+    protected function reloadTimeSlotsOnly(int $index): void
+    {
+        if (! isset($this->items[$index])) {
+            return;
+        }
+
+        $calendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
+        $bookingDate = (string) ($this->items[$index]['booking_date'] ?? '');
+
+        if ($calendarId <= 0 || $bookingDate === '') {
+            $this->items[$index]['time_slots'] = [];
+
+            return;
+        }
+
+        $calendar = Calendar::query()->find($calendarId);
+
+        if (! $calendar) {
+            return;
+        }
+
+        $durationMinutes = max(1, (int) ($this->items[$index]['duration_minutes'] ?? 60));
+        $mode = ($this->items[$index]['type'] ?? '') === 'unit_rental' ? 'day' : 'slot';
+
+        $this->items[$index]['time_slots'] = app(CalendarSlotService::class)->availableTimeSlots(
+            $calendar,
+            $bookingDate,
+            $durationMinutes,
+            $mode,
+            $this->reservedSlotsForItem($index),
+        );
+
+        $this->clearInvalidBookingSelection($index);
+    }
+
+    protected function clearInvalidBookingSelection(int $index): void
+    {
+        $startAt = $this->items[$index]['booking_start_at'] ?? null;
+        $endAt = $this->items[$index]['booking_end_at'] ?? null;
+
+        if (blank($startAt) || blank($endAt)) {
+            return;
+        }
+
+        $slot = collect($this->items[$index]['time_slots'] ?? [])
+            ->first(fn (array $candidate): bool => ($candidate['start_at'] ?? '') === $startAt
+                && ($candidate['end_at'] ?? '') === $endAt);
+
+        if (is_array($slot) && ($slot['available'] ?? false)) {
+            return;
+        }
+
+        $this->items[$index]['booking_start_at'] = null;
+        $this->items[$index]['booking_end_at'] = null;
+        $this->items[$index]['booking_time'] = '';
+    }
+
+    protected function refreshTimeSlotsForOtherItems(int $excludeIndex): void
+    {
+        foreach ($this->items as $index => $item) {
+            if ($index === $excludeIndex) {
+                continue;
+            }
+
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            if (blank($item['booking_date'] ?? '')) {
+                continue;
+            }
+
+            $this->reloadTimeSlotsOnly($index);
+        }
+    }
+
+    protected function refreshAllTimeSlots(): void
+    {
+        foreach ($this->items as $index => $item) {
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            if (blank($item['booking_date'] ?? '')) {
+                continue;
+            }
+
+            $this->reloadTimeSlotsOnly($index);
+        }
+    }
+
+    protected function loadBookingCalendars(int $index, ?int $previousCalendarId = null): void
     {
         $productId = (int) ($this->items[$index]['product_id'] ?? 0);
 
@@ -733,8 +878,13 @@ new class extends Livewire\Component {
             ->all() ?? [];
 
         if (count($this->items[$index]['calendars']) === 1) {
-            $this->items[$index]['calendar_id'] = $this->items[$index]['calendars'][0]['id'];
-            $this->loadBookingAvailability($index);
+            $calendarId = (int) $this->items[$index]['calendars'][0]['id'];
+            $preserveBookingDate = $previousCalendarId !== null
+                && $calendarId === $previousCalendarId
+                && filled($this->items[$index]['booking_date'] ?? '');
+
+            $this->items[$index]['calendar_id'] = $calendarId;
+            $this->loadBookingAvailability($index, $preserveBookingDate);
 
             return;
         }
@@ -746,6 +896,7 @@ new class extends Livewire\Component {
         $this->items[$index]['booking_start_at'] = null;
         $this->items[$index]['booking_end_at'] = null;
         $this->items[$index]['time_slots'] = [];
+        $this->refreshTimeSlotsForOtherItems($index);
     }
 
     public function useCustomProduct(int $index): void
@@ -771,9 +922,10 @@ new class extends Livewire\Component {
         $this->items[$index]['search'] = $name;
 
         if (Order::isBookingItemType($this->items[$index]['type'])) {
+            $previousCalendarId = (int) ($this->items[$index]['calendar_id'] ?? 0);
             $this->items[$index]['qty'] = 1;
             $this->items[$index]['duration_minutes'] = (int) data_get($content?->data, 'duration_minutes', 60);
-            $this->loadBookingCalendars($index);
+            $this->loadBookingCalendars($index, $previousCalendarId > 0 ? $previousCalendarId : null);
         }
 
         $this->recalculateLineTotal($index);
@@ -1045,6 +1197,91 @@ new class extends Livewire\Component {
 
             if (blank($item['booking_start_at'] ?? null) || blank($item['booking_end_at'] ?? null)) {
                 $this->addError("items.{$index}.booking_time", 'يجب اختيار وقت الحجز.');
+            }
+        }
+
+        $this->validateNoDuplicateBookingSlots();
+        $this->validateBookingSlotAvailability();
+    }
+
+    protected function validateNoDuplicateBookingSlots(): void
+    {
+        /** @var list<array{calendar_id: int, start_at: string, end_at: string}> $selections */
+        $selections = [];
+
+        foreach ($this->items as $index => $item) {
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            $startAt = $item['booking_start_at'] ?? null;
+            $endAt = $item['booking_end_at'] ?? null;
+            $calendarId = (int) ($item['calendar_id'] ?? 0);
+
+            if (blank($startAt) || blank($endAt) || $calendarId <= 0) {
+                continue;
+            }
+
+            $start = Carbon::parse((string) $startAt);
+            $end = Carbon::parse((string) $endAt);
+
+            foreach ($selections as $existing) {
+                if ($existing['calendar_id'] !== $calendarId) {
+                    continue;
+                }
+
+                $existingStart = Carbon::parse($existing['start_at']);
+                $existingEnd = Carbon::parse($existing['end_at']);
+
+                if ($start->lt($existingEnd) && $end->gt($existingStart)) {
+                    $this->addError("items.{$index}.booking_time", 'هذا الوقت محجوز بالفعل لعنصر آخر في الطلب.');
+                }
+            }
+
+            $selections[] = [
+                'calendar_id' => $calendarId,
+                'start_at' => (string) $startAt,
+                'end_at' => (string) $endAt,
+            ];
+        }
+    }
+
+    protected function validateBookingSlotAvailability(): void
+    {
+        foreach ($this->items as $index => $item) {
+            if (! Order::isBookingItemType($item['type'] ?? '')) {
+                continue;
+            }
+
+            $startAt = $item['booking_start_at'] ?? null;
+            $endAt = $item['booking_end_at'] ?? null;
+            $calendarId = (int) ($item['calendar_id'] ?? 0);
+            $bookingDate = (string) ($item['booking_date'] ?? '');
+
+            if (blank($startAt) || blank($endAt) || $calendarId <= 0 || $bookingDate === '') {
+                continue;
+            }
+
+            $calendar = Calendar::query()->find($calendarId);
+
+            if (! $calendar) {
+                continue;
+            }
+
+            $durationMinutes = max(1, (int) ($item['duration_minutes'] ?? 60));
+            $mode = ($item['type'] ?? '') === 'unit_rental' ? 'day' : 'slot';
+
+            $slot = collect(app(CalendarSlotService::class)->availableTimeSlots(
+                $calendar,
+                $bookingDate,
+                $durationMinutes,
+                $mode,
+                $this->reservedSlotsForItem($index),
+            ))->first(fn (array $candidate): bool => ($candidate['start_at'] ?? '') === $startAt
+                && ($candidate['end_at'] ?? '') === $endAt);
+
+            if (! is_array($slot) || ! ($slot['available'] ?? false)) {
+                $this->addError("items.{$index}.booking_time", 'الوقت المحدد غير متاح.');
             }
         }
     }

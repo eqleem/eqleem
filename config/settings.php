@@ -51,4 +51,14 @@ return [
             'index' => 'admin::settings.branches.branches',
         ],
     ],
+    'payment-options' => [
+        'order' => 10,
+        'slug' => 'payment-options',
+        'name' => 'وسائل الدفع',
+        'description' => 'تخصيص وسائل الدفع.',
+        'icon' => 'assets/icons/business/017-atm-card.svg',
+        'components' => [
+            'index' => 'admin::settings.payment-options.payment-options',
+        ],
+    ],
 ];

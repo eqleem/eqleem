@@ -62,6 +62,7 @@ class CalendarSlotService
     }
 
     /**
+     * @param  list<array{start_at: string, end_at: string}>  $reservedSlots
      * @return list<array{start: string, end: string, label: string, start_at: string, end_at: string, available: bool, unavailable_reason: ?string}>
      */
     public function availableTimeSlots(
@@ -69,6 +70,7 @@ class CalendarSlotService
         string $date,
         int $durationMinutes = 60,
         string $mode = 'slot',
+        array $reservedSlots = [],
     ): array {
         $day = Carbon::parse($date)->startOfDay();
         $window = $this->dayWindow($calendar, $day);
@@ -89,6 +91,17 @@ class CalendarSlotService
             ->whereDate('start_at', $date)
             ->where('status', '!=', 'cancelled')
             ->get(['start_at', 'end_at']);
+
+        foreach ($reservedSlots as $reservedSlot) {
+            if (! isset($reservedSlot['start_at'], $reservedSlot['end_at'])) {
+                continue;
+            }
+
+            $existingBookings->push(new Booking([
+                'start_at' => $reservedSlot['start_at'],
+                'end_at' => $reservedSlot['end_at'],
+            ]));
+        }
 
         if ($mode === 'day') {
             return $this->buildDaySlot($windowStart, $windowEnd, $existingBookings);

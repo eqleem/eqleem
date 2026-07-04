@@ -10,12 +10,12 @@
 ])
 
 <template x-teleport="body">
-<div {{ $attributes }} x-cloak x-data="{ showModal: false, activeModal: 'default', suppressClickAway: false }"
+<div {{ $attributes }} x-cloak x-data="{ showModal: false, activeModal: 'default', suppressClickAway: false }" data-modal-root
     @if ($escape) @keydown.window.escape="if (! suppressClickAway) { showModal = false; activeModal = '-'; }" @endif
     @file-crop-opened.window="suppressClickAway = true"
     @file-crop-closed.window="suppressClickAway = false"
-    @openmodal.window="activeModal = $event.detail.modal ? $event.detail.modal : 'default'; showModal = true;  document.body.className += ' overflow-hiddenXXX'; "
-    @closemodal.window="activeModal = null; showModal = false;   "
+    @openmodal.window="if ($event.detail.modal === @js($name)) { activeModal = $event.detail.modal; showModal = true; document.body.className += ' overflow-hiddenXXX'; }"
+    @closemodal.window="if (! $event.detail.modal || $event.detail.modal === @js($name)) { activeModal = null; showModal = false; }"
     x-show="showModal && activeModal == @js($name); " class="relative z-40 " aria-labelledby="modal-title"
     role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity"
@@ -23,7 +23,8 @@
 
     <div class="fixed inset-0 overflow-y-auto">
         <div class="flex min-h-full justify-center items-center w-full">
-            <div @if ($escape) @click.away="if (suppressClickAway || $event.target.closest('[data-file-crop-overlay]')) return; showModal = false" @endif
+            <div @if ($escape) @click.away="if (suppressClickAway || $event.target.closest('[data-file-crop-overlay]') || $event.target.closest('[data-modal-root]')) return; showModal = false" @endif
+                data-modal-root
                 class="relative transform overflow-hiddenX rounded-xl pb-2.5 bg-white min-h-[14vh]x shadow-xl transition-all w-full sm:max-w-{{ $size }} max-w-5xl m-4 lg:m-auto h-{{ $height }}">
                 <div class="flex items-center justify-between w-full p-2 border-b border-gray-100">
                     @if ($title)

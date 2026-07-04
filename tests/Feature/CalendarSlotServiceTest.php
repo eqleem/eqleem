@@ -67,6 +67,41 @@ it('returns all time slots and marks booked ones as unavailable', function () {
         ->and($availableSlot['available'])->toBeTrue();
 });
 
+it('marks reserved slots as unavailable when not yet persisted', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00');
+
+    $calendar = Calendar::query()->create([
+        'name' => 'Provider A',
+        'type' => 'service-provider',
+        'from' => '2026-07-06',
+        'to' => '2026-07-12',
+        'active' => true,
+        'availabilities' => Calendar::defaultAvailabilities(),
+    ]);
+
+    $slots = app(CalendarSlotService::class)->availableTimeSlots(
+        $calendar,
+        '2026-07-06',
+        60,
+        'slot',
+        [
+            [
+                'start_at' => '2026-07-06 09:00:00',
+                'end_at' => '2026-07-06 10:00:00',
+            ],
+        ],
+    );
+
+    $reservedSlot = collect($slots)->firstWhere('start', '09:00');
+    $availableSlot = collect($slots)->firstWhere('start', '10:00');
+
+    expect($reservedSlot)->not->toBeNull()
+        ->and($reservedSlot['available'])->toBeFalse()
+        ->and($reservedSlot['unavailable_reason'])->toBe('booked')
+        ->and($availableSlot)->not->toBeNull()
+        ->and($availableSlot['available'])->toBeTrue();
+});
+
 it('returns a day slot for rental units and marks it unavailable when booked', function () {
     Carbon::setTestNow('2026-07-06 08:00:00');
 

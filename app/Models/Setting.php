@@ -313,4 +313,44 @@ class Setting extends Model
 
         return array_merge(static::unitRentalSettingsDefaults(), $saved?->settings ?? []);
     }
+
+    public const PAYMENT_OPTIONS_GROUP = 'payment-options';
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function paymentMethodDefaults(string $slug): array
+    {
+        return config("payment-methods.{$slug}.defaults", []);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function paymentMethod(string $slug): array
+    {
+        $saved = static::forSlug(static::groupSlug(static::PAYMENT_OPTIONS_GROUP, $slug));
+        $defaults = static::paymentMethodDefaults($slug);
+
+        return array_merge($defaults, $saved?->settings ?? [], [
+            'active' => (bool) data_get($saved, 'active', false),
+        ]);
+    }
+
+    /**
+     * @return Collection<string, self>
+     */
+    public static function forPaymentOptions(): Collection
+    {
+        return static::forGroup(static::PAYMENT_OPTIONS_GROUP);
+    }
+
+    public static function savePaymentMethod(string $slug, array $settings, bool $active = true): self
+    {
+        return static::saveForSlug(
+            static::groupSlug(static::PAYMENT_OPTIONS_GROUP, $slug),
+            $settings,
+            $active,
+        );
+    }
 }
