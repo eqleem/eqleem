@@ -22,6 +22,19 @@ return [
         'EUR' => 'يورو (EUR)',
     ],
 
+    'currency_symbols' => [
+        'SAR' => "\u{20C1}",
+        'AED' => 'د.إ',
+        'KWD' => 'د.ك',
+        'BHD' => 'د.ب',
+        'QAR' => 'ر.ق',
+        'OMR' => 'ر.ع',
+        'JOD' => 'د.أ',
+        'EGP' => 'ج.م',
+        'USD' => '$',
+        'EUR' => '€',
+    ],
+
     'defaults' => [
         'default_language' => 'ar',
         'default_currency' => 'SAR',

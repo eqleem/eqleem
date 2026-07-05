@@ -204,7 +204,7 @@ class Checkout extends Component
 
             if ($grandTotal < $minimum) {
                 throw ValidationException::withMessages([
-                    'paymentMethod' => 'الحد الأدنى للدفع عند الاستلام هو '.money_format($minimum).'.',
+                    'paymentMethod' => 'الحد الأدنى للدفع عند الاستلام هو '.money_format_plain($minimum).'.',
                 ]);
             }
         }

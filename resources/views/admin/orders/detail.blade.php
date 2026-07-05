@@ -24,37 +24,37 @@
                 <div class="space-y-3 p-5">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">المجموع الفرعي</span>
-                        <span class="font-medium text-gray-800" dir="ltr">
-                            {{ $order->formatAmount($order->subtotal) }} {{ $order->currency_code }}
+                        <span class="font-medium text-gray-800" >
+                            {{ $order->formatMoney($order->subtotal) }}
                         </span>
                     </div>
                     @if ($shippingFee > 0)
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">الشحن</span>
-                            <span class="font-medium text-gray-800" dir="ltr">
-                                {{ $order->formatAmount($shippingFee) }} {{ $order->currency_code }}
+                            <span class="font-medium text-gray-800" >
+                                {{ $order->formatMoney($shippingFee) }}
                             </span>
                         </div>
                     @endif
                     @if ($order->discount_total > 0)
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">الخصومات</span>
-                            <span class="font-medium text-red-600" dir="ltr">
-                                −{{ $order->formatAmount($order->discount_total) }} {{ $order->currency_code }}
+                            <span class="font-medium text-red-600" >
+                                −{{ $order->formatMoney($order->discount_total) }}
                             </span>
                         </div>
                     @endif
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">الضريبة</span>
-                        <span class="font-medium text-gray-800" dir="ltr">
-                            {{ $order->formatAmount($order->tax_total) }} {{ $order->currency_code }}
+                        <span class="font-medium text-gray-800" >
+                            {{ $order->formatMoney($order->tax_total) }}
                         </span>
                     </div>
 
                     <div class="border-t border-gray-100 pt-4">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-semibold text-gray-800">الإجمالي</span>
-                            <span class="text-xl font-bold text-primary-700" dir="ltr">
+                            <span class="text-xl font-bold text-primary-700" >
                                 {{ $order->formattedGrandTotal() }}
                             </span>
                         </div>
@@ -63,15 +63,14 @@
                     <div class="space-y-2 border-t border-gray-100 pt-3">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المدفوع</span>
-                            <span class="font-medium text-emerald-700" dir="ltr">
-                                {{ $order->formatAmount($order->paid_total) }} {{ $order->currency_code }}
+                            <span class="font-medium text-emerald-700"  >
+                                {{ $order->formatMoney($order->paid_total) }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المتبقي</span>
-                            <span class="font-medium {{ $order->due_total > 0 ? 'text-amber-700' : 'text-gray-800' }}"
-                                dir="ltr">
-                                {{ $order->formatAmount($order->due_total) }} {{ $order->currency_code }}
+                            <span class="font-medium {{ $order->due_total > 0 ? 'text-amber-700' : 'text-gray-800' }}">
+                                {{ $order->formatMoney($order->due_total) }}
                             </span>
                         </div>
                     </div>
@@ -324,21 +323,21 @@
 
                                                     @if ($item->discount_total > 0)
                                                         <p class="text-xs text-red-500">
-                                                            خصم <span dir="ltr">{{ $order->formatAmount($item->discount_total) }}</span>
+                                                            خصم <span>{{ $order->formatMoney($item->discount_total) }}</span>
                                                         </p>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-3 py-4 whitespace-nowrap text-gray-600" dir="ltr">
+                                        <td class="px-3 py-4 whitespace-nowrap text-gray-600">
                                             <span class="sr-only">{{ $item->is_booking ? 'سعر الحجز' : 'سعر الوحدة' }}</span>
-                                            {{ $order->formatAmount($item->unit_price) }}
+                                            {{ $order->formatMoney($item->unit_price) }}
                                         </td>
                                         <td class="px-3 py-4 text-center text-gray-800">
                                             {{ $item->qty }}
                                         </td>
-                                        <td class="px-5 py-4 text-end font-semibold text-gray-900 whitespace-nowrap" dir="ltr">
-                                            {{ $order->formatAmount($item->line_total) }} {{ $order->currency_code }}
+                                        <td class="px-5 py-4 text-end font-semibold text-gray-900 whitespace-nowrap">
+                                            {{ $order->formatMoney($item->line_total) }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -350,35 +349,35 @@
                         <div class="ms-auto max-w-xs space-y-2">
                             <div class="flex items-center justify-between text-sm">
                                 <span class="text-gray-500">المجموع الفرعي</span>
-                                <span class="text-gray-800" dir="ltr">
-                                    {{ $order->formatAmount($order->subtotal) }} {{ $order->currency_code }}
+                                <span class="text-gray-800">
+                                    {{ $order->formatMoney($order->subtotal) }}
                                 </span>
                             </div>
                             @if ($shippingFee > 0)
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-gray-500">الشحن</span>
-                                    <span class="text-gray-800" dir="ltr">
-                                        {{ $order->formatAmount($shippingFee) }} {{ $order->currency_code }}
+                                    <span class="text-gray-800" >
+                                        {{ $order->formatMoney($shippingFee) }}
                                     </span>
                                 </div>
                             @endif
                             @if ($order->discount_total > 0)
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-gray-500">الخصومات</span>
-                                    <span class="text-red-600" dir="ltr">
-                                        −{{ $order->formatAmount($order->discount_total) }} {{ $order->currency_code }}
+                                    <span class="text-red-600">
+                                        −{{ $order->formatMoney($order->discount_total) }}
                                     </span>
                                 </div>
                             @endif
                             <div class="flex items-center justify-between text-sm">
                                 <span class="text-gray-500">الضريبة</span>
-                                <span class="text-gray-800" dir="ltr">
-                                    {{ $order->formatAmount($order->tax_total) }} {{ $order->currency_code }}
+                                <span class="text-gray-800">
+                                    {{ $order->formatMoney($order->tax_total) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between border-t border-gray-100 pt-2">
                                 <span class="font-semibold text-gray-800">الإجمالي</span>
-                                <span class="text-lg font-bold text-primary-700" dir="ltr">
+                                <span class="text-lg font-bold text-primary-700">
                                     {{ $order->formattedGrandTotal() }}
                                 </span>
                             </div>
@@ -439,7 +438,7 @@
                                             @endif
                                         </p>
                                     </div>
-                                    <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end" dir="ltr">
+                                    <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end">
                                         {{ $payment->formattedAmount() }} {{ $payment->currency }}
                                     </p>
                                 </div>
@@ -524,8 +523,8 @@
         <ui:form wire:submit="recordPayment" class="!p-5 !py-6">
             <div class="mb-4 rounded-xl bg-gray-50 px-4 py-3">
                 <p class="text-xs text-gray-400">المبلغ المتبقي</p>
-                <p class="mt-1 text-lg font-bold text-amber-700" dir="ltr">
-                    {{ $order->formatAmount($order->due_total) }} {{ $order->currency_code }}
+                <p class="mt-1 text-lg font-bold text-amber-700">
+                    {{ $order->formatMoney($order->due_total) }}
                 </p>
             </div>
 
@@ -538,7 +537,7 @@
                 :max="Order::fromMinor($order->due_total)"
                 placeholder="0.00"
                 dir="ltr"
-                suffix="{{ $order->currency_code }}"
+                suffix="{{ money_symbol($order->currency_code) }}"
             />
 
             <ui:select

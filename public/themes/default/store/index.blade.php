@@ -102,7 +102,7 @@
                             <div class="mt-4 flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-1 text-neutral-600 text-xs min-w-0">
                                     @if ($price > 0)
-                                        <p class="text-xl font-bold font-geist truncate" dir="ltr">{{ money_format($price) }}</p>
+                                        <p class="text-xl font-bold font-geist truncate" >{{ money_format($price) }}</p>
                                     @else
                                         <p class="text-sm text-stone-400">—</p>
                                     @endif

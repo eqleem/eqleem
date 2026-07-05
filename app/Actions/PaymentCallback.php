@@ -54,7 +54,7 @@ class PaymentCallback
             'payment_id' => $validatedData['id'],
             'gateway' => 'moyasar',
             'initial_status' => data_get($response, 'status'),
-            'currency' => data_get($response, 'currency', 'SAR'),
+            'currency' => data_get($response, 'currency', money_currency()),
             'description' => data_get($response, 'description'),
             'meta' => $response,
             'reason' => 'tenant-subscribe-to-plan',

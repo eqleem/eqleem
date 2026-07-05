@@ -168,8 +168,8 @@
                                                 wire:click="selectProduct({{ $index }}, {{ json_encode($product) }})"
                                                 class="w-full text-start px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0 text-sm">
                                                 {{ $product['name'] }}
-                                                <span class="text-xs text-gray-400 ms-2" dir="ltr">
-                                                    {{ \App\Models\Order::formatMinor($product['unit_price']) }} SAR
+                                                <span class="text-xs text-gray-400 ms-2">
+                                                    {{ money_format($product['unit_price']) }}
                                                 </span>
                                             </button>
                                         @endforeach
@@ -261,10 +261,8 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 <div>
                                     <label class="text-xs text-gray-500 mb-1 block">السعر</label>
-                                    <div class="py-2 px-3 text-sm font-semibold text-gray-800 bg-white rounded-lg border border-gray-100"
-                                        dir="ltr">
-                                        {{ \App\Models\Order::formatMinor(\App\Models\Order::minorFromDecimal($item['unit_price'])) }}
-                                        SAR
+                                    <div class="py-2 px-3 text-sm font-semibold text-gray-800 bg-white rounded-lg border border-gray-100">
+                                        {{ money_format(\App\Models\Order::minorFromDecimal($item['unit_price'])) }}
                                     </div>
                                 </div>
                                 <div>
@@ -276,9 +274,8 @@
                                 </div>
                                 <div>
                                     <label class="text-xs text-gray-500 mb-1 block">الإجمالي</label>
-                                    <div class="py-2 px-3 text-sm font-bold text-gray-800 bg-white rounded-lg border border-gray-100"
-                                        dir="ltr">
-                                        {{ \App\Models\Order::formatMinor($item['line_total']) }} SAR
+                                    <div class="py-2 px-3 text-sm font-bold text-gray-800 bg-white rounded-lg border border-gray-100">
+                                        {{ money_format($item['line_total']) }}
                                     </div>
                                 </div>
                             </div>
@@ -312,9 +309,8 @@
                                 </div>
                                 <div>
                                     <label class="text-xs text-gray-500 mb-1 block">الإجمالي</label>
-                                    <div class="py-2 px-3 text-sm font-bold text-gray-800 bg-white rounded-lg border border-gray-100"
-                                        dir="ltr">
-                                        {{ \App\Models\Order::formatMinor($item['line_total']) }} SAR
+                                    <div class="py-2 px-3 text-sm font-bold text-gray-800 bg-white rounded-lg border border-gray-100">
+                                        {{ money_format($item['line_total']) }}
                                     </div>
                                 </div>
                         </div>
@@ -328,22 +324,20 @@
             <div class="p-4 space-y-2 max-w-sm ms-auto">
                 <div class="flex items-center justify-between text-sm text-gray-600">
                     <span>المجموع الفرعي</span>
-                    <span class="font-semibold text-gray-800" dir="ltr">{{ $totals['subtotal_formatted'] }}
-                        SAR</span>
+                    <span class="font-semibold text-gray-800" >{{ money_format($totals['subtotal']) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm text-gray-600">
                     <span>الخصومات</span>
-                    <span class="font-semibold text-gray-800" dir="ltr">{{ $totals['discount_formatted'] }}
-                        SAR</span>
+                    <span class="font-semibold text-gray-800" >{{ money_format($totals['discount']) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm text-gray-600">
                     <span>الضريبة</span>
-                    <span class="font-semibold text-gray-800" dir="ltr">{{ $totals['tax_formatted'] }} SAR</span>
+                    <span class="font-semibold text-gray-800" >{{ money_format($totals['tax']) }}</span>
                 </div>
                 <div
                     class="border-t border-gray-100 pt-2 flex items-center justify-between text-base font-bold text-gray-800">
                     <span>الإجمالي النهائي</span>
-                    <span dir="ltr">{{ $totals['grand_formatted'] }} SAR</span>
+                    <span >{{ money_format($totals['grand']) }}</span>
                 </div>
             </div>
         </ui:box>
@@ -425,7 +419,12 @@ new class extends Livewire\Component {
 
     public bool $showCreateClientModal = false;
 
-    public string $currency_code = 'SAR';
+    public string $currency_code;
+
+    public function mount(): void
+    {
+        $this->currency_code = money_currency();
+    }
 
     /** @var array<int, array{key: string, type: string, product_id: ?int, name: string, search: string, description: string, qty: int, unit_price: string, discount: string, line_total: int, calendar_id: ?int, calendars: array<int, array{id: int, name: string}>, available_dates: array<int, string>, booking_date: string, booking_time: string, booking_start_at: ?string, booking_end_at: ?string, duration_minutes: int, time_slots: array<int, array{start: string, end: string, label: string, start_at: string, end_at: string}>}> */
     public array $items = [];
@@ -1526,10 +1525,6 @@ new class extends Livewire\Component {
             'discount' => $totals['discount_total'],
             'tax' => $totals['tax_total'],
             'grand' => $totals['grand_total'],
-            'subtotal_formatted' => Order::formatMinor($totals['subtotal']),
-            'discount_formatted' => Order::formatMinor($totals['discount_total']),
-            'tax_formatted' => Order::formatMinor($totals['tax_total']),
-            'grand_formatted' => Order::formatMinor($totals['grand_total']),
         ];
     }
 

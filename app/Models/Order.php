@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\HtmlString;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\ModelStatus\HasStatuses;
@@ -212,9 +213,14 @@ class Order extends Model
         return self::formatMinor($amount);
     }
 
-    public function formattedGrandTotal(): string
+    public function formatMoney(int|string|null $amount): HtmlString
     {
-        return $this->formatAmount($this->grand_total).' '.$this->currency_code;
+        return Money::displayWithCurrency($amount, $this->currency_code);
+    }
+
+    public function formattedGrandTotal(): HtmlString
+    {
+        return $this->formatMoney($this->grand_total);
     }
 
     public function statusValue(): string

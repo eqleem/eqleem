@@ -111,7 +111,7 @@
                                 </span>
 
                                 @if ($price > 0)
-                                    <span class="text-xl font-bold text-stone-900" dir="ltr">{{ money_format($price) }}</span>
+                                    <span class="text-xl font-bold text-stone-900" >{{ money_format($price) }}</span>
                                 @endif
                             </div>
 

@@ -57,7 +57,7 @@
 
                 <div class="flex flex-wrap items-center gap-3 mb-6">
                     @if ($price > 0)
-                        <span class="text-3xl font-bold text-primary-600" dir="ltr">{{ money_format($price) }}</span>
+                        <span class="text-3xl font-bold text-primary-600" >{{ money_format($price) }}</span>
                     @endif
 
                     @if ($deliveryDays > 0)

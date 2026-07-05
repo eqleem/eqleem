@@ -88,7 +88,7 @@
                             @endif
 
                             @if ($price > 0)
-                                <p class="mt-4 text-xl font-bold" dir="ltr">{{ money_format($price) }}</p>
+                                <p class="mt-4 text-xl font-bold" >{{ money_format($price) }}</p>
                             @endif
 
                             <button

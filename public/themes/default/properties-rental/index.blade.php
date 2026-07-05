@@ -92,7 +92,7 @@
                                 <div>
                                     <p class="text-[11px] text-stone-500">السعر / ليلة</p>
                                     @if ($price > 0)
-                                        <p class="text-lg font-black text-stone-900" dir="ltr">{{ money_format($price) }}</p>
+                                        <p class="text-lg font-black text-stone-900" >{{ money_format($price) }}</p>
                                     @else
                                         <p class="text-sm text-stone-400">—</p>
                                     @endif

@@ -55,7 +55,7 @@
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-stone-900">{{ $course->title }}</h1>
                     @if ($price > 0)
-                        <span class="text-2xl font-bold text-primary-600" dir="ltr">{{ money_format($price) }}</span>
+                        <span class="text-2xl font-bold text-primary-600" >{{ money_format($price) }}</span>
                     @endif
                 </div>
 

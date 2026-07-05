@@ -83,12 +83,12 @@
                             <div class="flex items-end justify-between gap-3">
                                 <div>
                                     <p class="text-2xl font-black text-primary-700">
-                                        <span dir="ltr">{{ money_format($pricePerNight) }}</span>
+                                        <span >{{ money_format($pricePerNight) }}</span>
                                         <span class="text-base font-bold"> / ليلة</span>
                                     </p>
                                     <p class="mt-1 text-xs text-stone-500">
                                         إجمالي {{ $nights }} {{ $nights === 1 ? 'ليلة' : 'ليالي' }}:
-                                        <span dir="ltr">{{ money_format($rentalTotal) }}</span>
+                                        <span >{{ money_format($rentalTotal) }}</span>
                                     </p>
                                 </div>
                             </div>

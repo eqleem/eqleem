@@ -52,7 +52,7 @@
         Moyasar.init({
             element: '#store-moyasar-form',
             amount: amount,
-            currency: 'SAR',
+            currency: @js(money_currency()),
             description: @js('طلب متجر — '.(tenant()?->name ?? '')),
             publishable_api_key: @js(config('services.moyasar.publishable_key')),
             callback_url: @js(route('tenant.payments.moyasar.callback', ['tenant' => tenant()?->handle])),

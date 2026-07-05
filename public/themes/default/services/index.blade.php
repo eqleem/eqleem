@@ -89,7 +89,7 @@
 
                                 <span class="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-3 py-1 text-sm font-semibold text-primary-700">
                                     @if ($price > 0)
-                                        <span dir="ltr">{{ money_format($price) }}</span>
+                                        <span >{{ money_format($price) }}</span>
                                     @else
                                         حسب الطلب
                                     @endif

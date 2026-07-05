@@ -8,7 +8,7 @@
 
     <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200">
         <h2 class="text-xl font-bold text-stone-900">إتمام الدفع — {{ $plan->label }}</h2>
-        <p class="mt-2 text-sm text-stone-500" dir="ltr">
+        <p class="mt-2 text-sm text-stone-500">
             {{ money_format($plan->price) }} — {{ $plan->billingLabel() }}
         </p>
 
@@ -27,7 +27,7 @@
     Moyasar.init({
         element: '#moyasar-form',
         amount: @js($plan->price),
-        currency: 'SAR',
+        currency: @js(money_currency()),
         description: @js('اشتراك '.$plan->label.' — '.$plan->billingLabel()),
         publishable_api_key: @js(config('services.moyasar.publishable_key')),
         callback_url: @js(route('admin.payments.moyasar.callback')),

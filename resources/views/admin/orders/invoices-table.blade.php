@@ -61,7 +61,7 @@
 
                         <div class="hidden sm:flex items-center gap-x-6 text-sm text-gray-600 shrink-0">
                             <div class="text-end">
-                                <div class="font-bold text-gray-800" dir="ltr">
+                                <div class="font-bold text-gray-800">
                                     {{ money_format($item->total_after_vat, currency: $item->currency) }}
                                 </div>
                                 <div class="text-xs text-gray-400 mt-0.5">

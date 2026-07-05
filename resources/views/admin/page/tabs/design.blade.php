@@ -458,7 +458,7 @@ new class extends \Livewire\Component
             return 'مجاني';
         }
 
-        return number_format((float) $price, 0).' ر.س';
+        return money_format(money_minor((float) $price));
     }
 
     public function render()

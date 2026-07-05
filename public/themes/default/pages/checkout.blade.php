@@ -125,7 +125,7 @@
                     @foreach ($items as $item)
                         <div wire:key="checkout-item-{{ $item->id }}" class="flex items-center justify-between gap-2 text-sm">
                             <span class="truncate text-stone-600">{{ $item->title() }} × {{ $item->quantity }}</span>
-                            <span class="shrink-0 font-semibold text-stone-900" dir="ltr">{{ money_format($item->lineTotal()) }}</span>
+                            <span class="shrink-0 font-semibold text-stone-900" >{{ money_format($item->lineTotal()) }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -137,17 +137,17 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-stone-500">إجمالي المنتجات</span>
-                        <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($subtotal) }}</span>
+                        <span class="font-semibold text-stone-900" >{{ money_format($subtotal) }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-stone-500">الشحن</span>
-                        <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($shippingFee) }}</span>
+                        <span class="font-semibold text-stone-900" >{{ money_format($shippingFee) }}</span>
                     </div>
                 </div>
 
                 <div class="my-4 flex items-center justify-between">
                     <span class="text-base font-bold text-stone-900">الإجمالي</span>
-                    <span class="text-base font-bold text-primary-700" dir="ltr">{{ money_format($grandTotal) }}</span>
+                    <span class="text-base font-bold text-primary-700" >{{ money_format($grandTotal) }}</span>
                 </div>
 
                 @if (! $requiresPayment)

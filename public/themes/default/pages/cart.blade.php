@@ -76,7 +76,7 @@
                                 </div>
                             </div>
 
-                            <span class="shrink-0 text-sm font-bold text-stone-900" dir="ltr">{{ money_format($item->lineTotal()) }}</span>
+                            <span class="shrink-0 text-sm font-bold text-stone-900" >{{ money_format($item->lineTotal()) }}</span>
                         </article>
                     @endforeach
                 </div>
@@ -85,7 +85,7 @@
             <div class="rounded-2xl border border-stone-200 bg-white p-5">
                 <div class="mb-4 flex items-center justify-between text-sm">
                     <span class="text-stone-500">الإجمالي</span>
-                    <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($subtotal) }}</span>
+                    <span class="font-semibold text-stone-900" >{{ money_format($subtotal) }}</span>
                 </div>
 
                 <a

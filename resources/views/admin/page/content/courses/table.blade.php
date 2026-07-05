@@ -98,7 +98,7 @@
                                                 </span>
                                             @endif
                                             @if (data_get($item->data, 'price'))
-                                                <span class="inline-block font-medium text-gray-700" dir="ltr">
+                                                <span class="inline-block font-medium text-gray-700">
                                                     {{ money_format(data_get($item->data, 'price')) }}
                                                 </span>
                                             @endif

@@ -12,6 +12,7 @@ use App\Models\Client;
 use App\Models\Content;
 use App\Models\Order;
 use App\Models\Tenant;
+use App\Support\Money;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -573,7 +574,7 @@ class CartService
                 'channel' => 'ecommerce',
                 'number' => $this->generateOrderNumber($tenantId),
                 'client_id' => $client->id,
-                'currency_code' => 'SAR',
+                'currency_code' => Money::defaultCurrencyCode(),
                 'subtotal' => $subtotal,
                 'discount_total' => 0,
                 'tax_total' => 0,
@@ -615,7 +616,7 @@ class CartService
                         'end_at' => $item->bookingEndAt(),
                         'status' => 'pending',
                         'price_snapshot' => Order::fromMinor($item->unit_price),
-                        'currency' => 'SAR',
+                        'currency' => Money::defaultCurrencyCode(),
                         'meta' => [
                             'order_channel' => 'ecommerce',
                         ],

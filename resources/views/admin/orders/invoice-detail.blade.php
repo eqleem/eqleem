@@ -22,13 +22,13 @@
                 <div class="space-y-3 p-5">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">قبل الضريبة</span>
-                        <span class="font-medium text-gray-800" dir="ltr">
+                        <span class="font-medium text-gray-800">
                             {{ money_format($invoice->total_before_vat, currency: $invoice->currency) }}
                         </span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">الضريبة</span>
-                        <span class="font-medium text-gray-800" dir="ltr">
+                        <span class="font-medium text-gray-800">
                             {{ money_format($vatAmount, currency: $invoice->currency) }}
                         </span>
                     </div>
@@ -36,7 +36,7 @@
                     <div class="border-t border-gray-100 pt-4">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-semibold text-gray-800">الإجمالي</span>
-                            <span class="text-xl font-bold text-primary-700" dir="ltr">
+                            <span class="text-xl font-bold text-primary-700">
                                 {{ money_format($invoice->total_after_vat, currency: $invoice->currency) }}
                             </span>
                         </div>
@@ -45,14 +45,13 @@
                     <div class="space-y-2 border-t border-gray-100 pt-3">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المدفوع</span>
-                            <span class="font-medium text-emerald-700" dir="ltr">
+                            <span class="font-medium text-emerald-700">
                                 {{ money_format($invoice->amount_paid, currency: $invoice->currency) }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المتبقي</span>
-                            <span class="font-medium {{ $dueAmount > 0 ? 'text-amber-700' : 'text-gray-800' }}"
-                                dir="ltr">
+                            <span class="font-medium {{ $dueAmount > 0 ? 'text-amber-700' : 'text-gray-800' }}">
                                 {{ money_format($dueAmount, currency: $invoice->currency) }}
                             </span>
                         </div>
@@ -223,10 +222,10 @@
                                         <td class="px-3 py-4 text-center text-gray-800" dir="ltr">
                                             {{ $item->quantity }}
                                         </td>
-                                        <td class="px-3 py-4 text-end whitespace-nowrap text-gray-600" dir="ltr">
+                                        <td class="px-3 py-4 text-end whitespace-nowrap text-gray-600">
                                             {{ money_format($item->amount_after_vat, currency: $item->currency) }}
                                         </td>
-                                        <td class="px-5 py-4 text-end font-semibold whitespace-nowrap text-gray-900" dir="ltr">
+                                        <td class="px-5 py-4 text-end font-semibold whitespace-nowrap text-gray-900">
                                             {{ money_format($item->total_after_vat, currency: $item->currency) }}
                                         </td>
                                     </tr>
@@ -239,13 +238,13 @@
                         <div class="ms-auto max-w-xs space-y-2">
                             <div class="flex items-center justify-between text-sm">
                                 <span class="text-gray-500">المجموع الفرعي</span>
-                                <span class="text-gray-800" dir="ltr">
+                                <span class="text-gray-800">
                                     {{ money_format($invoice->subtotal_after_vat, currency: $invoice->currency) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between border-t border-gray-100 pt-2">
                                 <span class="font-semibold text-gray-800">الإجمالي شامل الضريبة</span>
-                                <span class="text-lg font-bold text-primary-700" dir="ltr">
+                                <span class="text-lg font-bold text-primary-700">
                                     {{ money_format($invoice->total_after_vat, currency: $invoice->currency) }}
                                 </span>
                             </div>
@@ -282,7 +281,7 @@
                                             {{ $payment->created_at->translatedFormat('d M Y h:i A') }}
                                         </p>
                                     </div>
-                                    <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end" dir="ltr">
+                                    <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end">
                                         {{ money_format($payment->amount, currency: $payment->currency) }}
                                     </p>
                                 </div>

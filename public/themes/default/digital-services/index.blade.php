@@ -96,7 +96,7 @@
                                 </div>
 
                                 @if ($price > 0)
-                                    <p class="text-xl font-bold" dir="ltr">{{ money_format($price) }}</p>
+                                    <p class="text-xl font-bold" >{{ money_format($price) }}</p>
                                 @endif
                             </div>
 

@@ -22,14 +22,14 @@
                 <div class="space-y-3 p-5">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">المبلغ</span>
-                        <span class="font-medium text-gray-800" dir="ltr">
+                        <span class="font-medium text-gray-800">
                             {{ money_format($payment->amount, currency: $payment->currency) }}
                         </span>
                     </div>
                     @if ($fee)
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">رسوم البوابة</span>
-                            <span class="font-medium text-gray-800" dir="ltr">
+                            <span class="font-medium text-gray-800">
                                 {{ money_format($fee, currency: $payment->currency) }}
                             </span>
                         </div>
@@ -37,7 +37,7 @@
                     @if ($refunded !== null && $refunded > 0)
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المبلغ المسترجع</span>
-                            <span class="font-medium text-red-600" dir="ltr">
+                            <span class="font-medium text-red-600">
                                 −{{ money_format($refunded, currency: $payment->currency) }}
                             </span>
                         </div>
@@ -46,7 +46,7 @@
                     <div class="border-t border-gray-100 pt-4">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-semibold text-gray-800">الإجمالي</span>
-                            <span class="text-xl font-bold text-primary-700" dir="ltr">
+                            <span class="text-xl font-bold text-primary-700">
                                 {{ money_format($payment->amount, currency: $payment->currency) }}
                             </span>
                         </div>
@@ -351,8 +351,8 @@
                                     <p class="font-semibold text-gray-800">{{ $payment->purchased->label ?? $payment->purchased->name }}</p>
                                     <p class="mt-1 text-sm text-gray-500">{{ $payment->purchased->billingLabel() }}</p>
                                 </div>
-                                <p class="text-base font-bold text-gray-900" dir="ltr">
-                                    {{ $payment->purchased->formattedPrice() }} {{ $payment->currency }}
+                                <p class="text-base font-bold text-gray-900">
+                                    {{ money_format($payment->purchased->price, currency: $payment->currency) }}
                                 </p>
                             </div>
                         @else
@@ -377,7 +377,7 @@
                                 <p class="mt-1 text-sm text-gray-500">{{ $payment->order->statusLabel() }}</p>
                             </div>
                             <div class="text-end">
-                                <p class="font-bold text-gray-900" dir="ltr">{{ $payment->order->formattedGrandTotal() }}</p>
+                                <p class="font-bold text-gray-900">{{ $payment->order->formattedGrandTotal() }}</p>
                                 <ui:icon name="external-link" class="!mt-2 !h-4 !w-4 text-primary-500" />
                             </div>
                         </a>

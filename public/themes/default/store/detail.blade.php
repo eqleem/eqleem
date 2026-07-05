@@ -80,9 +80,9 @@
 
                     @if ($price > 0)
                         <div class="text-end shrink-0">
-                            <span class="text-2xl text-black font-semibold" dir="ltr">{{ money_format($price) }}</span>
+                            <span class="text-2xl text-black font-semibold">{{ money_format($price) }}</span>
                             @if (filled($comparePrice) && (int) $comparePrice > (int) $price)
-                                <p class="line-through text-sm text-stone-500" dir="ltr">{{ money_format($comparePrice) }}</p>
+                                <p class="line-through text-sm text-stone-500">{{ money_format($comparePrice) }}</p>
                             @endif
                         </div>
                     @endif

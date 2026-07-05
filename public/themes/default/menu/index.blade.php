@@ -3,6 +3,7 @@
         class="p-1 space-y-5"
         x-data="{
             meals: @js($mealsForJs),
+            currencySymbol: @js(money_symbol()),
             selectedMealId: null,
             selectedChoices: {},
             quantity: 1,
@@ -122,7 +123,7 @@
                                 </div>
 
                                 @if ($price > 0)
-                                    <span class="text-base font-bold text-stone-900" dir="ltr">{{ money_format($price) }}</span>
+                                    <span class="text-base font-bold text-stone-900" >{{ money_format($price) }}</span>
                                 @endif
                             </div>
 
@@ -152,7 +153,7 @@
                                 <p class="text-sm text-stone-500" x-text="selectedMeal.category"></p>
                                 <h4 class="text-base font-bold text-stone-900" x-text="selectedMeal.name"></h4>
                             </div>
-                            <span class="text-base font-bold text-primary-600" x-text="selectedMeal.price > 0 ? `${(selectedMeal.price / 100).toFixed(2)} ر.س` : '—'"></span>
+                            <span dir="ltr" class="text-base font-bold text-primary-600" x-text="selectedMeal.price > 0 ? `${(selectedMeal.price / 100).toFixed(2)} ${currencySymbol}` : '—'"></span>
                         </div>
 
                         <template x-for="(group, groupIndex) in selectedMeal.meal_options" :key="group.id ?? groupIndex">

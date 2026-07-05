@@ -78,7 +78,7 @@
                                         @endif
                                     </div>
 
-                                    <p class="shrink-0 text-sm font-bold text-stone-900" dir="ltr">
+                                    <p class="shrink-0 text-sm font-bold text-stone-900" >
                                         {{ money_format($item->line_total, currency: $order->currency_code) }}
                                     </p>
                                 </article>
@@ -94,19 +94,19 @@
                         <div class="space-y-3 border-b border-stone-100 pb-4 text-sm">
                             <div class="flex items-center justify-between">
                                 <span class="text-stone-500">المجموع الفرعي</span>
-                                <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($order->subtotal, currency: $order->currency_code) }}</span>
+                                <span class="font-semibold text-stone-900" >{{ money_format($order->subtotal, currency: $order->currency_code) }}</span>
                             </div>
 
                             @if ($shippingFee > 0)
                                 <div class="flex items-center justify-between">
                                     <span class="text-stone-500">الشحن</span>
-                                    <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($shippingFee, currency: $order->currency_code) }}</span>
+                                    <span class="font-semibold text-stone-900" >{{ money_format($shippingFee, currency: $order->currency_code) }}</span>
                                 </div>
                             @endif
 
                             <div class="flex items-center justify-between pt-1">
                                 <span class="font-bold text-stone-900">الإجمالي</span>
-                                <span class="text-base font-bold text-primary-700" dir="ltr">{{ money_format($order->grand_total, currency: $order->currency_code) }}</span>
+                                <span class="text-base font-bold text-primary-700" >{{ money_format($order->grand_total, currency: $order->currency_code) }}</span>
                             </div>
                         </div>
 

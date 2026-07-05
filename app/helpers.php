@@ -6,6 +6,7 @@ use App\Support\Money;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\HtmlString;
 
 if (! function_exists('theme_option')) {
     /**
@@ -229,9 +230,30 @@ if (! function_exists('money_minor')) {
     }
 }
 
-if (! function_exists('money_format')) {
-    function money_format(int|string|null $minor, int $precision = 2, ?string $currency = null): string
+if (! function_exists('money_currency')) {
+    function money_currency(): string
+    {
+        return Money::defaultCurrencyCode();
+    }
+}
+
+if (! function_exists('money_symbol')) {
+    function money_symbol(?string $currency = null): string
+    {
+        return Money::symbolFor($currency);
+    }
+}
+
+if (! function_exists('money_format_plain')) {
+    function money_format_plain(int|string|null $minor, int $precision = 2, ?string $currency = null): string
     {
         return Money::formatWithCurrency($minor, $currency, $precision);
+    }
+}
+
+if (! function_exists('money_format')) {
+    function money_format(int|string|null $minor, int $precision = 2, ?string $currency = null): HtmlString
+    {
+        return Money::displayWithCurrency($minor, $currency, $precision);
     }
 }

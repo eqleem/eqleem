@@ -57,11 +57,11 @@
 
                 <div class="flex flex-wrap items-center gap-3 mb-6">
                     @if ($price > 0)
-                        <span class="text-3xl font-bold text-primary-600" dir="ltr">{{ money_format($price) }}</span>
+                        <span class="text-3xl font-bold text-primary-600" >{{ money_format($price) }}</span>
                     @endif
 
                     @if (filled($comparePrice) && (int) $comparePrice > (int) $price)
-                        <span class="text-lg text-stone-400 line-through" dir="ltr">{{ money_format($comparePrice) }}</span>
+                        <span class="text-lg text-stone-400 line-through" >{{ money_format($comparePrice) }}</span>
                     @endif
 
                     @if ($downloadsCount > 0)

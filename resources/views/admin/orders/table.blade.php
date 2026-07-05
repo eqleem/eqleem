@@ -91,7 +91,7 @@
                                         {{ $paymentBadgeLabel }}
                                     </ui:badge>
 
-                                    <ui:badge color="gray" size="sm" dir="ltr">
+                                    <ui:badge color="gray" size="sm">
                                         {{ money_format($item->grand_total, currency: $item->currency_code) }}
                                     </ui:badge>
 

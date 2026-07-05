@@ -148,3 +148,18 @@ it('renders the language and currency settings page', function () {
         ->assertSee('العملة الافتراضية')
         ->assertSee('العملات المتاحة');
 });
+
+it('formats money using the tenant default currency from settings', function () {
+    createTenantForLocaleCurrencySettings();
+
+    Setting::saveLocaleCurrencySettings([
+        'default_language' => 'ar',
+        'default_currency' => 'USD',
+        'available_languages' => ['ar'],
+        'available_currencies' => ['USD'],
+    ]);
+
+    expect(money_currency())->toBe('USD')
+        ->and(money_format_plain(9900))->toBe('99'."\u{00A0}".'$')
+        ->and(money_symbol())->toBe('$');
+});

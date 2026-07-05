@@ -79,7 +79,7 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    suffix="ر.س"
+                    suffix="{{ money_symbol() }}"
                 />
 
                 <ui:input
@@ -90,7 +90,7 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    suffix="ر.س"
+                    suffix="{{ money_symbol() }}"
                 />
             </div>
 

@@ -8,7 +8,7 @@
             step="0.01"
             placeholder="99"
             dir="ltr"
-            suffix="ر.س"
+            suffix="{{ money_symbol() }}"
             info="أقل مبلغ لقبول خيار الدفع عند الاستلام"
         />
 
