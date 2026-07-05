@@ -191,6 +191,21 @@ if (! function_exists('contentTypeModel')) {
     }
 }
 
+if (! function_exists('contentTypeSlugFromModel')) {
+    function contentTypeSlugFromModel(string $modelType): ?string
+    {
+        foreach (config('content-types', []) as $slug => $type) {
+            $configuredModelType = $type['model_type'] ?? $slug;
+
+            if ($configuredModelType === $modelType) {
+                return $slug;
+            }
+        }
+
+        return null;
+    }
+}
+
 if (! function_exists('blogPostCategoryIds')) {
     /**
      * @return array<int, int>

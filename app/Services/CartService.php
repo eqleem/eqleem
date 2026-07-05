@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Actions\SendOrderConfirmationEmail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Client;
@@ -321,6 +322,8 @@ class CartService
             }
 
             $this->clear();
+
+            SendOrderConfirmationEmail::run($order);
 
             return $order;
         });

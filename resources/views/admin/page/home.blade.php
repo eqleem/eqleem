@@ -83,7 +83,7 @@
                 >
                     <span
                         x-bind:style="tab.color_bg_hex ? { backgroundColor: tab.color_bg_hex } : null"
-                        x-bind:class="[tab.color_bg_class, 'shrink-0 flex items-center justify-center rounded-s-lg p-2'].filter(Boolean).join(' ')"
+                        x-bind:class="[tab.color_bg_class, 'max-md:!bg-transparent shrink-0 flex items-center justify-center rounded-s-lg p-2'].filter(Boolean).join(' ')"
                     >
                         <img x-bind:src="tab.icon_url" x-bind:alt="tab.label" class="w-5 h-5">
                     </span>

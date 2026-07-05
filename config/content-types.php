@@ -86,7 +86,7 @@ return [
         'name' => 'الخدمات الرقمية',
         'description' => 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.',
         'icon' => 'assets/icons/business/015-cloud-network.svg',
-        'color' => '#E0E7FF',
+        'color' => 'blue',
         'components' => [
             'index' => 'admin::page.content.digital-services.index',
             'detail' => 'admin::page.content.digital-services.detail',

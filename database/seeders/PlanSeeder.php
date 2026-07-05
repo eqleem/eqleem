@@ -7,6 +7,7 @@ use App\Models\Plan;
 use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class PlanSeeder extends Seeder
 {
@@ -95,8 +96,39 @@ class PlanSeeder extends Seeder
             );
         }
 
+        $this->seedDomainFeature();
+
         Tenant::query()->each(function (Tenant $tenant): void {
             SubscribeTenantToPlan::make()->subscribeToFreePlan($tenant);
         });
+    }
+
+    protected function seedDomainFeature(): void
+    {
+        $domainFeature = Feature::query()->updateOrCreate(
+            ['name' => 'domain'],
+            [
+                'consumable' => false,
+                'quota' => false,
+                'postpaid' => false,
+                'periodicity' => null,
+                'periodicity_type' => null,
+            ],
+        );
+
+        $paidPlanSlugs = [
+            'basic-monthly',
+            'basic-yearly',
+            'pro-monthly',
+            'pro-yearly',
+        ];
+
+        Plan::query()
+            ->whereIn('slug', $paidPlanSlugs)
+            ->each(function (Plan $plan) use ($domainFeature): void {
+                $plan->features()->syncWithoutDetaching([
+                    $domainFeature->id => ['charges' => null],
+                ]);
+            });
     }
 }

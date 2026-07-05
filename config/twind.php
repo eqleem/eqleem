@@ -46,6 +46,8 @@ return [
             ],
             'fontFamily' => [
                 'sans' => 'saudi_riyal, ibmps, sans-serif',
+                'sarmady' => 'sarmady',
+                'milligram' => 'milligram',
                 'codec-ultra' => 'codec-ultra',
                 'title' => 'codec-ultra',
                 'poster' => 'vesterbro-poster',
@@ -58,13 +60,29 @@ return [
     ],
     'preflight' => [
         '@font-face' => [
+                  
+                
             [
-                'fontFamily' => 'almushaf',
-                'src' => 'url(/assets/fonts/almushaf.eot?#iefix), url(/assets/fonts/almushaf.woff) format("woff2") ',
+                'fontFamily' => 'milligram',
+                'src' => 'url(/assets/fonts/milligram/arabic-bold.ttf)',
+                'fontStyle' => 'bold',
+                'fontWeight' => 'bold',
+                'fontDisplay' => 'auto',
+            ],          
+            [
+                'fontFamily' => 'milligram',
+                'src' => 'url(/assets/fonts/milligram/arabic-regular.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 400,
                 'fontDisplay' => 'auto',
-            ],
+            ],   
+            [
+                'fontFamily' => 'milligram',
+                'src' => 'url(/assets/fonts/milligram/arabic-light.ttf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 300,
+                'fontDisplay' => 'auto',
+            ],    
             [
                 'fontFamily' => 'eqleem',
                 'src' => 'url(/assets/fonts/as-wc26-bold.otf)',

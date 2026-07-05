@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Aliziodev\LaravelTaxonomy\Traits\HasTaxonomy;
+use App\Actions\EnsureSectionBlockLink;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -72,6 +73,20 @@ class Content extends Model implements HasMedia
                     ->whereKey($content->tenant_id)
                     ->value('user_id');
             }
+        });
+
+        static::created(function (Content $content): void {
+            if ($content->block_id !== null) {
+                return;
+            }
+
+            $contentTypeSlug = contentTypeSlugFromModel($content->type);
+
+            if ($contentTypeSlug === null || ! $content->tenant_id) {
+                return;
+            }
+
+            EnsureSectionBlockLink::run($content->tenant_id, $contentTypeSlug);
         });
     }
 

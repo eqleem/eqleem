@@ -9,7 +9,7 @@
 <div {{ $attributes->merge(['class' => 'bg-white rounded-2xl shadow-sm w-full relative']) }}>
 
     @if ($prime)
-        @if (tenant()->cantConsume('domain'))
+        @if (currentTenant()?->fresh(['subscription.plan.features'])->missingFeature('domain'))
             {{-- <div
                 class="text-2xl z-50 absolute -top-3 -left-2 bg-yellow-100 border border-dotted border-yellow-500 rounded px-2 p-1 rotate-12">
                 👑

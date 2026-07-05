@@ -314,6 +314,51 @@ class Setting extends Model
         return array_merge(static::unitRentalSettingsDefaults(), $saved?->settings ?? []);
     }
 
+    public const LOCALE_CURRENCY_SETTINGS_SLUG = 'locale-currency';
+
+    /**
+     * @return array{default_language: string, default_currency: string, available_languages: list<string>, available_currencies: list<string>}
+     */
+    public static function localeCurrencySettingsDefaults(): array
+    {
+        return config('locales.defaults', [
+            'default_language' => 'ar',
+            'default_currency' => 'SAR',
+            'available_languages' => ['ar'],
+            'available_currencies' => ['SAR'],
+        ]);
+    }
+
+    /**
+     * @return array{default_language: string, default_currency: string, available_languages: list<string>, available_currencies: list<string>}
+     */
+    public static function localeCurrencySettings(): array
+    {
+        $saved = static::forSlug(static::LOCALE_CURRENCY_SETTINGS_SLUG);
+        $defaults = static::localeCurrencySettingsDefaults();
+        $settings = array_merge($defaults, $saved?->settings ?? []);
+
+        $settings['available_languages'] = array_values(array_unique(array_filter(
+            (array) data_get($settings, 'available_languages', $defaults['available_languages']),
+            fn (mixed $code): bool => is_string($code) && $code !== '',
+        )));
+
+        $settings['available_currencies'] = array_values(array_unique(array_filter(
+            (array) data_get($settings, 'available_currencies', $defaults['available_currencies']),
+            fn (mixed $code): bool => is_string($code) && $code !== '',
+        )));
+
+        return $settings;
+    }
+
+    /**
+     * @param  array{default_language: string, default_currency: string, available_languages: list<string>, available_currencies: list<string>}  $settings
+     */
+    public static function saveLocaleCurrencySettings(array $settings): self
+    {
+        return static::saveForSlug(static::LOCALE_CURRENCY_SETTINGS_SLUG, $settings);
+    }
+
     public const PAYMENT_OPTIONS_GROUP = 'payment-options';
 
     /**

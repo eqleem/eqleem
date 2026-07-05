@@ -43,6 +43,8 @@ class CreateTenant
 
         SubscribeTenantToPlan::make()->subscribeToFreePlan($tenant);
 
+        SendWelcomeEmail::run($tenant);
+
         return $tenant;
     }
 

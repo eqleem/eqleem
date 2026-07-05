@@ -41,6 +41,16 @@ return [
             'index' => 'admin::settings.info.verification',
         ],
     ],
+    'language-currency' => [
+        'order' => 5,
+        'slug' => 'language-currency',
+        'name' => 'اللغة والعملة',
+        'description' => 'اللغة والعملة الافتراضية والمتاحة لصفحتك',
+        'icon' => 'assets/icons/business/009-web browser.svg',
+        'components' => [
+            'index' => 'admin::settings.info.language-currency',
+        ],
+    ],
     'branches' => [
         'order' => 7,
         'slug' => 'branches',

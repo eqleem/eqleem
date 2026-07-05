@@ -13,14 +13,18 @@
 
         <div class="px-4 mx-auto max-w-7xl ">
             <div class="flex justify-center max-w-xl mx-auto">
-                <div class="rounded-full flex items-center w-full mx-auto justify-between -mt-7 bg-white text-white px-2 py-2 text-xs sm:text-sm font-medium">
+                <div class="rounded-full flex items-center w-full mx-auto justify-between -mt-7 bg-black px-2 py-2 text-xs sm:text-sm font-medium">
                       <a href="{{ route('home') }}" wire:navigate title="" class="flex items-center gap-x-2 ms-3">
-                        <img class="w-auto h-5 md:h-7" src="{{ asset('assets/images/logo-text-black.webp') }}" alt="" />
+                        {{-- <img class="w-auto h-5 md:h-9" src="{{ asset('assets/images/logo-shape-color.svg') }}" alt="" /> --}}
+                        <img class="w-auto h-9 md:h-9" src="{{ asset('assets/images/logo-white.webp') }}" alt="" />
+                        {{-- <img class="w-auto h-9 md:h-9" src="{{ asset('assets/images/logo-blue.webp') }}" alt="" /> --}}
+                        {{-- <img class="w-auto h-9 md:h-11" src="{{ asset('assets/images/logo.webp') }}" alt="" /> --}}
+                        {{-- <img class="w-auto h-5 md:h-9" src="{{ asset('assets/images/logo-text-dawshah.png') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-5 md:h-7" src="{{ asset('assets/images/logo-y-r-p.webp') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-6 md:h-9" src="{{ asset('assets/images/logo-10-white.webp') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-6 md:h-9" src="{{ asset('assets/images/logo-10-orange.webp') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-6 md:h-9" src="{{ asset('assets/images/t1-w.png') }}" alt="" /> --}}
-                        {{-- <span class="text-xl lg:text-3xl font-camel font-extrabold">
+                        {{-- <span class="text-xl lg:text-2xl font-camel font-extrabold text-amber-800">
                             {{ config('app.name') }} 
                         </span> --}}
                     </a>
@@ -28,7 +32,7 @@
               
                     <div class="flex items-center justify-end lg:gap-x-2">
                         @auth
-                            <ui:button variant="primary" href="{{ route('admin.home') }}" label="لوحة التحكم" class="!rounded-full text-base font-tsh !p-6" rounded="full" icon="settings" />
+                            <ui:button variant="primary" color="white" href="{{ route('admin.home') }}" label="لوحة التحكم" class="!rounded-full text-base font-tsh !p-6" rounded="full" icon="settings" />
                         @else
                             <ui:button variant="primary" href="{{ route('auth.register') }}" label="أنشئ صفحة أعمال" wire:navigate rounded="full" icon="plus" class="!rounded-full !bg-primary-600 !hover:bg-primary-700 " />
                             <ui:button variant="ghost" href="{{ route('auth.login') }}" label="دخول" wire:navigate class="!rounded-full" icon:trailing="arrow-left" />
@@ -76,7 +80,8 @@
             </div>
         </div>
 
-                <h1 class="text-4xl sm:text-5xl md:text-6xl text-base-900 font-semibold leading-12 !lg:leading-[4.5rem] max-w-sm sm:max-w-xl xl:max-w-2xl mx-auto">
+                <h1 class="font-milligram  text-5xl md:text-6xl text-base-900 font-semibold leading-12 !lg:leading-[4.5rem]  max-w-xl xl:max-w-2xl mx-auto">
+ 
                      أنشئ صفحة أعمال 
                      تحوّل زوّارك إلى عملاء،   
                     {{-- <div class="relative inline-flex">
@@ -87,15 +92,24 @@
                     {{-- <span class="text-primary-500">تبيع عنّك، </span> --}}
                      بدقائق!
                 </h1>
-                <p class="mt-8 text-gray-500 max-w-sm lg:max-w-xl mx-auto text-base lg:text-xl">
+                <p class="font-milligram mt-8 text-gray-600 max-w-sm lg:max-w-xl mx-auto text-base lg:text-xl">
                     {{-- <b>صفحة أعمال</b> --}}
-                    <img src="{{ asset('assets/images/logo-text-black.webp') }}" class="inline-block h-6 md:h-9" alt="" />
+                    {{-- <img src="{{ asset('assets/images/logo-text-black.webp') }}" class="inline-block h-6 md:h-9" alt="" /> --}}
+
+          
+                        <img class="w-auto h-9 md:h-9 inline-block me-1 bg-black/5 rounded-md p-1 px-2" src="{{ asset('assets/images/logo.webp') }}" alt="" />
+                
+           
+
                     يساعدك تنشئ
 
                     صفحة أعمال لنشاطك التجاري لتحويل الزوار إلى عملاء
                     خلال دقائق،
                     تتمم عمليات البيع،
-                    تستقبل طلبات العملاء عنّك، تجاوب على أسئلتهم، وتوصلهم بك 24/7 على مدار الساعة.
+                    تستقبل طلبات العملاء عنّك، تجاوب على أسئلتهم، وتوصلهم بك 
+                    
+                    <span class="font-serif font-light">24/7</span>
+                    على مدار الساعة.
                 </p>
             </div>
 

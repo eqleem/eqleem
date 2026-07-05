@@ -156,40 +156,122 @@
                             <div class="space-y-3">
                                 @foreach ($items as $item)
                                     <div wire:key="item-{{ $item->id }}"
-                                        class="group flex flex-col gap-4 rounded-xl  bg-gray-50/60 p-4 transition hover:border-gray-200 hover:bg-white sm:flex-row sm:items-center sm:justify-between">
+                                        class="group flex flex-col gap-4 rounded-xl bg-gray-50/60 p-4 transition hover:border-gray-200 hover:bg-white sm:flex-row sm:items-start sm:justify-between">
                                         <div class="flex min-w-0 items-start gap-3">
                                             <div
                                                 class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-gray-400 ring-1 ring-gray-100 transition group-hover:text-primary-500">
-                                                <ui:icon name="package" class="h-5 w-5" />
+                                                <ui:icon name="{{ $item->type_icon }}" class="h-5 w-5" />
                                             </div>
-                                            <div class="min-w-0">
-                                                <p class="font-semibold text-gray-800">{{ $item->name }}</p>
-                                                @if ($item->sku)
-                                                    <p class="mt-0.5 text-xs text-gray-400" dir="ltr">
-                                                        SKU: {{ $item->sku }}
-                                                    </p>
-                                                @endif
-                                                <div class="mt-2 flex flex-wrap items-center gap-2">
-                                                    <span
-                                                        class="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
-                                                        الكمية: {{ $item->qty }}
-                                                    </span>
-                                                    @if ($item->discount_total > 0)
-                                                        <span
-                                                            class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
-                                                            خصم
-                                                            <span class="ms-1" dir="ltr">
-                                                                {{ $order->formatAmount($item->discount_total) }}
+                                            <div class="min-w-0 space-y-2">
+                                                <div>
+                                                    <p class="font-semibold text-gray-800">{{ $item->name }}</p>
+                                                    <div class="mt-1.5 flex flex-wrap items-center gap-2">
+                                                        <ui:badge color="{{ $item->type_badge_color }}" size="sm">
+                                                            {{ $item->type_label }}
+                                                        </ui:badge>
+                                                        @if ($item->is_booking && $item->booking_status_label)
+                                                            <ui:badge color="{{ $item->booking_status_color }}" size="sm">
+                                                                {{ $item->booking_status_label }}
+                                                            </ui:badge>
+                                                        @endif
+                                                        @if ($item->discount_total > 0)
+                                                            <span
+                                                                class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                                                                خصم
+                                                                <span class="ms-1" dir="ltr">
+                                                                    {{ $order->formatAmount($item->discount_total) }}
+                                                                </span>
                                                             </span>
-                                                        </span>
-                                                    @endif
+                                                        @endif
+                                                    </div>
                                                 </div>
+
+                                                @if ($item->is_booking)
+                                                    <div class="space-y-1.5 rounded-lg bg-white/80 px-3 py-2.5 ring-1 ring-gray-100">
+                                                        @if ($item->booking_date_label)
+                                                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                                                <ui:icon name="calendar-event" class="h-4 w-4 shrink-0 text-primary-500" />
+                                                                <span class="text-xs text-gray-400">تاريخ الموعد</span>
+                                                                <span class="font-medium">{{ $item->booking_date_label }}</span>
+                                                            </div>
+                                                            @if ($item->booking_time_label)
+                                                                <div class="flex items-center gap-2 text-sm text-gray-700">
+                                                                    <ui:icon name="clock" class="h-4 w-4 shrink-0 text-primary-500" />
+                                                                    <span class="text-xs text-gray-400">وقت الموعد</span>
+                                                                    <span class="font-medium" dir="ltr">{{ $item->booking_time_label }}</span>
+                                                                </div>
+                                                            @endif
+                                                            @if ($item->booking_duration_label)
+                                                                <div class="flex items-center gap-2 text-sm text-gray-700">
+                                                                    <ui:icon name="hourglass-empty" class="h-4 w-4 shrink-0 text-primary-500" />
+                                                                    <span class="text-xs text-gray-400">المدة</span>
+                                                                    <span class="font-medium">{{ $item->booking_duration_label }}</span>
+                                                                </div>
+                                                            @endif
+                                                        @else
+                                                            <p class="text-sm text-amber-600">لا توجد بيانات حجز لهذا العنصر.</p>
+                                                        @endif
+                                                        @if ($item->calendar_name)
+                                                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                                                <ui:icon name="calendar" class="h-4 w-4 shrink-0 text-primary-500" />
+                                                                <span class="text-xs text-gray-400">التقويم</span>
+                                                                <span class="font-medium">{{ $item->calendar_name }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        @if (in_array($item->type, ['product', 'digital_product', 'menu'], true) && $item->sku)
+                                                            <span
+                                                                class="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200"
+                                                                dir="ltr">
+                                                                SKU: {{ $item->sku }}
+                                                            </span>
+                                                        @endif
+                                                        @if ($item->type === 'course')
+                                                            <span
+                                                                class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+                                                                <ui:icon name="users" class="h-3.5 w-3.5 text-gray-400" />
+                                                                المقاعد: {{ $item->qty }}
+                                                            </span>
+                                                        @else
+                                                            <span
+                                                                class="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+                                                                الكمية: {{ $item->qty }}
+                                                            </span>
+                                                        @endif
+                                                        @if ($item->type === 'digital_product')
+                                                            <span
+                                                                class="inline-flex items-center gap-1 rounded-md bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700">
+                                                                <ui:icon name="file-download" class="h-3.5 w-3.5" />
+                                                                تسليم رقمي
+                                                            </span>
+                                                        @elseif ($item->type === 'digital_service')
+                                                            <span
+                                                                class="inline-flex items-center gap-1 rounded-md bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700">
+                                                                <ui:icon name="cloud-computing" class="h-3.5 w-3.5" />
+                                                                خدمة رقمية
+                                                            </span>
+                                                        @elseif ($item->type === 'course')
+                                                            <span
+                                                                class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                                                                <ui:icon name="school-bell" class="h-3.5 w-3.5" />
+                                                                تسجيل في الدورة
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    @if (filled($item->description))
+                                                        <p class="text-sm leading-relaxed text-gray-500">{{ $item->description }}</p>
+                                                    @endif
+                                                @endif
                                             </div>
                                         </div>
 
-                                        <div class="flex shrink-0 items-center justify-between gap-6 sm:flex-col sm:items-end sm:justify-center sm:gap-1 sm:text-end">
+                                        <div class="flex shrink-0 items-center justify-between gap-6 sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:pt-1 sm:text-end">
                                             <div class="text-end">
-                                                <p class="text-xs text-gray-400">سعر الوحدة</p>
+                                                <p class="text-xs text-gray-400">
+                                                    {{ $item->is_booking ? 'سعر الحجز' : 'سعر الوحدة' }}
+                                                </p>
                                                 <p class="text-sm font-medium text-gray-600" dir="ltr">
                                                     {{ $order->formatAmount($item->unit_price) }}
                                                     {{ $order->currency_code }}
@@ -614,7 +696,10 @@
 
 use App\Actions\RecordOrderPayment;
 use App\Models\ActivityLog;
+use App\Models\Booking;
+use App\Models\Calendar;
 use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -646,12 +731,160 @@ new class extends \Livewire\Component {
 
         $this->order = $query->whereUuid(request()->id)->firstOrFail();
 
-        $this->items = DB::table('order_items')
-            ->where('order_id', $this->order->id)
+        $this->items = $this->loadOrderItems($this->order->id);
+
+        $this->newStatus = $this->order->statusValue();
+    }
+
+    /**
+     * @return Collection<int, object>
+     */
+    protected function loadOrderItems(int $orderId): Collection
+    {
+        $items = DB::table('order_items')
+            ->where('order_id', $orderId)
             ->orderBy('id')
             ->get();
 
-        $this->newStatus = $this->order->statusValue();
+        $metas = $items->mapWithKeys(function (object $item): array {
+            $meta = is_string($item->meta ?? null)
+                ? (json_decode($item->meta, true) ?: [])
+                : (array) ($item->meta ?? []);
+
+            return [$item->id => $meta];
+        });
+
+        $bookingIds = $metas->pluck('booking_id')->filter()->unique()->values();
+
+        $bookings = $bookingIds->isEmpty()
+            ? collect()
+            : Booking::query()
+                ->with('calendar')
+                ->whereIn('id', $bookingIds)
+                ->get()
+                ->keyBy('id');
+
+        $calendarIds = $metas->pluck('calendar_id')
+            ->filter()
+            ->unique()
+            ->diff($bookings->pluck('calendar_id')->filter())
+            ->values();
+
+        $calendars = $calendarIds->isEmpty()
+            ? collect()
+            : Calendar::query()
+                ->whereIn('id', $calendarIds)
+                ->get()
+                ->keyBy('id');
+
+        return $items->map(function (object $item) use ($metas, $bookings, $calendars): object {
+            $meta = $metas->get($item->id, []);
+            $type = (string) ($meta['type'] ?? 'other');
+            $isBooking = Order::isBookingItemType($type);
+            $booking = filled($meta['booking_id'] ?? null)
+                ? $bookings->get($meta['booking_id'])
+                : null;
+
+            $startAt = $booking?->start_at
+                ?? (filled($meta['booking_start_at'] ?? null) ? Carbon::parse($meta['booking_start_at']) : null);
+            $endAt = $booking?->end_at
+                ?? (filled($meta['booking_end_at'] ?? null) ? Carbon::parse($meta['booking_end_at']) : null);
+
+            $calendarId = $booking?->calendar_id ?? ($meta['calendar_id'] ?? null);
+            $calendarName = $booking?->calendar?->name
+                ?? ($calendarId ? $calendars->get($calendarId)?->name : null);
+
+            $bookingStatus = $booking?->status;
+
+            $item->type = $type;
+            $item->type_label = Order::itemTypeOptions()[$type] ?? $type;
+            $item->type_icon = Order::itemTypeIcons()[$type] ?? 'package';
+            $item->type_badge_color = $this->itemTypeBadgeColor($type);
+            $item->is_booking = $isBooking;
+            $item->description = filled($meta['description'] ?? null) ? (string) $meta['description'] : null;
+            $item->image_url = $meta['image_url'] ?? null;
+            $item->booking_date_label = $startAt?->translatedFormat('l j F Y');
+            $item->booking_time_label = $this->bookingTimeLabel($startAt, $endAt);
+            $item->booking_duration_label = $this->bookingDurationLabel($startAt, $endAt);
+            $item->calendar_name = $calendarName;
+            $item->booking_status = $bookingStatus;
+            $item->booking_status_label = $bookingStatus
+                ? (Booking::statuses()[$bookingStatus] ?? $bookingStatus)
+                : null;
+            $item->booking_status_color = $this->bookingStatusBadgeColor($bookingStatus);
+
+            return $item;
+        });
+    }
+
+    protected function itemTypeBadgeColor(string $type): string
+    {
+        return match ($type) {
+            'product' => 'blue',
+            'digital_product' => 'purple',
+            'course' => 'purple',
+            'digital_service' => 'blue',
+            'menu' => 'yellow',
+            'service' => 'green',
+            'unit_rental' => 'blue',
+            default => 'gray',
+        };
+    }
+
+    protected function bookingStatusBadgeColor(?string $status): string
+    {
+        return match ($status) {
+            'pending' => 'yellow',
+            'confirmed' => 'green',
+            'cancelled' => 'red',
+            'completed' => 'blue',
+            default => 'gray',
+        };
+    }
+
+    protected function bookingTimeLabel(?Carbon $startAt, ?Carbon $endAt): ?string
+    {
+        if (! $startAt) {
+            return null;
+        }
+
+        if ($endAt && ! $startAt->isSameDay($endAt)) {
+            return $startAt->translatedFormat('d M Y h:i A').' — '.$endAt->translatedFormat('d M Y h:i A');
+        }
+
+        if ($endAt) {
+            return $startAt->translatedFormat('h:i A').' — '.$endAt->translatedFormat('h:i A');
+        }
+
+        return $startAt->translatedFormat('h:i A');
+    }
+
+    protected function bookingDurationLabel(?Carbon $startAt, ?Carbon $endAt): ?string
+    {
+        if (! $startAt || ! $endAt || $endAt->lte($startAt)) {
+            return null;
+        }
+
+        $minutes = (int) $startAt->diffInMinutes($endAt);
+
+        if ($minutes < 60) {
+            return $minutes.' دقيقة';
+        }
+
+        $hours = intdiv($minutes, 60);
+        $remainingMinutes = $minutes % 60;
+
+        if ($hours >= 24 && $remainingMinutes === 0 && $hours % 24 === 0) {
+            $days = intdiv($hours, 24);
+
+            return $days === 1 ? 'يوم واحد' : $days.' أيام';
+        }
+
+        if ($remainingMinutes === 0) {
+            return $hours === 1 ? 'ساعة واحدة' : $hours.' ساعات';
+        }
+
+        return $hours.' س '.$remainingMinutes.' د';
     }
 
     #[Computed]

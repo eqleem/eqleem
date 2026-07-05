@@ -21,7 +21,7 @@
         'outline' => 'bg-white text-black/70 hover:bg-black/5 border border-black/10 shadow-none',
         'ghost' => 'bg-transparent text-black/70 hover:bg-black/10 shadow-none',
         'green' => 'bg-green-600 text-white hover:bg-green-700',
-        'danger' => 'bg-red-600 text-white hover:bg-red-700',
+        'danger' => 'bg-red-700 text-white hover:bg-red-800',
         'warning' => 'bg-yellow-500 text-white hover:bg-yellow-600',
         'link' => 'bg-transparent text-black/70 underline hover:bg-transparent shadow-none hover:text-black/30',
         default => 'bg-gray-300 text-black/50'

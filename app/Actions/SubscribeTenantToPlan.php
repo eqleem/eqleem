@@ -13,11 +13,13 @@ class SubscribeTenantToPlan
 
     public function handle(Tenant $tenant, Plan $plan): Subscription
     {
-        if ($tenant->subscription) {
-            return $tenant->switchTo($plan);
-        }
+        $subscription = $tenant->subscription
+            ? $tenant->switchTo($plan)
+            : $tenant->subscribeTo($plan);
 
-        return $tenant->subscribeTo($plan);
+        $this->refreshCurrentTenantContext($tenant);
+
+        return $subscription;
     }
 
     public function subscribeToFreePlan(Tenant $tenant): ?Subscription
@@ -31,6 +33,17 @@ class SubscribeTenantToPlan
             return $tenant->subscription;
         }
 
-        return $tenant->subscribeTo($plan);
+        $subscription = $tenant->subscribeTo($plan);
+
+        $this->refreshCurrentTenantContext($tenant);
+
+        return $subscription;
+    }
+
+    protected function refreshCurrentTenantContext(Tenant $tenant): void
+    {
+        if (currentTenant()?->is($tenant)) {
+            setCurrentTenant($tenant->fresh(['subscription.plan.features']));
+        }
     }
 }

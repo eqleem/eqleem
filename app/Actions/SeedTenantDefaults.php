@@ -7,7 +7,6 @@ use App\Models\Content;
 use App\Models\SocialAccount;
 use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
-use App\Support\CtaLink;
 use App\Support\FormField;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -214,51 +213,8 @@ class SeedTenantDefaults
 
     protected function seedBlockLinks(Tenant $tenant, BlockTypeRegistry $blockTypes): void
     {
-        $blockLinkType = $blockTypes->find('block-link');
-
-        if (! $blockLinkType) {
-            return;
-        }
-
-        $sections = ['blog', 'portfolio'];
-
-        foreach ($sections as $index => $contentType) {
-            $exists = Block::query()
-                ->withoutGlobalScope('tenant')
-                ->where('tenant_id', $tenant->id)
-                ->where('type', 'block-link')
-                ->where('data->content_type', $contentType)
-                ->where('data->link_type', 'section')
-                ->exists();
-
-            if ($exists) {
-                continue;
-            }
-
-            $title = CtaLink::blockLinkTitleFromTypeKey('section:'.$contentType);
-            $description = CtaLink::blockLinkDescriptionFromTypeKey('section:'.$contentType);
-
-            Block::create([
-                'tenant_id' => $tenant->id,
-                'uuid' => Str::uuid(),
-                'component' => $blockLinkType->component,
-                'type' => 'block-link',
-                'title' => $title,
-                'slug' => $contentType.'-'.Str::lower(Str::random(8)),
-                'data' => [
-                    'link_type' => 'section',
-                    'content_type' => $contentType,
-                    'content_id' => null,
-                    'title' => $title,
-                    'description' => $description,
-                ],
-                'sort_order' => $index + 1,
-                'is_default' => false,
-                'status' => 'published',
-                'active' => true,
-                'position' => 'home',
-                'published_at' => now(),
-            ]);
+        foreach (['blog', 'portfolio'] as $contentType) {
+            EnsureSectionBlockLink::make()->handle($tenant->id, $contentType, $blockTypes);
         }
     }
 }

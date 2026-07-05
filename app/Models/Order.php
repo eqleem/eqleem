@@ -271,10 +271,27 @@ class Order extends Model
         }
 
         return match ($method) {
-            'cash' => 'نقداً',
-            'card' => 'بطاقة',
+            'cash', 'cod' => 'الدفع عند الاستلام',
+            'card' => 'مدى / فيزا / ماستركارد',
+            'apple_pay' => 'Apple Pay',
             'bank_transfer' => 'تحويل بنكي',
             'online' => 'دفع إلكتروني',
+            default => $method,
+        };
+    }
+
+    public function shippingMethodLabel(): string
+    {
+        $method = data_get($this->meta, 'shipping_method');
+
+        if (! $method) {
+            return '-';
+        }
+
+        return match ($method) {
+            'express' => 'توصيل سريع (24-48 ساعة)',
+            'scheduled' => 'توصيل مجدول',
+            'pickup' => 'استلام من المعرض',
             default => $method,
         };
     }
