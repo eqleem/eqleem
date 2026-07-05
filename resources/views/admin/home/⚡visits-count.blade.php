@@ -23,7 +23,7 @@
 
 <?php
 
-use App\Models\User;
+use App\Models\RequestAnalytics;
 use SaKanjo\EasyMetrics\Metrics\Value;
 
 new class extends \Livewire\Component {
@@ -33,7 +33,8 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        [$this->value, $this->growth] = Value::make(User::class)
+        [$this->value, $this->growth] = Value::make(RequestAnalytics::class)
+            ->dateColumn('visited_at')
             ->withGrowthRate()
             ->ranges($this->range)
             ->count();

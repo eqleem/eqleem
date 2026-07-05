@@ -459,6 +459,26 @@ it('uses quantity flow for menu items', function () {
         ->and(Booking::query()->count())->toBe(0);
 });
 
+it('restores item structure when livewire sends partial item data', function () {
+    [$user] = createTenantWithUserForAddOrder();
+
+    Livewire::actingAs($user)
+        ->test('admin::orders.add-order')
+        ->call('addItem', 'menu')
+        ->set('items', [[
+            'type' => 'menu',
+            'search' => 'برجر',
+            'name' => '',
+            'qty' => 2,
+            'unit_price' => '35',
+            'discount' => '0',
+        ]])
+        ->assertSet('items.0.key', fn (?string $key): bool => filled($key))
+        ->assertSet('items.0.type', 'menu')
+        ->assertSet('items.0.line_total', 7000)
+        ->assertStatus(200);
+});
+
 it('exposes new quantity item types in add item options', function () {
     [$user] = createTenantWithUserForAddOrder();
 

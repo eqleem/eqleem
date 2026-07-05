@@ -34,6 +34,18 @@
         }"
         class="flex lg:gap-5 gap-2 items-start"
     >
+        @php
+            $contentTabBgClasses = collect(config('content-types', []))
+                ->flatMap(fn (array $type): array => [
+                    \App\Support\ContentType::backgroundClassFor($type['color'] ?? 'gray'),
+                    \App\Support\ContentType::hoverBackgroundClassFor($type['color'] ?? 'gray'),
+                ])
+                ->filter()
+                ->unique()
+                ->implode(' ');
+        @endphp
+        <div class="hidden {{ $contentTabBgClasses }} bg-[var(--tab-bg)] hover:bg-[var(--tab-bg)]" aria-hidden="true"></div>
+
         {{-- Tab nav (right in RTL) --}}
         <nav class="lg:w-48 w-auto shrink-0 bg-gray-300/30 rounded-xl p-0.5 space-y-0.5">
             <template x-for="tab in tabs.filter((item) => item.type === 'fixed')" :key="tab.id">
@@ -41,9 +53,9 @@
                     type="button"
                     x-on:click="setTab(tab.id)"
                     x-bind:class="isActive(tab.id)
-                        ? 'bg-white text-gray-900 shadow-sm font-semibold'
+                        ? 'bg-white text-gray-700  '
                         : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
-                    class="w-full text-start px-3 py-2.5 rounded-lg text-sm transition flex items-center gap-2"
+                    class="w-full text-start px-3 py-2.5 rounded-lg bg-stone-100/50 text-sm transition flex items-center gap-2"
                 >
                     <img x-show="tab.icon_url" x-bind:src="tab.icon_url" x-bind:alt="tab.label" class="w-5 h-5 shrink-0">
                     <span x-text="tab.label" class="truncate hidden md:block"></span>
@@ -59,12 +71,22 @@
                 <button
                     type="button"
                     x-on:click="setTab(tab.id)"
-                    x-bind:class="isActive(tab.id)
-                        ? 'bg-white text-gray-900 shadow-sm font-semibold'
-                        : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
-                    class="w-full text-start px-3 py-2.5 rounded-lg text-sm transition flex items-center gap-2"
+                    x-bind:style="tab.color_bg_hex ? { '--tab-bg': tab.color_bg_hex } : null"
+                    x-bind:class="[
+                        isActive(tab.id) && tab.color_bg_class ? tab.color_bg_class : '',
+                        isActive(tab.id) && tab.color_bg_hex ? 'bg-[var(--tab-bg)]' : '',
+                        ! isActive(tab.id) && tab.color_hover_class ? tab.color_hover_class : '',
+                        ! isActive(tab.id) && tab.color_bg_hex ? 'hover:bg-[var(--tab-bg)]' : '',
+                        isActive(tab.id) ? 'text-gray-900' : 'text-gray-600 hover:text-gray-800',
+                    ].filter(Boolean).join(' ')"
+                    class="w-full text-start rounded-lg bg-stone-100/50 text-sm transition flex items-center gap-2  "
                 >
-                    <img x-bind:src="tab.icon_url" x-bind:alt="tab.label" class="w-5 h-5 shrink-0">
+                    <span
+                        x-bind:style="tab.color_bg_hex ? { backgroundColor: tab.color_bg_hex } : null"
+                        x-bind:class="[tab.color_bg_class, 'shrink-0 flex items-center justify-center rounded-s-lg p-2'].filter(Boolean).join(' ')"
+                    >
+                        <img x-bind:src="tab.icon_url" x-bind:alt="tab.label" class="w-5 h-5">
+                    </span>
                     <span x-text="tab.label" class="truncate hidden md:block"></span>
                 </button>
             </template>

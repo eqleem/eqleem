@@ -29,6 +29,7 @@ return new class extends Migration
                 $table->string('session_id');
                 $table->string('visitor_id')->nullable();
                 $table->unsignedBigInteger('user_id')->nullable();
+                $table->unsignedBigInteger('client_id')->nullable()->index();
                 $table->unsignedBigInteger('tenant_id')->nullable();
                 $table->string('http_method');
                 $table->string('request_category');
@@ -37,5 +38,4 @@ return new class extends Migration
             });
         }
     }
- 
 };

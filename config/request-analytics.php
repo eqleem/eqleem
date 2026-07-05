@@ -43,6 +43,7 @@ return [
         'dashboard',
         'dashboard/*',
         'api/*',
+        'admin',
         'admin/*',
         'livewire-*/*',
         '*/preview',

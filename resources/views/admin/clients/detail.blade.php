@@ -58,11 +58,11 @@
                 class="mt-6"
             >
                 <x-slot name="nav" class="border-b">
-                    <ui:tab.nav name="info" label="{{ __('Personal info') }}"
+                    <ui:tab.nav name="info" label="{{ __('Personal info') }}" icon="user"
                         activeClass="border-b-2 !border-blue-800" />
-                    <ui:tab.nav name="orders" label="{{ __('Orders') }}"
+                    <ui:tab.nav name="orders" label="{{ __('Orders') }}" icon="message-2"
                         activeClass="border-b-2 !border-blue-800" />
-                    <ui:tab.nav name="invoices" label="الفواتير"
+                    <ui:tab.nav name="invoices" label="الفواتير" icon="file-invoice"
                         activeClass="border-b-2 !border-blue-800" />
                 </x-slot>
                 <x-slot name="content">

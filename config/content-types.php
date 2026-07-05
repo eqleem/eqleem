@@ -8,6 +8,7 @@ return [
         'name' => 'الصفحات',
         'description' => 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.',
         'icon' => 'assets/icons/ecommerce/031-content.svg',
+        'color' => 'blue',
         'components' => [
             'index' => 'admin::page.content.pages.index',
             'detail' => 'admin::page.content.pages.detail',
@@ -20,6 +21,7 @@ return [
         'name' => 'المدونة',
         'description' => 'كتابة ونشر المقالات وتنظيم التصنيفات.',
         'icon' => 'assets/icons/stationery/002-book.svg',
+        'color' => 'orange',
         'components' => [
             'index' => 'admin::page.content.blog.index',
             'detail' => 'admin::page.content.blog.detail',
@@ -32,6 +34,7 @@ return [
         'name' => 'معرض الأعمال',
         'description' => 'عرض وإدارة مشاريعك وأعمالك السابقة.',
         'icon' => 'assets/icons/business/047-portfolio.svg',
+        'color' => 'violet',
         'components' => [
             'index' => 'admin::page.content.portfolio.index',
             'detail' => 'admin::page.content.portfolio.detail',
@@ -44,6 +47,7 @@ return [
         'name' => 'النماذج',
         'description' => 'إنشاء وإدارة نماذج التواصل وجمع البيانات.',
         'icon' => 'assets/icons/stationery/005-clipboard.svg',
+        'color' => 'yellow',
         'components' => [
             'index' => 'admin::page.content.forms.index',
             'detail' => 'admin::page.content.forms.detail',
@@ -56,6 +60,7 @@ return [
         'name' => 'المتجر الإلكتروني',
         'description' => 'إدارة المنتجات والتصنيفات وإعدادات المتجر.',
         'icon' => 'assets/icons/ecommerce/018-cart.svg',
+        'color' => 'green',
         'components' => [
             'index' => 'admin::page.content.store.index',
             'detail' => 'admin::page.content.store.detail',
@@ -67,7 +72,8 @@ return [
         'model_type' => 'digital-product',
         'name' => 'المنتجات الرقمية',
         'description' => 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
-        'icon' => 'assets/icons/tabler/file-download.svg',
+        'icon' => 'assets/icons/business/035-file.svg',
+        'color' => 'red',
         'components' => [
             'index' => 'admin::page.content.digital-products.index',
             'detail' => 'admin::page.content.digital-products.detail',
@@ -79,7 +85,8 @@ return [
         'model_type' => 'digital-service',
         'name' => 'الخدمات الرقمية',
         'description' => 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.',
-        'icon' => 'assets/icons/tabler/cloud-computing.svg',
+        'icon' => 'assets/icons/business/015-cloud-network.svg',
+        'color' => '#E0E7FF',
         'components' => [
             'index' => 'admin::page.content.digital-services.index',
             'detail' => 'admin::page.content.digital-services.detail',
@@ -91,7 +98,8 @@ return [
         'model_type' => 'service',
         'name' => 'الخدمات',
         'description' => 'عرض وإدارة الخدمات المقدمة.',
-        'icon' => 'assets/icons/tabler/hotel-service.svg',
+        'icon' => 'assets/icons/business/025-team work.svg',
+        'color' => 'teal',
         'components' => [
             'index' => 'admin::page.content.services.index',
             'detail' => 'admin::page.content.services.detail',
@@ -104,6 +112,7 @@ return [
         'name' => 'النشرة البريدية',
         'description' => 'إنشاء وإرسال النشرات البريدية للمشتركين.',
         'icon' => 'assets/icons/business/045-message.svg',
+        'color' => 'rose',
         'components' => [
             'index' => 'admin::page.content.newsletter.index',
             'detail' => 'admin::page.content.newsletter.detail',
@@ -115,7 +124,8 @@ return [
         'model_type' => 'menu',
         'name' => 'قائمة الطعام',
         'description' => 'إدارة أصناف وعناصر قائمة الطعام.',
-        'icon' => 'assets/icons/tabler/chef-hat.svg',
+        'icon' => 'assets/icons/business/059-teacup.svg',
+        'color' => 'amber',
         'components' => [
             'index' => 'admin::page.content.menu.index',
             'detail' => 'admin::page.content.menu.detail',
@@ -127,7 +137,8 @@ return [
         'model_type' => 'unit',
         'name' => 'تأجير الوحدات',
         'description' => 'إدارة الوحدات المتاحة للتأجير.',
-        'icon' => 'assets/icons/tabler/building-estate.svg',
+        'icon' => 'assets/icons/business/010-location.svg',
+        'color' => 'lime',
         'components' => [
             'index' => 'admin::page.content.unit-rental.index',
             'detail' => 'admin::page.content.unit-rental.detail',
@@ -139,7 +150,8 @@ return [
         'model_type' => 'cv',
         'name' => 'السيرة الذاتية',
         'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
-        'icon' => 'assets/icons/tabler/file-cv.svg',
+        'icon' => 'assets/icons/stationery/011-id-card.svg',
+        'color' => 'purple',
         'components' => [
             'index' => 'admin::page.content.cv.index',
             'detail' => 'admin::page.content.cv.detail',
@@ -151,7 +163,8 @@ return [
         'model_type' => 'course',
         'name' => 'الدورات التدريبية',
         'description' => 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.',
-        'icon' => 'assets/icons/tabler/school-bell.svg',
+        'icon' => 'assets/icons/business/011-presentation.svg',
+        'color' => 'pink',
         'components' => [
             'index' => 'admin::page.content.courses.index',
             'detail' => 'admin::page.content.courses.detail',

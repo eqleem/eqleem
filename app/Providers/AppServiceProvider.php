@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
+use App\Models\RequestAnalytics as AppRequestAnalytics;
+use App\Observers\RequestAnalyticsObserver;
 use App\Support\BlockTypeRegistry;
 use App\Support\BlockVariants;
 use App\Support\ContentTypeRegistry;
@@ -13,7 +15,6 @@ use App\Support\TenantThemeOptions;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
-use App\Observers\RequestAnalyticsObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         RequestAnalytics::observe(RequestAnalyticsObserver::class);
+        AppRequestAnalytics::observe(RequestAnalyticsObserver::class);
 
     }
 }

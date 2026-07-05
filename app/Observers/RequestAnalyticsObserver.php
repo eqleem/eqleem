@@ -2,24 +2,21 @@
 
 namespace App\Observers;
 
+use Illuminate\Support\Facades\Auth;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
-use Illuminate\Database\Eloquent\Builder;
-    
+
 class RequestAnalyticsObserver
 {
-    public function created(RequestAnalytics $requestAnalytics): void
+    public function creating(RequestAnalytics $requestAnalytics): void
     {
-        if(tenant()) {
+        if (tenant() && is_null($requestAnalytics->tenant_id)) {
             $requestAnalytics->tenant_id = tenant()->id;
-            $requestAnalytics->saveQuietly();
+        }
+
+        $clientId = Auth::guard('client')->id();
+
+        if ($clientId && is_null($requestAnalytics->client_id)) {
+            $requestAnalytics->client_id = $clientId;
         }
     }
-
-    protected static function bootedTenantRequestAnalytics(RequestAnalytics $model) 
-    {
-      
-        $model::addGlobalScope('tenant_request_analytics', function (Builder $builder) {
-            $builder->where('tenant_id', tenant('id') ?? null);   
-        });
-    } 
 }

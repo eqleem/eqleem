@@ -6,7 +6,7 @@ return [
         'slug' => 'structure',
         'name' => 'هيكل الصفحة',
         'description' => 'إدارة ترتيب الأقسام وإضافة أو إزالة الكتل من الصفحة الرئيسية.',
-        'icon' => 'assets/icons/business/036-Jigsaw.svg',
+        'icon' => 'assets/icons/tabler/puzzle-2.svg',
         'component' => 'admin::page.tabs.structure',
     ],
     'design' => [
@@ -14,7 +14,7 @@ return [
         'slug' => 'design',
         'name' => 'تصميم الصفحة',
         'description' => 'تخصيص الألوان والخطوط والمظهر العام للصفحة.',
-        'icon' => 'assets/icons/stationery/007-paint-swatch.svg',
+        'icon' => 'assets/icons/tabler/color-swatch.svg',
         'component' => 'admin::page.tabs.design',
     ],
 ];

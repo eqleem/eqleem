@@ -430,6 +430,16 @@ new class extends Livewire\Component {
     /** @var array<int, array{key: string, type: string, product_id: ?int, name: string, search: string, description: string, qty: int, unit_price: string, discount: string, line_total: int, calendar_id: ?int, calendars: array<int, array{id: int, name: string}>, available_dates: array<int, string>, booking_date: string, booking_time: string, booking_start_at: ?string, booking_end_at: ?string, duration_minutes: int, time_slots: array<int, array{start: string, end: string, label: string, start_at: string, end_at: string}>}> */
     public array $items = [];
 
+    public function hydrate(): void
+    {
+        $this->ensureItemsStructure();
+    }
+
+    public function updatedItems(): void
+    {
+        $this->ensureItemsStructure();
+    }
+
     protected function rules(): array
     {
         return [
@@ -964,6 +974,34 @@ new class extends Livewire\Component {
         if (preg_match('/^items\.(\d+)\.(qty|unit_price|discount)$/', $property, $matches)) {
             $this->recalculateLineTotal((int) $matches[1]);
         }
+    }
+
+    protected function ensureItemsStructure(): void
+    {
+        foreach ($this->items as $index => $item) {
+            if ($this->itemHasCompleteStructure($item)) {
+                continue;
+            }
+
+            $key = filled($item['key'] ?? null) ? $item['key'] : Str::uuid()->toString();
+
+            $this->items[$index] = array_merge($this->blankItem(), $item, ['key' => $key]);
+
+            if (! array_key_exists('line_total', $item)) {
+                $this->recalculateLineTotal($index);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $item
+     */
+    protected function itemHasCompleteStructure(array $item): bool
+    {
+        return filled($item['key'] ?? null)
+            && array_key_exists('line_total', $item)
+            && array_key_exists('calendars', $item)
+            && array_key_exists('time_slots', $item);
     }
 
     protected function blankItem(): array

@@ -1,7 +1,7 @@
  
 <?php
 use SaKanjo\EasyMetrics\Metrics;
-use App\Models\User;
+use App\Models\RequestAnalytics;
 use App\Traits\HasChartWidget;
 
 new class extends \Livewire\Component {
@@ -16,7 +16,8 @@ new class extends \Livewire\Component {
 
     function mount()
     {
-        $data = Metrics\Trend::make(User::class)
+        $data = Metrics\Trend::make(RequestAnalytics::class)
+            ->dateColumn('visited_at')
             ->ranges($this->range)
             ->countByDays();
 
