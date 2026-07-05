@@ -5,6 +5,7 @@ namespace App\Livewire\Tenant\Courses;
 use App\Models\Content;
 use App\Models\Setting;
 use App\Models\Taxonomy;
+use App\Services\CartService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
@@ -16,6 +17,20 @@ class Index extends Component
     public ?string $categorySlug = null;
 
     public string $search = '';
+
+    public function addToCart(int $courseId, CartService $cart): void
+    {
+        $course = Content::query()
+            ->type(contentTypeModel('courses'))
+            ->published()
+            ->where('active', true)
+            ->whereKey($courseId)
+            ->firstOrFail();
+
+        $cart->addItem($course);
+
+        $this->dispatch('cart-updated');
+    }
 
     public function render()
     {

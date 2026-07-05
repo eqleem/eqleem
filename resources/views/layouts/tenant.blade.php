@@ -11,6 +11,9 @@
  
         <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
  
+        <link rel="stylesheet" href="{{ asset('assets/vendor/moyasar/moyasar.css') }}">
+        <script src="{{ asset('assets/vendor/moyasar/moyasar.js') }}"></script>
+
         <script>
             let config = { ...@js(config('twind')), ...customTwindconf };
             config.theme = config.theme || {};

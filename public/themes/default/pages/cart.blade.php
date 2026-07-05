@@ -4,7 +4,7 @@
         @if ($items->isEmpty())
             <div class="rounded-2xl border border-stone-200 bg-white p-8 text-center">
                 <p class="text-base font-semibold text-stone-700">السلة فارغة</p>
-                <p class="mt-2 text-sm text-stone-500">أضف منتجات من المتجر لبدء التسوق.</p>
+                <p class="mt-2 text-sm text-stone-500">أضف منتجات أو خدمات أو دورات لبدء التسوق.</p>
                 <a
                     href="{{ route('tenant.store.index') }}"
                     wire:navigate
@@ -17,7 +17,7 @@
             <div class="rounded-2xl border border-stone-200 bg-white p-5">
                 <div class="mb-4 flex items-center justify-between">
                     <h3 class="text-lg font-bold text-stone-900">ملخص السلة</h3>
-                    <span class="rounded-lg bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{{ $itemCount }} {{ $itemCount === 1 ? 'منتج' : 'منتجات' }}</span>
+                    <span class="rounded-lg bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{{ $itemCount }} {{ $itemCount === 1 ? 'عنصر' : 'عناصر' }}</span>
                 </div>
 
                 <div class="space-y-3">
@@ -33,24 +33,42 @@
 
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-semibold text-stone-900">{{ $item->title() }}</p>
+
+                                @if ($item->isBooking())
+                                    <div class="mt-1 space-y-0.5 text-xs text-stone-500">
+                                        @if ($item->bookingDateLabel())
+                                            <p>{{ $item->bookingDateLabel() }}</p>
+                                        @endif
+                                        @if ($item->bookingTimeLabel())
+                                            <p dir="ltr">{{ $item->bookingTimeLabel() }}</p>
+                                        @endif
+                                    </div>
+                                @elseif ($item->mealOptionsLabel())
+                                    <p class="mt-1 text-xs text-stone-500">{{ $item->mealOptionsLabel() }}</p>
+                                @endif
+
                                 <div class="mt-2 flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
-                                        class="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-stone-600 hover:bg-white"
-                                        aria-label="تقليل الكمية"
-                                    >−</button>
-                                    <span class="w-6 text-center text-xs font-medium">{{ $item->quantity }}</span>
-                                    <button
-                                        type="button"
-                                        wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})"
-                                        class="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-stone-600 hover:bg-white"
-                                        aria-label="زيادة الكمية"
-                                    >+</button>
+                                    @if ($item->isBooking())
+                                        <span class="rounded-md bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700">حجز</span>
+                                    @else
+                                        <button
+                                            type="button"
+                                            wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
+                                            class="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-stone-600 hover:bg-white"
+                                            aria-label="تقليل الكمية"
+                                        >−</button>
+                                        <span class="w-6 text-center text-xs font-medium">{{ $item->quantity }}</span>
+                                        <button
+                                            type="button"
+                                            wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})"
+                                            class="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-stone-600 hover:bg-white"
+                                            aria-label="زيادة الكمية"
+                                        >+</button>
+                                    @endif
                                     <button
                                         type="button"
                                         wire:click="removeItem({{ $item->id }})"
-                                        wire:confirm="هل تريد حذف هذا المنتج من السلة؟"
+                                        wire:confirm="هل تريد حذف هذا العنصر من السلة؟"
                                         class="ms-auto text-xs text-red-600 hover:text-red-700"
                                     >
                                         حذف
@@ -66,7 +84,7 @@
 
             <div class="rounded-2xl border border-stone-200 bg-white p-5">
                 <div class="mb-4 flex items-center justify-between text-sm">
-                    <span class="text-stone-500">إجمالي المنتجات</span>
+                    <span class="text-stone-500">الإجمالي</span>
                     <span class="font-semibold text-stone-900" dir="ltr">{{ money_format($subtotal) }}</span>
                 </div>
 

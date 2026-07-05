@@ -5,8 +5,10 @@ namespace App\Livewire\Tenant\Menu;
 use App\Models\Content;
 use App\Models\Setting;
 use App\Models\Taxonomy;
+use App\Services\CartService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -16,6 +18,34 @@ class Index extends Component
     public ?string $categorySlug = null;
 
     public string $search = '';
+
+    public bool $addedToCart = false;
+
+    /**
+     * @param  array<string, mixed>  $selectedChoices
+     */
+    public function addMealToCart(int $mealId, int $quantity, array $selectedChoices, CartService $cart): void
+    {
+        $meal = Content::query()
+            ->type(contentTypeModel('menu'))
+            ->published()
+            ->where('active', true)
+            ->whereKey($mealId)
+            ->firstOrFail();
+
+        try {
+            $cart->addMenuItem($meal, $quantity, $selectedChoices);
+        } catch (ValidationException $exception) {
+            $this->addError('meal_options', $exception->validator->errors()->first('meal_options') ?? 'يرجى اختيار جميع الخيارات المطلوبة.');
+
+            return;
+        }
+
+        $this->addedToCart = true;
+        $this->resetValidation();
+        $this->dispatch('cart-updated');
+        $this->dispatch('close-modal', name: 'meal-customize-modal');
+    }
 
     public function render()
     {

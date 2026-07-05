@@ -8,7 +8,7 @@
     backLinkText="العودة للمتجر"
 >
     <x-slot:actions>
-        <livewire:tenant.cart.badge />
+        
     </x-slot:actions>
 
     {{ $slot }}

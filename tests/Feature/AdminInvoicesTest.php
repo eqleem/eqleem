@@ -85,7 +85,8 @@ it('renders invoice detail page with items and totals', function () {
         ->get(route('admin.orders.invoices.detail', ['uuid' => $invoice->uuid]))
         ->assertSuccessful()
         ->assertSee($invoice->s_number)
-        ->assertSee('بنود الفاتورة')
+        ->assertSee('تفاصيل الفاتورة')
+        ->assertSee('البنود')
         ->assertSee('ملخص الفاتورة');
 });
 

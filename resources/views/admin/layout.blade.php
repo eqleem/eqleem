@@ -50,11 +50,10 @@
 
 
         <div class="text-center text-stone-400 pb-4 mx-auto flex items-center justify-center">
-            {{ date('Y') }} © 
-            {{-- {{ config('app.name') }} --}}
+             
             <a href="https://eqleem.com" target="_blank" title="إقليم" aria-label="إقليم"
                 class="text-stone-500 hover:text-stone-600 inline-block mx-2">
-                <img class="h-6 w-auto" src="{{ asset('assets/images/logo-text-black.webp') }}" alt="إقليم"
+                <img class="h-6 w-auto" src="{{ asset('assets/images/logo.webp') }}" alt="إقليم"
                     title="إقليم">
             </a>
         </div>

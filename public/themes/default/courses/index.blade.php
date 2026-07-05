@@ -66,39 +66,38 @@
                         $price = (int) data_get($course->data, 'price', 0);
                     @endphp
 
-                    <a
-                        href="{{ route('tenant.courses.detail', $course->slug) }}"
-                        wire:navigate
-                        wire:key="course-{{ $course->id }}"
-                        class="group rounded-xl md:rounded-2xl overflow-hidden bg-white transition"
-                    >
-                        <div class="relative">
-                            <img
-                                src="{{ $imageUrl }}"
-                                alt="{{ $course->title }}"
-                                class="w-full h-56 md:h-64 object-cover group-hover:scale-105 transition-all duration-500"
-                            >
+                    <article wire:key="course-{{ $course->id }}" class="overflow-hidden rounded-xl bg-white transition md:rounded-2xl">
+                        <a href="{{ route('tenant.courses.detail', $course->slug) }}" wire:navigate class="group block">
+                            <div class="relative">
+                                <img
+                                    src="{{ $imageUrl }}"
+                                    alt="{{ $course->title }}"
+                                    class="h-56 w-full object-cover transition-all duration-500 group-hover:scale-105 md:h-64"
+                                >
 
-                            <div class="absolute top-2 end-2 inline-flex items-center rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">
-                                {{ $course->courseLevelLabel() }}
-                            </div>
-
-                            @if ($courseCategories->isNotEmpty())
-                                <div class="absolute bottom-2 start-2 flex flex-wrap gap-1">
-                                    @foreach ($courseCategories->take(2) as $category)
-                                        <span class="rounded-md bg-black/30 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md">
-                                            {{ $category->name }}
-                                        </span>
-                                    @endforeach
+                                <div class="absolute top-2 end-2 inline-flex items-center rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">
+                                    {{ $course->courseLevelLabel() }}
                                 </div>
-                            @endif
-                        </div>
 
-                        <div class="p-4 border border-neutral-200 border-t-0 rounded-b-xl md:rounded-b-2xl">
-                            <h3 class="text-lg font-semibold tracking-tight font-geist text-stone-900">{{ $course->title }}</h3>
+                                @if ($courseCategories->isNotEmpty())
+                                    <div class="absolute bottom-2 start-2 flex flex-wrap gap-1">
+                                        @foreach ($courseCategories->take(2) as $category)
+                                            <span class="rounded-md bg-black/30 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md">
+                                                {{ $category->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
+
+                        <div class="rounded-b-xl border border-neutral-200 border-t-0 p-4 md:rounded-b-2xl">
+                            <a href="{{ route('tenant.courses.detail', $course->slug) }}" wire:navigate>
+                                <h3 class="text-lg font-semibold tracking-tight text-stone-900">{{ $course->title }}</h3>
+                            </a>
 
                             @if (filled(data_get($course->data, 'subtitle')))
-                                <p class="mt-1 text-xs text-stone-500 line-clamp-2">{{ data_get($course->data, 'subtitle') }}</p>
+                                <p class="mt-1 line-clamp-2 text-xs text-stone-500">{{ data_get($course->data, 'subtitle') }}</p>
                             @endif
 
                             <div class="mt-4 flex items-center justify-between text-sm text-stone-600">
@@ -116,12 +115,22 @@
                                 @endif
                             </div>
 
-                            <div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-50 text-primary-600 text-sm font-semibold group-hover:bg-primary-100 transition">
-                                عرض التفاصيل
-                                <iconify-icon icon="solar:arrow-left-linear" class="text-base"></iconify-icon>
+                            <div class="mt-4 grid grid-cols-2 gap-2">
+                                <a href="{{ route('tenant.courses.detail', $course->slug) }}" wire:navigate class="inline-flex items-center justify-center gap-2 rounded-xl bg-stone-100 px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-200">
+                                    التفاصيل
+                                </a>
+                                <button
+                                    type="button"
+                                    wire:click="addToCart({{ $course->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="addToCart({{ $course->id }})"
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-50 px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-100"
+                                >
+                                    أضف للسلة
+                                </button>
                             </div>
                         </div>
-                    </a>
+                    </article>
                 @endforeach
             </div>
         @endif

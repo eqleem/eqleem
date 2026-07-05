@@ -62,31 +62,30 @@
                         $deliveryDays = (int) data_get($service->data, 'delivery_days', 0);
                     @endphp
 
-                    <a
-                        href="{{ route('tenant.digital-services.detail', $service->slug) }}"
-                        wire:navigate
-                        wire:key="digital-service-{{ $service->id }}"
-                        class="group rounded-xl md:rounded-2xl overflow-hidden bg-white transition"
-                    >
-                        <div class="relative">
-                            <img src="{{ $imageUrl }}" alt="{{ $service->title }}" class="w-full h-56 md:h-72 object-cover group-hover:scale-105 transition-all duration-500">
+                    <article wire:key="digital-service-{{ $service->id }}" class="overflow-hidden rounded-xl bg-white transition md:rounded-2xl">
+                        <a href="{{ route('tenant.digital-services.detail', $service->slug) }}" wire:navigate class="group block">
+                            <div class="relative">
+                                <img src="{{ $imageUrl }}" alt="{{ $service->title }}" class="h-56 w-full object-cover transition-all duration-500 group-hover:scale-105 md:h-72">
 
-                            @if ($serviceCategories->isNotEmpty())
-                                <div class="absolute bottom-2 start-2 flex flex-wrap gap-1">
-                                    @foreach ($serviceCategories->take(2) as $category)
-                                        <span class="rounded-md bg-black/30 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md">
-                                            {{ $category->name }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+                                @if ($serviceCategories->isNotEmpty())
+                                    <div class="absolute bottom-2 start-2 flex flex-wrap gap-1">
+                                        @foreach ($serviceCategories->take(2) as $category)
+                                            <span class="rounded-md bg-black/30 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md">
+                                                {{ $category->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
 
-                        <div class="p-3 border border-neutral-200 border-t-0 rounded-b-xl md:rounded-b-2xl">
-                            <h3 class="text-lg tracking-tight font-semibold font-geist truncate">{{ $service->title }}</h3>
+                        <div class="rounded-b-xl border border-neutral-200 border-t-0 p-3 md:rounded-b-2xl">
+                            <a href="{{ route('tenant.digital-services.detail', $service->slug) }}" wire:navigate>
+                                <h3 class="truncate text-lg font-semibold tracking-tight text-stone-900">{{ $service->title }}</h3>
+                            </a>
 
                             @if ($subtitle !== '')
-                                <p class="mt-0.5 text-xs text-neutral-600 font-geist line-clamp-2">{{ $subtitle }}</p>
+                                <p class="mt-0.5 line-clamp-2 text-xs text-neutral-600">{{ $subtitle }}</p>
                             @endif
 
                             <div class="mt-4 flex items-center justify-between gap-2">
@@ -97,11 +96,22 @@
                                 </div>
 
                                 @if ($price > 0)
-                                    <p class="text-xl font-bold font-geist" dir="ltr">{{ money_format($price) }}</p>
+                                    <p class="text-xl font-bold" dir="ltr">{{ money_format($price) }}</p>
                                 @endif
                             </div>
+
+                            <button
+                                type="button"
+                                wire:click="addToCart({{ $service->id }})"
+                                wire:loading.attr="disabled"
+                                wire:target="addToCart({{ $service->id }})"
+                                class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-50 px-4 py-2.5 text-sm font-semibold text-primary-700 hover:bg-primary-100"
+                            >
+                                <iconify-icon icon="hugeicons:shopping-basket-02" class="text-xl"></iconify-icon>
+                                أضف للسلة
+                            </button>
                         </div>
-                    </a>
+                    </article>
                 @endforeach
             </div>
         @endif

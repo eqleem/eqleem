@@ -61,27 +61,61 @@
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-stone-200 bg-white p-5">
-                    <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الدفع</h3>
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model="paymentMethod" type="radio" value="card" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <span class="text-sm font-medium text-stone-700">مدى / فيزا / ماستركارد</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model="paymentMethod" type="radio" value="apple_pay" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <span class="text-sm font-medium text-stone-700">Apple Pay</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model="paymentMethod" type="radio" value="bank_transfer" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <span class="text-sm font-medium text-stone-700">تحويل بنكي</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model="paymentMethod" type="radio" value="cod" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <span class="text-sm font-medium text-stone-700">الدفع عند الاستلام</span>
-                        </label>
+                @if ($requiresPayment)
+                    <div class="rounded-2xl border border-stone-200 bg-white p-5">
+                        <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الدفع</h3>
+
+                        @if ($paymentMethods->isEmpty())
+                            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                                لا توجد وسائل دفع مفعّلة حالياً. يرجى التواصل مع المتجر لإتمام الطلب.
+                            </div>
+                        @else
+                            <div class="space-y-3">
+                                @foreach ($paymentMethods as $method)
+                                    @php
+                                        $label = filled($method['label'] ?? null) ? $method['label'] : $method['name'];
+                                        $isSelected = $paymentMethod === $method['slug'];
+                                    @endphp
+                                    <div wire:key="payment-method-{{ $method['slug'] }}">
+                                        <label @class([
+                                            'flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition',
+                                            'border-primary-400 bg-primary-50/40' => $isSelected,
+                                            'border-stone-200 hover:border-primary-300' => ! $isSelected,
+                                        ])>
+                                            <input
+                                                wire:model.live="paymentMethod"
+                                                type="radio"
+                                                value="{{ $method['slug'] }}"
+                                                class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400"
+                                            >
+                                            <img src="{{ $method['icon_url'] ?? asset($method['icon']) }}" alt="" class="h-8 w-8 shrink-0 object-contain">
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-sm font-semibold text-stone-900">{{ $label }}</p>
+                                                @if (filled($method['description'] ?? null))
+                                                    <p class="text-xs text-stone-500">{{ $method['description'] }}</p>
+                                                @endif
+                                            </div>
+                                        </label>
+
+                                        @if ($isSelected && filled($method['checkout_component'] ?? null))
+                                            @include($method['checkout_component'], [
+                                                'selectedPaymentMethod' => $method,
+                                                'grandTotal' => $grandTotal,
+                                            ])
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @error('paymentMethod') <p class="mt-3 text-xs text-red-600">{{ $message }}</p> @enderror
+                        @endif
                     </div>
-                </div>
+                @else
+                    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                        <p class="text-sm font-semibold text-emerald-800">هذا الطلب مجاني</p>
+                        <p class="mt-1 text-xs text-emerald-700">لا يلزم الدفع. يمكنك إتمام الطلب مباشرة من ملخص السلة.</p>
+                    </div>
+                @endif
             </div>
 
             <aside class="h-fit rounded-2xl border border-stone-200 bg-white p-5 lg:sticky lg:top-6">
@@ -116,21 +150,27 @@
                     <span class="text-base font-bold text-primary-700" dir="ltr">{{ money_format($grandTotal) }}</span>
                 </div>
 
-                <button
-                    type="button"
-                    wire:click="placeOrder"
-                    wire:loading.attr="disabled"
-                    wire:target="placeOrder"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-70"
-                >
-                    <iconify-icon icon="hugeicons:checkmark-circle-02" class="text-xl"></iconify-icon>
-                    <span wire:loading.remove wire:target="placeOrder">تأكيد وإتمام الطلب</span>
-                    <span wire:loading wire:target="placeOrder">جاري إنشاء الطلب...</span>
-                </button>
+                @if (! $requiresPayment)
+                    <button
+                        type="button"
+                        wire:click="placeFreeOrder"
+                        wire:loading.attr="disabled"
+                        wire:target="placeFreeOrder"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-70"
+                    >
+                        <iconify-icon icon="hugeicons:checkmark-circle-02" class="text-xl"></iconify-icon>
+                        <span wire:loading.remove wire:target="placeFreeOrder">إتمام الطلب المجاني</span>
+                        <span wire:loading wire:target="placeFreeOrder">جاري إنشاء الطلب...</span>
+                    </button>
+                @else
+                    {{-- <div class="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-center text-xs text-stone-600">
+                        أكمل الدفع من خلال وسيلة الدفع المختارة أعلاه لإتمام الطلب.
+                    </div> --}}
+                @endif
 
-                <p class="mt-3 text-center text-xs text-stone-500">
+                {{-- <p class="mt-3 text-center text-xs text-stone-500">
                     بإتمام الطلب أنت توافق على الشروط وسياسة الاسترجاع.
-                </p>
+                </p> --}}
             </aside>
         </section>
     @endif

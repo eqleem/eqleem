@@ -42,7 +42,7 @@
 
     <div class="mt-6 flex justify-center">
         <a href="https://eqleem.com" target="_blank" rel="noopener noreferrer" title="إقليم" aria-label="إقليم" class="inline-block text-stone-500 hover:text-stone-600 transition">
-            <img class="h-6 w-auto" src="{{ asset('assets/images/logo-text-black.webp') }}" alt="إقليم">
+            <img class="h-7 w-auto" src="{{ asset('assets/images/logo.webp') }}" alt="إقليم">
         </a>
     </div>
 </div>

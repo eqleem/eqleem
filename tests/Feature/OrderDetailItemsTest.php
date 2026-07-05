@@ -147,7 +147,7 @@ it('shows booking details for service and unit rental items', function () {
     $this->actingAs($user)
         ->get(route('admin.orders.detail', ['id' => $order->uuid]))
         ->assertSuccessful()
-        ->assertSee('عناصر الطلب')
+        ->assertSee('العناصر')
         ->assertSee('خدمة تصوير')
         ->assertSee('خدمة')
         ->assertSee('تاريخ الموعد')

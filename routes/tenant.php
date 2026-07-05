@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\StoreCheckoutPaymentCallback;
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,7 @@ use Pages\Checkout;
 use Pages\Contact;
 use Pages\Faq;
 use Pages\Features;
+use Pages\OrderConfirmation;
 use Pages\Pricing;
 use Pages\Resume;
 use Pages\Reviews;
@@ -70,4 +72,6 @@ Route::prefix('{tenant}')
         Route::get('/contact', Contact::class)->name('pages.contact');
         Route::get('/checkout', Checkout::class)->name('pages.checkout');
         Route::get('/cart', Cart::class)->name('pages.cart');
+        Route::get('/orders/{order:uuid}', OrderConfirmation::class)->name('pages.order-confirmation');
+        Route::get('/payments/moyasar/callback', '\\'.StoreCheckoutPaymentCallback::class)->name('payments.moyasar.callback');
     });

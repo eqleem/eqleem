@@ -270,13 +270,26 @@ class Order extends Model
             return '-';
         }
 
+        if ($method === 'free') {
+            return 'طلب مجاني';
+        }
+
+        $configuredName = config("payment-methods.{$method}.name");
+
+        if (is_string($configuredName) && filled($configuredName)) {
+            return $configuredName;
+        }
+
         return match ($method) {
-            'cash', 'cod' => 'الدفع عند الاستلام',
-            'card' => 'مدى / فيزا / ماستركارد',
+            'cash', 'cod', 'cash-on-delivery' => 'الدفع عند الاستلام',
+            'card', 'credit-card' => 'البطاقة الائتمانية',
             'apple_pay' => 'Apple Pay',
-            'bank_transfer' => 'تحويل بنكي',
+            'bank_transfer', 'bank-transfer' => 'تحويل بنكي',
             'online' => 'دفع إلكتروني',
-            default => $method,
+            'custom' => 'دفع مخصص',
+            'tabby' => 'تابي',
+            'tamara' => 'تمارا',
+            default => (string) $method,
         };
     }
 
@@ -294,6 +307,21 @@ class Order extends Model
             'pickup' => 'استلام من المعرض',
             default => $method,
         };
+    }
+
+    public function channelLabel(): string
+    {
+        return match ($this->channel) {
+            'ecommerce' => 'المتجر الإلكتروني',
+            'manual' => 'إدخال يدوي',
+            'pos' => 'نقطة البيع',
+            default => filled($this->channel) ? (string) $this->channel : '-',
+        };
+    }
+
+    public function shippingFee(): int
+    {
+        return (int) data_get($this->meta, 'shipping_fee', 0);
     }
 
     public function statusBadgeColor(): string

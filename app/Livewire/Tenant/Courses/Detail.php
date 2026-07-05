@@ -3,11 +3,14 @@
 namespace App\Livewire\Tenant\Courses;
 
 use App\Models\Content;
+use App\Services\CartService;
 use Livewire\Component;
 
 class Detail extends Component
 {
     public Content $course;
+
+    public bool $addedToCart = false;
 
     public function mount(string $slug): void
     {
@@ -17,6 +20,14 @@ class Detail extends Component
             ->where('active', true)
             ->where('slug', $slug)
             ->firstOrFail();
+    }
+
+    public function addToCart(CartService $cart): void
+    {
+        $cart->addItem($this->course);
+
+        $this->addedToCart = true;
+        $this->dispatch('cart-updated');
     }
 
     public function render()

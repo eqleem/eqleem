@@ -10,6 +10,13 @@
         </a>
     </div>
 
+    @if ($addedToCart)
+        <div class="mx-3 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تمت إضافة الحجز إلى السلة.
+            <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="ms-1 font-semibold underline">عرض السلة</a>
+        </div>
+    @endif
+
     <section class="mb-8 w-full px-3">
         <div class="grid grid-cols-1 gap-12 md:grid-cols-2">
             @if ($images !== [])
@@ -66,90 +73,62 @@
                 @endif
 
                 @if ($pricePerNight > 0)
-                    <div
-                        class="mt-6 rounded-2xl border border-stone-200 bg-white shadow-sm"
-                        x-data="{
-                            pricePerNight: {{ $pricePerNight / 100 }},
-                            checkIn: '{{ now()->toDateString() }}',
-                            checkOut: '{{ now()->addDay()->toDateString() }}',
-                            showDates: false,
-                            get nights() {
-                                const start = new Date(this.checkIn);
-                                const end = new Date(this.checkOut);
-                                const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                                return Math.max(diff, 1);
-                            },
-                            get nightsLabel() {
-                                if (this.nights === 1) return 'ليلة واحدة';
-                                if (this.nights === 2) return 'ليلتان';
-                                return `${this.nights} ليالي`;
-                            },
-                            get total() {
-                                return this.pricePerNight * this.nights;
-                            },
-                            formatMoney(amount) {
-                                return Number(amount).toLocaleString('ar-SA', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-                            },
-                            formatDate(date) {
-                                if (! date) return '—';
-                                return new Date(`${date}T00:00:00`).toLocaleDateString('ar-SA', { weekday: 'short', day: 'numeric', month: 'short' });
-                            },
-                            openCalendar() {
-                                this.showDates = ! this.showDates;
-                            },
-                        }"
-                    >
+                    @php
+                        $nights = max(\Carbon\Carbon::parse($checkIn)->diffInDays(\Carbon\Carbon::parse($checkOut)), 1);
+                        $rentalTotal = $pricePerNight * $nights;
+                    @endphp
+
+                    <div class="mt-6 rounded-2xl border border-stone-200 bg-white shadow-sm">
                         <div class="border-b border-stone-100 px-5 py-4">
                             <div class="flex items-end justify-between gap-3">
                                 <div>
                                     <p class="text-2xl font-black text-primary-700">
-                                        <span x-text="formatMoney(pricePerNight)"></span>
-                                        <span class="text-base font-bold">ريال / ليلة</span>
+                                        <span dir="ltr">{{ money_format($pricePerNight) }}</span>
+                                        <span class="text-base font-bold"> / ليلة</span>
                                     </p>
                                     <p class="mt-1 text-xs text-stone-500">
-                                        إجمالي <span x-text="nightsLabel"></span>
-                                        <span x-text="formatMoney(total)"></span> ر.س
+                                        إجمالي {{ $nights }} {{ $nights === 1 ? 'ليلة' : 'ليالي' }}:
+                                        <span dir="ltr">{{ money_format($rentalTotal) }}</span>
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="space-y-5 px-5 py-5">
-                            <div class="relative">
-                                <button
-                                    type="button"
-                                    x-on:click="openCalendar()"
-                                    class="w-full overflow-hidden rounded-xl border border-primary-200 text-start transition hover:border-primary-300 hover:bg-primary-50/30"
-                                >
-                                    <div class="grid grid-cols-2 divide-x divide-x-reverse divide-primary-100">
-                                        <div class="px-4 py-3">
-                                            <span class="mb-1 block text-xs text-stone-500">تاريخ الوصول</span>
-                                            <span class="block text-sm font-semibold text-stone-900" x-text="formatDate(checkIn)"></span>
-                                        </div>
-                                        <div class="px-4 py-3">
-                                            <span class="mb-1 block text-xs text-stone-500">تاريخ المغادرة</span>
-                                            <span class="block text-sm font-semibold text-stone-900" x-text="formatDate(checkOut)"></span>
-                                        </div>
-                                    </div>
-                                </button>
-
-                                <div x-show="showDates" x-cloak class="mt-3 grid grid-cols-1 gap-3 rounded-xl border border-stone-200 bg-stone-50 p-4 sm:grid-cols-2">
+                            @if ($calendars === [])
+                                <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                    لا يوجد تقويم مرتبط بهذه الوحدة.
+                                </p>
+                            @else
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <label class="space-y-1 text-sm">
                                         <span class="font-medium text-stone-700">تاريخ الوصول</span>
-                                        <input type="date" x-model="checkIn" class="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-stone-700">
+                                        <input type="date" wire:model.live="checkIn" class="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-stone-700" dir="ltr">
+                                        @error('checkIn')
+                                            <p class="text-xs text-red-600">{{ $message }}</p>
+                                        @enderror
                                     </label>
                                     <label class="space-y-1 text-sm">
                                         <span class="font-medium text-stone-700">تاريخ المغادرة</span>
-                                        <input type="date" x-model="checkOut" :min="checkIn" class="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-stone-700">
+                                        <input type="date" wire:model.live="checkOut" min="{{ $checkIn }}" class="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-stone-700" dir="ltr">
+                                        @error('checkOut')
+                                            <p class="text-xs text-red-600">{{ $message }}</p>
+                                        @enderror
                                     </label>
                                 </div>
-                            </div>
 
-                            <form wire:submit.prevent>
-                                <button type="submit" class="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary-500 text-sm font-bold text-white transition hover:bg-primary-600">
-                                    احجز الآن
+                                <button
+                                    type="button"
+                                    wire:click="addToCart"
+                                    wire:loading.attr="disabled"
+                                    wire:target="addToCart"
+                                    class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary-500 text-sm font-bold text-white transition hover:bg-primary-600 disabled:opacity-70"
+                                >
+                                    <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
+                                    <span wire:loading.remove wire:target="addToCart">أضف للسلة</span>
+                                    <span wire:loading wire:target="addToCart">جاري الإضافة...</span>
                                 </button>
-                            </form>
+                            @endif
                         </div>
                     </div>
                 @endif

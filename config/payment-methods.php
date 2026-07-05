@@ -9,6 +9,7 @@ return [
         'icon' => 'assets/images/bank-transfer.png',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.bank-transfer',
+            'checkout' => 'tenant-theme::components.checkout.payment.bank-transfer',
         ],
         'defaults' => [
             'accounts' => [],
@@ -22,6 +23,7 @@ return [
         'icon' => 'assets/images/credit-card-payment.svg',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.credit-card',
+            'checkout' => 'tenant-theme::components.checkout.payment.credit-card',
         ],
         'defaults' => [
             'label' => '',
@@ -36,6 +38,7 @@ return [
         'icon' => 'assets/images/cod-payment.webp',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.cash-on-delivery',
+            'checkout' => 'tenant-theme::components.checkout.payment.cash-on-delivery',
         ],
         'defaults' => [
             'min_limit' => null,
@@ -51,6 +54,7 @@ return [
         'icon' => 'assets/images/tabby-payment.webp',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.tabby',
+            'checkout' => 'tenant-theme::components.checkout.payment.tabby',
         ],
         'defaults' => [
             'public_key' => '',
@@ -69,6 +73,7 @@ return [
         'icon' => 'assets/images/tamara_installment_mini.webp',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.tamara',
+            'checkout' => 'tenant-theme::components.checkout.payment.tamara',
         ],
         'defaults' => [
             'api_token' => '',
@@ -86,6 +91,7 @@ return [
         'icon' => 'assets/icons/tabler/cash-banknote.svg',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.custom',
+            'checkout' => 'tenant-theme::components.checkout.payment.custom',
         ],
         'defaults' => [
             'label' => '',

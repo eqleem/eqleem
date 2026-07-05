@@ -5,6 +5,7 @@ namespace App\Livewire\Tenant\DigitalProducts;
 use App\Models\Content;
 use App\Models\Setting;
 use App\Models\Taxonomy;
+use App\Services\CartService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
@@ -16,6 +17,20 @@ class Index extends Component
     public ?string $categorySlug = null;
 
     public string $search = '';
+
+    public function addToCart(int $productId, CartService $cart): void
+    {
+        $product = Content::query()
+            ->type(contentTypeModel('digital-products'))
+            ->published()
+            ->where('active', true)
+            ->whereKey($productId)
+            ->firstOrFail();
+
+        $cart->addItem($product);
+
+        $this->dispatch('cart-updated');
+    }
 
     public function render()
     {

@@ -5,6 +5,13 @@
         </a>
     </div>
 
+    @if ($addedToCart)
+        <div class="mx-3 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تمت إضافة الدورة إلى السلة.
+            <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="ms-1 font-semibold underline">عرض السلة</a>
+        </div>
+    @endif
+
     <section class="px-3 mb-8 w-full">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div class="space-y-4">
@@ -63,9 +70,9 @@
                 @endif
 
                 <div class="mt-6 flex flex-wrap items-center gap-3">
-                    <button type="button" class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white hover:bg-primary-700 transition">
+                    <button type="button" wire:click="addToCart" class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white hover:bg-primary-700 transition">
                         <iconify-icon icon="solar:check-circle-bold-duotone" class="text-xl"></iconify-icon>
-                        الالتحاق بالدورة
+                        إضافة إلى السلة
                     </button>
                     <a href="{{ route('tenant.courses.index') }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50">
                         <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>

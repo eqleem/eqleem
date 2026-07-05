@@ -2,6 +2,7 @@
 
 use App\Livewire\Tenant\Pages\Checkout;
 use App\Livewire\Tenant\Store\Detail;
+use App\Mail\NewOrderNotification;
 use App\Mail\OrderConfirmation;
 use App\Models\Client;
 use App\Models\Content;
@@ -26,19 +27,21 @@ beforeEach(function () {
 });
 
 /**
- * @return array{tenant: Tenant, product: Content}
+ * @return array{tenant: Tenant, owner: User, product: Content}
  */
-function createOrderConfirmationContext(): array
+function createNewOrderNotificationContext(): array
 {
-    $user = User::factory()->create([
+    $owner = User::factory()->create([
         'uuid' => (string) Str::uuid(),
+        'name' => 'مدير المتجر',
+        'email' => 'owner@example.com',
     ]);
 
     $tenant = Tenant::create([
         'uuid' => (string) Str::uuid(),
-        'name' => 'متجر التأكيد',
-        'handle' => 'confirm-store-'.Str::lower(Str::random(6)),
-        'user_id' => $user->id,
+        'name' => 'متجر الإشعارات',
+        'handle' => 'notify-store-'.Str::lower(Str::random(6)),
+        'user_id' => $owner->id,
         'active' => true,
         'status' => 'active',
     ]);
@@ -46,8 +49,8 @@ function createOrderConfirmationContext(): array
     $product = Content::withoutGlobalScope('tenant')->create([
         'tenant_id' => $tenant->id,
         'type' => contentTypeModel('store'),
-        'title' => 'منتج التأكيد',
-        'slug' => 'confirm-product',
+        'title' => 'منتج الإشعار',
+        'slug' => 'notify-product',
         'status' => 'published',
         'published_at' => now()->subMinute(),
         'active' => true,
@@ -57,13 +60,13 @@ function createOrderConfirmationContext(): array
         ],
     ]);
 
-    return compact('tenant', 'product');
+    return compact('tenant', 'owner', 'product');
 }
 
-it('queues an order confirmation email after checkout', function () {
+it('queues a new order notification email to the tenant owner after checkout', function () {
     Mail::fake();
 
-    ['tenant' => $tenant, 'product' => $product] = createOrderConfirmationContext();
+    ['tenant' => $tenant, 'owner' => $owner, 'product' => $product] = createNewOrderNotificationContext();
 
     setCurrentTenant($tenant);
 
@@ -83,19 +86,27 @@ it('queues an order confirmation email after checkout', function () {
 
     $order = Order::query()->first();
 
-    Mail::assertQueued(OrderConfirmation::class, function (OrderConfirmation $mail) use ($order, $tenant) {
-        return $mail->hasTo('ahmad@example.com')
+    Mail::assertQueued(NewOrderNotification::class, function (NewOrderNotification $mail) use ($order, $tenant, $owner) {
+        return $mail->hasTo('owner@example.com')
             && $mail->order->is($order)
             && $mail->tenant->is($tenant)
+            && $mail->owner->is($owner)
             && $mail->customerName === 'أحمد محمد'
-            && $mail->items->count() === 1;
+            && $mail->customerPhone === '0500000000'
+            && $mail->customerEmail === 'ahmad@example.com'
+            && $mail->items->count() === 1
+            && $mail->orderDetailUrl === route('admin.orders.detail', ['id' => $order->uuid]);
     });
+
+    Mail::assertQueued(OrderConfirmation::class);
 });
 
-it('does not queue an order confirmation email when client has no email', function () {
+it('does not queue a new order notification email when tenant owner has no email', function () {
     Mail::fake();
 
-    ['tenant' => $tenant, 'product' => $product] = createOrderConfirmationContext();
+    ['tenant' => $tenant, 'product' => $product] = createNewOrderNotificationContext();
+
+    $tenant->user->update(['email' => '']);
 
     setCurrentTenant($tenant);
 
@@ -105,18 +116,18 @@ it('does not queue an order confirmation email when client has no email', functi
         ->call('addToCart');
 
     Livewire::test(Checkout::class)
-        ->set('name', 'عميل بدون بريد')
+        ->set('name', 'عميل')
         ->set('phone', '0511111111')
-        ->set('email', '')
+        ->set('email', 'client@example.com')
         ->set('shippingMethod', 'pickup')
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
-    Mail::assertNothingQueued();
+    Mail::assertNotQueued(NewOrderNotification::class);
 });
 
-it('renders the order confirmation email with order details', function () {
-    ['tenant' => $tenant] = createOrderConfirmationContext();
+it('renders the new order notification email with order and payment details', function () {
+    ['tenant' => $tenant, 'owner' => $owner] = createNewOrderNotificationContext();
 
     $client = Client::withoutGlobalScope('tenantable')->create([
         'name' => 'سارة علي',
@@ -130,21 +141,21 @@ it('renders the order confirmation email with order details', function () {
         'type' => 'order',
         'status' => 'open',
         'channel' => 'ecommerce',
-        'number' => '000001',
+        'number' => '000042',
         'client_id' => $client->id,
         'currency_code' => 'SAR',
         'subtotal' => 50000,
         'discount_total' => 0,
         'tax_total' => 0,
         'grand_total' => 53500,
-        'paid_total' => 0,
-        'due_total' => 53500,
-        'payment_status' => 'unpaid',
+        'paid_total' => 53500,
+        'due_total' => 0,
+        'payment_status' => 'paid',
         'issued_at' => now(),
         'financial_status' => 'open',
         'fulfillment_status' => 'unfulfilled',
         'meta' => [
-            'payment_method' => 'card',
+            'payment_method' => 'credit-card',
             'shipping_method' => 'express',
             'shipping_fee' => 3500,
             'source' => 'store_cart',
@@ -153,7 +164,7 @@ it('renders the order confirmation email with order details', function () {
 
     DB::table('order_items')->insert([
         'order_id' => $order->id,
-        'name' => 'منتج التأكيد',
+        'name' => 'منتج الإشعار',
         'qty' => 2,
         'unit_price' => 25000,
         'discount_total' => 0,
@@ -174,20 +185,29 @@ it('renders the order confirmation email with order details', function () {
             return $item;
         });
 
-    $mail = new OrderConfirmation(
+    $mail = new NewOrderNotification(
         order: $order,
         tenant: $tenant,
+        owner: $owner,
         customerName: 'سارة علي',
+        customerPhone: '0522222222',
+        customerEmail: 'sara@example.com',
         items: $items,
+        orderDetailUrl: route('admin.orders.detail', ['id' => $order->uuid]),
     );
 
     $html = $mail->render();
 
     expect($html)
+        ->toContain('مدير المتجر')
+        ->toContain('لديك طلب جديد')
+        ->toContain('متجر الإشعارات')
+        ->toContain('#000042')
         ->toContain('سارة علي')
-        ->toContain('متجر التأكيد')
-        ->toContain('#000001')
-        ->toContain('منتج التأكيد')
-        ->toContain('توصيل سريع (24-48 ساعة)')
-        ->toContain('البطاقة الائتمانية');
+        ->toContain('0522222222')
+        ->toContain('منتج الإشعار')
+        ->toContain('تفاصيل الدفع')
+        ->toContain($order->paymentMethodLabel())
+        ->toContain('مدفوع')
+        ->toContain('عرض الطلب في لوحة التحكم');
 });

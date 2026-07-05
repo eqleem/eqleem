@@ -1,12 +1,14 @@
 <?php
 
 use App\Livewire\Tenant\Pages\Checkout;
+use App\Livewire\Tenant\Pages\OrderConfirmation;
 use App\Livewire\Tenant\Store\Detail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Client;
 use App\Models\Content;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\CartService;
@@ -143,6 +145,10 @@ it('creates an ecommerce order from checkout and clears the cart', function () {
 
     setCurrentTenant($tenant);
 
+    Setting::savePaymentMethod('cash-on-delivery', [
+        'label' => 'الدفع عند الاستلام',
+    ], true);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->set('quantity', 2)
         ->call('addToCart');
@@ -152,18 +158,25 @@ it('creates an ecommerce order from checkout and clears the cart', function () {
         ->set('phone', '0500000000')
         ->set('email', 'ahmad@example.com')
         ->set('shippingMethod', 'pickup')
-        ->set('paymentMethod', 'cod')
-        ->call('placeOrder')
-        ->assertRedirect(route('tenant.store.index', ['tenant' => $tenant->handle]));
+        ->set('paymentMethod', 'cash-on-delivery')
+        ->call('confirmCashOnDelivery');
+
+    $order = Order::query()->firstOrFail();
 
     expect(CartItem::query()->count())->toBe(0)
-        ->and(Order::query()->count())->toBe(1);
-
-    $order = Order::query()->first();
-
-    expect($order->channel)->toBe('ecommerce')
+        ->and(Order::query()->count())->toBe(1)
+        ->and($order->channel)->toBe('ecommerce')
         ->and($order->grand_total)->toBe(50000)
+        ->and(data_get($order->meta, 'payment_method'))->toBe('cash-on-delivery')
         ->and(DB::table('order_items')->where('order_id', $order->id)->count())->toBe(1);
+
+    session(['recent_order_id' => $order->id]);
+
+    Livewire::test(OrderConfirmation::class, ['order' => $order])
+        ->assertSee('تم استلام طلبك بنجاح')
+        ->assertSee('#'.$order->number)
+        ->assertSee('منتج تجريبي')
+        ->assertSee('متابعة التسوق');
 
     $orderItemMeta = json_decode((string) DB::table('order_items')->where('order_id', $order->id)->value('meta'), true);
 
@@ -291,4 +304,112 @@ it('merges guest cart quantities with existing client cart items', function () {
 
     expect(CartItem::query()->sum('quantity'))->toBe(4)
         ->and(Cart::query()->count())->toBe(1);
+});
+
+it('shows only active payment methods on checkout', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    Setting::savePaymentMethod('cash-on-delivery', ['label' => 'الدفع عند الاستلام'], true);
+    Setting::savePaymentMethod('bank-transfer', [], false);
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->assertSee('الدفع عند الاستلام')
+        ->assertDontSee('التحويل البنكي');
+});
+
+it('requires bank transfer reference before completing checkout', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    Setting::savePaymentMethod('bank-transfer', [
+        'accounts' => [[
+            'id' => 'acc-1',
+            'bank_name' => 'الراجحي',
+            'account_name' => 'شركة اختبار',
+            'iban' => 'SA1234567890123456789012',
+            'account_number' => '1234567890',
+        ]],
+    ], true);
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->set('paymentMethod', 'bank-transfer')
+        ->set('bankTransferAccountId', 'acc-1')
+        ->call('confirmBankTransfer')
+        ->assertHasErrors(['bankTransferReference']);
+});
+
+it('completes a free checkout without payment methods', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    $product->update([
+        'data' => array_merge($product->data ?? [], ['price' => 0]),
+    ]);
+
+    app(CartService::class)->addProduct($product->fresh());
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->set('shippingMethod', 'pickup')
+        ->call('placeFreeOrder');
+
+    $order = Order::query()->firstOrFail();
+
+    expect($order->grand_total)->toBe(0)
+        ->and($order->payment_status)->toBe('paid')
+        ->and(data_get($order->meta, 'payment_method'))->toBe('free');
+
+    session(['recent_order_id' => $order->id]);
+
+    Livewire::test(OrderConfirmation::class, ['order' => $order])
+        ->assertSee('تم استلام طلبك بنجاح')
+        ->assertSee('#'.$order->number);
+});
+
+it('rejects free checkout when order total is greater than zero', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->call('placeFreeOrder')
+        ->assertHasErrors(['paymentMethod']);
+});
+
+it('denies viewing order confirmation without access', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    Setting::savePaymentMethod('cash-on-delivery', [], true);
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->set('paymentMethod', 'cash-on-delivery')
+        ->call('confirmCashOnDelivery');
+
+    $order = Order::query()->firstOrFail();
+
+    session()->forget('recent_order_id');
+
+    Livewire::test(OrderConfirmation::class, ['order' => $order])
+        ->assertForbidden();
 });

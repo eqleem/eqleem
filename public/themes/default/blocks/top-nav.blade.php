@@ -73,6 +73,8 @@
                 </div>
             @endif
 
+            <livewire:tenant.cart.badge />
+            
             @if ($showClientLogin)
                 @if (authClient())
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">

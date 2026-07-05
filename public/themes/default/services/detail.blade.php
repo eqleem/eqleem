@@ -7,6 +7,13 @@
         </a>
     </div>
 
+    @if ($addedToCart)
+        <div class="mx-3 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تمت إضافة الحجز إلى السلة.
+            <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="ms-1 font-semibold underline">عرض السلة</a>
+        </div>
+    @endif
+
     <section class="mb-8 w-full px-3" x-data>
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
             @if ($images !== [])
@@ -78,8 +85,8 @@
 
                 <button
                     type="button"
+                    wire:click="openBookingModal"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white hover:bg-primary-700 md:w-auto"
-                    x-on:click="$dispatch('set-booking-service', { service: @js($service->title) }); $dispatch('open-modal', { name: 'service-booking-modal' })"
                 >
                     <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
                     حجز الخدمة
@@ -89,27 +96,103 @@
     </section>
 
     <x-tenant-theme::modal name="service-booking-modal" maxWidth="lg">
-        <x-slot:title>طلب حجز خدمة</x-slot:title>
+        <x-slot:title>حجز الخدمة</x-slot:title>
 
-        <form class="space-y-4" x-data="{ serviceName: @js($service->title) }" x-on:set-booking-service.window="serviceName = $event.detail.service">
+        <form wire:submit="addToCart" class="space-y-4">
             <div class="space-y-1">
                 <label class="text-sm font-medium text-stone-700">الخدمة</label>
-                <input type="text" x-model="serviceName" readonly class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700">
+                <input type="text" value="{{ $service->title }}" readonly class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700">
             </div>
 
-            <div class="space-y-1">
-                <label class="text-sm font-medium text-stone-700">الاسم</label>
-                <input type="text" class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none" placeholder="اكتب اسمك">
-            </div>
+            @if ($calendars === [])
+                <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    لا يوجد تقويم مرتبط بهذه الخدمة. يرجى التواصل مع المتجر لإتمام الحجز.
+                </p>
+            @else
+                @if (count($calendars) > 1)
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-stone-700">التقويم</label>
+                        <select
+                            wire:model.live="calendarId"
+                            class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none"
+                        >
+                            <option value="">اختر التقويم ..</option>
+                            @foreach ($calendars as $calendar)
+                                <option value="{{ $calendar['id'] }}">{{ $calendar['name'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('calendarId')
+                            <p class="text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endif
 
-            <div class="space-y-1">
-                <label class="text-sm font-medium text-stone-700">رقم الجوال</label>
-                <input type="tel" class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none" placeholder="05xxxxxxxx" dir="ltr">
-            </div>
+                @if ($calendarId && $availableDates !== [])
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-stone-700">تاريخ الحجز</label>
+                        <select
+                            wire:model.live="bookingDate"
+                            class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none"
+                            dir="ltr"
+                        >
+                            <option value="">اختر التاريخ ..</option>
+                            @foreach ($availableDates as $availableDate)
+                                <option value="{{ $availableDate }}">
+                                    {{ \Carbon\Carbon::parse($availableDate)->translatedFormat('l j F Y') }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bookingDate')
+                            <p class="text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @elseif ($calendarId)
+                    <p class="text-sm text-amber-700">لا توجد تواريخ متاحة في التقويم المحدد.</p>
+                @endif
 
-            <button type="button" class="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-700">
-                إرسال طلب الحجز
-            </button>
+                @if ($bookingDate !== '' && $timeSlots !== [])
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-stone-700">وقت الحجز</label>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($timeSlots as $slot)
+                                @if ($slot['available'] ?? false)
+                                    <button
+                                        type="button"
+                                        wire:click="selectTimeSlot(@js($slot['start_at']), @js($slot['end_at']))"
+                                        class="rounded-xl border px-3 py-2 text-sm transition {{ $bookingStartAt === $slot['start_at'] && $bookingEndAt === $slot['end_at'] ? 'border-primary-500 bg-primary-50 font-semibold text-primary-700' : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50' }}"
+                                        dir="ltr"
+                                    >
+                                        {{ $slot['label'] }}
+                                    </button>
+                                @else
+                                    <span
+                                        title="{{ ($slot['unavailable_reason'] ?? '') === 'booked' ? 'محجوز' : 'غير متاح' }}"
+                                        class="cursor-not-allowed select-none rounded-xl border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-300 line-through"
+                                        dir="ltr"
+                                    >
+                                        {{ $slot['label'] }}
+                                    </span>
+                                @endif
+                            @endforeach
+                        </div>
+                        @error('bookingStartAt')
+                            <p class="text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @elseif ($bookingDate !== '')
+                    <p class="text-sm text-amber-700">لا توجد فترات في هذا التاريخ.</p>
+                @endif
+
+                <button
+                    type="submit"
+                    wire:loading.attr="disabled"
+                    @disabled(! $calendarId || $bookingDate === '' || blank($bookingStartAt))
+                    class="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <span wire:loading.remove wire:target="addToCart">إضافة إلى السلة</span>
+                    <span wire:loading wire:target="addToCart">جاري الإضافة...</span>
+                </button>
+            @endif
         </form>
     </x-tenant-theme::modal>
 </x-tenant-theme::services.layout>

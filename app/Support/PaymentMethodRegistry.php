@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Setting;
 use Illuminate\Support\Collection;
 
 class PaymentMethodRegistry
@@ -34,5 +35,22 @@ class PaymentMethodRegistry
     public function defaults(string $slug): array
     {
         return config("payment-methods.{$slug}.defaults", []);
+    }
+
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function activeForCheckout(): Collection
+    {
+        return $this->all()
+            ->map(function (PaymentMethod $method): array {
+                $settings = Setting::paymentMethod($method->slug);
+
+                return array_merge($method->toArray(), $settings, [
+                    'checkout_component' => $method->component('checkout'),
+                ]);
+            })
+            ->filter(fn (array $method): bool => (bool) ($method['active'] ?? false))
+            ->values();
     }
 }

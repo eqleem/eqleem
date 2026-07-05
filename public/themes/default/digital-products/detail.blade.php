@@ -7,6 +7,13 @@
         </a>
     </div>
 
+    @if ($addedToCart)
+        <div class="mx-3 mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            تمت إضافة المنتج إلى السلة.
+            <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="ms-1 font-semibold underline">عرض السلة</a>
+        </div>
+    @endif
+
     <section class="px-3 mb-8 w-full">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             @if ($images !== [])
@@ -70,10 +77,25 @@
                     </div>
                 @endif
 
-                <button type="button" class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white hover:bg-primary-700 transition">
-                    <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
-                    شراء المنتج
-                </button>
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 items-center rounded-xl border border-stone-200 px-2">
+                        <button type="button" wire:click="decrementQuantity" class="flex h-8 w-8 items-center justify-center text-stone-500 hover:text-stone-900" aria-label="تقليل الكمية">−</button>
+                        <span class="w-8 text-center text-sm font-medium">{{ $quantity }}</span>
+                        <button type="button" wire:click="incrementQuantity" class="flex h-8 w-8 items-center justify-center text-stone-500 hover:text-stone-900" aria-label="زيادة الكمية">+</button>
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="addToCart"
+                        wire:loading.attr="disabled"
+                        wire:target="addToCart"
+                        class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white hover:bg-primary-700 transition disabled:opacity-70"
+                    >
+                        <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                        <span wire:loading.remove wire:target="addToCart">أضف للسلة</span>
+                        <span wire:loading wire:target="addToCart">جاري الإضافة...</span>
+                    </button>
+                </div>
             </div>
         </div>
     </section>

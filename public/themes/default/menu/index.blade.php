@@ -37,6 +37,13 @@
             }
         }"
     >
+        @if ($addedToCart)
+            <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                تمت إضافة الوجبة إلى السلة.
+                <a href="{{ route('tenant.pages.cart') }}" wire:navigate class="ms-1 font-semibold underline">عرض السلة</a>
+            </div>
+        @endif
+
         <section class="mb-2 flex w-full items-center justify-between gap-3">
             <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 rounded-2xl p-1 whitespace-nowrap w-full">
                 <a
@@ -176,13 +183,19 @@
                             </div>
                         </div>
 
+                        @error('meal_options')
+                            <p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $message }}</p>
+                        @enderror
+
                         <button
                             type="button"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700"
-                            x-on:click="$dispatch('close-modal', { name: 'meal-customize-modal' })"
+                            wire:loading.attr="disabled"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            x-on:click="$wire.addMealToCart(parseInt(selectedMealId, 10), quantity, selectedChoices)"
                         >
                             <iconify-icon icon="hugeicons:shopping-basket-02" class="text-xl"></iconify-icon>
-                            إضافة للسلة
+                            <span wire:loading.remove wire:target="addMealToCart">إضافة للسلة</span>
+                            <span wire:loading wire:target="addMealToCart">جاري الإضافة...</span>
                         </button>
                     </div>
                 </template>

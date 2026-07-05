@@ -26,73 +26,99 @@ function createTenantForBlockLinkTest(): array
 
     setCurrentTenant($tenant);
 
+    Block::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->where('type', 'block-link')
+        ->where('data->link_type', 'section')
+        ->delete();
+
     return [$owner, $tenant];
 }
 
-function storeSectionBlockLinkCount(int $tenantId): int
+function sectionBlockLinkCount(int $tenantId, string $contentTypeSlug): int
 {
     return Block::query()
         ->withoutGlobalScope('tenant')
         ->where('tenant_id', $tenantId)
         ->where('type', 'block-link')
-        ->where('data->content_type', 'store')
+        ->where('data->content_type', $contentTypeSlug)
         ->where('data->link_type', 'section')
         ->count();
 }
 
-it('adds a store block link when the first product is created', function () {
+dataset('section block link content types', [
+    'store' => ['store', 'product', 'المتجر الإلكتروني'],
+    'portfolio' => ['portfolio', 'portfolio', 'أعمالنا'],
+    'digital-products' => ['digital-products', 'digital-product', 'المنتجات الرقمية'],
+    'digital-services' => ['digital-services', 'digital-service', 'الخدمات الرقمية'],
+    'services' => ['services', 'service', 'خدماتنا'],
+    'newsletter' => ['newsletter', 'newsletter', 'النشرة البريدية'],
+    'menu' => ['menu', 'menu', 'قائمة الطعام'],
+    'unit-rental' => ['unit-rental', 'unit', 'تأجير الوحدات'],
+    'courses' => ['courses', 'course', 'الدورات'],
+]);
+
+it('adds a section block link when the first content item is created', function (
+    string $contentTypeSlug,
+    string $modelType,
+    string $expectedTitle,
+) {
     [, $tenant] = createTenantForBlockLinkTest();
 
-    expect(storeSectionBlockLinkCount($tenant->id))->toBe(0);
+    expect(sectionBlockLinkCount($tenant->id, $contentTypeSlug))->toBe(0);
 
     Content::query()->create([
         'tenant_id' => $tenant->id,
-        'type' => contentTypeModel('store'),
-        'title' => 'Product One',
-        'slug' => 'product-one',
+        'type' => $modelType,
+        'title' => 'Test Item',
+        'slug' => $contentTypeSlug.'-item-'.Str::lower(Str::random(6)),
         'status' => 'draft',
         'active' => true,
     ]);
 
-    expect(storeSectionBlockLinkCount($tenant->id))->toBe(1);
+    expect(sectionBlockLinkCount($tenant->id, $contentTypeSlug))->toBe(1);
 
     $block = Block::query()
         ->withoutGlobalScope('tenant')
         ->where('tenant_id', $tenant->id)
         ->where('type', 'block-link')
-        ->where('data->content_type', 'store')
+        ->where('data->content_type', $contentTypeSlug)
         ->first();
 
     expect($block)->not->toBeNull()
         ->and($block->position)->toBe('home')
         ->and($block->active)->toBeTrue()
         ->and($block->data['link_type'])->toBe('section')
-        ->and($block->data['title'])->toBe('المتجر الإلكتروني');
-});
+        ->and($block->data['title'])->toBe($expectedTitle);
+})->with('section block link content types');
 
-it('does not duplicate the store block link when another product is created', function () {
+it('does not duplicate the section block link when another item is created', function (
+    string $contentTypeSlug,
+    string $modelType,
+) {
     [, $tenant] = createTenantForBlockLinkTest();
 
     Content::query()->create([
         'tenant_id' => $tenant->id,
-        'type' => contentTypeModel('store'),
-        'title' => 'Product One',
-        'slug' => 'product-one',
+        'type' => $modelType,
+        'title' => 'First Item',
+        'slug' => $contentTypeSlug.'-first-'.Str::lower(Str::random(6)),
         'status' => 'draft',
         'active' => true,
     ]);
 
     Content::query()->create([
         'tenant_id' => $tenant->id,
-        'type' => contentTypeModel('store'),
-        'title' => 'Product Two',
-        'slug' => 'product-two',
+        'type' => $modelType,
+        'title' => 'Second Item',
+        'slug' => $contentTypeSlug.'-second-'.Str::lower(Str::random(6)),
         'status' => 'draft',
         'active' => true,
     ]);
 
-    expect(storeSectionBlockLinkCount($tenant->id))->toBe(1);
-});
+    expect(sectionBlockLinkCount($tenant->id, $contentTypeSlug))->toBe(1);
+})->with('section block link content types');
 
 it('does not add a block link for excluded content types like forms', function () {
     [, $tenant] = createTenantForBlockLinkTest();
@@ -133,5 +159,5 @@ it('does not add a block link for nested block content', function () {
         'active' => true,
     ]);
 
-    expect(storeSectionBlockLinkCount($tenant->id))->toBe(0);
+    expect(sectionBlockLinkCount($tenant->id, 'store'))->toBe(0);
 });

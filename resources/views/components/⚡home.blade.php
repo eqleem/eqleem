@@ -12,7 +12,7 @@
         </div>
 
         <div class="px-4 mx-auto max-w-7xl ">
-            <div class="flex justify-center max-w-xl mx-auto">
+            <div class="flex justify-center max-w-5xl mx-auto">
                 <div class="rounded-full flex items-center w-full mx-auto justify-between -mt-7 bg-black px-2 py-2 text-xs sm:text-sm font-medium">
                       <a href="{{ route('home') }}" wire:navigate title="" class="flex items-center gap-x-2 ms-3">
                         {{-- <img class="w-auto h-5 md:h-9" src="{{ asset('assets/images/logo-shape-color.svg') }}" alt="" /> --}}
