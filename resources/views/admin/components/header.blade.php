@@ -1,6 +1,6 @@
 {{-- ref code : {{ auth()->user()->getReferralCode()}} --}}
 <header class="bg-primary-700 p-2 text-white">
-    <div class="max-w-5xl flex justify-between mx-auto">
+    <div class="max-w-7xl flex justify-between mx-auto">
         <div class="flex items-center gap-x-3">
             <a href="{{ route('admin.home') }}" wire:navigate class="flex items-center gap-x-2 justify-center text-center"
                 wire:ignore>

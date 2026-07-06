@@ -1,5 +1,5 @@
 <nav class="bg-primary-800 text-white text-opacity-50X text-base p-0.5">
-    <div wire:ignore class="max-w-5xl mx-auto flex items-center justify-between md:justify-start gap-x-0.5 ">
+    <div wire:ignore class="max-w-7xl mx-auto flex items-center justify-between md:justify-start gap-x-0.5 ">
         <a href="{{ route('admin.home') }}" wire:navigate
             class="h-9 text-sm md:text-base w-fullx md:w-auto justify-center flex items-center gap-x-2 p-1.5  px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900 {{ \Route::currentRouteName() == 'admin.home' ? 'bg-gray-100 text-gray-900' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">

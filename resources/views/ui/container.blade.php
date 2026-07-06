@@ -7,7 +7,7 @@
 <div>
     @if ($title)
         <div class=" border-b p-px  bg-gray-300 text-gray-500 text-base" hx-boost="true">
-            <div class="flex items-center gap-x-3 max-w-5xl mx-auto truncate text-sm">
+            <div class="flex items-center gap-x-3 max-w-7xl mx-auto truncate text-sm">
                 @if ($backRoute)
                     <a href="{{ $backRoute }}" wire:navigate
                         class="bg-gray-200 p-2 flex items-center gap-x-2 hover:bg-gray-100 text-sm">
@@ -25,7 +25,7 @@
         </div>
     @endif
 
-    <div class="mx-auto py-6 md:py-10 max-w-5xl px-1 md:px-3X" {{ $attributes }}>
+    <div class="mx-auto py-6 md:py-10 max-w-7xl px-1 md:px-3X" {{ $attributes }}>
         {{ $slot }}
     </div>
 </div>
