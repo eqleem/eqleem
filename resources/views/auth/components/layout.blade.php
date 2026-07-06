@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-stone-300 flex flex-col items-center py-12 md:pt-32">
   
     <a href="{{ route('home') }}" wire:navigate title="" class="flex flex-col items-center gap-y-4">
-        <img class="w-auto h-12" src="{{ asset('assets/images/logo-text-black.webp') }}" alt="" />
+        <img class="w-auto h-12" src="{{ asset('assets/images/logo.webp') }}" alt="" />
         {{-- <img class="w-auto h-9" src="{{ asset('assets/images/logo.webp') }}" alt="" /> --}}
         {{-- <span class="text-xl lg:text-3xl font-camel font-extrabold">
             {{ config('app.name') }} 
