@@ -1,4 +1,4 @@
-<ui:container>
+<ui:container class="!pb-24">
     <ui:mainbox title="إدارة الاشتراك" subtitle="اختر الباقة المناسبة لصفحتك.">
         <x-slot:icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-6 h-6">
@@ -36,7 +36,7 @@
             </div>
 
             <div class="pointer-events-none ms-1.5 flex flex-col items-start pt-1">
-                <p class="-rotate-3 whitespace-nowrap text-[10px] font-bold leading-none text-emerald-700">
+                <p class="-rotate-3 whitespace-nowrap ms-3 text-[10px] font-bold leading-none text-emerald-700">
                     خصم شهرين
                 </p>
                 <svg
@@ -192,6 +192,65 @@
             </div>
         @endforeach
     </div>
+
+    <section class="mt-20">
+        <div class="mx-auto max-w-3xl text-center">
+            <div class="inline-flex size-11 items-center justify-center rounded-xl bg-stone-100 text-stone-600">
+                <iconify-icon icon="solar:question-circle-bold" class="text-xl"></iconify-icon>
+            </div>
+            <h2 class="mt-4 text-2xl font-bold text-stone-900">الأسئلة المتكررة</h2>
+            <p class="mt-2 text-sm leading-relaxed text-stone-500">
+                إجابات سريعة عن الاشتراكات والباقات. لم تجد إجابتك؟
+                <a href="{{ route('admin.settings.home') }}" wire:navigate class="font-medium text-stone-700 underline underline-offset-2 hover:text-stone-900">تواصل معنا</a>.
+            </p>
+        </div>
+
+        <div
+            x-cloak
+            x-data="{ active: 1 }"
+            class="mx-auto mt-10 max-w-3xl overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"
+        >
+            @foreach ($this->subscriptionFaqs() as $index => $faq)
+                <div
+                    wire:key="plan-faq-{{ $index }}"
+                    x-data="{
+                        id: {{ $index + 1 }},
+                        get expanded() {
+                            return this.active === this.id
+                        },
+                        set expanded(value) {
+                            this.active = value ? this.id : null
+                        },
+                    }"
+                    class="@unless($loop->last) border-b border-stone-200 @endunless"
+                    role="region"
+                >
+                    <h3>
+                        <button
+                            type="button"
+                            @click="expanded = !expanded"
+                            :aria-expanded="expanded"
+                            class="flex w-full items-center justify-between gap-4 px-6 py-5 text-start text-sm font-semibold text-stone-900 transition hover:bg-stone-50 sm:px-7"
+                        >
+                            <span>{{ $faq['question'] }}</span>
+                            <span
+                                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500 transition"
+                                :class="expanded ? 'rotate-180' : ''"
+                            >
+                                <iconify-icon icon="solar:alt-arrow-down-linear" class="text-lg"></iconify-icon>
+                            </span>
+                        </button>
+                    </h3>
+
+                    <div x-show="expanded" x-collapse>
+                        <div class="border-t border-stone-100 px-6 pb-6 pt-4 sm:px-7">
+                            <p class="text-sm leading-relaxed text-stone-600">{{ $faq['answer'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
 </ui:container>
 
 <?php
@@ -347,6 +406,39 @@ new class extends \Livewire\Component {
                 'icon' => 'solar:user-rounded-bold',
             ],
         };
+    }
+
+    /**
+     * @return list<array{question: string, answer: string}>
+     */
+    public function subscriptionFaqs(): array
+    {
+        return [
+            [
+                'question' => 'هل الباقة المجانية مجانية فعلاً؟',
+                'answer' => 'نعم، يمكنك إنشاء صفحتك واستخدام الميزات الأساسية بدون بطاقة بنكية أو حد زمني. الباقة المجانية مناسبة للبدء وتجربة المنصة.',
+            ],
+            [
+                'question' => 'ما الفرق بين الاشتراك الشهري والسنوي؟',
+                'answer' => 'كلاهما يمنحك نفس الميزات، لكن الاشتراك السنوي يوفر خصم شهرين مقارنة بالدفع الشهري على مدار العام.',
+            ],
+            [
+                'question' => 'هل يمكنني الترقية أو تخفيض باقتي لاحقاً؟',
+                'answer' => 'نعم، يمكنك تغيير باقتك في أي وقت من صفحة الاشتراك. عند الترقية تُفعَّل الميزات الجديدة فوراً، وعند التخفيض تبقى الميزات الحالية حتى نهاية فترة الاشتراك.',
+            ],
+            [
+                'question' => 'هل أحتاج بطاقة بنكية للباقة المجانية؟',
+                'answer' => 'لا، تفعيل الباقة المجانية لا يتطلب أي بيانات دفع. بطاقة البنك مطلوبة فقط عند الاشتراك في الباقات المدفوعة.',
+            ],
+            [
+                'question' => 'كيف يتم الدفع للباقات المدفوعة؟',
+                'answer' => 'ندعم الدفع الآمن عبر بطاقات الائتمان والخصم (مدى، فيزا، ماستركارد). يتم تجديد الاشتراك تلقائياً في نهاية كل فترة ما لم تُلغِ الاشتراك.',
+            ],
+            [
+                'question' => 'هل يمكنني إلغاء الاشتراك؟',
+                'answer' => 'نعم، يمكنك إلغاء الاشتراك في أي وقت. ستبقى باقتك المدفوعة فعّالة حتى نهاية الفترة المدفوعة، ثم تعود صفحتك للباقة المجانية ما لم تجدّد.',
+            ],
+        ];
     }
 
     public function subscribeFree(): void

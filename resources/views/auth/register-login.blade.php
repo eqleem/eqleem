@@ -26,7 +26,7 @@
     <form wire:submit="submit" class="flex flex-col gap-y-1">
         <ui:input label="البريد الإلكتروني" name="email" infoDir="rtl" width="w-full" dir="ltr" type="email" placeholder="your@email.com" />
 
-        <ui:button label="أرسل الرابط إلى بريدي الإلكتروني" wire-target="submit" class="mt-4" />
+        <ui:button label="أرسل الرابط إلى بريدي الإلكتروني" wire:target="submit" class="mt-4" />
     </form>
 </x-auth::layout>
 

@@ -40,9 +40,9 @@
 
 
         @if($usePassword)
-            <ui:button label="إنشاء الحساب" wire-target="submit" class="mt-4" />
+            <ui:button label="إنشاء الحساب" wire:target="submit" class="mt-4" />
         @else
-            <ui:button label="أرسل رابط التسجيل" wire-target="submit" class="mt-4" />
+            <ui:button label="أرسل رابط التسجيل" wire:target="submit" class="mt-4" />
         @endif
     </form>
 </x-auth::layout>

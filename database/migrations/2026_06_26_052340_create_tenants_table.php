@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('theme_id')->nullable(); // one theme for all apps
             $table->string('handle')->unique()->index();
+            $table->string('custom_domain', 255)->nullable()->unique();
+            $table->string('custom_domain_status', 50)->default('pending')->nullable();
             $table->string('name');
             $table->boolean('active')->default(true);
             $table->jsonb('data')->nullable();

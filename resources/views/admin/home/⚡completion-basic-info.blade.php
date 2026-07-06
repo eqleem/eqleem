@@ -3,17 +3,14 @@
         <div class="space-y-2">
             <ui:input name="name" label="اسم الصفحة" placeholder="اسم الصفحة" />
 
-            <ui:toggle name="showAvatar" label="عرض الشعار" live />
-
-            @if ($showAvatar)
-                <ui:file name="logo" label="الشعار" uploadLabel="رفع شعار">
-                    @if ($logo)
-                        <img src="{{ $logo->temporaryUrl() }}" class="mb-1 size-20 rounded-full object-cover">
-                    @elseif ($currentLogo)
-                        <img src="{{ $currentLogo }}" class="mb-1 size-20 rounded-full object-cover">
-                    @endif
-                </ui:file>
-            @endif
+            <ui:file-crop
+                name="logo"
+                label="الشعار"
+                uploadLabel="رفع شعار"
+                shape="square"
+                previewClass="mb-1 size-20 rounded-lg object-cover"
+                :preview="$logo ?: ($currentLogo ?: null)"
+            />
 
             <ui:textarea
                 name="bio"
@@ -43,8 +40,6 @@ new class extends Livewire\Component
 
     public string $name = '';
 
-    public bool $showAvatar = true;
-
     public $logo = null;
 
     public string $currentLogo = '';
@@ -61,7 +56,6 @@ new class extends Livewire\Component
 
         $this->name = (string) ($tenant?->name ?? '');
         $this->currentLogo = (string) ($tenant?->logo ?? '');
-        $this->showAvatar = (bool) ($data['show_avatar'] ?? true);
         $this->bio = (string) ($data['bio'] ?? '');
     }
 
@@ -101,7 +95,6 @@ new class extends Livewire\Component
         if ($headerBlock) {
             $headerBlock->update([
                 'data' => array_merge($headerBlock->data ?? [], [
-                    'show_avatar' => $this->showAvatar,
                     'bio' => $this->bio,
                 ]),
             ]);

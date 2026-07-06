@@ -43,9 +43,9 @@
 
 
         @if($usePassword)
-            <ui:button label="تسجيل الدخول" wire-target="submit" class="mt-4" />
+            <ui:button label="تسجيل الدخول" wire:target="submit" class="mt-4" />
         @else
-            <ui:button label="أرسل رابط تسجيل الدخول" wire-target="submit" class="mt-4" />
+            <ui:button label="أرسل رابط تسجيل الدخول" wire:target="submit" class="mt-4" />
         @endif
     </form>
 

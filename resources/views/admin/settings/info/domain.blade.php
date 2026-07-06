@@ -142,8 +142,8 @@ new class extends \Livewire\Component {
     {
         $this->tenant = currentTenant();
         $this->handle = $this->tenant->handle;
-        $this->customDomain = (string) data_get($this->tenant->meta, 'custom_domain', '');
-        $this->customDomainStatus = data_get($this->tenant->meta, 'custom_domain_status');
+        $this->customDomain = (string) ($this->tenant->custom_domain ?? '');
+        $this->customDomainStatus = $this->tenant->custom_domain_status;
     }
 
     public function submit(): void
@@ -173,17 +173,17 @@ new class extends \Livewire\Component {
         $normalized = $this->customDomain;
 
         if (blank($normalized)) {
-            $this->tenant->meta->forget('custom_domain');
-            $this->tenant->meta->forget('custom_domain_status');
+            $this->tenant->custom_domain = null;
+            $this->tenant->custom_domain_status = null;
             $this->customDomainStatus = null;
         } else {
-            $previousDomain = (string) data_get($this->tenant->meta, 'custom_domain', '');
+            $previousDomain = (string) ($this->tenant->custom_domain ?? '');
 
-            $this->tenant->meta->set('custom_domain', $normalized);
-            $this->customDomainStatus = $previousDomain === $normalized && filled(data_get($this->tenant->meta, 'custom_domain_status'))
-                ? (string) data_get($this->tenant->meta, 'custom_domain_status')
+            $this->tenant->custom_domain = $normalized;
+            $this->customDomainStatus = $previousDomain === $normalized && filled($this->tenant->custom_domain_status)
+                ? (string) $this->tenant->custom_domain_status
                 : 'pending';
-            $this->tenant->meta->set('custom_domain_status', $this->customDomainStatus);
+            $this->tenant->custom_domain_status = $this->customDomainStatus;
         }
 
         $this->customDomain = $normalized;
@@ -196,7 +196,7 @@ new class extends \Livewire\Component {
     {
         return Tenant::query()
             ->where('id', '!=', $this->tenant->id)
-            ->where('meta->custom_domain', $domain)
+            ->where('custom_domain', $domain)
             ->exists();
     }
 

@@ -39,7 +39,7 @@
             class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition"
             aria-label="خيارات البلوك"
         >
-            <ui:icon name="settings-cog" class="!w-4 !h-4" />
+            <ui:icon name="settings" class="!w-5 !h-5" />
         </button>
     @endif
 </li>

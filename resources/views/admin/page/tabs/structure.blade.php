@@ -88,7 +88,7 @@
                                     class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition"
                                     aria-label="خيارات البلوك"
                                 >
-                                    <ui:icon name="settings-cog" class="!w-4 !h-4" />
+                                    <ui:icon name="settings" class="!w-5 !h-5" />
                                 </button>
                             @endif
 
@@ -97,7 +97,7 @@
                                 wire:click.stop="toggleBlockActive({{ $block['id'] }})"
                                 wire:loading.attr="disabled"
                                 wire:target="toggleBlockActive({{ $block['id'] }})"
-                                class="shrink-0 rounded-lg p-1 hover:bg-gray-100 transition disabled:opacity-50"
+                                class="shrink-0 flex items-center justify-center transition disabled:opacity-50"
                                 aria-label="{{ $block['active'] ? 'تعطيل البلوك' : 'تفعيل البلوك' }}"
                                 role="switch"
                                 aria-checked="{{ $block['active'] ? 'true' : 'false' }}"

@@ -6,7 +6,7 @@
 
         <ui:input label="كلمة المرور" width="w-full" name="password" wire:model="password" dir="ltr"  type="password" placeholder="*****" />
         <ui:input label="تأكيد كلمة المرور" width="w-full" name="password_confirmation" wire:model="password_confirmation" dir="ltr"  type="password" placeholder="*****" />
-        <ui:button variant="primary" type="submit" icon="lock-open" wire-target="submit"> استعادة كلمة المرور </ui:button>
+        <ui:button variant="primary" type="submit" icon="lock-open" wire:target="submit"> استعادة كلمة المرور </ui:button>
 
         @if($errors->any())
             <div class="alert alert-danger">

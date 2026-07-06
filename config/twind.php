@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Sarmady glyphs render ~58% smaller than IBM Plex at the same font-size (cap-height ratio).
+ * size-adjust normalizes visual size at the @font-face level so views keep standard text-* classes.
+ */
+$sarmadyMetrics = [
+    'sizeAdjust' => '160%',
+];
+
 return [
     'darkMode' => 'class',
     'hash' => false,
@@ -45,7 +53,7 @@ return [
                 ],
             ],
             'fontFamily' => [
-                'sans' => 'saudi_riyal, ibmps, sans-serif',
+                'sans' => 'sarmady, ibmps, sans-serif',
                 'sarmady' => 'sarmady',
                 'milligram' => 'milligram',
                 'codec-ultra' => 'codec-ultra',
@@ -60,29 +68,56 @@ return [
     ],
     'preflight' => [
         '@font-face' => [
-                  
-                
+            array_merge([
+                'fontFamily' => 'sarmady',
+                'src' => 'url(/assets/fonts/sarmady/sarmady-compressed-black.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 900,
+                'fontDisplay' => 'auto',
+            ], $sarmadyMetrics),
+            array_merge([
+                'fontFamily' => 'sarmady',
+                'src' => 'url(/assets/fonts/sarmady/sarmady-bold.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 700,
+                'fontDisplay' => 'auto',
+            ], $sarmadyMetrics),
+            array_merge([
+                'fontFamily' => 'sarmady',
+                'src' => 'url(/assets/fonts/sarmady/sarmady-regular.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 400,
+                'fontDisplay' => 'auto',
+            ], $sarmadyMetrics),
+            array_merge([
+                'fontFamily' => 'sarmady',
+                'src' => 'url(/assets/fonts/sarmady/sarmady-light.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 300,
+                'fontDisplay' => 'auto',
+            ], $sarmadyMetrics),
+
             [
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-bold.ttf)',
                 'fontStyle' => 'bold',
                 'fontWeight' => 'bold',
                 'fontDisplay' => 'auto',
-            ],          
+            ],
             [
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-regular.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 400,
                 'fontDisplay' => 'auto',
-            ],   
+            ],
             [
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-light.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 300,
                 'fontDisplay' => 'auto',
-            ],    
+            ],
             [
                 'fontFamily' => 'eqleem',
                 'src' => 'url(/assets/fonts/as-wc26-bold.otf)',

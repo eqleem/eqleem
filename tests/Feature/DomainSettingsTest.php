@@ -60,8 +60,8 @@ it('saves a custom domain with pending status', function () {
 
     $tenant->refresh();
 
-    expect(data_get($tenant->meta, 'custom_domain'))->toBe('shop.example.com')
-        ->and(data_get($tenant->meta, 'custom_domain_status'))->toBe('pending');
+    expect($tenant->custom_domain)->toBe('shop.example.com')
+        ->and($tenant->custom_domain_status)->toBe('pending');
 });
 
 it('normalizes custom domain input before saving', function () {
@@ -73,7 +73,7 @@ it('normalizes custom domain input before saving', function () {
         ->call('submitCustomDomain')
         ->assertHasNoErrors();
 
-    expect(data_get($tenant->fresh()->meta, 'custom_domain'))->toBe('shop.example.com');
+    expect($tenant->fresh()->custom_domain)->toBe('shop.example.com');
 });
 
 it('shows cname target based on tenant handle', function () {
@@ -108,9 +108,10 @@ it('rejects duplicate custom domains across tenants', function () {
         'status' => 'active',
     ]);
 
-    $otherTenant->meta->set('custom_domain', 'shop.example.com');
-    $otherTenant->meta->set('custom_domain_status', 'pending');
-    $otherTenant->save();
+    $otherTenant->update([
+        'custom_domain' => 'shop.example.com',
+        'custom_domain_status' => 'pending',
+    ]);
 
     setCurrentTenant($tenant);
 
@@ -124,9 +125,10 @@ it('rejects duplicate custom domains across tenants', function () {
 it('clears custom domain when input is empty', function () {
     [$user, $tenant] = createTenantForDomainSettings();
 
-    $tenant->meta->set('custom_domain', 'shop.example.com');
-    $tenant->meta->set('custom_domain_status', 'pending');
-    $tenant->save();
+    $tenant->update([
+        'custom_domain' => 'shop.example.com',
+        'custom_domain_status' => 'pending',
+    ]);
 
     Livewire::actingAs($user)
         ->test('admin::settings.info.domain')
@@ -136,8 +138,8 @@ it('clears custom domain when input is empty', function () {
 
     $tenant->refresh();
 
-    expect(data_get($tenant->meta, 'custom_domain'))->toBeNull()
-        ->and(data_get($tenant->meta, 'custom_domain_status'))->toBeNull();
+    expect($tenant->custom_domain)->toBeNull()
+        ->and($tenant->custom_domain_status)->toBeNull();
 });
 
 it('grants custom domain access to basic plan subscribers', function () {

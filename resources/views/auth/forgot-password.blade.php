@@ -3,7 +3,7 @@
     <form wire:submit="submit" class="grid mb-12 flex flex-col gap-y-2">
         <ui:input label="بريدك الإلكتروني" width="w-full" name="email" wire:model="email" dir="ltr"  type="email" placeholder="your@email.com" />
       
-        <ui:button variant="primary" type="submit" icon="lock-open" wire-target="submit"> استعادة كلمة المرور </ui:button>
+        <ui:button variant="primary" type="submit" icon="lock-open" wire:target="submit"> استعادة كلمة المرور </ui:button>
     </form>
   
     <div class="mt-2  flex justify-between items-center border-b border-gray-300/50 border-dotted p-1 rounded">

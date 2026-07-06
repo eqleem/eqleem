@@ -49,7 +49,7 @@
         </main>
 
 
-        <div class="text-center text-stone-400 pb-4 mx-auto flex items-center justify-center">
+        <div class="mx-auto flex items-center justify-center pb-10 pt-8 text-center text-stone-400">
              
             <a href="https://eqleem.com" target="_blank" title="إقليم" aria-label="إقليم"
                 class="text-stone-500 hover:text-stone-600 inline-block mx-2">

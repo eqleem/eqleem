@@ -16,7 +16,7 @@
                 <div class="rounded-full flex items-center w-full mx-auto justify-between -mt-7 bg-black px-2 py-2 text-xs sm:text-sm font-medium">
                       <a href="{{ route('home') }}" wire:navigate title="" class="flex items-center gap-x-2 ms-3">
                         {{-- <img class="w-auto h-5 md:h-9" src="{{ asset('assets/images/logo-shape-color.svg') }}" alt="" /> --}}
-                        <img class="w-auto h-9 md:h-9" src="{{ asset('assets/images/logo-white.webp') }}" alt="" />
+                        <img class="w-auto h-7 md:h-8" src="{{ asset('assets/images/logo-white.webp') }}" alt="" />
                         {{-- <img class="w-auto h-9 md:h-9" src="{{ asset('assets/images/logo-blue.webp') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-9 md:h-11" src="{{ asset('assets/images/logo.webp') }}" alt="" /> --}}
                         {{-- <img class="w-auto h-5 md:h-9" src="{{ asset('assets/images/logo-text-dawshah.png') }}" alt="" /> --}}
@@ -35,7 +35,7 @@
                             <ui:button variant="primary" color="white" href="{{ route('admin.home') }}" label="لوحة التحكم" class="!rounded-full text-base font-tsh !p-6" rounded="full" icon="settings" />
                         @else
                             <ui:button variant="primary" href="{{ route('auth.register') }}" label="أنشئ صفحة أعمال" wire:navigate rounded="full" icon="plus" class="!rounded-full !bg-primary-600 !hover:bg-primary-700 " />
-                            <ui:button variant="ghost" href="{{ route('auth.login') }}" label="دخول" wire:navigate class="!rounded-full" icon:trailing="arrow-left" />
+                            <ui:button variant="ghost" href="{{ route('auth.login') }}" label="دخول" wire:navigate class="!rounded-full text-white hover:opacity-80" icon:trailing="arrow-left" />
                         @endauth   
                     </div>
                 </div>
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-                <h1 class="font-milligram  text-5xl md:text-6xl text-base-900 font-semibold leading-12 !lg:leading-[4.5rem]  max-w-xl xl:max-w-2xl mx-auto">
+                <h1 class=" text-5xl md:text-6xl text-base-900 font-semibold !leading-[4rem] !lg:leading-[4.5rem]  max-w-xl xl:max-w-2xl mx-auto">
  
                      أنشئ صفحة أعمال 
                      تحوّل زوّارك إلى عملاء،   
@@ -92,7 +92,7 @@
                     {{-- <span class="text-primary-500">تبيع عنّك، </span> --}}
                      بدقائق!
                 </h1>
-                <p class="font-milligram mt-8 text-gray-600 max-w-sm lg:max-w-xl mx-auto text-base lg:text-xl">
+                <p class="font-milligramx mt-8 text-gray-600 max-w-sm lg:max-w-xl mx-auto text-base lg:text-xl">
                     {{-- <b>صفحة أعمال</b> --}}
                     {{-- <img src="{{ asset('assets/images/logo-text-black.webp') }}" class="inline-block h-6 md:h-9" alt="" /> --}}
 
