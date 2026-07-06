@@ -5,6 +5,8 @@
     'uploadLabel' => null,
     'shape' => 'circle',
     'outputSize' => 512,
+    'cropTitle' => 'قص الصورة',
+    'allowShapeSwitch' => false,
     'preview' => null,
     'previewClass' => 'mb-1 size-20 rounded-full object-cover',
 ])
@@ -31,6 +33,7 @@
         'wireName' => $name,
         'outputSize' => $outputSize,
         'shape' => $shape,
+        'allowShapeSwitch' => $allowShapeSwitch,
         'previewUrl' => $previewUrl,
     ]))"
 >
@@ -88,7 +91,7 @@
     <div
         x-show="open"
         x-cloak
-        dir="ltr"
+        {{-- dir="ltr" --}}
         data-file-crop-overlay
         class="fixed inset-0 z-[100] flex items-center justify-center p-4"
         x-transition.opacity
@@ -96,9 +99,9 @@
     >
         <div class="absolute inset-0 bg-gray-800/75" x-on:click="closeCropper()"></div>
 
-        <div class="relative w-full max-w-md rounded-xl bg-white shadow-xl" x-on:click.stop>
+        <div class="relative w-full {{ $shape === 'free' ? 'max-w-lg' : 'max-w-md' }} rounded-xl bg-white shadow-xl" x-on:click.stop>
             <div class="flex items-center justify-between border-b border-gray-100 p-3 px-4">
-                <p class="text-sm font-semibold text-gray-600" dir="rtl">قص الشعار</p>
+                <p class="text-sm font-semibold text-gray-600" dir="rtl">{{ $cropTitle }}</p>
                 <button type="button" x-on:click="closeCropper()" class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200">
                     <ui:icon name="x" class="!size-4" />
                 </button>
@@ -108,18 +111,39 @@
                 <div
                     wire:ignore
                     :id="cropHostId"
-                    class="min-h-[360px] min-w-[320px]"
+                    class="{{ $shape === 'free' ? 'min-h-[400px] min-w-[360px]' : 'min-h-[360px] min-w-[320px]' }}"
                 ></div>
             </div>
 
             <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4" dir="rtl">
-                <ui:button type="button" variant="ghost" label="إلغاء" x-on:click="closeCropper()" />
                 <ui:button
                     type="button"
-                    label="تأكيد"
+                    variant="ghost"
+                    label="إلغاء"
+                    x-bind:disabled="cropping"
+                    x-on:click="closeCropper()"
+                />
+                <ui:button
+                    type="button"
                     x-bind:disabled="cropping"
                     x-on:click="confirmCrop()"
-                />
+                >
+                    <span x-show="! cropping">تأكيد</span>
+                    <span x-show="cropping" x-cloak class="inline-flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 animate-spin" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <line x1="12" y1="6" x2="12" y2="3" />
+                            <line x1="16.25" y1="7.75" x2="18.4" y2="5.6" />
+                            <line x1="18" y1="12" x2="21" y2="12" />
+                            <line x1="16.25" y1="16.25" x2="18.4" y2="18.4" />
+                            <line x1="12" y1="18" x2="12" y2="21" />
+                            <line x1="7.75" y1="16.25" x2="5.6" y2="18.4" />
+                            <line x1="6" y1="12" x2="3" y2="12" />
+                            <line x1="7.75" y1="7.75" x2="5.6" y2="5.6" />
+                        </svg>
+                        جاري المعالجة...
+                    </span>
+                </ui:button>
             </div>
         </div>
     </div>

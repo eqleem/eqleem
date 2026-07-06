@@ -32,6 +32,8 @@
     },
     "headerImage": {
         "type": "upload-single-image",
+        "crop": true,
+        "cropShape": "free",
         "label": "صورة الهيدر",
         "info": "إذا كنت ترغب بإظهار صورة في أعلى الموقع.",
         "default": ""

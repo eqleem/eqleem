@@ -13,7 +13,7 @@ new class extends Component
  
     public function render()
     {
-        return $this->view()->layout('admin::layout');
+        return $this->view()->layout('admin::layout')->title('لوحة التحكم');
     }
 };
 ?>

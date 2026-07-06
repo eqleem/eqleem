@@ -8,6 +8,7 @@
                 label="الشعار"
                 uploadLabel="رفع شعار"
                 shape="square"
+                cropTitle="قص الشعار"
                 previewClass="mb-1 size-20 rounded-lg object-cover"
                 :preview="$logo ?: ($currentLogo ?: null)"
             />
