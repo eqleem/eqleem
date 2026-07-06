@@ -12,6 +12,7 @@ use App\Support\BlockVariants;
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
 use App\Support\TenantThemeOptions;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
@@ -35,6 +36,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $appUrl = config('app.url');
+
+        if (is_string($appUrl) && str_starts_with($appUrl, 'https://')) {
+            URL::forceScheme('https');
+        }
+
         Livewire::addPersistentMiddleware([
             AdminMiddleware::class,
             ResolveTenantFromPath::class,
