@@ -16,7 +16,7 @@ return [
     'component_locations' => [
         resource_path('views/components'),
         resource_path('views/livewire'),
-        resource_path('views/tenant'),
+        resource_path('views/tenant-not-after-themes'),
         resource_path('views/ui'),
     ],
 
@@ -34,7 +34,7 @@ return [
     'component_namespaces' => [
         'layouts' => resource_path('views/layouts'),
         'pages' => resource_path('views/pages'),
-        'tenant' => resource_path('views/tenant'),
+        'tenant' => resource_path('views/tenant-not-after-themes'),
         'auth' => resource_path('views/auth'),
         'admin' => resource_path('views/admin'),
     ],
