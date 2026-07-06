@@ -12,7 +12,7 @@
         {!! str_replace(
             '<svg',
             '<svg class="inline-block dark:text-gray-500 ' . $class . ' ' . $iconclass . ' size-' . $size . ' "',
-            file_get_contents(public_path("$path/$dir/$name.svg")),
+            file_get_contents(tablerIconPath($name, $path, $dir)),
         ) !!}
     </span>
 @else

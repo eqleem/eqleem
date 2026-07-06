@@ -230,6 +230,37 @@ if (! function_exists('money_minor')) {
     }
 }
 
+if (! function_exists('tablerIconPath')) {
+    function tablerIconPath(string $name, string $path = 'assets/icons', string $dir = 'tabler'): string
+    {
+        $base = public_path("{$path}/{$dir}");
+        $direct = "{$base}/{$name}.svg";
+
+        if (is_file($direct)) {
+            return $direct;
+        }
+
+        static $index = [];
+
+        if (! isset($index[$base]) && is_dir($base)) {
+            $index[$base] = [];
+
+            foreach (scandir($base) as $file) {
+                if (! str_ends_with(strtolower($file), '.svg')) {
+                    continue;
+                }
+
+                $key = strtolower(pathinfo($file, PATHINFO_FILENAME));
+                $index[$base][$key] ??= $file;
+            }
+        }
+
+        $resolved = $index[$base][strtolower($name)] ?? null;
+
+        return $resolved !== null ? "{$base}/{$resolved}" : $direct;
+    }
+}
+
 if (! function_exists('money_currency')) {
     function money_currency(): string
     {
