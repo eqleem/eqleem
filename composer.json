@@ -30,7 +30,7 @@
             "type": "path",
             "url": "packages/laravel-soulbscription",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         }
     ],
