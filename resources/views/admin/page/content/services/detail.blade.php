@@ -148,6 +148,8 @@ use Illuminate\Validation\Rule;
 
 new class extends \Livewire\Component
 {
+    private const CALENDAR_TYPE = 'service-provider';
+
     /** @var array<string, mixed> */
     public array $contentType = [];
 
@@ -238,12 +240,13 @@ new class extends \Livewire\Component
     public function calendars(): array
     {
         return Calendar::query()
+            ->where('type', self::CALENDAR_TYPE)
             ->where('active', true)
             ->orderBy('name')
             ->get()
             ->map(fn (Calendar $calendar): array => [
                 'id' => (string) $calendar->id,
-                'label' => $calendar->name.' ('.$calendar->type_label.')',
+                'label' => $calendar->name,
                 'selectable' => true,
             ])
             ->all();
@@ -328,6 +331,8 @@ new class extends \Livewire\Component
             'calendarIds' => 'nullable|array',
             'calendarIds.*' => [
                 Rule::exists('calendars', 'id')->where(function ($query): void {
+                    $query->where('type', self::CALENDAR_TYPE);
+
                     if ($tenantId = currentTenantId()) {
                         $query->where('tenant_id', $tenantId);
                     }
@@ -375,6 +380,13 @@ new class extends \Livewire\Component
 
         $calendarIds = collect($this->calendarIds)
             ->map(fn (mixed $id): string => (string) $id)
+            ->intersect(
+                collect($this->calendars())
+                    ->where('selectable', true)
+                    ->pluck('id')
+                    ->map(fn (mixed $id): string => (string) $id)
+                    ->all(),
+            )
             ->map(fn (string $id): int => (int) $id)
             ->values()
             ->all();

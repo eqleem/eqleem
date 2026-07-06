@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>{{ $title ?? config('app.name') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-shape-white.webp') }}">
 
         <script src="{{ asset('assets/js/twind.min.js') }}"></script>
         <script src="{{ asset('assets/js/twind.custom.js') }}"></script>

@@ -487,6 +487,11 @@ class Content extends Model implements HasMedia
         return self::orderItemTypeFor((string) $this->type);
     }
 
+    public function isShippable(): bool
+    {
+        return Order::isShippableItemType($this->orderItemType());
+    }
+
     public static function orderItemTypeFor(string $contentType): string
     {
         return match ($contentType) {

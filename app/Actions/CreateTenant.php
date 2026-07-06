@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Events\TenantCreated;
 use App\Models\Tenant;
+use App\Services\TenantProfileService;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
@@ -44,6 +45,8 @@ class CreateTenant
         SubscribeTenantToPlan::make()->subscribeToFreePlan($tenant);
 
         SendWelcomeEmail::run($tenant);
+
+        app(TenantProfileService::class)->seedFromUser($tenant->fresh());
 
         return $tenant;
     }

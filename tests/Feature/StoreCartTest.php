@@ -413,3 +413,92 @@ it('denies viewing order confirmation without access', function () {
     Livewire::test(OrderConfirmation::class, ['order' => $order])
         ->assertForbidden();
 });
+
+it('stores shippable flag on cart items based on content type', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    $course = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('courses'),
+        'title' => 'دورة Laravel',
+        'slug' => 'laravel-course',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'active' => true,
+        'data' => ['price' => 8000],
+    ]);
+
+    $cart = app(CartService::class);
+    $cart->addProduct($product);
+    $cart->addItem($course);
+
+    $items = CartItem::query()->orderBy('id')->get();
+
+    expect($items[0]->isShippable())->toBeTrue()
+        ->and(data_get($items[0]->meta, 'shippable'))->toBeTrue()
+        ->and($items[1]->isShippable())->toBeFalse()
+        ->and(data_get($items[1]->meta, 'shippable'))->toBeFalse();
+});
+
+it('shows shipping options only when the cart contains shippable items', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    $course = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('courses'),
+        'title' => 'دورة Laravel',
+        'slug' => 'laravel-course',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'active' => true,
+        'data' => ['price' => 8000],
+    ]);
+
+    app(CartService::class)->addItem($course);
+
+    Livewire::test(Checkout::class)
+        ->assertDontSee('خيارات الشحن والتسليم');
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->assertSee('خيارات الشحن والتسليم')
+        ->assertSee('توصيل سريع (24-48 ساعة)');
+});
+
+it('does not charge shipping for non-shippable checkout orders', function () {
+    ['tenant' => $tenant] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    $course = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('courses'),
+        'title' => 'دورة Laravel',
+        'slug' => 'laravel-course',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'active' => true,
+        'data' => ['price' => 8000],
+    ]);
+
+    Setting::savePaymentMethod('cash-on-delivery', [], true);
+
+    app(CartService::class)->addItem($course);
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->set('paymentMethod', 'cash-on-delivery')
+        ->call('confirmCashOnDelivery');
+
+    $order = Order::query()->firstOrFail();
+
+    expect($order->grand_total)->toBe(8000)
+        ->and(data_get($order->meta, 'shipping_fee'))->toBe(0)
+        ->and(data_get($order->meta, 'shipping_method'))->toBe('none');
+});

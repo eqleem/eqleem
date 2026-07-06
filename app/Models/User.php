@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'email', 'password', 'current_tenant_id', 'image', 'uuid'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'current_tenant_id', 'image', 'uuid'])]
 #[Hidden(['password', 'remember_token'])]
 
 class User extends Authenticatable implements HasMedia

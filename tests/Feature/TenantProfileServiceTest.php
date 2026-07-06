@@ -158,6 +158,7 @@ it('imports contact and social links from the header block when profile is empty
 
     $tenant->meta->forget('contact');
     $tenant->meta->forget('social_links');
+    $tenant->meta->forget('contact_saved');
     $tenant->save();
 
     $service = app(TenantProfileService::class);
@@ -166,6 +167,172 @@ it('imports contact and social links from the header block when profile is empty
 
     expect($contact['country'])->toBe('السعودية')
         ->and($contact['city'])->toBe('جدة')
+        ->and($contact['email'])->toBe($tenant->user->email)
         ->and($links)->toHaveCount(1)
         ->and($links->first()['url'])->toBe('https://twitter.com/imported');
+});
+
+it('falls back to user contact details before contact is saved', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'member@example.com',
+        'phone' => '0509876543',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Test Tenant',
+        'handle' => 'test-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    $tenant->meta->set('contact', [
+        'phone' => '',
+        'email' => '',
+        'whatsapp' => '',
+        'country' => '',
+        'city' => '',
+    ]);
+    $tenant->meta->set('social_links', []);
+    $tenant->save();
+
+    $contact = app(TenantProfileService::class)->contact($tenant->fresh());
+
+    expect($contact['phone'])->toBe('0509876543')
+        ->and($contact['email'])->toBe('member@example.com');
+});
+
+it('keeps tenant contact separate from user after saving', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'member@example.com',
+        'phone' => '0509876543',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Test Tenant',
+        'handle' => 'test-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    $tenant->meta->set('contact', [
+        'phone' => '',
+        'email' => '',
+        'whatsapp' => '',
+        'country' => '',
+        'city' => '',
+    ]);
+    $tenant->meta->set('social_links', []);
+    $tenant->save();
+
+    $service = app(TenantProfileService::class);
+
+    $service->saveContact($tenant, [
+        'phone' => '0501111111',
+        'email' => 'business@example.com',
+        'country' => 'السعودية',
+        'city' => 'الرياض',
+    ]);
+
+    $contact = $service->contact($tenant->fresh());
+
+    expect($contact['phone'])->toBe('0501111111')
+        ->and($contact['email'])->toBe('business@example.com')
+        ->and($user->fresh()->phone)->toBe('0509876543')
+        ->and($user->fresh()->email)->toBe('member@example.com');
+});
+
+it('seeds tenant contact from user on registration', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'new@example.com',
+        'phone' => '0505555555',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'New Tenant',
+        'handle' => 'new-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'email' => 'new@example.com',
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    app(TenantProfileService::class)->seedContactFromUser($tenant->fresh());
+
+    $contact = app(TenantProfileService::class)->contact($tenant->fresh());
+
+    expect($contact['email'])->toBe('new@example.com')
+        ->and($contact['phone'])->toBe('0505555555');
+});
+
+it('falls back to user avatar as tenant logo before logo is saved', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'image' => 'https://example.com/avatar.jpg',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Test Tenant',
+        'handle' => 'test-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    $service = app(TenantProfileService::class);
+
+    expect($service->logo($tenant))->toBe('https://example.com/avatar.jpg')
+        ->and($service->hasLogo($tenant))->toBeTrue();
+});
+
+it('seeds tenant logo from user avatar on registration', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'image' => 'https://example.com/social-avatar.jpg',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'New Tenant',
+        'handle' => 'new-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    app(TenantProfileService::class)->seedLogoFromUser($tenant->fresh());
+
+    expect(data_get($tenant->fresh()->meta, 'logo'))->toBe('https://example.com/social-avatar.jpg')
+        ->and($tenant->fresh()->logo)->toBe('https://example.com/social-avatar.jpg');
+});
+
+it('keeps tenant logo separate from user after uploading custom logo', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'image' => 'https://example.com/avatar.jpg',
+    ]);
+
+    $tenant = Tenant::create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Test Tenant',
+        'handle' => 'test-tenant-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    $service = app(TenantProfileService::class);
+    $service->saveLogo($tenant, 'tenant-media/test/logo.png');
+
+    expect(data_get($tenant->fresh()->meta, 'logo'))->toBe('tenant-media/test/logo.png')
+        ->and((bool) data_get($tenant->fresh()->meta, 'logo_saved'))->toBeTrue()
+        ->and($user->fresh()->getRawOriginal('image'))->toBe('https://example.com/avatar.jpg');
 });

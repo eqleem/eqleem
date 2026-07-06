@@ -192,6 +192,19 @@ class Order extends Model
     }
 
     /**
+     * @return list<string>
+     */
+    public static function shippableItemTypes(): array
+    {
+        return ['product', 'menu'];
+    }
+
+    public static function isShippableItemType(string $type): bool
+    {
+        return in_array($type, self::shippableItemTypes(), true);
+    }
+
+    /**
      * @return array<string, string>
      */
     public static function itemTypeIcons(): array
@@ -311,6 +324,7 @@ class Order extends Model
             'express' => 'توصيل سريع (24-48 ساعة)',
             'scheduled' => 'توصيل مجدول',
             'pickup' => 'استلام من المعرض',
+            'none' => 'بدون شحن',
             default => $method,
         };
     }

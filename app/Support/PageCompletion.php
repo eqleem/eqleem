@@ -40,7 +40,7 @@ class PageCompletion
                 label: 'البيانات الأساسية',
                 hint: 'أضف اسم الصفحة وشعارها ونبذة تعريفية.',
                 done: filled($tenant->name)
-                    && $this->hasLogo($tenant)
+                    && app(TenantProfileService::class)->hasLogo($tenant)
                     && filled(data_get($headerData, 'bio')),
                 modal: 'home-step-basic-info',
             ),
@@ -94,11 +94,6 @@ class PageCompletion
             'total' => $total,
             'steps' => $steps,
         ];
-    }
-
-    protected function hasLogo(Tenant $tenant): bool
-    {
-        return filled(data_get($tenant->meta, 'logo')) || filled(data_get($tenant->data, 'logo'));
     }
 
     /**

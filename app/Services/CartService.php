@@ -188,10 +188,19 @@ class CartService
         return $this->items()->sum(fn (CartItem $item): int => $item->lineTotal());
     }
 
+    public function requiresShipping(): bool
+    {
+        return $this->items()->contains(fn (CartItem $item): bool => $item->isShippable());
+    }
+
     public function shippingFee(string $shippingMethod): int
     {
+        if (! $this->requiresShipping()) {
+            return 0;
+        }
+
         return match ($shippingMethod) {
-            'pickup' => 0,
+            'pickup', 'none' => 0,
             default => 3500,
         };
     }
@@ -231,13 +240,23 @@ class CartService
             'productable_id' => $content->id,
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
-            'meta' => [
-                'item_type' => $content->orderItemType(),
-                'title' => $content->title,
-                'slug' => $content->slug,
-                'image_url' => $content->cartImageUrl(),
-            ],
+            'line_signature' => '',
+            'meta' => $this->baseCartMeta($content),
         ]);
+    }
+
+    /**
+     * @return array{item_type: string, title: string, slug: string, image_url: ?string, shippable: bool}
+     */
+    protected function baseCartMeta(Content $content): array
+    {
+        return [
+            'item_type' => $content->orderItemType(),
+            'title' => $content->title,
+            'slug' => $content->slug,
+            'image_url' => $content->cartImageUrl(),
+            'shippable' => $content->isShippable(),
+        ];
     }
 
     /**
@@ -261,30 +280,30 @@ class CartService
         $cart = $this->cart();
         $unitPrice = (int) ($booking['unit_price'] ?? data_get($content->data, 'price', 0));
 
+        $lineSignature = CartItem::bookingLineSignature(
+            $booking['booking_start_at'],
+            $booking['booking_end_at'],
+        );
+
         $duplicate = CartItem::query()
             ->where('cart_id', $cart->id)
             ->where('productable_type', $content->getMorphClass())
             ->where('productable_id', $content->id)
-            ->where('meta->booking_start_at', $booking['booking_start_at'])
-            ->where('meta->booking_end_at', $booking['booking_end_at'])
+            ->where('line_signature', $lineSignature)
             ->first();
 
         if ($duplicate instanceof CartItem) {
             return $duplicate;
         }
 
-        $meta = [
-            'item_type' => $content->orderItemType(),
-            'title' => $content->title,
-            'slug' => $content->slug,
-            'image_url' => $content->cartImageUrl(),
+        $meta = array_merge($this->baseCartMeta($content), [
             'calendar_id' => $booking['calendar_id'],
             'calendar_name' => $booking['calendar_name'],
             'booking_date' => $booking['booking_date'],
             'booking_start_at' => $booking['booking_start_at'],
             'booking_end_at' => $booking['booking_end_at'],
             'duration_minutes' => $booking['duration_minutes'],
-        ];
+        ]);
 
         if (isset($booking['nights'])) {
             $meta['nights'] = (int) $booking['nights'];
@@ -304,6 +323,7 @@ class CartService
             'productable_id' => $content->id,
             'quantity' => 1,
             'unit_price' => $unitPrice,
+            'line_signature' => $lineSignature,
             'meta' => $meta,
         ]);
     }
@@ -331,7 +351,7 @@ class CartService
             ->where('cart_id', $cart->id)
             ->where('productable_type', $meal->getMorphClass())
             ->where('productable_id', $meal->id)
-            ->where('meta->options_signature', $resolved['signature'])
+            ->where('line_signature', $resolved['signature'])
             ->first();
 
         if ($duplicate instanceof CartItem) {
@@ -346,15 +366,12 @@ class CartService
             'productable_id' => $meal->id,
             'quantity' => $quantity,
             'unit_price' => $resolved['unit_price'],
-            'meta' => [
-                'item_type' => $meal->orderItemType(),
-                'title' => $meal->title,
-                'slug' => $meal->slug,
-                'image_url' => $meal->cartImageUrl(),
+            'line_signature' => $resolved['signature'],
+            'meta' => array_merge($this->baseCartMeta($meal), [
                 'options_signature' => $resolved['signature'],
                 'meal_options' => $resolved['selected'],
                 'meal_options_label' => $resolved['label'],
-            ],
+            ]),
         ]);
     }
 
@@ -557,12 +574,14 @@ class CartService
         abort_unless($tenantId, 404);
 
         $subtotal = $this->subtotal();
-        $shippingFee = $this->shippingFee($shippingMethod);
+        $requiresShipping = $this->requiresShipping();
+        $effectiveShippingMethod = $requiresShipping ? $shippingMethod : 'none';
+        $shippingFee = $this->shippingFee($effectiveShippingMethod);
         $grandTotal = $subtotal + $shippingFee;
 
         $this->validateBookingItems($items);
 
-        return DB::transaction(function () use ($items, $customer, $shippingMethod, $paymentMethod, $paymentMeta, $tenantId, $subtotal, $shippingFee, $grandTotal): Order {
+        return DB::transaction(function () use ($items, $customer, $effectiveShippingMethod, $paymentMethod, $paymentMeta, $tenantId, $subtotal, $shippingFee, $grandTotal): Order {
             $client = $this->resolveCheckoutClient($customer, $tenantId);
 
             $isFreeOrder = $grandTotal <= 0;
@@ -588,7 +607,7 @@ class CartService
                 'fulfillment_status' => 'unfulfilled',
                 'meta' => array_merge([
                     'payment_method' => $paymentMethod,
-                    'shipping_method' => $shippingMethod,
+                    'shipping_method' => $effectiveShippingMethod,
                     'shipping_fee' => $shippingFee,
                     'source' => 'store_cart',
                 ], $paymentMeta),

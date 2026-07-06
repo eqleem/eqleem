@@ -55,14 +55,24 @@ class Checkout extends Component
     /**
      * @return array<string, array<int, mixed>>
      */
-    protected function customerRules(): array
+    protected function customerRules(CartService $cart): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
-            'shippingMethod' => ['required', 'in:express,scheduled,pickup'],
         ];
+
+        if ($cart->requiresShipping()) {
+            $rules['shippingMethod'] = ['required', 'in:express,scheduled,pickup'];
+        }
+
+        return $rules;
+    }
+
+    protected function resolvedShippingMethod(CartService $cart): string
+    {
+        return $cart->requiresShipping() ? $this->shippingMethod : 'none';
     }
 
     public function messages(): array
@@ -163,7 +173,7 @@ class Checkout extends Component
                     'phone' => $this->phone,
                     'email' => $this->email ?: null,
                 ],
-                'shipping_method' => $this->shippingMethod,
+                'shipping_method' => $this->resolvedShippingMethod($cart),
                 'payment_method' => 'credit-card',
                 'grand_total' => $grandTotal,
             ],
@@ -175,9 +185,10 @@ class Checkout extends Component
 
     protected function validateCheckoutDetails(CartService $cart): int
     {
-        $this->validate($this->customerRules());
+        $this->validate($this->customerRules($cart));
 
-        $grandTotal = $cart->subtotal() + $cart->shippingFee($this->shippingMethod);
+        $shippingMethod = $this->resolvedShippingMethod($cart);
+        $grandTotal = $cart->subtotal() + $cart->shippingFee($shippingMethod);
 
         if ($grandTotal <= 0) {
             return $grandTotal;
@@ -244,7 +255,7 @@ class Checkout extends Component
                 'phone' => $this->phone,
                 'email' => $this->email ?: null,
             ],
-            $this->shippingMethod,
+            $this->resolvedShippingMethod($cart),
             $paymentMethod,
             $paymentMeta,
         );
@@ -302,7 +313,9 @@ class Checkout extends Component
     {
         $items = $cart->items();
         $subtotal = $cart->subtotal();
-        $shippingFee = $cart->shippingFee($this->shippingMethod);
+        $requiresShipping = $cart->requiresShipping();
+        $shippingMethod = $this->resolvedShippingMethod($cart);
+        $shippingFee = $cart->shippingFee($shippingMethod);
         $grandTotal = $subtotal + $shippingFee;
         $itemCount = $items->sum('quantity');
         $paymentMethods = $this->activePaymentMethods();
@@ -312,6 +325,7 @@ class Checkout extends Component
         return tenantView('pages.checkout', [
             'items' => $items,
             'subtotal' => $subtotal,
+            'requiresShipping' => $requiresShipping,
             'shippingFee' => $shippingFee,
             'grandTotal' => $grandTotal,
             'itemCount' => $itemCount,

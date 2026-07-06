@@ -9,7 +9,7 @@
         <p class="mt-2 text-sm text-stone-600">ستدفع المبلغ نقداً عند استلام طلبك.</p>
     @endif
 
-    @if ($shippingMethod === 'pickup')
+    @if ($shippingMethod === 'pickup' && $requiresShipping)
         <p class="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
             الدفع عند الاستلام متاح عادةً للطلبات التي تتطلب شحناً. تأكد من أن هذا الخيار مناسب لطلبك.
         </p>

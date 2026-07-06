@@ -34,32 +34,34 @@
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-stone-200 bg-white p-5">
-                    <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الشحن والتسليم</h3>
-                    <div class="space-y-3">
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model.live="shippingMethod" type="radio" value="express" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-stone-900">توصيل سريع (24-48 ساعة)</p>
-                                <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
-                            </div>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model.live="shippingMethod" type="radio" value="scheduled" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-stone-900">توصيل مجدول</p>
-                                <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
-                            </div>
-                        </label>
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                            <input wire:model.live="shippingMethod" type="radio" value="pickup" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-stone-900">استلام من المعرض</p>
-                                <p class="text-xs text-stone-500">بدون رسوم شحن.</p>
-                            </div>
-                        </label>
+                @if ($requiresShipping)
+                    <div class="rounded-2xl border border-stone-200 bg-white p-5">
+                        <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الشحن والتسليم</h3>
+                        <div class="space-y-3">
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
+                                <input wire:model.live="shippingMethod" type="radio" value="express" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-stone-900">توصيل سريع (24-48 ساعة)</p>
+                                    <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
+                                </div>
+                            </label>
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
+                                <input wire:model.live="shippingMethod" type="radio" value="scheduled" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-stone-900">توصيل مجدول</p>
+                                    <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
+                                </div>
+                            </label>
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
+                                <input wire:model.live="shippingMethod" type="radio" value="pickup" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-stone-900">استلام من المعرض</p>
+                                    <p class="text-xs text-stone-500">بدون رسوم شحن.</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 @if ($requiresPayment)
                     <div class="rounded-2xl border border-stone-200 bg-white p-5">
@@ -101,6 +103,7 @@
                                             @include($method['checkout_component'], [
                                                 'selectedPaymentMethod' => $method,
                                                 'grandTotal' => $grandTotal,
+                                                'requiresShipping' => $requiresShipping,
                                             ])
                                         @endif
                                     </div>
@@ -123,9 +126,24 @@
 
                 <div class="mb-4 space-y-3 border-b border-stone-100 pb-4">
                     @foreach ($items as $item)
-                        <div wire:key="checkout-item-{{ $item->id }}" class="flex items-center justify-between gap-2 text-sm">
-                            <span class="truncate text-stone-600">{{ $item->title() }} × {{ $item->quantity }}</span>
-                            <span class="shrink-0 font-semibold text-stone-900" >{{ money_format($item->lineTotal()) }}</span>
+                        <div wire:key="checkout-item-{{ $item->id }}" class="flex items-start justify-between gap-2 text-sm">
+                            <div class="min-w-0">
+                                <p class="truncate font-medium text-stone-700">{{ $item->title() }} × {{ $item->quantity }}</p>
+
+                                @if ($item->isBooking())
+                                    <div class="mt-1 space-y-0.5 text-xs text-stone-500">
+                                        @if ($item->bookingDateLabel())
+                                            <p>{{ $item->bookingDateLabel() }}</p>
+                                        @endif
+                                        @if ($item->bookingTimeLabel())
+                                            <p @if ($item->itemType() === 'service') dir="ltr" @endif>{{ $item->bookingTimeLabel() }}</p>
+                                        @endif
+                                    </div>
+                                @elseif ($item->mealOptionsLabel())
+                                    <p class="mt-1 text-xs text-stone-500">{{ $item->mealOptionsLabel() }}</p>
+                                @endif
+                            </div>
+                            <span class="shrink-0 font-semibold text-stone-900">{{ money_format($item->lineTotal()) }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -139,10 +157,12 @@
                         <span class="text-stone-500">إجمالي المنتجات</span>
                         <span class="font-semibold text-stone-900" >{{ money_format($subtotal) }}</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-stone-500">الشحن</span>
-                        <span class="font-semibold text-stone-900" >{{ money_format($shippingFee) }}</span>
-                    </div>
+                    @if ($requiresShipping)
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-stone-500">الشحن</span>
+                            <span class="font-semibold text-stone-900" >{{ money_format($shippingFee) }}</span>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="my-4 flex items-center justify-between">

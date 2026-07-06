@@ -6,6 +6,8 @@
 
         <title>{{ $title ?? '' }} | {{tenant()->name}}</title>
 
+        <link rel="icon" type="image/png" href="{{ tenant('logo') }}">
+
         <script src="{{ asset('assets/js/twind.min.js') }}"></script>
         <script src="{{ asset('assets/js/twind.custom.js') }}"></script>
  

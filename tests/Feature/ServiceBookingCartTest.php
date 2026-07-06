@@ -146,6 +146,9 @@ it('creates a mixed ecommerce order with product service and course items', func
         ->call('addToCart');
 
     Livewire::test(Checkout::class)
+        ->assertSee('خيارات الشحن والتسليم')
+        ->assertSee('6 يوليو 2026')
+        ->assertSee('09:00 - 10:00')
         ->set('name', 'أحمد محمد')
         ->set('phone', '0500000000')
         ->set('shippingMethod', 'pickup')

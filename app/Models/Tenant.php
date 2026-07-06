@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\TenantCreated;
+use App\Services\TenantProfileService;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -11,8 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 use Spatie\MediaLibrary\HasMedia;
@@ -130,18 +129,6 @@ class Tenant extends Model implements HasMedia
 
     public function getLogoAttribute(): string
     {
-        $stored = data_get($this->meta, 'logo') ?? data_get($this->data, 'logo');
-
-        if (Str::startsWith((string) $stored, 'http')) {
-            return (string) $stored;
-        }
-
-        $path = is_array($stored) ? ($stored['path'] ?? null) : $stored;
-
-        if (filled($path)) {
-            return Storage::url((string) $path);
-        }
-
-        return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$this->uuid;
+        return app(TenantProfileService::class)->logo($this);
     }
 }

@@ -29,9 +29,13 @@ return new class extends Migration
             $table->unsignedInteger('quantity')->default(1);
             $table->unsignedBigInteger('unit_price')->default(0);
             $table->json('meta')->nullable();
+            $table->string('line_signature', 191)->default('');
             $table->timestamps();
 
-            $table->unique(['cart_id', 'productable_id', 'productable_type'], 'cart_items_cart_productable_unique');
+            $table->unique(
+                ['cart_id', 'productable_type', 'productable_id', 'line_signature'],
+                'cart_items_cart_productable_line_unique',
+            );
         });
     }
 

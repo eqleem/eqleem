@@ -16,7 +16,13 @@ class CartItem extends Model
         'quantity',
         'unit_price',
         'meta',
+        'line_signature',
     ];
+
+    public static function bookingLineSignature(string $startAt, string $endAt): string
+    {
+        return $startAt.'|'.$endAt;
+    }
 
     protected function casts(): array
     {
@@ -45,6 +51,15 @@ class CartItem extends Model
     public function itemType(): string
     {
         return (string) data_get($this->meta, 'item_type', 'other');
+    }
+
+    public function isShippable(): bool
+    {
+        if (array_key_exists('shippable', $this->meta ?? [])) {
+            return (bool) data_get($this->meta, 'shippable');
+        }
+
+        return Order::isShippableItemType($this->itemType());
     }
 
     public function title(): string

@@ -8,6 +8,9 @@
 
         <script src="{{ asset('assets/js/twind.min.js') }}"></script>
         <script src="{{ asset('assets/js/twind.custom.js') }}"></script>
+         
+        <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-shape-white.webp') }}">
+ 
  
         <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
@@ -44,7 +47,7 @@
         <x-admin::header />
         <x-admin::navbar />
 
-        <main class="min-h-[90vh]">    
+        <main class="min-h-[85vh]">    
             {{ $slot }}
         </main>
 

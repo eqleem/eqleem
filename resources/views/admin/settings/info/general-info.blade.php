@@ -213,7 +213,7 @@ new class extends \Livewire\Component
 
         if ($this->logo) {
             $path = $this->logo->storePublicly('tenant-media/'.$this->tenant->uuid.'/logo', 'spaces');
-            $this->tenant->meta->set('logo', $path);
+            app(TenantProfileService::class)->saveLogo($this->tenant, $path);
             $this->currentLogo = $this->tenant->fresh()->logo;
             $this->reset('logo');
         }

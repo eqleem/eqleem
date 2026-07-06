@@ -31,6 +31,7 @@
 <?php
 
 use App\Models\Block;
+use App\Services\TenantProfileService;
 use Livewire\WithFileUploads;
 
 new class extends Livewire\Component
@@ -84,10 +85,10 @@ new class extends Livewire\Component
 
             if ($this->logo) {
                 $path = $this->logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
-                $tenant->meta->set('logo', $path);
+                app(TenantProfileService::class)->saveLogo($tenant, $path);
+            } else {
+                $tenant->save();
             }
-
-            $tenant->save();
 
             $this->currentLogo = $tenant->logo;
             $this->reset('logo');
