@@ -7,4 +7,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
- 
+
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('backup:run')->daily()->at('01:30');
