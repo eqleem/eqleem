@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('auth.login');
         });
 
+        $middleware->trustProxies(at: [
+            '*', // Your Load Balancer's Private IP
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
