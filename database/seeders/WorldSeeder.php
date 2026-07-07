@@ -27,6 +27,10 @@ class WorldSeeder extends Seeder
             return;
         }
 
+        if (Country::count() > 0) {
+            return;
+        }
+
         $this->createLanguages();
         $this->createNationalities();
         $this->createCountries();
