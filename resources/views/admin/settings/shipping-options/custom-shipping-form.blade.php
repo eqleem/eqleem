@@ -10,7 +10,7 @@
         min="0"
         step="0.01"
         placeholder="24"
-        dir="ltr"
+        
         suffix="{{ money_symbol() }}"
     />
 
@@ -30,6 +30,7 @@
             :selected="$cityIds"
             placeholder="ابحث عن مدينة أو اختر كل المدن"
             search-name="citySearch"
+            open-name="cityPickerOpen"
             live
             info="يمكنك اختيار مدن محددة أو خيار كل المدن داخل الدولة."
         />
@@ -91,6 +92,8 @@ new class extends \Livewire\Component
 
     public string $citySearch = '';
 
+    public bool $cityPickerOpen = false;
+
     public function mount(?string $optionId = null): void
     {
         $this->optionId = $optionId;
@@ -104,6 +107,7 @@ new class extends \Livewire\Component
     {
         $this->cityIds = [];
         $this->citySearch = '';
+        $this->cityPickerOpen = false;
     }
 
     public function updatedCityIds(): void

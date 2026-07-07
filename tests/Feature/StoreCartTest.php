@@ -391,6 +391,36 @@ it('rejects free checkout when order total is greater than zero', function () {
         ->assertHasErrors(['paymentMethod']);
 });
 
+it('redirects to order confirmation after checkout', function () {
+    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    Setting::savePaymentMethod('cash-on-delivery', [], true);
+
+    app(CartService::class)->addProduct($product);
+
+    Livewire::test(Checkout::class)
+        ->set('name', 'أحمد')
+        ->set('phone', '0500000000')
+        ->set('paymentMethod', 'cash-on-delivery')
+        ->call('confirmCashOnDelivery')
+        ->assertRedirect(route('tenant.pages.order-confirmation', [
+            'tenant' => $tenant->handle,
+            'order' => Order::query()->value('uuid'),
+        ]));
+
+    $order = Order::query()->firstOrFail();
+
+    $this->withSession(['recent_order_id' => $order->id])
+        ->get(route('tenant.pages.order-confirmation', [
+            'tenant' => $tenant->handle,
+            'order' => $order->uuid,
+        ]))
+        ->assertSuccessful()
+        ->assertSee('تم استلام طلبك بنجاح');
+});
+
 it('denies viewing order confirmation without access', function () {
     ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
 

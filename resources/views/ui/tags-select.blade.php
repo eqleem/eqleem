@@ -10,6 +10,7 @@
     'labelWidth' => 'w-36',
     'searchable' => true,
     'searchName' => null,
+    'openName' => null,
 ])
 
 @php
@@ -18,23 +19,73 @@
     $selectedOptions = $selectableOptions
         ->filter(fn (array $option): bool => in_array((string) $option['id'], $selectedIds, true))
         ->values();
+    $usesServerSearch = filled($searchName);
 @endphp
 
 <ui:field name="{{ $name }}" info="{{ $info }}" label="{{ __($label) }}" :width="$width" :labelWidth="$labelWidth">
     <div
-        class="relative !min-w-[12rem]"
-        x-data="{
-            open: false,
-            search: '',
-            matches(label) {
-                if (! this.search.trim()) {
-                    return true;
-                }
+        @if ($openName)
+            x-data="{
+                open: @entangle($openName).live,
+                search: '',
+                panelStyle: '',
+                matches(label) {
+                    if (@js($usesServerSearch) || ! this.search.trim()) {
+                        return true;
+                    }
 
-                return label.toLowerCase().includes(this.search.trim().toLowerCase());
-            }
-        }"
+                    return label.toLowerCase().includes(this.search.trim().toLowerCase());
+                },
+                updatePosition() {
+                    if (! this.open || ! this.$refs.trigger) {
+                        return;
+                    }
+
+                    const rect = this.$refs.trigger.getBoundingClientRect();
+
+                    this.panelStyle = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;width:${Math.max(rect.width, 288)}px;z-index:9999;`;
+                },
+                toggle() {
+                    this.open = ! this.open;
+
+                    if (this.open) {
+                        this.$nextTick(() => this.updatePosition());
+                    }
+                }
+            }"
+        @else
+            x-data="{
+                open: false,
+                search: '',
+                panelStyle: '',
+                matches(label) {
+                    if (@js($usesServerSearch) || ! this.search.trim()) {
+                        return true;
+                    }
+
+                    return label.toLowerCase().includes(this.search.trim().toLowerCase());
+                },
+                updatePosition() {
+                    if (! this.open || ! this.$refs.trigger) {
+                        return;
+                    }
+
+                    const rect = this.$refs.trigger.getBoundingClientRect();
+
+                    this.panelStyle = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;width:${Math.max(rect.width, 288)}px;z-index:9999;`;
+                },
+                toggle() {
+                    this.open = ! this.open;
+
+                    if (this.open) {
+                        this.$nextTick(() => this.updatePosition());
+                    }
+                }
+            }"
+        @endif
         @click.outside="open = false"
+        @resize.window="updatePosition()"
+        @scroll.window="updatePosition()"
     >
         <div class="rounded-md border border-transparent bg-white px-3 py-2 text-sm shadow-sm focus-within:border-primary-400">
             @if ($selectedOptions->isNotEmpty())
@@ -60,7 +111,8 @@
 
             <button
                 type="button"
-                @click="open = !open"
+                x-ref="trigger"
+                @click="toggle()"
                 class="flex w-full items-center justify-between gap-2 text-start"
             >
                 <span @class(['truncate text-gray-400' => $selectedOptions->isEmpty(), 'text-gray-600' => $selectedOptions->isNotEmpty()])>
@@ -74,63 +126,68 @@
             </button>
         </div>
 
-        <div
-            x-show="open"
-            x-cloak
-            x-transition
-            class="absolute z-50 mt-1 max-h-56 !min-w-[12rem] w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg"
-        >
-            @if ($searchable)
-                <div class="border-b border-gray-100 p-2">
-                    @if ($searchName)
-                        <input
-                            type="search"
-                            wire:model.live.debounce.300ms="{{ $searchName }}"
-                            placeholder="ابحث..."
-                            class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 focus:border-primary-400 focus:outline-none"
-                            @click.stop
-                        >
-                    @else
-                        <input
-                            type="search"
-                            x-model="search"
-                            placeholder="ابحث..."
-                            class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 focus:border-primary-400 focus:outline-none"
-                            @click.stop
-                        >
-                    @endif
-                </div>
-            @endif
-
-            <div class="max-h-44 overflow-y-auto p-1">
-                @forelse ($options as $option)
-                    @if ($option['selectable'] ?? true)
-                        <label
-                            wire:key="{{ $name }}-option-{{ $option['id'] }}"
-                            x-show="matches(@js($option['label']))"
-                            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                        >
+        <template x-teleport="body">
+            <div
+                x-show="open"
+                x-cloak
+                x-transition
+                :style="panelStyle"
+                class="max-h-56 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl"
+            >
+                @if ($searchable)
+                    <div class="border-b border-gray-100 p-2">
+                        @if ($searchName)
                             <input
-                                type="checkbox"
-                                @if ($live) wire:model.live="{{ $name }}" @else wire:model="{{ $name }}" @endif
-                                value="{{ $option['id'] }}"
-                                class="h-3.5 w-3.5 shrink-0 rounded border-gray-300"
+                                type="search"
+                                wire:model.live.debounce.300ms="{{ $searchName }}"
+                                placeholder="ابحث..."
+                                class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 focus:border-primary-400 focus:outline-none"
+                                @click.stop
+                                @keydown.stop
                             >
-                            <span class="min-w-0 truncate">{{ $option['label'] }}</span>
-                        </label>
-                    @else
-                        <div
-                            wire:key="{{ $name }}-group-{{ $option['id'] }}"
-                            x-show="matches(@js($option['label']))"
-                            class="truncate px-2 py-1 text-xs font-medium text-gray-400"
-                        >
-                            {{ $option['label'] }}
-                        </div>
-                    @endif
-                @empty
-                    <p class="px-2 py-2 text-xs text-gray-400">لا توجد خيارات</p>
-                @endforelse
+                        @else
+                            <input
+                                type="search"
+                                x-model="search"
+                                placeholder="ابحث..."
+                                class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 focus:border-primary-400 focus:outline-none"
+                                @click.stop
+                                @keydown.stop
+                            >
+                        @endif
+                    </div>
+                @endif
+
+                <div class="max-h-44 overflow-y-auto p-1">
+                    @forelse ($options as $option)
+                        @if ($option['selectable'] ?? true)
+                            <label
+                                wire:key="{{ $name }}-option-{{ $option['id'] }}"
+                                x-show="matches(@js($option['label']))"
+                                class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                            >
+                                <input
+                                    type="checkbox"
+                                    @if ($live) wire:model.live="{{ $name }}" @else wire:model="{{ $name }}" @endif
+                                    value="{{ $option['id'] }}"
+                                    class="h-3.5 w-3.5 shrink-0 rounded border-gray-300"
+                                >
+                                <span class="min-w-0 truncate">{{ $option['label'] }}</span>
+                            </label>
+                        @else
+                            <div
+                                wire:key="{{ $name }}-group-{{ $option['id'] }}"
+                                x-show="matches(@js($option['label']))"
+                                class="truncate px-2 py-1 text-xs font-medium text-gray-400"
+                            >
+                                {{ $option['label'] }}
+                            </div>
+                        @endif
+                    @empty
+                        <p class="px-2 py-2 text-xs text-gray-400">لا توجد خيارات</p>
+                    @endforelse
+                </div>
             </div>
-        </div>
+        </template>
     </div>
 </ui:field>

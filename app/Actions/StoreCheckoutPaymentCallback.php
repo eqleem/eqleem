@@ -71,7 +71,10 @@ class StoreCheckoutPaymentCallback
         session()->flash('recent_order_id', $order->id);
         session()->flash('status', 'تم الدفع وإنشاء الطلب بنجاح.');
 
-        return redirect()->route('tenant.pages.order-confirmation', ['order' => $order->uuid]);
+        return redirect()->route('tenant.pages.order-confirmation', [
+            'tenant' => tenant('handle'),
+            'order' => $order->uuid,
+        ]);
     }
 
     protected function redirectWithError(string $message)

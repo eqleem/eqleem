@@ -173,3 +173,18 @@ it('orders countries with priority and all countries option', function () {
         ->and($options[1]['label'])->toBe('الدول المفضلة')
         ->and(collect($options)->firstWhere('id', 'SA'))->not->toBeNull();
 });
+
+it('shows saudi cities in arabic in city options', function () {
+    $options = collect(app(WorldLocationOptions::class)->citySelectOptions('SA'))
+        ->filter(fn (array $option): bool => $option['selectable'] ?? true);
+
+    expect($options->firstWhere('label', 'الرياض'))->not->toBeNull()
+        ->and($options->firstWhere('label', 'ابها'))->not->toBeNull();
+});
+
+it('finds saudi cities by arabic search term', function () {
+    $options = collect(app(WorldLocationOptions::class)->citySelectOptions('SA', 'الرياض'))
+        ->filter(fn (array $option): bool => $option['selectable'] ?? true);
+
+    expect($options->firstWhere('label', 'الرياض'))->not->toBeNull();
+});

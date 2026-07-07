@@ -263,7 +263,10 @@ class Checkout extends Component
         $this->dispatch('cart-updated');
         session()->flash('recent_order_id', $order->id);
 
-        $this->redirect(route('tenant.pages.order-confirmation', ['order' => $order->uuid]), navigate: true);
+        $this->redirect(route('tenant.pages.order-confirmation', [
+            'tenant' => tenant('handle'),
+            'order' => $order->uuid,
+        ]));
     }
 
     /**

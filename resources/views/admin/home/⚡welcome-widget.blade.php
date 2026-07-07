@@ -42,94 +42,35 @@
 >
     <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
         <div class="p-5 sm:p-6">
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-primary-100">{{ $greeting }}</p>
-                    <h2 class="mt-1 text-xl font-bold sm:text-2xl">
-                        مرحباً، {{ $userName }} 👋
-                    </h2>
-                    <p class="mt-2 max-w-lg text-sm leading-relaxed text-primary-100/90">
-                        @if ($percentage >= 100)
-                            صفحتك جاهزة بالكامل — شاركها الآن وابدأ بجذب عملائك.
-                        @elseif ($percentage >= 70)
-                            أنت قريب جداً! أكمل الخطوات المتبقية لتظهر صفحتك بأفضل شكل.
-                        @else
-                            أكمل إعداد صفحتك خطوة بخطوة لتبدو احترافية وتجذب المزيد من الزوار.
-                        @endif
-                    </p>
-
-                    @if ($percentage >= 100)
-                        <button
-                            type="button"
-                            x-on:click="$dispatch('openmodal', { modal: 'home-step-content' })"
-                            class="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
-                        >
-                            <iconify-icon icon="solar:add-circle-bold" class="text-lg"></iconify-icon>
-                            إضافة محتوى
-                        </button>
-                    @endif
-                </div>
-
-                @if ($percentage < 100)
-                    <div class="flex shrink-0 items-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
-                        <div class="relative size-20 shrink-0">
-                            <svg class="size-20 -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
-                                <circle cx="18" cy="18" r="15.5" fill="none" class="stroke-white/20" stroke-width="3" />
-                                <circle
-                                    cx="18"
-                                    cy="18"
-                                    r="15.5"
-                                    fill="none"
-                                    class="stroke-amber-300 transition-all duration-700 ease-out"
-                                    stroke-width="3"
-                                    stroke-linecap="round"
-                                    stroke-dasharray="{{ $percentage }}, 100"
-                                />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-2xl font-bold leading-none">{{ $percentage }}%</span>
-                                <span class="mt-0.5 text-[10px] text-primary-100">اكتمال</span>
-                            </div>
-                        </div>
-
-                        <div class="min-w-0">
-                            <p class="text-sm font-semibold">
-                                {{ $completedSteps }}/{{ $totalSteps }} خطوات
-                            </p>
-                            @if ($nextStep)
-                                <button
-                                    type="button"
-                                    x-on:click="$dispatch('openmodal', { modal: @js($nextStep['modal']) })"
-                                    class="mt-1 block text-start text-xs leading-relaxed text-amber-200 transition hover:text-white"
-                                >
-                                    التالي: {{ $nextStep['label'] }} ←
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-            </div>
+            <p class="text-sm font-medium text-primary-100">{{ $greeting }}</p>
+            <h2 class="mt-1 text-xl font-bold sm:text-2xl">مرحباً، {{ $userName }} 👋</h2>
 
             @if ($percentage < 100)
-                <div class="mt-5 flex flex-wrap gap-2">
-                    @foreach ($steps as $index => $step)
-                        <button
-                            type="button"
-                            x-on:click="$dispatch('openmodal', { modal: @js($step['modal']) })"
-                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition {{ $step['done'] ? 'bg-emerald-400/15 text-emerald-100 ring-emerald-300/25 hover:bg-emerald-400/25' : 'bg-white/10 text-white ring-white/15 hover:bg-white/20' }}"
-                            title="{{ $step['hint'] }}"
-                        >
-                            @if ($step['done'])
-                                <iconify-icon icon="solar:check-circle-bold" class="text-sm text-emerald-300"></iconify-icon>
-                            @else
-                                <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-300/20 text-[10px] font-bold text-amber-200">
-                                    {{ $index + 1 }}
-                                </span>
-                            @endif
-                            {{ $step['label'] }}
-                        </button>
-                    @endforeach
+                <div class="mt-4">
+                    <div class="flex items-center justify-between text-xs sm:text-sm">
+                        <span class="text-primary-100">{{ $completedSteps }}/{{ $totalSteps }} خطوات</span>
+                        <span class="font-bold">{{ $percentage }}%</span>
+                    </div>
+                    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20 sm:h-2">
+                        <div
+                            class="h-full rounded-full bg-amber-300 transition-all duration-700 ease-out"
+                            style="width: {{ $percentage }}%"
+                        ></div>
+                    </div>
                 </div>
+
+                @if ($nextStep)
+                    <button
+                        type="button"
+                        x-on:click="$dispatch('openmodal', { modal: @js($nextStep['modal']) })"
+                        class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 sm:w-auto"
+                    >
+                        <iconify-icon icon="solar:arrow-left-bold" class="text-base"></iconify-icon>
+                        {{ $nextStep['label'] }}
+                    </button>
+                @endif
+            @else
+                <p class="mt-2 text-sm text-primary-100/90">صفحتك جاهزة — شاركها مع عملائك.</p>
             @endif
         </div>
 
@@ -152,7 +93,7 @@
                     href="{{ $pageUrl }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex flex-col items-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                    class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                     title="معاينة الصفحة"
                 >
                     <iconify-icon icon="solar:eye-bold" class="text-lg"></iconify-icon>
@@ -162,7 +103,7 @@
                 <button
                     type="button"
                     x-on:click="copyLink()"
-                    class="flex flex-col items-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                    class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                     title="نسخ الرابط"
                 >
                     <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
@@ -172,7 +113,7 @@
                 <button
                     type="button"
                     x-on:click="$dispatch('openmodal', { modal: 'home-share-page' })"
-                    class="flex flex-col items-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                    class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                     title="مشاركة الصفحة"
                 >
                     <iconify-icon icon="solar:share-bold" class="text-lg"></iconify-icon>
@@ -182,17 +123,18 @@
                 <button
                     type="button"
                     x-on:click="$dispatch('openmodal', { modal: 'home-page-qr' })"
-                    class="flex flex-col items-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
-                    title="رمز QR"
+                    class="flex items-center justify-center rounded-xl bg-white p-1 ring-1 ring-white/20 transition hover:bg-white/90"
+                    title="رمز QR — اضغط للتكبير"
                 >
-                    <iconify-icon icon="solar:qr-code-bold" class="text-lg"></iconify-icon>
-                    QR
+                    <img
+                        src="{{ $this->qrImageUrl(120) }}"
+                        alt="رمز QR لصفحة {{ tenant('name') }}"
+                        class="size-16 rounded-md"
+                        loading="lazy"
+                    >
                 </button>
             </div>
-
-            <p x-show="copied" x-transition class="mt-2 text-center text-xs text-emerald-300">
-                تم نسخ الرابط
-            </p>
+ 
         </div>
     </div>
 
@@ -287,7 +229,7 @@
 
             <div class="mx-auto inline-block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
                 <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={{ urlencode($pageUrl) }}"
+                    src="{{ $this->qrImageUrl(220) }}"
                     alt="رمز QR لصفحة {{ tenant('name') }}"
                     class="mx-auto size-[220px]"
                     loading="lazy"
@@ -395,8 +337,13 @@ new class extends Component
         return 'مساء الخير';
     }
 
+    public function qrImageUrl(int $size = 220): string
+    {
+        return 'https://api.qrserver.com/v1/create-qr-code/?size='.$size.'x'.$size.'&data='.urlencode($this->pageUrl);
+    }
+
     public function placeholder(): string
     {
-        return '<div class="mb-6 h-44 animate-pulse rounded-2xl bg-gray-300/40"></div>';
+        return '<div class="mb-6 h-36 animate-pulse rounded-2xl bg-gray-300/40"></div>';
     }
 }; ?>

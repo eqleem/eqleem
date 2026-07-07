@@ -23,6 +23,17 @@ class WorldLocationOptions
         'AE', 'YE',
     ];
 
+    /** @var array<string, string> */
+    private const SA_STATE_ALIASES = [
+        "'Asir" => 'Asir',
+        'Al Bahah' => 'Bahah',
+        'Al Jawf' => 'Jawf',
+        'Al Madinah' => 'Madinah',
+        'Al-Qassim' => 'Qassim',
+        "Ha'il" => 'Hail',
+        'Jizan' => 'Jazan',
+    ];
+
     /**
      * @return list<array{id: string, label: string, selectable?: bool}>
      */
@@ -105,14 +116,26 @@ class WorldLocationOptions
 
         if (filled($search)) {
             $term = '%'.mb_strtolower(trim($search)).'%';
-            $query->where(function ($builder) use ($term): void {
+            $query->where(function ($builder) use ($term, $country, $search): void {
                 $builder
                     ->whereRaw('LOWER(name) LIKE ?', [$term])
                     ->orWhereRaw('LOWER(json_extract(translations, "$.ar")) LIKE ?', [$term]);
-            });
+
+                if ($country->iso2 === 'SA') {
+                    $arabicNames = $this->matchingSaCityEnglishNames($search);
+
+                    if ($arabicNames !== []) {
+                        $builder->orWhereIn('name', $arabicNames);
+                    }
+                }
+            })->limit(200);
+        } elseif ($country->iso2 === 'SA') {
+            $query->limit(1000);
+        } else {
+            $query->limit(200);
         }
 
-        $cities = $query->limit(200)->get(['id', 'name', 'state_id', 'translations']);
+        $cities = $query->get(['id', 'name', 'state_id', 'translations', 'country_id']);
 
         $options = [
             [
@@ -122,8 +145,8 @@ class WorldLocationOptions
         ];
 
         $grouped = $cities
-            ->groupBy(fn (City $city): string => $this->localizedName($city->state, 'مناطق أخرى'))
-            ->sortKeys();
+            ->groupBy(fn (City $city): string => $this->localizedName($city->state, 'مناطق أخرى', locale: 'ar'))
+            ->sortKeys(SORT_STRING);
 
         foreach ($grouped as $region => $regionCities) {
             $options[] = [
@@ -132,10 +155,10 @@ class WorldLocationOptions
                 'selectable' => false,
             ];
 
-            foreach ($regionCities->sortBy(fn (City $city): string => $this->localizedName($city)) as $city) {
+            foreach ($regionCities->sortBy(fn (City $city): string => $this->localizedName($city, locale: 'ar'), SORT_STRING) as $city) {
                 $options[] = [
                     'id' => (string) $city->id,
-                    'label' => $this->localizedName($city),
+                    'label' => $this->localizedName($city, locale: 'ar'),
                 ];
             }
         }
@@ -179,8 +202,8 @@ class WorldLocationOptions
         return City::query()
             ->whereIn('id', $ids)
             ->orderBy('name')
-            ->get(['id', 'name', 'translations'])
-            ->map(fn (City $city): string => $this->localizedName($city))
+            ->get(['id', 'name', 'translations', 'country_id'])
+            ->map(fn (City $city): string => $this->localizedName($city, locale: 'ar'))
             ->values()
             ->all();
     }
@@ -232,14 +255,140 @@ class WorldLocationOptions
         ], fn (array $items): bool => $items !== []);
     }
 
-    protected function localizedName(Country|State|City|null $model, string $fallback = ''): string
+    protected function localizedName(Country|State|City|null $model, string $fallback = '', string $locale = 'ar'): string
     {
         if (! $model) {
             return $fallback;
         }
 
-        $locale = app()->getLocale();
+        $translation = data_get($model->translations, $locale);
 
-        return (string) data_get($model->translations, $locale, $model->name ?? $fallback);
+        if (is_string($translation) && $translation !== '') {
+            return $translation;
+        }
+
+        if ($model instanceof City) {
+            $arabicCityName = $this->saCityArabicNames()[mb_strtolower(trim($model->name))] ?? null;
+
+            if (is_string($arabicCityName) && $arabicCityName !== '') {
+                return $arabicCityName;
+            }
+        }
+
+        if ($model instanceof State) {
+            $arabicStateName = $this->saStateArabicNames()[$model->name] ?? null;
+
+            if (is_string($arabicStateName) && $arabicStateName !== '') {
+                return $arabicStateName;
+            }
+        }
+
+        return (string) ($model->name ?? $fallback);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function saCityArabicNames(): array
+    {
+        return once(function (): array {
+            $path = database_path('data-light/cities_lite.json');
+
+            if (! is_file($path)) {
+                return [];
+            }
+
+            $cities = json_decode((string) file_get_contents($path), true);
+
+            if (! is_array($cities)) {
+                return [];
+            }
+
+            return collect($cities)
+                ->filter(fn (mixed $city): bool => is_array($city) && filled($city['name_en'] ?? null) && filled($city['name_ar'] ?? null))
+                ->mapWithKeys(fn (array $city): array => [
+                    mb_strtolower(trim((string) $city['name_en'])) => (string) $city['name_ar'],
+                ])
+                ->all();
+        });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function saStateArabicNames(): array
+    {
+        return once(function (): array {
+            $path = database_path('data-light/regions_lite.json');
+
+            if (! is_file($path)) {
+                return [];
+            }
+
+            $regions = json_decode((string) file_get_contents($path), true);
+
+            if (! is_array($regions)) {
+                return [];
+            }
+
+            $names = [];
+
+            foreach ($regions as $region) {
+                if (! is_array($region) || ! filled($region['name_en'] ?? null) || ! filled($region['name_ar'] ?? null)) {
+                    continue;
+                }
+
+                $names[(string) $region['name_en']] = (string) $region['name_ar'];
+            }
+
+            foreach (self::SA_STATE_ALIASES as $worldName => $liteName) {
+                if (isset($names[$liteName])) {
+                    $names[$worldName] = $names[$liteName];
+                }
+            }
+
+            return $names;
+        });
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function matchingSaCityEnglishNames(string $search): array
+    {
+        $needle = mb_strtolower(trim($search));
+
+        if ($needle === '') {
+            return [];
+        }
+
+        $path = database_path('data-light/cities_lite.json');
+
+        if (! is_file($path)) {
+            return [];
+        }
+
+        $cities = json_decode((string) file_get_contents($path), true);
+
+        if (! is_array($cities)) {
+            return [];
+        }
+
+        return collect($cities)
+            ->filter(function (mixed $city) use ($needle): bool {
+                if (! is_array($city)) {
+                    return false;
+                }
+
+                $arabicName = mb_strtolower((string) ($city['name_ar'] ?? ''));
+                $englishName = mb_strtolower((string) ($city['name_en'] ?? ''));
+
+                return str_contains($arabicName, $needle) || str_contains($englishName, $needle);
+            })
+            ->pluck('name_en')
+            ->map(fn (mixed $name): string => (string) $name)
+            ->unique()
+            ->values()
+            ->all();
     }
 }
