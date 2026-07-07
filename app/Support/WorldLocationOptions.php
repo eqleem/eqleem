@@ -117,11 +117,9 @@ class WorldLocationOptions
         if (filled($search)) {
             $term = '%'.mb_strtolower(trim($search)).'%';
             $query->where(function ($builder) use ($term, $country, $search): void {
-                $builder
-                    ->whereRaw('LOWER(name) LIKE ?', [$term])
-                    ->orWhereRaw('LOWER(json_extract(translations, "$.ar")) LIKE ?', [$term]);
+                $builder->whereRaw('LOWER(name) LIKE ?', [$term]);
 
-                if ($country->iso2 === 'SA') {
+                if ($country->iso2 === 'SA' && mb_strlen(trim($search)) >= 2) {
                     $arabicNames = $this->matchingSaCityEnglishNames($search);
 
                     if ($arabicNames !== []) {
