@@ -1,0 +1,136 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    protected $connection = 'world';
+
+    public function up(): void
+    {
+        if (DB::connection()->getName() != 'world') {
+            return;
+        }
+
+        if (Schema::hasTable('countries')) {
+            return;
+        }
+
+        Schema::connection('world')->create('countries', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 100);
+            $table->string('iso2', 2)->unique()->index();
+            $table->string('iso3', 3)->unique()->index();
+            $table->string('numeric_code', 3)->nullable();
+            $table->string('phonecode')->index()->nullable();
+            $table->string('capital')->nullable();
+            $table->string('currency')->nullable();
+            $table->string('currency_name')->nullable();
+            $table->string('currency_symbol')->nullable();
+            $table->string('tld')->nullable();
+            $table->string('native')->nullable();
+            $table->string('region')->nullable();
+            $table->string('subregion')->nullable();
+            $table->json('timezones')->nullable();
+            $table->json('translations')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('emoji', 191)->nullable();
+            $table->string('emojiU', 191)->nullable();
+            $table->boolean('flag')->default(1);
+            $table->boolean('active')->index()->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->json('meta')->nullable();
+
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('states', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->index()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('name', 150);
+            $table->json('translations')->nullable();
+
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->json('meta')->nullable();
+
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('cities', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->index()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('state_id')->index()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('name', 150);
+            $table->json('translations')->nullable();
+
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->json('meta')->nullable();
+
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('villages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->index()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('state_id')->index()->nullable();
+            $table->string('name', 150);
+            $table->json('translations')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->json('meta')->nullable();
+
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('neighborhoods', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->index()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('city_id')->index()->nullable();
+            $table->string('name');
+            $table->json('translations')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->json('meta')->nullable();
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('languages', function (Blueprint $table) {
+            $table->id();
+            $table->string('code', 2)->unique()->index();
+            $table->string('name');
+            $table->string('name_native')->nullable();
+            $table->string('dir')->default('ltr')->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->json('meta')->nullable();
+            $table->softDeletes();
+        });
+
+        Schema::connection('world')->create('nationalities', function (Blueprint $table) {
+            $table->id();
+            $table->string('code', 2)->unique()->index();
+            $table->string('name');
+            $table->json('translations')->nullable();
+            $table->boolean('active')->index()->default(true);
+            $table->json('meta')->nullable();
+            $table->softDeletes();
+        });
+    }
+};

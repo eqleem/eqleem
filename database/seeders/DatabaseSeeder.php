@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
 
         $admin->update(['current_tenant_id' => $tenant->id]);
 
+        $this->call(WorldSeeder::class);
         $this->call(ThemeSeeder::class);
         $this->call(PlanSeeder::class);
     }

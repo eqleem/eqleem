@@ -1,0 +1,1252 @@
+[
+    {
+        "country_code": "AF",
+        "country_enName": "Afghanistan",
+        "country_arName": "افغانستان"
+    },
+    {
+        "country_code": "AX",
+        "country_enName": "Aland Islands",
+        "country_arName": "جزر آلاند"
+    },
+    {
+        "country_code": "AL",
+        "country_enName": "Albania",
+        "country_arName": "ألبانيا"
+    },
+    {
+        "country_code": "DZ",
+        "country_enName": "Algeria",
+        "country_arName": "الجزائر"
+    },
+    {
+        "country_code": "AS",
+        "country_enName": "American Samoa",
+        "country_arName": "ساموا الأمريكية"
+    },
+    {
+        "country_code": "AD",
+        "country_enName": "Andorra",
+        "country_arName": "أندورا"
+    },
+    {
+        "country_code": "AO",
+        "country_enName": "Angola",
+        "country_arName": "أنجولا"
+    },
+    {
+        "country_code": "AI",
+        "country_enName": "Anguilla",
+        "country_arName": "أنجويلا"
+    },
+    {
+        "country_code": "AQ",
+        "country_enName": "Antarctica",
+        "country_arName": "القارة القطبية الجنوبية"
+    },
+    {
+        "country_code": "AG",
+        "country_enName": "Antigua And Barbuda",
+        "country_arName": "انتيغا وباربودا"
+    },
+    {
+        "country_code": "AR",
+        "country_enName": "Argentina",
+        "country_arName": "الأرجنتين"
+    },
+    {
+        "country_code": "AM",
+        "country_enName": "Armenia",
+        "country_arName": "أرمينيا"
+    },
+    {
+        "country_code": "AW",
+        "country_enName": "Aruba",
+        "country_arName": "أروبا"
+    },
+    {
+        "country_code": "AU",
+        "country_enName": "Australia",
+        "country_arName": "أستراليا"
+    },
+    {
+        "country_code": "AT",
+        "country_enName": "Austria",
+        "country_arName": "النمسا"
+    },
+    {
+        "country_code": "AZ",
+        "country_enName": "Azerbaijan",
+        "country_arName": "أذربيجان"
+    },
+    {
+        "country_code": "BS",
+        "country_enName": "The Bahamas",
+        "country_arName": "البهاما"
+    },
+    {
+        "country_code": "BH",
+        "country_enName": "Bahrain",
+        "country_arName": "البحرين"
+    },
+    {
+        "country_code": "BD",
+        "country_enName": "Bangladesh",
+        "country_arName": "بنجلاديش"
+    },
+    {
+        "country_code": "BB",
+        "country_enName": "Barbados",
+        "country_arName": "باربادوس"
+    },
+    {
+        "country_code": "BY",
+        "country_enName": "Belarus",
+        "country_arName": "روسيا البيضاء"
+    },
+    {
+        "country_code": "BE",
+        "country_enName": "Belgium",
+        "country_arName": "بلجيكا"
+    },
+    {
+        "country_code": "BZ",
+        "country_enName": "Belize",
+        "country_arName": "بيليز"
+    },
+    {
+        "country_code": "BJ",
+        "country_enName": "Benin",
+        "country_arName": "بنين"
+    },
+    {
+        "country_code": "BM",
+        "country_enName": "Bermuda",
+        "country_arName": "برمودا"
+    },
+    {
+        "country_code": "BT",
+        "country_enName": "Bhutan",
+        "country_arName": "بوتان"
+    },
+    {
+        "country_code": "BO",
+        "country_enName": "Bolivia",
+        "country_arName": "بوليفيا"
+    },
+    {
+        "country_code": "BA",
+        "country_enName": "Bosnia and Herzegovina",
+        "country_arName": "البوسنة والهرسك"
+    },
+    {
+        "country_code": "BW",
+        "country_enName": "Botswana",
+        "country_arName": "بوتسوانا"
+    },
+    {
+        "country_code": "BV",
+        "country_enName": "Bouvet Island",
+        "country_arName": "جزيرة بوفيت"
+    },
+    {
+        "country_code": "BR",
+        "country_enName": "Brazil",
+        "country_arName": "البرازيل"
+    },
+    {
+        "country_code": "IO",
+        "country_enName": "British Indian Ocean Territory",
+        "country_arName": "إقليم المحيط الهندي البريطاني"
+    },
+    {
+        "country_code": "BN",
+        "country_enName": "Brunei",
+        "country_arName": "بروناي دار السلام"
+    },
+    {
+        "country_code": "BG",
+        "country_enName": "Bulgaria",
+        "country_arName": "بلغاريا"
+    },
+    {
+        "country_code": "BF",
+        "country_enName": "Burkina Faso",
+        "country_arName": "بوركينا فاسو"
+    },
+    {
+        "country_code": "BI",
+        "country_enName": "Burundi",
+        "country_arName": "بوروندي"
+    },
+    {
+        "country_code": "KH",
+        "country_enName": "Cambodia",
+        "country_arName": "كمبوديا"
+    },
+    {
+        "country_code": "CM",
+        "country_enName": "Cameroon",
+        "country_arName": "الكاميرون"
+    },
+    {
+        "country_code": "CA",
+        "country_enName": "Canada",
+        "country_arName": "كندا"
+    },
+    {
+        "country_code": "CV",
+        "country_enName": "Cape Verde",
+        "country_arName": "الرأس الأخضر"
+    },
+    {
+        "country_code": "KY",
+        "country_enName": "Cayman Islands",
+        "country_arName": "جزر الكايمان"
+    },
+    {
+        "country_code": "CF",
+        "country_enName": "Central African Republic",
+        "country_arName": "جمهورية إفريقيا الوسطى"
+    },
+    {
+        "country_code": "TD",
+        "country_enName": "Chad",
+        "country_arName": "تشاد"
+    },
+    {
+        "country_code": "CL",
+        "country_enName": "Chile",
+        "country_arName": "تشيلي"
+    },
+    {
+        "country_code": "CN",
+        "country_enName": "China",
+        "country_arName": "الصين"
+    },
+    {
+        "country_code": "CX",
+        "country_enName": "Christmas Island",
+        "country_arName": "جزيرة كريسماس"
+    },
+    {
+        "country_code": "CC",
+        "country_enName": "Cocos (Keeling) Islands",
+        "country_arName": "جزر كوكوس"
+    },
+    {
+        "country_code": "CO",
+        "country_enName": "Colombia",
+        "country_arName": "كولومبيا"
+    },
+    {
+        "country_code": "KM",
+        "country_enName": "Comoros",
+        "country_arName": "جزر القمر"
+    },
+    {
+        "country_code": "CG",
+        "country_enName": "Congo",
+        "country_arName": "الكونغو"
+    },
+    {
+        "country_code": "CD",
+        "country_enName": "Democratic Republic of the Congo",
+        "country_arName": "جمهورية الكونغو الديمقراطية"
+    },
+    {
+        "country_code": "CK",
+        "country_enName": "Cook Islands",
+        "country_arName": "جزر كوك"
+    },
+    {
+        "country_code": "CR",
+        "country_enName": "Costa Rica",
+        "country_arName": "كوستاريكا"
+    },
+    {
+        "country_code": "CI",
+        "country_enName": "Cote D'Ivoire (Ivory Coast)",
+        "country_arName": "ساحل العاج"
+    },
+    {
+        "country_code": "HR",
+        "country_enName": "Croatia",
+        "country_arName": "كرواتيا"
+    },
+    {
+        "country_code": "CU",
+        "country_enName": "Cuba",
+        "country_arName": "كوبا"
+    },
+    {
+        "country_code": "CY",
+        "country_enName": "Cyprus",
+        "country_arName": "قبرص"
+    },
+    {
+        "country_code": "CZ",
+        "country_enName": "Czech Republic",
+        "country_arName": "تشيكيا"
+    },
+    {
+        "country_code": "DK",
+        "country_enName": "Denmark",
+        "country_arName": "الدنمارك"
+    },
+    {
+        "country_code": "DJ",
+        "country_enName": "Djibouti",
+        "country_arName": "جيبوتي"
+    },
+    {
+        "country_code": "DM",
+        "country_enName": "Dominica",
+        "country_arName": "دومينيكا"
+    },
+    {
+        "country_code": "DO",
+        "country_enName": "Dominican Republic",
+        "country_arName": "جمهورية الدومينيكان"
+    },
+    {
+        "country_code": "TL",
+        "country_enName": "East Timor",
+        "country_arName": "تيمور الشرقية"
+    },
+    {
+        "country_code": "EC",
+        "country_enName": "Ecuador",
+        "country_arName": "الاكوادور"
+    },
+    {
+        "country_code": "EG",
+        "country_enName": "Egypt",
+        "country_arName": "مصر"
+    },
+    {
+        "country_code": "SV",
+        "country_enName": "El Salvador",
+        "country_arName": "السلفادور"
+    },
+    {
+        "country_code": "GQ",
+        "country_enName": "Equatorial Guinea",
+        "country_arName": "غينيا الاستوائية"
+    },
+    {
+        "country_code": "ER",
+        "country_enName": "Eritrea",
+        "country_arName": "إرتريا"
+    },
+    {
+        "country_code": "EE",
+        "country_enName": "Estonia",
+        "country_arName": "إستونيا"
+    },
+    {
+        "country_code": "ET",
+        "country_enName": "Ethiopia",
+        "country_arName": "إثيوبيا"
+    },
+    {
+        "country_code": "FK",
+        "country_enName": "Falkland Islands",
+        "country_arName": "جزر فوكلاند"
+    },
+    {
+        "country_code": "FO",
+        "country_enName": "Faroe Islands",
+        "country_arName": "جزر فارو"
+    },
+    {
+        "country_code": "FJ",
+        "country_enName": "Fiji Islands",
+        "country_arName": "فيجي"
+    },
+    {
+        "country_code": "FI",
+        "country_enName": "Finland",
+        "country_arName": "فنلندا"
+    },
+    {
+        "country_code": "FR",
+        "country_enName": "France",
+        "country_arName": "فرنسا"
+    },
+    {
+        "country_code": "GF",
+        "country_enName": "French Guiana",
+        "country_arName": "غينيا الفرنسية"
+    },
+    {
+        "country_code": "PF",
+        "country_enName": "French Polynesia",
+        "country_arName": "بولينيزيا الفرنسية"
+    },
+    {
+        "country_code": "TF",
+        "country_enName": "French Southern Territories",
+        "country_arName": "أراضي فرنسية جنوبية وأنتارتيكية"
+    },
+    {
+        "country_code": "GA",
+        "country_enName": "Gabon",
+        "country_arName": "الغابون"
+    },
+    {
+        "country_code": "GM",
+        "country_enName": "The Gambia",
+        "country_arName": "غامبيا"
+    },
+    {
+        "country_code": "GE",
+        "country_enName": "Georgia",
+        "country_arName": "جورجيا"
+    },
+    {
+        "country_code": "DE",
+        "country_enName": "Germany",
+        "country_arName": "ألمانيا"
+    },
+    {
+        "country_code": "GH",
+        "country_enName": "Ghana",
+        "country_arName": "غانا"
+    },
+    {
+        "country_code": "GI",
+        "country_enName": "Gibraltar",
+        "country_arName": "جبل طارق"
+    },
+    {
+        "country_code": "GR",
+        "country_enName": "Greece",
+        "country_arName": "اليونان"
+    },
+    {
+        "country_code": "GL",
+        "country_enName": "Greenland",
+        "country_arName": "جرينلاند"
+    },
+    {
+        "country_code": "GD",
+        "country_enName": "Grenada",
+        "country_arName": "غرينادا"
+    },
+    {
+        "country_code": "GP",
+        "country_enName": "Guadeloupe",
+        "country_arName": "غوادلوب"
+    },
+    {
+        "country_code": "GU",
+        "country_enName": "Guam",
+        "country_arName": "غوام"
+    },
+    {
+        "country_code": "GT",
+        "country_enName": "Guatemala",
+        "country_arName": "جواتيمالا"
+    },
+    {
+        "country_code": "GG",
+        "country_enName": "Guernsey and Alderney",
+        "country_arName": "جيرنسي"
+    },
+    {
+        "country_code": "GN",
+        "country_enName": "Guinea",
+        "country_arName": "غينيا"
+    },
+    {
+        "country_code": "GW",
+        "country_enName": "Guinea-Bissau",
+        "country_arName": "غينيا بيساو"
+    },
+    {
+        "country_code": "GY",
+        "country_enName": "Guyana",
+        "country_arName": "غويانا"
+    },
+    {
+        "country_code": "HT",
+        "country_enName": "Haiti",
+        "country_arName": "هايتي"
+    },
+    {
+        "country_code": "HM",
+        "country_enName": "Heard Island and McDonald Islands",
+        "country_arName": "جزيرة هيرد وجزر ماكدونالد"
+    },
+    {
+        "country_code": "HN",
+        "country_enName": "Honduras",
+        "country_arName": "هندوراس"
+    },
+    {
+        "country_code": "HK",
+        "country_enName": "Hong Kong S.A.R.",
+        "country_arName": "هونغ كونغ"
+    },
+    {
+        "country_code": "HU",
+        "country_enName": "Hungary",
+        "country_arName": "المجر"
+    },
+    {
+        "country_code": "IS",
+        "country_enName": "Iceland",
+        "country_arName": "أيسلندا"
+    },
+    {
+        "country_code": "IN",
+        "country_enName": "India",
+        "country_arName": "الهند"
+    },
+    {
+        "country_code": "ID",
+        "country_enName": "Indonesia",
+        "country_arName": "إندونيسيا"
+    },
+    {
+        "country_code": "IR",
+        "country_enName": "Iran",
+        "country_arName": "ایران"
+    },
+    {
+        "country_code": "IQ",
+        "country_enName": "Iraq",
+        "country_arName": "العراق"
+    },
+    {
+        "country_code": "IE",
+        "country_enName": "Ireland",
+        "country_arName": "أيرلندا"
+    },
+    {
+        "country_code": "IL",
+        "country_enName": "Israel",
+        "country_arName": "إسرائيل"
+    },
+    {
+        "country_code": "IT",
+        "country_enName": "Italy",
+        "country_arName": "إيطاليا"
+    },
+    {
+        "country_code": "JM",
+        "country_enName": "Jamaica",
+        "country_arName": "جامايكا"
+    },
+    {
+        "country_code": "JP",
+        "country_enName": "Japan",
+        "country_arName": "اليابان"
+    },
+    {
+        "country_code": "JE",
+        "country_enName": "Jersey",
+        "country_arName": "جيرسي"
+    },
+    {
+        "country_code": "JO",
+        "country_enName": "Jordan",
+        "country_arName": "الأردن"
+    },
+    {
+        "country_code": "KZ",
+        "country_enName": "Kazakhstan",
+        "country_arName": "كازاخستان"
+    },
+    {
+        "country_code": "KE",
+        "country_enName": "Kenya",
+        "country_arName": "كينيا"
+    },
+    {
+        "country_code": "KI",
+        "country_enName": "Kiribati",
+        "country_arName": "كيريباس"
+    },
+    {
+        "country_code": "KP",
+        "country_enName": "North Korea",
+        "country_arName": "كوريا الشمالية"
+    },
+    {
+        "country_code": "KR",
+        "country_enName": "South Korea",
+        "country_arName": "كوريا الجنوبية"
+    },
+    {
+        "country_code": "KW",
+        "country_enName": "Kuwait",
+        "country_arName": "الكويت"
+    },
+    {
+        "country_code": "KG",
+        "country_enName": "Kyrgyzstan",
+        "country_arName": "قرغيزستان"
+    },
+    {
+        "country_code": "LA",
+        "country_enName": "Laos",
+        "country_arName": "لاوس"
+    },
+    {
+        "country_code": "LV",
+        "country_enName": "Latvia",
+        "country_arName": "لاتفيا"
+    },
+    {
+        "country_code": "LB",
+        "country_enName": "Lebanon",
+        "country_arName": "لبنان"
+    },
+    {
+        "country_code": "LS",
+        "country_enName": "Lesotho",
+        "country_arName": "ليسوتو"
+    },
+    {
+        "country_code": "LR",
+        "country_enName": "Liberia",
+        "country_arName": "ليبيريا"
+    },
+    {
+        "country_code": "LY",
+        "country_enName": "Libya",
+        "country_arName": "ليبيا"
+    },
+    {
+        "country_code": "LI",
+        "country_enName": "Liechtenstein",
+        "country_arName": "ليختنشتاين"
+    },
+    {
+        "country_code": "LT",
+        "country_enName": "Lithuania",
+        "country_arName": "ليتوانيا"
+    },
+    {
+        "country_code": "LU",
+        "country_enName": "Luxembourg",
+        "country_arName": "لوكسمبورغ"
+    },
+    {
+        "country_code": "MO",
+        "country_enName": "Macau S.A.R.",
+        "country_arName": "ماكاو"
+    },
+    {
+        "country_code": "MK",
+        "country_enName": "Macedonia",
+        "country_arName": "مقدونيا"
+    },
+    {
+        "country_code": "MG",
+        "country_enName": "Madagascar",
+        "country_arName": "مدغشقر"
+    },
+    {
+        "country_code": "MW",
+        "country_enName": "Malawi",
+        "country_arName": "مالاوي"
+    },
+    {
+        "country_code": "MY",
+        "country_enName": "Malaysia",
+        "country_arName": "ماليزيا"
+    },
+    {
+        "country_code": "MV",
+        "country_enName": "Maldives",
+        "country_arName": "المالديف"
+    },
+    {
+        "country_code": "ML",
+        "country_enName": "Mali",
+        "country_arName": "مالي"
+    },
+    {
+        "country_code": "MT",
+        "country_enName": "Malta",
+        "country_arName": "مالطا"
+    },
+    {
+        "country_code": "IM",
+        "country_enName": "Isle of Man",
+        "country_arName": "جزيرة مان"
+    },
+    {
+        "country_code": "MH",
+        "country_enName": "Marshall Islands",
+        "country_arName": "جزر مارشال"
+    },
+    {
+        "country_code": "MQ",
+        "country_enName": "Martinique",
+        "country_arName": "مارتينيك"
+    },
+    {
+        "country_code": "MR",
+        "country_enName": "Mauritania",
+        "country_arName": "موريتانيا"
+    },
+    {
+        "country_code": "MU",
+        "country_enName": "Mauritius",
+        "country_arName": "موريشيوس"
+    },
+    {
+        "country_code": "YT",
+        "country_enName": "Mayotte",
+        "country_arName": "مايوت"
+    },
+    {
+        "country_code": "MX",
+        "country_enName": "Mexico",
+        "country_arName": "المكسيك"
+    },
+    {
+        "country_code": "FM",
+        "country_enName": "Micronesia",
+        "country_arName": "ولايات ميكرونيسيا المتحدة"
+    },
+    {
+        "country_code": "MD",
+        "country_enName": "Moldova",
+        "country_arName": "مولدوفا"
+    },
+    {
+        "country_code": "MC",
+        "country_enName": "Monaco",
+        "country_arName": "موناكو"
+    },
+    {
+        "country_code": "MN",
+        "country_enName": "Mongolia",
+        "country_arName": "منغوليا"
+    },
+    {
+        "country_code": "ME",
+        "country_enName": "Montenegro",
+        "country_arName": "الجبل الأسود"
+    },
+    {
+        "country_code": "MS",
+        "country_enName": "Montserrat",
+        "country_arName": "مونتسرات"
+    },
+    {
+        "country_code": "MA",
+        "country_enName": "Morocco",
+        "country_arName": "المغرب"
+    },
+    {
+        "country_code": "MZ",
+        "country_enName": "Mozambique",
+        "country_arName": "موزمبيق"
+    },
+    {
+        "country_code": "MM",
+        "country_enName": "Myanmar",
+        "country_arName": "ميانمار"
+    },
+    {
+        "country_code": "NA",
+        "country_enName": "Namibia",
+        "country_arName": "ناميبيا"
+    },
+    {
+        "country_code": "NR",
+        "country_enName": "Nauru",
+        "country_arName": "ناورو"
+    },
+    {
+        "country_code": "NP",
+        "country_enName": "Nepal",
+        "country_arName": "نيبال"
+    },
+    {
+        "country_code": "BQ",
+        "country_enName": "Bonaire, Sint Eustatius and Saba",
+        "country_arName": "الجزر الكاريبية الهولندية"
+    },
+    {
+        "country_code": "NL",
+        "country_enName": "Netherlands",
+        "country_arName": "هولندا"
+    },
+    {
+        "country_code": "NC",
+        "country_enName": "New Caledonia",
+        "country_arName": "كاليدونيا الجديدة"
+    },
+    {
+        "country_code": "NZ",
+        "country_enName": "New Zealand",
+        "country_arName": "نيوزيلندا"
+    },
+    {
+        "country_code": "NI",
+        "country_enName": "Nicaragua",
+        "country_arName": "نيكاراجوا"
+    },
+    {
+        "country_code": "NE",
+        "country_enName": "Niger",
+        "country_arName": "النيجر"
+    },
+    {
+        "country_code": "NG",
+        "country_enName": "Nigeria",
+        "country_arName": "نيجيريا"
+    },
+    {
+        "country_code": "NU",
+        "country_enName": "Niue",
+        "country_arName": "نييوي"
+    },
+    {
+        "country_code": "NF",
+        "country_enName": "Norfolk Island",
+        "country_arName": "جزيرة نورفولك"
+    },
+    {
+        "country_code": "MP",
+        "country_enName": "Northern Mariana Islands",
+        "country_arName": "جزر ماريانا الشمالية"
+    },
+    {
+        "country_code": "NO",
+        "country_enName": "Norway",
+        "country_arName": "النرويج"
+    },
+    {
+        "country_code": "OM",
+        "country_enName": "Oman",
+        "country_arName": "عمان"
+    },
+    {
+        "country_code": "PK",
+        "country_enName": "Pakistan",
+        "country_arName": "باكستان"
+    },
+    {
+        "country_code": "PW",
+        "country_enName": "Palau",
+        "country_arName": "بالاو"
+    },
+    {
+        "country_code": "PS",
+        "country_enName": "Palestinian",
+        "country_arName": "فلسطين"
+    },
+    {
+        "country_code": "PA",
+        "country_enName": "Panama",
+        "country_arName": "بنما"
+    },
+    {
+        "country_code": "PG",
+        "country_enName": "Papua new Guinea",
+        "country_arName": "بابوا غينيا الجديدة"
+    },
+    {
+        "country_code": "PY",
+        "country_enName": "Paraguay",
+        "country_arName": "باراغواي"
+    },
+    {
+        "country_code": "PE",
+        "country_enName": "Peru",
+        "country_arName": "بيرو"
+    },
+    {
+        "country_code": "PH",
+        "country_enName": "Philippines",
+        "country_arName": "الفلبين"
+    },
+    {
+        "country_code": "PN",
+        "country_enName": "Pitcairn Island",
+        "country_arName": "جزر بيتكيرن"
+    },
+    {
+        "country_code": "PL",
+        "country_enName": "Poland",
+        "country_arName": "بولندا"
+    },
+    {
+        "country_code": "PT",
+        "country_enName": "Portugal",
+        "country_arName": "البرتغال"
+    },
+    {
+        "country_code": "PR",
+        "country_enName": "Puerto Rico",
+        "country_arName": "بورتوريكو"
+    },
+    {
+        "country_code": "QA",
+        "country_enName": "Qatar",
+        "country_arName": "قطر"
+    },
+    {
+        "country_code": "RE",
+        "country_enName": "Reunion",
+        "country_arName": "ريونيون"
+    },
+    {
+        "country_code": "RO",
+        "country_enName": "Romania",
+        "country_arName": "رومانيا"
+    },
+    {
+        "country_code": "RU",
+        "country_enName": "Russia",
+        "country_arName": "روسيا"
+    },
+    {
+        "country_code": "RW",
+        "country_enName": "Rwanda",
+        "country_arName": "رواندا"
+    },
+    {
+        "country_code": "SH",
+        "country_enName": "Saint Helena",
+        "country_arName": "سانت هيلانة"
+    },
+    {
+        "country_code": "KN",
+        "country_enName": "Saint Kitts And Nevis",
+        "country_arName": "سانت كيتس ونيفيس"
+    },
+    {
+        "country_code": "LC",
+        "country_enName": "Saint Lucia",
+        "country_arName": "سانت لوسيا"
+    },
+    {
+        "country_code": "PM",
+        "country_enName": "Saint Pierre and Miquelon",
+        "country_arName": "سان بيار وميكلون"
+    },
+    {
+        "country_code": "VC",
+        "country_enName": "Saint Vincent And The Grenadines",
+        "country_arName": "سانت فنسنت والجرينادينز"
+    },
+    {
+        "country_code": "BL",
+        "country_enName": "Saint-Barthelemy",
+        "country_arName": "سانت بارتيليمي"
+    },
+    {
+        "country_code": "MF",
+        "country_enName": "Saint-Martin (French part)",
+        "country_arName": "سانت مارتن"
+    },
+    {
+        "country_code": "WS",
+        "country_enName": "Samoa",
+        "country_arName": "ساموا"
+    },
+    {
+        "country_code": "SM",
+        "country_enName": "San Marino",
+        "country_arName": "سان مارينو"
+    },
+    {
+        "country_code": "ST",
+        "country_enName": "Sao Tome and Principe",
+        "country_arName": "ساو تومي وبرينسيبي"
+    },
+    {
+        "country_code": "SA",
+        "country_enName": "Saudi Arabia",
+        "country_arName": "السعودية"
+    },
+    {
+        "country_code": "SN",
+        "country_enName": "Senegal",
+        "country_arName": "السنغال"
+    },
+    {
+        "country_code": "RS",
+        "country_enName": "Serbia",
+        "country_arName": "صربيا"
+    },
+    {
+        "country_code": "SC",
+        "country_enName": "Seychelles",
+        "country_arName": "سيشيل"
+    },
+    {
+        "country_code": "SL",
+        "country_enName": "Sierra Leone",
+        "country_arName": "سيراليون"
+    },
+    {
+        "country_code": "SG",
+        "country_enName": "Singapore",
+        "country_arName": "سنغافورة"
+    },
+    {
+        "country_code": "SK",
+        "country_enName": "Slovakia",
+        "country_arName": "سلوفاكيا"
+    },
+    {
+        "country_code": "SI",
+        "country_enName": "Slovenia",
+        "country_arName": "سلوفينيا"
+    },
+    {
+        "country_code": "SB",
+        "country_enName": "Solomon Islands",
+        "country_arName": "جزر سليمان"
+    },
+    {
+        "country_code": "SO",
+        "country_enName": "Somalia",
+        "country_arName": "الصومال"
+    },
+    {
+        "country_code": "ZA",
+        "country_enName": "South Africa",
+        "country_arName": "جنوب أفريقيا"
+    },
+    {
+        "country_code": "GS",
+        "country_enName": "South Georgia",
+        "country_arName": "جورجيا الجنوبية وجزر ساندويتش الجنوبية"
+    },
+    {
+        "country_code": "SS",
+        "country_enName": "South Sudan",
+        "country_arName": "جنوب السودان"
+    },
+    {
+        "country_code": "ES",
+        "country_enName": "Spain",
+        "country_arName": "إسبانيا"
+    },
+    {
+        "country_code": "LK",
+        "country_enName": "Sri Lanka",
+        "country_arName": "سريلانكا"
+    },
+    {
+        "country_code": "SD",
+        "country_enName": "Sudan",
+        "country_arName": "السودان"
+    },
+    {
+        "country_code": "SR",
+        "country_enName": "Suriname",
+        "country_arName": "سورينام"
+    },
+    {
+        "country_code": "SJ",
+        "country_enName": "Svalbard And Jan Mayen Islands",
+        "country_arName": "سفالبارد ويان ماين"
+    },
+    {
+        "country_code": "SZ",
+        "country_enName": "Swaziland",
+        "country_arName": "إسواتيني"
+    },
+    {
+        "country_code": "SE",
+        "country_enName": "Sweden",
+        "country_arName": "السويد"
+    },
+    {
+        "country_code": "CH",
+        "country_enName": "Switzerland",
+        "country_arName": "سويسرا"
+    },
+    {
+        "country_code": "SY",
+        "country_enName": "Syria",
+        "country_arName": "سوريا"
+    },
+    {
+        "country_code": "TW",
+        "country_enName": "Taiwan",
+        "country_arName": "تايوان"
+    },
+    {
+        "country_code": "TJ",
+        "country_enName": "Tajikistan",
+        "country_arName": "طاجيكستان"
+    },
+    {
+        "country_code": "TZ",
+        "country_enName": "Tanzania",
+        "country_arName": "تنزانيا"
+    },
+    {
+        "country_code": "TH",
+        "country_enName": "Thailand",
+        "country_arName": "تايلاند"
+    },
+    {
+        "country_code": "TG",
+        "country_enName": "Togo",
+        "country_arName": "توجو"
+    },
+    {
+        "country_code": "TK",
+        "country_enName": "Tokelau",
+        "country_arName": "توكلو"
+    },
+    {
+        "country_code": "TO",
+        "country_enName": "Tonga",
+        "country_arName": "تونغا"
+    },
+    {
+        "country_code": "TT",
+        "country_enName": "Trinidad And Tobago",
+        "country_arName": "ترينيداد وتوباغو"
+    },
+    {
+        "country_code": "TN",
+        "country_enName": "Tunisia",
+        "country_arName": "تونس"
+    },
+    {
+        "country_code": "TR",
+        "country_enName": "Turkey",
+        "country_arName": "تركيا"
+    },
+    {
+        "country_code": "TM",
+        "country_enName": "Turkmenistan",
+        "country_arName": "تركمانستان"
+    },
+    {
+        "country_code": "TC",
+        "country_enName": "Turks And Caicos Islands",
+        "country_arName": "جزر تركس وكايكوس"
+    },
+    {
+        "country_code": "TV",
+        "country_enName": "Tuvalu",
+        "country_arName": "توفالو"
+    },
+    {
+        "country_code": "UG",
+        "country_enName": "Uganda",
+        "country_arName": "أوغندا"
+    },
+    {
+        "country_code": "UA",
+        "country_enName": "Ukraine",
+        "country_arName": "أوكرانيا"
+    },
+    {
+        "country_code": "AE",
+        "country_enName": "United Arab Emirates",
+        "country_arName": "الإمارات العربية المتحدة"
+    },
+    {
+        "country_code": "GB",
+        "country_enName": "United Kingdom",
+        "country_arName": "المملكة المتحدة"
+    },
+    {
+        "country_code": "US",
+        "country_enName": "United States",
+        "country_arName": "الولايات المتحدة الأمريكية"
+    },
+    {
+        "country_code": "UM",
+        "country_enName": "United States Minor Outlying Islands",
+        "country_arName": "جزر الولايات المتحدة النائية"
+    },
+    {
+        "country_code": "UY",
+        "country_enName": "Uruguay",
+        "country_arName": "أوروغواي"
+    },
+    {
+        "country_code": "UZ",
+        "country_enName": "Uzbekistan",
+        "country_arName": "أوزبكستان"
+    },
+    {
+        "country_code": "VU",
+        "country_enName": "Vanuatu",
+        "country_arName": "فانواتو"
+    },
+    {
+        "country_code": "VA",
+        "country_enName": "Vatican City State (Holy See)",
+        "country_arName": "الفاتيكان"
+    },
+    {
+        "country_code": "VE",
+        "country_enName": "Venezuela",
+        "country_arName": "فنزويلا"
+    },
+    {
+        "country_code": "VN",
+        "country_enName": "Vietnam",
+        "country_arName": "فيتنام"
+    },
+    {
+        "country_code": "VG",
+        "country_enName": "Virgin Islands (British)",
+        "country_arName": "جزر فيرجن البريطانية"
+    },
+    {
+        "country_code": "VI",
+        "country_enName": "Virgin Islands (US)",
+        "country_arName": "جزر العذراء الامريكية"
+    },
+    {
+        "country_code": "WF",
+        "country_enName": "Wallis And Futuna Islands",
+        "country_arName": "واليس وفوتونا"
+    },
+    {
+        "country_code": "EH",
+        "country_enName": "Western Sahara",
+        "country_arName": "الصحراء الغربية"
+    },
+    {
+        "country_code": "YE",
+        "country_enName": "Yemen",
+        "country_arName": "اليمن"
+    },
+    {
+        "country_code": "ZM",
+        "country_enName": "Zambia",
+        "country_arName": "زامبيا"
+    },
+    {
+        "country_code": "ZW",
+        "country_enName": "Zimbabwe",
+        "country_arName": "زيمبابوي"
+    },
+    {
+        "country_code": "XK",
+        "country_enName": "Kosovo",
+        "country_arName": "كوسوفو"
+    },
+    {
+        "country_code": "CW",
+        "country_enName": "Curaçao",
+        "country_arName": "كوراساو"
+    },
+    {
+        "country_code": "SX",
+        "country_enName": "Sint Maarten (Dutch part)",
+        "country_arName": "سينت مارتن"
+    }
+]

@@ -4,14 +4,6 @@
             <img src="{{ asset($tab['icon']) }}" class="w-7 h-7" alt="">
         </x-slot:icon>
 
-        <x-slot:actions>
-            <ui:button
-                icon="square-rounded-plus"
-                label="إضافة بلوك"
-                @click.prevent="$wire.openAddBlockModal()"
-            />
-        </x-slot:actions>
-
         <div class="p-4 space-y-4">
             @if ($topBlocks->isNotEmpty())
                 <div class="rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden">
@@ -23,13 +15,28 @@
                 </div>
             @endif
 
-            <div class="relative min-h-20 rounded-xl border border-gray-200 bg-gray-50/80">
-                <ul
-                    wire:sortable="updateBlockOrder"
-                    wire:sortable.options="{ animation: 150 }"
-                    wire:key="user-blocks-list-{{ $blocksVersion }}"
-                    class="p-2 space-y-1.5"
-                >
+            <div class="rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-700">بلوكات الصفحة</p>
+                        <p class="text-xs text-gray-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
+                    </div>
+                    <ui:button
+                        icon="square-rounded-plus"
+                        label="إضافة بلوك"
+                        variant="secondary"
+                        class="shrink-0"
+                        @click.prevent="$wire.openAddBlockModal()"
+                    />
+                </div>
+
+                <div class="relative min-h-20">
+                    <ul
+                        wire:sortable="updateBlockOrder"
+                        wire:sortable.options="{ animation: 150 }"
+                        wire:key="user-blocks-list-{{ $blocksVersion }}"
+                        class="p-2 space-y-1.5"
+                    >
                     @foreach ($userBlocks as $block)
                         <li
                             wire:sortable.item="{{ $block['id'] }}"
@@ -120,13 +127,14 @@
                             </button>
                         </li>
                     @endforeach
-                </ul>
+                    </ul>
 
-                @if ($userBlocks->isEmpty())
-                    <p class="pointer-events-none absolutex pb-3 inset-0 flex items-center justify-center text-[11px] text-gray-300 select-none">
-                       أضف بلوات لصفحتك من الزر بالأعلى
-                    </p>
-                @endif
+                    @if ($userBlocks->isEmpty())
+                        <p class="pointer-events-none absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-gray-400 select-none">
+                            لا توجد بلوكات بعد. اضغط «إضافة بلوك» لإضافة أول بلوك في هذا القسم.
+                        </p>
+                    @endif
+                </div>
             </div>
 
             @if ($bottomBlocks->isNotEmpty())

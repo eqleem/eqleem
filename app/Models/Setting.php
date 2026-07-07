@@ -398,4 +398,66 @@ class Setting extends Model
             $active,
         );
     }
+
+    public const SHIPPING_OPTIONS_GROUP = 'shipping-options';
+
+    public const CUSTOM_SHIPPING_SLUG = 'shipping-options.custom';
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function shippingMethodDefaults(string $slug): array
+    {
+        return config("shipping-methods.{$slug}.defaults", []);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function shippingMethod(string $slug): array
+    {
+        $saved = static::forSlug(static::groupSlug(static::SHIPPING_OPTIONS_GROUP, $slug));
+        $defaults = static::shippingMethodDefaults($slug);
+
+        return array_merge($defaults, $saved?->settings ?? [], [
+            'active' => (bool) data_get($saved, 'active', false),
+        ]);
+    }
+
+    /**
+     * @return list<array{id: string, name: string, price: float, country: string, all_cities: bool, city_ids: list<string>, active: bool}>
+     */
+    public static function customShippingDefaults(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return list<array{id: string, name: string, price: float, country: string, all_cities: bool, city_ids: list<string>, active: bool}>
+     */
+    public static function customShippingOptions(): array
+    {
+        $saved = static::forSlug(static::CUSTOM_SHIPPING_SLUG);
+
+        return array_values(data_get($saved?->settings, 'items', static::customShippingDefaults()));
+    }
+
+    public static function saveShippingMethod(string $slug, array $settings, bool $active = true): self
+    {
+        return static::saveForSlug(
+            static::groupSlug(static::SHIPPING_OPTIONS_GROUP, $slug),
+            $settings,
+            $active,
+        );
+    }
+
+    /**
+     * @param  list<array{id: string, name: string, price: float, country: string, all_cities: bool, city_ids: list<string>, active: bool}>  $items
+     */
+    public static function saveCustomShippingOptions(array $items): self
+    {
+        return static::saveForSlug(static::CUSTOM_SHIPPING_SLUG, [
+            'items' => array_values($items),
+        ]);
+    }
 }

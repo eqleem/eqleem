@@ -71,4 +71,14 @@ return [
             'index' => 'admin::settings.payment-options.payment-options',
         ],
     ],
+    'shipping-option' => [
+        'order' => 11,
+        'slug' => 'shipping-option',
+        'name' => 'وسائل الشحن',
+        'description' => 'تخصيص طرق الشحن المتاحة.',
+        'icon' => 'assets/icons/ecommerce/018-cart.svg',
+        'components' => [
+            'index' => 'admin::settings.shipping-options.shipping-options',
+        ],
+    ],
 ];

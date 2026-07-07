@@ -114,6 +114,13 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'world' => [
+            'driver' => 'sqlite',
+            'url' => env('DB_URL_WORLD'),
+            'database' => env('DB_DATABASE_WORLD', database_path('world.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
     ],
 
     /*
