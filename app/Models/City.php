@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasBilingualName;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class City extends Model
 {
+    use HasBilingualName;
+
     protected $connection = 'world';
 
     protected $fillable = [
-        'id', 'name', 'country_id', 'state_id',
-        'latitude', 'longitude', 'active', 'translations',
+        'id', 'name_en', 'name_ar', 'country_id', 'state_id', 'active', 'meta',
     ];
 
     protected $casts = [
         'active' => 'boolean',
-        'translations' => 'json',
+        'meta' => 'json',
     ];
 
     /**

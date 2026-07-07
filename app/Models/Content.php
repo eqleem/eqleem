@@ -24,6 +24,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'block_id',
     'parent_id',
     'type',
+    'template',
     'title',
     'slug',
     'data',
@@ -88,6 +89,10 @@ class Content extends Model implements HasMedia
 
             EnsureSectionBlockLink::run($content->tenant_id, $contentTypeSlug);
         });
+
+        static::deleting(function (Content $content): bool {
+            return ! $content->isSystemPage();
+        });
     }
 
     public function tenant(): BelongsTo
@@ -125,6 +130,39 @@ class Content extends Model implements HasMedia
     public function scopeType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
+    }
+
+    public function scopeTemplate(Builder $query, string $template): Builder
+    {
+        return $query->where('template', $template);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function pageTemplateOptions(): array
+    {
+        return [
+            'default' => 'صفحة عادية',
+            'contact' => 'اتصل بنا',
+            'faq' => 'الأسئلة المتكررة',
+            'features' => 'المزايا',
+            'pricing' => 'الباقات والأسعار',
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function systemPageTemplates(): array
+    {
+        return ['contact', 'faq'];
+    }
+
+    public function isSystemPage(): bool
+    {
+        return $this->type === contentTypeModel('pages')
+            && in_array((string) $this->template, self::systemPageTemplates(), true);
     }
 
     public function getAvatarAttribute(): string

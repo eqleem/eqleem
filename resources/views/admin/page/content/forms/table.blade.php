@@ -59,8 +59,11 @@
                             </div>
                         </div>
                         <div class="py-3 w-full">
-                            <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
-                                wire:navigate class="flex items-center gap-x-3">
+                            <button
+                                type="button"
+                                wire:click="openItem(@js($item->uuid))"
+                                class="flex items-center gap-x-3 w-full text-start"
+                            >
                                 <img
                                     class="h-12 w-12 flex-none rounded-xl object-cover bg-gray-100"
                                     src="{{ $item->avatar }}"
@@ -94,28 +97,21 @@
                                         </p>
                                     </div>
                                 </div>
-                            </a>
+                            </button>
                         </div>
 
                         <div class="pe-6">
-                            <div x-data="{ dropdownMenu: false }">
-                                <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
-                                    <button @click="dropdownMenu = ! dropdownMenu" type="button"
-                                        class="hover:bg-gray-200 p-1 rounded-lg inline-block">
-                                        <ui:icon name="dots" class="text-gray-400" />
-                                    </button>
-
-                                    <div x-show="dropdownMenu"
-                                        class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-48 flex-col gap-y-px"
-                                        x-transition.scale.origin.top>
-                                        <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
-                                            wire:navigate
+                            <ui:table-menu>
+<button
+                                            type="button"
+                                            wire:click="openItem(@js($item->uuid))"
                                             x-on:click="dropdownMenu = false"
-                                            class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
+                                            class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start"
+                                        >
                                             <ui:icon name="pencil" wire:loading.remove class="!w-4 !h-4 text-gray-400" />
                                                 
                                             {{ __('Edit') }}
-                                        </a>
+                                        </button>
                                         <button
                                             type="button"
                                             wire:click="clone({{ $item->id }})"
@@ -128,9 +124,7 @@
                                             <ui:icon name="loader-3" wire:loading wire:target="clone({{ $item->id }})" class="!w-4 !h-4 animate-spin text-gray-400" />
                                             نسخ النموذج
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
+</ui:table-menu>
                         </div>
                     </div>
                 @endforeach
@@ -213,6 +207,21 @@ new class extends Livewire\Component
 
         $this->selectedIds = [];
         $this->dispatch('notify', text: __('Selected items deleted successfully.'));
+    }
+
+    public function openItem(?string $uuid): void
+    {
+        if (! filled($uuid)) {
+            $this->dispatch('notify', text: 'تعذر فتح هذا العنصر. حاول تحديث الصفحة.');
+
+            return;
+        }
+
+        $this->dispatch(
+            'openContentItem',
+            tab: $this->contentType['tab_id'],
+            item: $uuid,
+        );
     }
 
     public function clone(int $id): void

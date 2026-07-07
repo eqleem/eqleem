@@ -112,9 +112,12 @@ new class extends \Livewire\Component
 
     public function updatedCityIds(): void
     {
-        $this->cityIds = array_values(array_unique(array_filter(
-            $this->cityIds,
-            fn (mixed $id): bool => is_string($id) || is_int($id),
+        $this->cityIds = array_values(array_unique(array_map(
+            fn (mixed $id): string => (string) $id,
+            array_filter(
+                $this->cityIds,
+                fn (mixed $id): bool => is_string($id) || is_int($id),
+            ),
         )));
 
         if (in_array(WorldLocationOptions::ALL_CITIES, $this->cityIds, true)) {
@@ -132,16 +135,22 @@ new class extends \Livewire\Component
      */
     protected function rules(): array
     {
+        $locations = app(WorldLocationOptions::class);
+
         $rules = [
             'active' => ['boolean'],
             'name' => ['required', 'string', 'min:1', 'max:120'],
             'price' => ['required', 'numeric', 'min:0'],
-            'country' => ['required', 'string', Rule::in(array_keys(app(WorldLocationOptions::class)->countryMap()))],
+            'country' => ['required', 'string', Rule::in($locations->selectableCountryIds())],
         ];
 
         if ($this->country !== WorldLocationOptions::ALL_COUNTRIES) {
             $rules['cityIds'] = ['required', 'array', 'min:1'];
-            $rules['cityIds.*'] = ['required', 'string'];
+            $rules['cityIds.*'] = [
+                'required',
+                'string',
+                Rule::in($locations->selectableCityIds($this->country, $this->cityIds)),
+            ];
         }
 
         return $rules;
@@ -218,7 +227,10 @@ new class extends \Livewire\Component
         $this->name = (string) ($option['name'] ?? '');
         $this->price = isset($option['price']) ? (string) $option['price'] : null;
         $this->country = (string) ($option['country'] ?? 'SA');
-        $this->cityIds = (array) ($option['city_ids'] ?? []);
+        $this->cityIds = array_values(array_map(
+            fn (mixed $id): string => (string) $id,
+            (array) ($option['city_ids'] ?? []),
+        ));
 
         if (($option['all_cities'] ?? false) && $this->country !== WorldLocationOptions::ALL_COUNTRIES) {
             $this->cityIds = [WorldLocationOptions::ALL_CITIES];
@@ -230,8 +242,8 @@ new class extends \Livewire\Component
         $locations = app(WorldLocationOptions::class);
 
         return $this->view([
-            'countryOptions' => collect($locations->countryMap())->all(),
-            'cityOptions' => $locations->citySelectOptions($this->country, $this->citySearch),
+            'countryOptions' => $locations->countrySelectOptions(),
+            'cityOptions' => $locations->citySelectOptions($this->country, $this->citySearch, $this->cityIds),
         ]);
     }
 }; ?>

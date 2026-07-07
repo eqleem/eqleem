@@ -12,20 +12,37 @@ trait HasUuid
          * Attach to the 'creating' Model Event to provide a UUID
          * for the `uuid` field
          */
-        static::creating(function ($model) {
+        static::creating(function ($model): void {
             $columnName = static::getUuidColumn();
 
-            $model->$columnName = Str::uuid();
+            if (blank($model->{$columnName})) {
+                $model->{$columnName} = (string) Str::uuid();
+            }
         });
+    }
+
+    public function ensureUuid(): static
+    {
+        $columnName = static::getUuidColumn();
+
+        if (filled($this->{$columnName})) {
+            return $this;
+        }
+
+        $this->forceFill([
+            $columnName => (string) Str::uuid(),
+        ])->save();
+
+        return $this;
     }
 
     /* Getters and Setters */
 
-    public function getUuidAttribute()
+    public function getUuidAttribute(): ?string
     {
         $columnName = static::getUuidColumn();
 
-        return $this->attributes[$columnName];
+        return $this->attributes[$columnName] ?? null;
     }
 
     protected static function getUuidColumn()

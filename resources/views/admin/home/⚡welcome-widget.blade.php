@@ -42,7 +42,17 @@
 >
     <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
         <div class="p-5 sm:p-6">
-            <p class="text-sm font-medium text-primary-100">{{ $greeting }}</p>
+            <div class="flex items-center justify-between gap-3">
+                <p class="text-sm font-medium text-primary-100">{{ $greeting }}</p>
+                <button
+                    type="button"
+                    x-on:click="$dispatch('openmodal', { modal: 'home-step-content' })"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                >
+                    <iconify-icon icon="solar:add-circle-bold" class="text-base"></iconify-icon>
+                    إضافة محتوى
+                </button>
+            </div>
             <h2 class="mt-1 text-xl font-bold sm:text-2xl">مرحباً، {{ $userName }} 👋</h2>
 
             @if ($percentage < 100)

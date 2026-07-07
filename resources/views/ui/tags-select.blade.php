@@ -132,6 +132,8 @@
                 x-cloak
                 x-transition
                 :style="panelStyle"
+                data-tags-select-panel
+                @click.stop
                 class="max-h-56 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl"
             >
                 @if ($searchable)

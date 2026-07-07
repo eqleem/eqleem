@@ -100,24 +100,13 @@
                         </div>
 
                         <div class="pe-6">
-                            <div x-data="{ dropdownMenu: false }">
-                                <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
-                                    <button @click="dropdownMenu = ! dropdownMenu" type="button"
-                                        class="hover:bg-gray-200 p-1 rounded-lg inline-block">
-                                        <ui:icon name="dots" class="text-gray-400" />
-                                    </button>
-
-                                    <div x-show="dropdownMenu"
-                                        class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-48 flex-col gap-y-px"
-                                        x-transition.scale.origin.top>
-                                        <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
+                            <ui:table-menu>
+<a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
                                             {{ __('Edit') }}
                                         </a>
-                                    </div>
-                                </div>
-                            </div>
+</ui:table-menu>
                         </div>
                     </div>
                 @endforeach

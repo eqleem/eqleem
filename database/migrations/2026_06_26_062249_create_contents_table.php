@@ -32,6 +32,9 @@ return new class extends Migration
 
             $table->string('type');
 
+            $table->string('template')
+                ->nullable();
+
             $table->string('title');
 
             $table->string('slug');

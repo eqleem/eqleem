@@ -146,10 +146,12 @@
         </div>
 
         <ui:modal :title="$editingCustomId ? 'تعديل خدمة شحن' : 'أضف خدمة شحن'" size="3xl" name="custom-shipping-form">
-            <livewire:admin::settings.shipping-options.custom-shipping-form
-                :option-id="$editingCustomId"
-                :key="'custom-shipping-form-'.($editingCustomId ?? 'new')"
-            />
+            @if ($customFormMounted)
+                <livewire:admin::settings.shipping-options.custom-shipping-form
+                    :option-id="$editingCustomId"
+                    :key="'custom-shipping-form-'.($editingCustomId ?? 'new')"
+                />
+            @endif
         </ui:modal>
     </ui:mainbox>
 </div>
@@ -170,6 +172,8 @@ new class extends \Livewire\Component
     public array $customOptions = [];
 
     public ?string $editingCustomId = null;
+
+    public bool $customFormMounted = false;
 
     public function mount(): void
     {
@@ -205,6 +209,7 @@ new class extends \Livewire\Component
     public function openCustomForm(?string $optionId = null): void
     {
         $this->editingCustomId = $optionId;
+        $this->customFormMounted = true;
         $this->dispatch('openmodal', modal: 'custom-shipping-form');
     }
 
@@ -243,6 +248,7 @@ new class extends \Livewire\Component
     public function refreshCustomOptions(): void
     {
         $this->editingCustomId = null;
+        $this->customFormMounted = false;
         $this->loadCustomOptions();
     }
 
@@ -265,21 +271,66 @@ new class extends \Livewire\Component
     protected function loadCustomOptions(): void
     {
         $locations = app(WorldLocationOptions::class);
+        $savedOptions = collect(Setting::customShippingOptions());
 
-        $this->customOptions = collect(Setting::customShippingOptions())
-            ->map(function (array $option) use ($locations): array {
-                $cityLabels = $locations->cityLabels(
-                    (string) ($option['country'] ?? WorldLocationOptions::ALL_COUNTRIES),
-                    (array) ($option['city_ids'] ?? []),
-                    (bool) ($option['all_cities'] ?? false),
-                );
+        $cityIds = $savedOptions
+            ->flatMap(function (array $option): array {
+                if (($option['all_cities'] ?? false) || ($option['country'] ?? '') === WorldLocationOptions::ALL_COUNTRIES) {
+                    return [];
+                }
+
+                return collect($option['city_ids'] ?? [])
+                    ->reject(fn (mixed $id): bool => (string) $id === WorldLocationOptions::ALL_CITIES)
+                    ->map(fn (mixed $id): int => (int) $id)
+                    ->filter(fn (int $id): bool => $id > 0)
+                    ->all();
+            })
+            ->unique()
+            ->values()
+            ->all();
+
+        $cityLabelMap = $locations->cityLabelsByIds($cityIds);
+
+        $this->customOptions = $savedOptions
+            ->map(function (array $option) use ($locations, $cityLabelMap): array {
+                $country = (string) ($option['country'] ?? WorldLocationOptions::ALL_COUNTRIES);
+                $cityLabels = $this->resolveCityLabels($option, $cityLabelMap);
 
                 return array_merge($option, [
-                    'country_label' => $locations->countryLabel((string) ($option['country'] ?? WorldLocationOptions::ALL_COUNTRIES)),
+                    'country_label' => $locations->countryLabel($country),
                     'cities_summary' => $cityLabels === [] ? '' : implode('، ', array_slice($cityLabels, 0, 2)).(count($cityLabels) > 2 ? ' +' .(count($cityLabels) - 2) : ''),
                 ]);
             })
             ->sortBy('name')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $option
+     * @param  array<int, string>  $cityLabelMap
+     * @return list<string>
+     */
+    protected function resolveCityLabels(array $option, array $cityLabelMap): array
+    {
+        $country = (string) ($option['country'] ?? WorldLocationOptions::ALL_COUNTRIES);
+
+        if ($country === WorldLocationOptions::ALL_COUNTRIES || ($option['all_cities'] ?? false)) {
+            return ['كل المدن'];
+        }
+
+        $cityIds = (array) ($option['city_ids'] ?? []);
+
+        if ($cityIds === [WorldLocationOptions::ALL_CITIES] || in_array(WorldLocationOptions::ALL_CITIES, $cityIds, true)) {
+            return ['كل المدن داخل الدولة'];
+        }
+
+        return collect($cityIds)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0)
+            ->map(fn (int $id): ?string => $cityLabelMap[$id] ?? null)
+            ->filter()
+            ->sort()
             ->values()
             ->all();
     }

@@ -2,26 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasBilingualName;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Country extends Model
 {
+    use HasBilingualName;
+
     protected $connection = 'world';
 
     protected $fillable = [
-        'id', 'name', 'iso2', 'iso3', 'numeric_code', 'phonecode',
-        'capital', 'currency', 'currency_name', 'currency_symbol',
-        'tld', 'native', 'region', 'subregion', 'timezones', 'translations',
-        'latitude', 'longitude', 'emoji', 'emojiU', 'flag', 'active', 'meta',
+        'id', 'name_en', 'name_ar', 'iso2', 'active', 'meta',
     ];
 
     protected $casts = [
-        'translations' => 'json',
-        'timezones' => 'json',
         'meta' => 'json',
-        'flag' => 'boolean',
         'active' => 'boolean',
     ];
 
@@ -57,33 +54,10 @@ class Country extends Model
     }
 
     /**
-     * get Country By iso3 code.
-     *
      * @throws \Throwable
      */
-    public static function getByIso3(string $iso3)
+    public static function getByCode(string $code): self
     {
-        $country = static::where('iso3', strtoupper($iso3))->first();
-        throw_if(is_null($country), "{$iso3} does not exist");
-
-        return $country;
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public static function getByCode(string $code)
-    {
-        $code = strtoupper($code);
-        $columns = \mb_strlen($code) == 3 ? 'iso3' : 'iso2';
-        $country = static::where($columns, $code)->first();
-        throw_if(is_null($country), "{$code} does not exist");
-
-        return $country;
-    }
-
-    public function getNameAttribute($value)
-    {
-        return data_get($this->translations, app()->getLocale(), $value);
+        return static::getByIso2($code);
     }
 }

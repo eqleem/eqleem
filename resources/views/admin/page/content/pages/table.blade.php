@@ -53,14 +53,19 @@
                     <div wire:key="page-{{ $item->uuid }}"
                         class="flex items-center justify-between gap-x-7 w-full hover:bg-gray-50 last:rounded-b-2xl">
                         <div class="ps-6">
-                            <div class="flex items-center">
-                                <input wire:model="selectedIds" value="{{ $item->id }}" type="checkbox"
-                                    class="rounded-xl border-gray-300 shadow-sm w-4 h-4">
-                            </div>
+                            @unless ($item->isSystemPage())
+                                <div class="flex items-center">
+                                    <input wire:model="selectedIds" value="{{ $item->id }}" type="checkbox"
+                                        class="rounded-xl border-gray-300 shadow-sm w-4 h-4">
+                                </div>
+                            @endunless
                         </div>
                         <div class="py-3 w-full">
-                            <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
-                                wire:navigate class="flex items-center gap-x-3">
+                            <button
+                                type="button"
+                                wire:click="openItem(@js($item->uuid))"
+                                class="flex items-center gap-x-3 w-full text-start"
+                            >
                                 @php($imageUrl = contentImageUrl(data_get($item->data, 'image')) ?? $item->avatar)
                                 <img
                                     class="h-12 w-12 flex-none rounded-xl object-cover bg-gray-100"
@@ -70,7 +75,7 @@
                                 <div>
                                     <h2 class="text-sm font-semibold truncate text-gray-700">{{ $item->title }}</h2>
                                     <div class="flex items-center gap-x-2 mt-1">
-                                        @if ($item->status === 'published')
+                                        @if ($item->active)
                                             <div class="mt-1 flex items-center gap-x-1.5">
                                                 <div class="flex-none rounded-full bg-emerald-500/20 p-1">
                                                     <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
@@ -82,6 +87,12 @@
                                                 class="truncate inline-flex items-center gap-x-1 bg-gray-100 p-1 px-2 rounded-md text-xs">
                                                 {{ $item->status_label }}
                                             </span>
+                                            @if ($item->isSystemPage())
+                                                <span
+                                                    class="truncate inline-flex items-center gap-x-1 bg-blue-50 text-blue-700 p-1 px-2 rounded-md text-xs">
+                                                    {{ Content::pageTemplateOptions()[$item->template] ?? $item->template }}
+                                                </span>
+                                            @endif
                                             @if ($item->published_at)
                                                 <span class="inline-block" dir="ltr">
                                                     {{ $item->published_at->translatedFormat('d M Y') }}
@@ -90,38 +101,58 @@
                                         </p>
                                     </div>
                                 </div>
-                            </a>
+                            </button>
                         </div>
 
                         <div class="pe-6">
-                            <div x-data="{ dropdownMenu: false }">
-                                <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
-                                    <button @click="dropdownMenu = ! dropdownMenu" type="button"
-                                        class="hover:bg-gray-200 p-1 rounded-lg inline-block">
-                                        <ui:icon name="dots" class="text-gray-400" />
-                                    </button>
-
-                                    <div x-show="dropdownMenu"
-                                        class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-48 flex-col gap-y-px"
-                                        x-transition.scale.origin.top>
-                                        <a href="{{ route('admin.page.home', ['tab' => $contentType['tab_id'], 'item' => $item->uuid]) }}"
-                                            wire:navigate
-                                            class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
+                            <ui:table-menu>
+<button
+                                            type="button"
+                                            wire:click="openItem(@js($item->uuid))"
+                                            x-on:click="dropdownMenu = false"
+                                            class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start"
+                                        >
+                                            <ui:icon name="pencil" wire:loading.remove class="!w-4 !h-4 text-gray-400" />
                                             {{ __('Edit') }}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            wire:click="toggleActive({{ $item->id }})"
+                                            x-on:click="dropdownMenu = false"
+                                            wire:loading.attr="disabled"
+                                            wire:target="toggleActive({{ $item->id }})"
+                                            class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start"
+                                        >
+                                            <ui:icon name="{{ $item->active ? 'eye-off' : 'eye' }}" wire:loading.remove wire:target="toggleActive({{ $item->id }})" class="!w-4 !h-4 text-gray-400" />
+                                            <ui:icon name="loader-3" wire:loading wire:target="toggleActive({{ $item->id }})" class="!w-4 !h-4 animate-spin text-gray-400" />
+                                            {{ $item->active ? 'تعطيل' : 'تفعيل' }}
+                                        </button>
+                                        @unless ($item->isSystemPage())
+                                            <button
+                                                type="button"
+                                                wire:click="delete({{ $item->id }})"
+                                                wire:confirm="هل أنت متأكد من حذف هذه الصفحة؟"
+                                                x-on:click="dropdownMenu = false"
+                                                wire:loading.attr="disabled"
+                                                wire:target="delete({{ $item->id }})"
+                                                class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start text-red-600"
+                                            >
+                                                <ui:icon name="trash" wire:loading.remove wire:target="delete({{ $item->id }})" class="!w-4 !h-4" />
+                                                <ui:icon name="loader-3" wire:loading wire:target="delete({{ $item->id }})" class="!w-4 !h-4 animate-spin text-gray-400" />
+                                                {{ __('Delete') }}
+                                            </button>
+                                        @endunless
+</ui:table-menu>
                         </div>
                     </div>
                 @endforeach
             </div>
         @endif
 
-        <div wire:loading wire:target="search, nextPage, previousPage, deleteSelected"
+        <div wire:loading wire:target="search, nextPage, previousPage, deleteSelected, delete, toggleActive"
             class="absolute inset-0 bg-white opacity-50"></div>
 
-        <div wire:loading.flex wire:target="search, nextPage, previousPage, deleteSelected"
+        <div wire:loading.flex wire:target="search, nextPage, previousPage, deleteSelected, delete, toggleActive"
             class="flex justify-center items-center absolute inset-0">
             <ui:icon name="loader-3" class="animate-spin text-gray-300 w-10 h-10" />
         </div>
@@ -178,8 +209,18 @@ new class extends Livewire\Component
 
     public function delete(int $id): void
     {
-        Content::query()->type(contentTypeModel($this->contentType['slug']))->whereKey($id)->first()?->delete();
+        $content = Content::query()
+            ->type(contentTypeModel($this->contentType['slug']))
+            ->whereKey($id)
+            ->first();
 
+        if (! $content || $content->isSystemPage()) {
+            return;
+        }
+
+        $content->delete();
+
+        $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $id]));
         $this->dispatch('notify', text: __('Item(s) deleted successfully.'));
     }
 
@@ -189,23 +230,63 @@ new class extends Livewire\Component
             ->type(contentTypeModel($this->contentType['slug']))
             ->whereIn('id', $this->selectedIds)
             ->get()
+            ->reject(fn (Content $item): bool => $item->isSystemPage())
             ->each(fn (Content $item) => $item->delete());
 
         $this->selectedIds = [];
         $this->dispatch('notify', text: __('Selected items deleted successfully.'));
     }
 
+    public function toggleActive(int $id): void
+    {
+        $content = Content::query()
+            ->type(contentTypeModel($this->contentType['slug']))
+            ->whereKey($id)
+            ->first();
+
+        if (! $content) {
+            return;
+        }
+
+        $content->update(['active' => ! $content->active]);
+
+        $this->dispatch(
+            'notify',
+            text: $content->active ? 'تم تفعيل الصفحة.' : 'تم تعطيل الصفحة.',
+        );
+    }
+
+    public function openItem(?string $uuid): void
+    {
+        if (! filled($uuid)) {
+            $this->dispatch('notify', text: 'تعذر فتح هذا العنصر. حاول تحديث الصفحة.');
+
+            return;
+        }
+
+        $this->dispatch(
+            'openContentItem',
+            tab: $this->contentType['tab_id'],
+            item: $uuid,
+        );
+    }
+
     public function with(): array
     {
         $query = Content::query()
             ->type(contentTypeModel($this->contentType['slug']))
+            ->orderByRaw("CASE template WHEN 'contact' THEN 1 WHEN 'faq' THEN 2 ELSE 99 END")
             ->orderByDesc('id');
 
         $query = $this->applySearch($query);
 
         $results = $query->paginate(20);
 
-        $this->allIdsOnPage = $results->map(fn (Content $item): string => (string) $item->id)->toArray();
+        $this->allIdsOnPage = $results
+            ->reject(fn (Content $item): bool => $item->isSystemPage())
+            ->map(fn (Content $item): string => (string) $item->id)
+            ->values()
+            ->all();
 
         return [
             'results' => $results,

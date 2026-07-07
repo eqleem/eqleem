@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <div class="relative last-child:rounded-b-2xl pb-4X p-1">
+    <div class="relative overflow-visible last-child:rounded-b-2xl pb-4X p-1">
 
         @if ($results->count() == 0)
             <ui:empty subtitle="سيتم عرض العملاء هنا بعد إضافتهم أو شراء أحد المنتجات أو الخدمات.">
@@ -54,13 +54,13 @@
                                     class="rounded-xl border-gray-300 shadow-sm w-4 h-4">
                             </div>
                         </div>
-                        <div class="py-3 w-full">
+                        <div class="py-3 w-full  truncate">
                             <a href="{{ route('admin.clients.detail', ['id' => $item->uuid]) }}" wire:navigate
                                 class="flex items-center gap-x-2">
 
                                 <img class="h-10 w-10 flex-none rounded-full bg-gray-50" src="{{ $item->avatar }}"
                                     alt="">
-                                <div>
+                                <div class="">
                                     <h2 class="text-lg text-gray-700 dark:text-white ">
                                         {{ $item->name }}</h2>
                                     <div class="flex items-center gap-x-2 mt-1">
@@ -74,7 +74,7 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        <p class="mt-1 flex text-xs items-center gap-1  text-gray-500">
+                                        <p class="mt-1 flex text-xs items-center gap-1  text-gray-500 truncate  ">
                                             @if ($item->email)
                                                 <span
                                                     class="truncate inline-flex items-center gap-x-1 bg-gray-100 p-1 px-2 rounded-md text-xs">{{ $item->email }}
@@ -92,29 +92,13 @@
 
                         <div class="pe-6">
 
-                            <div x-data="{ dropdownMenu: false }">
-                                <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
-                                    <button @click="dropdownMenu = ! dropdownMenu" type="button"
-                                        class="hover:bg-gray-200 p-1 rounded-lg inline-block" id="user-menu-button"
-                                        aria-expanded="false" aria-haspopup="true">
-                                        <ui:icon name="dots" class="  text-gray-400" />
-                                    </button>
-
-                                    <div x-show="dropdownMenu"
-                                        class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-48 flex-col gap-y-px"
-                                        role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
-                                        tabindex="-1" x-transition.scale.origin.top>
-
-
-                                        <a href="{{ route('admin.clients.detail', ['id' => $item->uuid]) }}"
+                            <ui:table-menu>
+                                            <a href="{{ route('admin.clients.detail', ['id' => $item->uuid]) }}"
                                             wire:navigate
                                             class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2">
                                             {{ __('Edit') }}
                                         </a>
-
-                                    </div>
-                                </div>
-                            </div>
+                                        </ui:table-menu>
                         </div>
                     </div>
                 @endforeach

@@ -83,17 +83,8 @@
                                 {{ $calendar->to?->translatedFormat('j F Y') ?? '—' }}
                             </td>
                             <td class="px-4 py-4 text-end">
-                                <div x-data="{ dropdownMenu: false }" class="inline-block">
-                                    <div class="relative" @click.outside="dropdownMenu=false" x-cloak>
-                                        <button @click="dropdownMenu = ! dropdownMenu" type="button"
-                                            class="hover:bg-gray-200 p-1 rounded-lg inline-block">
-                                            <ui:icon name="dots" class="text-gray-400" />
-                                        </button>
-
-                                        <div x-show="dropdownMenu"
-                                            class="absolute z-50 mt-2 bg-white border shadow-sm rounded-lg text-gray-800 text-sm flex p-1 ltr:right-0 rtl:left-0 w-40 flex-col gap-y-px"
-                                            x-transition.scale.origin.top>
-                                            <button type="button"
+                                <ui:table-menu class="inline-block" width="w-40">
+<button type="button"
                                                 wire:click="openEditModal({{ $calendar->id }})"
                                                 @click="dropdownMenu = false"
                                                 class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start">
@@ -106,9 +97,7 @@
                                                 class="hover:bg-stone-100 p-1.5 rounded flex items-center gap-x-2 w-full text-start text-red-600">
                                                 {{ __('Delete') }}
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
+</ui:table-menu>
                             </td>
                         </tr>
                     @endforeach

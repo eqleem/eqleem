@@ -64,6 +64,35 @@ it('seeds a complete contact form with uuid when registering a tenant', function
         ->and(data_get($form->data, 'success_message'))->not->toBeEmpty();
 });
 
+it('seeds default contact and faq pages when registering a tenant', function () {
+    [, $tenant] = createTenantForSeedDefaultsTest();
+
+    SeedTenantDefaults::run($tenant->fresh());
+
+    $contactPage = Content::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->type(contentTypeModel('pages'))
+        ->where('template', 'contact')
+        ->first();
+
+    $faqPage = Content::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->type(contentTypeModel('pages'))
+        ->where('template', 'faq')
+        ->first();
+
+    expect($contactPage)->not->toBeNull()
+        ->and($contactPage->title)->toBe('اتصل بنا')
+        ->and($contactPage->slug)->toBe('contact-us')
+        ->and($contactPage->status)->toBe('published')
+        ->and($faqPage)->not->toBeNull()
+        ->and($faqPage->title)->toBe('الأسئلة المتكررة')
+        ->and($faqPage->slug)->toBe('faq')
+        ->and($faqPage->status)->toBe('published');
+});
+
 it('opens the seeded contact form detail page using its uuid', function () {
     [$user, $tenant] = createTenantForSeedDefaultsTest();
 

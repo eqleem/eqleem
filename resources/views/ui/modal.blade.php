@@ -23,7 +23,7 @@
 
     <div class="fixed inset-0 overflow-y-auto">
         <div class="flex min-h-full justify-center items-center w-full">
-            <div @if ($escape) @click.away="if (suppressClickAway || $event.target.closest('[data-file-crop-overlay]') || $event.target.closest('[data-modal-root]')) return; showModal = false" @endif
+            <div @if ($escape) @click.away="if (suppressClickAway || $event.target.closest('[data-file-crop-overlay]') || $event.target.closest('[data-tags-select-panel]') || $event.target.closest('[data-modal-root]')) return; showModal = false" @endif
                 data-modal-root
                 class="relative transform overflow-hiddenX rounded-xl pb-2.5 bg-white min-h-[14vh]x shadow-xl transition-all w-full sm:max-w-{{ $size }} max-w-5xl m-4 lg:m-auto h-{{ $height }}">
                 <div class="flex items-center justify-between w-full p-2 border-b border-gray-100">

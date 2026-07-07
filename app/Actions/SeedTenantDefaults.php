@@ -29,6 +29,7 @@ class SeedTenantDefaults
         $contactForm = $this->seedContactForm($tenant);
         $this->seedCtaLink($tenant, $contactForm);
         $this->seedBlockLinks($tenant, $blockTypes);
+        $this->seedDefaultPages($tenant);
 
         $tenant->meta->set('defaults_seeded', true);
         $tenant->save();
@@ -126,7 +127,7 @@ class SeedTenantDefaults
             ->first();
 
         if ($existing) {
-            return $existing;
+            return $existing->ensureUuid();
         }
 
         $fields = FormField::forStorage([
@@ -216,5 +217,62 @@ class SeedTenantDefaults
         foreach (['blog', 'portfolio'] as $contentType) {
             EnsureSectionBlockLink::make()->handle($tenant->id, $contentType, $blockTypes);
         }
+    }
+
+    protected function seedDefaultPages(Tenant $tenant): void
+    {
+        $pages = [
+            [
+                'template' => 'contact',
+                'title' => 'اتصل بنا',
+                'slug' => 'contact-us',
+                'data' => [
+                    'subtitle' => 'يسعدنا تواصلك معنا. املأ النموذج وسنرد عليك في أقرب وقت.',
+                ],
+            ],
+            [
+                'template' => 'faq',
+                'title' => 'الأسئلة المتكررة',
+                'slug' => 'faq',
+                'data' => [
+                    'subtitle' => 'إجابات على أكثر الأسئلة شيوعاً حول خدماتنا.',
+                ],
+            ],
+        ];
+
+        foreach ($pages as $page) {
+            $this->seedDefaultPage($tenant, $page);
+        }
+    }
+
+    /**
+     * @param  array{template: string, title: string, slug: string, data?: array<string, mixed>}  $page
+     */
+    protected function seedDefaultPage(Tenant $tenant, array $page): void
+    {
+        $existing = Content::query()
+            ->withoutGlobalScope('tenant')
+            ->where('tenant_id', $tenant->id)
+            ->type(contentTypeModel('pages'))
+            ->where('template', $page['template'])
+            ->first();
+
+        if ($existing) {
+            $existing->ensureUuid();
+
+            return;
+        }
+
+        Content::create([
+            'tenant_id' => $tenant->id,
+            'type' => contentTypeModel('pages'),
+            'template' => $page['template'],
+            'title' => $page['title'],
+            'slug' => $page['slug'],
+            'data' => $page['data'] ?? [],
+            'active' => true,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
     }
 }

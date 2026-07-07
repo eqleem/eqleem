@@ -45,7 +45,7 @@ it('defines eqleem ship in shipping methods config', function () {
 
     expect($methods)->toHaveCount(1)
         ->and($methods->first()->slug)->toBe('eqleem-ship')
-        ->and($methods->first()->name)->toBe('إقليم شيب - شحن عادي');
+        ->and($methods->first()->name)->toBe('شحن إقليم - شحن عادي');
 });
 
 it('toggles a shipping method active state for the tenant', function () {
@@ -161,7 +161,7 @@ it('renders the shipping options settings page', function () {
     Livewire::actingAs($user)
         ->test('admin::settings.shipping-options.shipping-options')
         ->assertSee('وسائل الشحن')
-        ->assertSee('إقليم شيب - شحن عادي')
+        ->assertSee('شحن إقليم - شحن عادي')
         ->assertSee('خيارات الشحن المخصصة')
         ->assertSee('أضف خدمة شحن');
 });
@@ -174,12 +174,47 @@ it('orders countries with priority and all countries option', function () {
         ->and(collect($options)->firstWhere('id', 'SA'))->not->toBeNull();
 });
 
-it('shows saudi cities in arabic in city options', function () {
+it('shows saudi cities in arabic in city options when searching', function () {
+    $options = collect(app(WorldLocationOptions::class)->citySelectOptions('SA', 'الرياض'))
+        ->filter(fn (array $option): bool => $option['selectable'] ?? true);
+
+    expect($options->firstWhere('label', 'الرياض'))->not->toBeNull();
+});
+
+it('does not load all saudi cities without a search term', function () {
     $options = collect(app(WorldLocationOptions::class)->citySelectOptions('SA'))
         ->filter(fn (array $option): bool => $option['selectable'] ?? true);
 
-    expect($options->firstWhere('label', 'الرياض'))->not->toBeNull()
-        ->and($options->firstWhere('label', 'ابها'))->not->toBeNull();
+    expect($options)->toHaveCount(1)
+        ->and($options->first()['id'])->toBe(WorldLocationOptions::ALL_CITIES);
+});
+
+it('loads saved custom shipping cities when editing', function () {
+    [$user] = createTenantWithUserForShippingOptions();
+
+    $city = City::query()
+        ->active()
+        ->whereHas('country', fn ($query) => $query->where('iso2', 'SA'))
+        ->where('name_ar', 'الرياض')
+        ->firstOrFail();
+
+    $cityId = (string) $city->id;
+
+    Setting::saveCustomShippingOptions([[
+        'id' => 'custom-edit',
+        'name' => 'شحن الرياض',
+        'price' => 30,
+        'country' => 'SA',
+        'all_cities' => false,
+        'city_ids' => [$cityId],
+        'active' => true,
+    ]]);
+
+    Livewire::actingAs($user)
+        ->test('admin::settings.shipping-options.custom-shipping-form', ['optionId' => 'custom-edit'])
+        ->assertSet('country', 'SA')
+        ->assertSet('cityIds', [$cityId])
+        ->assertSee('الرياض');
 });
 
 it('finds saudi cities by arabic search term', function () {

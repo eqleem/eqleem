@@ -4,7 +4,7 @@ return [
     'eqleem-ship' => [
         'order' => 1,
         'slug' => 'eqleem-ship',
-        'name' => 'إقليم شيب - شحن عادي',
+        'name' => 'شحن إقليم - شحن عادي',
         'description' => 'خيار الشحن المفضل، شحن داخلي ودولي، للشحن العادي الجاف.',
         'icon' => 'assets/icons/ecommerce/009-cargo ship.svg',
         'components' => [
