@@ -249,21 +249,36 @@ class WorldSeeder extends Seeder
     protected function createLanguages(): void
     {
         $rows = $this->getJsonFileAsArray('languages');
+
+        if ($rows === []) {
+            return;
+        }
+
+        $existingCodes = Language::query()->pluck('code')->flip();
         $chunkLength = 200;
 
         $this->command?->info('Starting Seed languages Data ...');
         $this->command?->getOutput()->progressStart(count($rows));
 
         foreach (array_chunk($rows, $chunkLength) as $chunk) {
+            $records = [];
+
             foreach ($chunk as $row) {
-                Language::create([
-                    'code' => $row['code'],
-                    'name' => $row['name'],
-                    'name_native' => $row['name_native'] ?? null,
-                    'dir' => $row['dir'] ?? 'ltr',
-                ]);
+                if (! $existingCodes->has($row['code'])) {
+                    $records[] = [
+                        'code' => $row['code'],
+                        'name' => $row['name'],
+                        'name_native' => $row['name_native'] ?? null,
+                        'dir' => $row['dir'] ?? 'ltr',
+                        'active' => true,
+                    ];
+                }
 
                 $this->command?->getOutput()->progressAdvance();
+            }
+
+            if ($records !== []) {
+                Language::insert($records);
             }
         }
 
@@ -274,8 +289,13 @@ class WorldSeeder extends Seeder
     protected function createNationalities(): void
     {
         $rows = $this->getJsonFileAsArray('nationalities');
+
+        if ($rows === []) {
+            return;
+        }
+
+        $existingCodes = Nationality::query()->pluck('code')->flip();
         $chunkLength = 200;
-        $now = now();
 
         $this->command?->info('Starting Seed nationalities Data ...');
         $this->command?->getOutput()->progressStart(count($rows));
@@ -284,20 +304,25 @@ class WorldSeeder extends Seeder
             $records = [];
 
             foreach ($chunk as $row) {
-                $records[] = [
-                    'code' => $row['country_code'],
-                    'name_en' => $row['country_enNationality'],
-                    'name_ar' => $row['country_arNationality'],
-                    'active' => true,
-                    'meta' => json_encode([
-                        'country_enName' => $row['country_enName'] ?? null,
-                        'country_arName' => $row['country_arName'] ?? null,
-                    ]),
-                ];
+                if (! $existingCodes->has($row['country_code'])) {
+                    $records[] = [
+                        'code' => $row['country_code'],
+                        'name_en' => $row['country_enNationality'],
+                        'name_ar' => $row['country_arNationality'],
+                        'active' => true,
+                        'meta' => json_encode([
+                            'country_enName' => $row['country_enName'] ?? null,
+                            'country_arName' => $row['country_arName'] ?? null,
+                        ]),
+                    ];
+                }
+
+                $this->command?->getOutput()->progressAdvance();
             }
 
-            Nationality::insert($records);
-            $this->command?->getOutput()->progressAdvance(count($chunk));
+            if ($records !== []) {
+                Nationality::insert($records);
+            }
         }
 
         $this->resetSequence('nationalities');
