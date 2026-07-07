@@ -5,7 +5,9 @@ namespace App\Livewire\Tenant\Pages;
 use App\Models\Client;
 use App\Models\Setting;
 use App\Services\CartService;
+use App\Services\CheckoutShippingService;
 use App\Support\PaymentMethodRegistry;
+use App\Support\WorldLocationOptions;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +22,17 @@ class Checkout extends Component
 
     public string $email = '';
 
-    public string $shippingMethod = 'express';
+    public string $address = '';
+
+    public string $country = 'SA';
+
+    public string $cityId = '';
+
+    public string $citySearch = '';
+
+    public string $neighborhood = '';
+
+    public string $shippingMethod = '';
 
     public ?string $paymentMethod = null;
 
@@ -42,14 +54,45 @@ class Checkout extends Component
             $this->name = (string) ($profile['name'] ?? $client->name);
             $this->phone = (string) ($profile['phone'] ?? $client->phone ?? '');
             $this->email = (string) ($profile['email'] ?? $client->email ?? '');
+            $this->address = (string) ($client->address ?? '');
+            $this->neighborhood = (string) ($client->neighborhood ?? '');
         }
 
         $this->paymentMethod = $this->activePaymentMethods()->first()['slug'] ?? null;
+        $this->ensureShippingMethodSelection();
     }
 
     public function updatedPaymentMethod(): void
     {
         $this->resetPaymentFields();
+    }
+
+    public function updatedCountry(): void
+    {
+        $this->cityId = '';
+        $this->citySearch = '';
+        $this->ensureShippingMethodSelection();
+    }
+
+    public function updatedCityId(): void
+    {
+        $this->syncCitySearchFromSelection();
+        $this->ensureShippingMethodSelection();
+    }
+
+    public function updatedCitySearch(): void
+    {
+        if ($this->cityId !== '' && $this->citySearch !== $this->selectedCityLabel()) {
+            $this->cityId = '';
+            $this->ensureShippingMethodSelection();
+        }
+    }
+
+    public function selectCity(string $cityId): void
+    {
+        $this->cityId = $cityId;
+        $this->syncCitySearchFromSelection();
+        $this->ensureShippingMethodSelection();
     }
 
     /**
@@ -64,7 +107,21 @@ class Checkout extends Component
         ];
 
         if ($cart->requiresShipping()) {
-            $rules['shippingMethod'] = ['required', 'in:express,scheduled,pickup'];
+            $locations = app(WorldLocationOptions::class);
+            $availableMethods = $this->availableShippingMethodKeys();
+
+            $rules['address'] = ['required', 'string', 'max:255'];
+            $rules['country'] = [
+                'required',
+                'string',
+                Rule::in(collect($locations->selectableCountryIds())
+                    ->reject(fn (string $id): bool => $id === WorldLocationOptions::ALL_COUNTRIES)
+                    ->values()
+                    ->all()),
+            ];
+            $rules['cityId'] = ['required', 'string', Rule::in($locations->selectableCityIds($this->country, [$this->cityId]))];
+            $rules['neighborhood'] = ['required', 'string', 'max:120'];
+            $rules['shippingMethod'] = ['required', Rule::in($availableMethods)];
         }
 
         return $rules;
@@ -75,12 +132,44 @@ class Checkout extends Component
         return $cart->requiresShipping() ? $this->shippingMethod : 'none';
     }
 
+    /**
+     * @return array{address: string, country: string, city_id: string, neighborhood: string}
+     */
+    protected function shippingAddressPayload(): array
+    {
+        return [
+            'address' => $this->address,
+            'country' => $this->country,
+            'city_id' => $this->cityId,
+            'neighborhood' => $this->neighborhood,
+        ];
+    }
+
+    /**
+     * @return array{name: string, phone: string, email?: string|null, address?: string, country?: string, city_id?: string, neighborhood?: string}
+     */
+    protected function customerPayload(): array
+    {
+        return [
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'email' => $this->email ?: null,
+            ...$this->shippingAddressPayload(),
+        ];
+    }
+
     public function messages(): array
     {
         return [
             'name.required' => 'الاسم مطلوب.',
             'phone.required' => 'رقم الهاتف مطلوب.',
             'email.email' => 'البريد الإلكتروني غير صالح.',
+            'address.required' => 'العنوان مطلوب.',
+            'country.required' => 'الدولة مطلوبة.',
+            'cityId.required' => 'المدينة مطلوبة.',
+            'neighborhood.required' => 'الحي مطلوب.',
+            'shippingMethod.required' => 'يرجى اختيار وسيلة الشحن.',
+            'shippingMethod.in' => 'وسيلة الشحن المختارة غير متاحة.',
             'paymentMethod.required' => 'يرجى اختيار وسيلة الدفع.',
             'paymentMethod.in' => 'وسيلة الدفع المختارة غير متاحة.',
             'bankTransferAccountId.required' => 'يرجى اختيار الحساب البنكي.',
@@ -168,11 +257,7 @@ class Checkout extends Component
         session([
             'pending_store_checkout' => [
                 'tenant_id' => currentTenantId(),
-                'customer' => [
-                    'name' => $this->name,
-                    'phone' => $this->phone,
-                    'email' => $this->email ?: null,
-                ],
+                'customer' => $this->customerPayload(),
                 'shipping_method' => $this->resolvedShippingMethod($cart),
                 'payment_method' => 'credit-card',
                 'grand_total' => $grandTotal,
@@ -188,7 +273,7 @@ class Checkout extends Component
         $this->validate($this->customerRules($cart));
 
         $shippingMethod = $this->resolvedShippingMethod($cart);
-        $grandTotal = $cart->subtotal() + $cart->shippingFee($shippingMethod);
+        $grandTotal = $cart->subtotal() + $cart->shippingFee($shippingMethod, $this->shippingAddressPayload());
 
         if ($grandTotal <= 0) {
             return $grandTotal;
@@ -250,11 +335,7 @@ class Checkout extends Component
     protected function completeCheckout(CartService $cart, string $paymentMethod, array $paymentMeta = []): void
     {
         $order = $cart->checkout(
-            [
-                'name' => $this->name,
-                'phone' => $this->phone,
-                'email' => $this->email ?: null,
-            ],
+            $this->customerPayload(),
             $this->resolvedShippingMethod($cart),
             $paymentMethod,
             $paymentMeta,
@@ -289,6 +370,47 @@ class Checkout extends Component
         return Setting::paymentMethod($this->paymentMethod);
     }
 
+    /**
+     * @return list<string>
+     */
+    protected function availableShippingMethodKeys(): array
+    {
+        return app(CheckoutShippingService::class)->availableMethodKeys(
+            $this->country,
+            $this->cityId !== '' ? $this->cityId : null,
+        );
+    }
+
+    protected function ensureShippingMethodSelection(): void
+    {
+        $available = $this->availableShippingMethodKeys();
+
+        if ($available === []) {
+            $this->shippingMethod = '';
+
+            return;
+        }
+
+        if (! in_array($this->shippingMethod, $available, true)) {
+            $this->shippingMethod = $available[0];
+        }
+    }
+
+    protected function selectedCityLabel(): string
+    {
+        if ($this->cityId === '') {
+            return '';
+        }
+
+        return app(WorldLocationOptions::class)
+            ->cityLabelsByIds([(int) $this->cityId])[(int) $this->cityId] ?? '';
+    }
+
+    protected function syncCitySearchFromSelection(): void
+    {
+        $this->citySearch = $this->selectedCityLabel();
+    }
+
     protected function resetPaymentFields(): void
     {
         $this->reset([
@@ -318,23 +440,34 @@ class Checkout extends Component
         $subtotal = $cart->subtotal();
         $requiresShipping = $cart->requiresShipping();
         $shippingMethod = $this->resolvedShippingMethod($cart);
-        $shippingFee = $cart->shippingFee($shippingMethod);
+        $shippingAddress = $this->shippingAddressPayload();
+        $shippingOptions = $requiresShipping
+            ? app(CheckoutShippingService::class)->availableOptions($this->country, $this->cityId !== '' ? $this->cityId : null)
+            : collect();
+        $shippingFee = $cart->shippingFee($shippingMethod, $shippingAddress);
         $grandTotal = $subtotal + $shippingFee;
         $itemCount = $items->sum('quantity');
         $paymentMethods = $this->activePaymentMethods();
         $requiresPayment = $grandTotal > 0;
         $selectedPaymentMethod = $paymentMethods->firstWhere('slug', $this->paymentMethod);
+        $locations = app(WorldLocationOptions::class);
 
         return tenantView('pages.checkout', [
             'items' => $items,
             'subtotal' => $subtotal,
             'requiresShipping' => $requiresShipping,
+            'shippingOptions' => $shippingOptions,
             'shippingFee' => $shippingFee,
             'grandTotal' => $grandTotal,
             'itemCount' => $itemCount,
             'paymentMethods' => $paymentMethods,
             'requiresPayment' => $requiresPayment,
             'selectedPaymentMethod' => $selectedPaymentMethod,
+            'countryOptions' => $locations->countrySelectOptions(includeAll: false),
+            'cityOptions' => $this->country !== ''
+                ? $locations->citySelectOptions($this->country, $this->citySearch, [$this->cityId])
+                : [],
+            'selectedCityLabel' => $this->selectedCityLabel(),
         ])->title('إتمام الشراء');
     }
 }

@@ -193,21 +193,28 @@ class CartService
         return $this->items()->contains(fn (CartItem $item): bool => $item->isShippable());
     }
 
-    public function shippingFee(string $shippingMethod): int
+    /**
+     * @param  array{country?: string|null, city_id?: string|null}  $address
+     */
+    public function shippingFee(string $shippingMethod, array $address = []): int
     {
-        if (! $this->requiresShipping()) {
+        if (! $this->requiresShipping() || $shippingMethod === 'none') {
             return 0;
         }
 
-        return match ($shippingMethod) {
-            'pickup', 'none' => 0,
-            default => 3500,
-        };
+        return app(CheckoutShippingService::class)->fee(
+            $shippingMethod,
+            $address['country'] ?? null,
+            $address['city_id'] ?? null,
+        );
     }
 
-    public function grandTotal(string $shippingMethod): int
+    /**
+     * @param  array{country?: string|null, city_id?: string|null}  $address
+     */
+    public function grandTotal(string $shippingMethod, array $address = []): int
     {
-        return $this->subtotal() + $this->shippingFee($shippingMethod);
+        return $this->subtotal() + $this->shippingFee($shippingMethod, $address);
     }
 
     public function addProduct(Content $product, int $quantity = 1): CartItem
@@ -561,7 +568,7 @@ class CartService
     }
 
     /**
-     * @param  array{name: string, phone: string, email?: string|null}  $customer
+     * @param  array{name: string, phone: string, email?: string|null, address?: string|null, country?: string|null, city_id?: string|null, neighborhood?: string|null}  $customer
      * @param  array<string, mixed>  $paymentMeta
      */
     public function checkout(array $customer, string $shippingMethod, ?string $paymentMethod, array $paymentMeta = []): Order
@@ -576,12 +583,18 @@ class CartService
         $subtotal = $this->subtotal();
         $requiresShipping = $this->requiresShipping();
         $effectiveShippingMethod = $requiresShipping ? $shippingMethod : 'none';
-        $shippingFee = $this->shippingFee($effectiveShippingMethod);
+        $shippingAddress = $requiresShipping
+            ? app(CheckoutShippingService::class)->normalizeAddress($customer)
+            : [];
+        $shippingFee = $this->shippingFee($effectiveShippingMethod, $shippingAddress);
         $grandTotal = $subtotal + $shippingFee;
+        $shippingMethodLabel = $requiresShipping
+            ? app(CheckoutShippingService::class)->label($effectiveShippingMethod)
+            : null;
 
         $this->validateBookingItems($items);
 
-        return DB::transaction(function () use ($items, $customer, $effectiveShippingMethod, $paymentMethod, $paymentMeta, $tenantId, $subtotal, $shippingFee, $grandTotal): Order {
+        return DB::transaction(function () use ($items, $customer, $effectiveShippingMethod, $paymentMethod, $paymentMeta, $tenantId, $subtotal, $shippingFee, $grandTotal, $shippingAddress, $shippingMethodLabel): Order {
             $client = $this->resolveCheckoutClient($customer, $tenantId);
 
             $isFreeOrder = $grandTotal <= 0;
@@ -608,7 +621,9 @@ class CartService
                 'meta' => array_merge([
                     'payment_method' => $paymentMethod,
                     'shipping_method' => $effectiveShippingMethod,
+                    'shipping_method_label' => $shippingMethodLabel,
                     'shipping_fee' => $shippingFee,
+                    'shipping_address' => $shippingAddress !== [] ? $shippingAddress : null,
                     'source' => 'store_cart',
                 ], $paymentMeta),
             ]);

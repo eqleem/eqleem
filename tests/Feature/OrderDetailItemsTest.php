@@ -162,6 +162,45 @@ it('shows booking details for service and unit rental items', function () {
         ->assertDontSee('المقاعد:');
 });
 
+it('renders structured shipping address on order detail page', function () {
+    [$user, $tenant] = createTenantWithUserForOrderDetailItems();
+
+    $order = createOrderWithItems($tenant, [
+        [
+            'name' => 'منتج يحتاج شحن',
+            'qty' => 1,
+            'unit_price' => 5000,
+            'line_total' => 5000,
+            'meta' => [
+                'type' => 'product',
+            ],
+        ],
+    ]);
+
+    $order->update([
+        'meta' => [
+            'shipping_method' => 'custom:test-shipping',
+            'shipping_method_label' => 'شحن سريع',
+            'shipping_fee' => 2100,
+            'shipping_address' => [
+                'address' => 'شارع الملك فهد',
+                'country' => 'SA',
+                'city_id' => '1',
+                'neighborhood' => 'حي العليا',
+                'country_label' => 'السعودية',
+                'city_label' => 'الرياض',
+            ],
+        ],
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('admin.orders.detail', ['id' => $order->uuid]))
+        ->assertSuccessful()
+        ->assertSee('عنوان الشحن')
+        ->assertSee('شارع الملك فهد، حي العليا، الرياض، السعودية')
+        ->assertSee('شحن سريع');
+});
+
 it('shows product and course details for non-booking items', function () {
     [$user, $tenant] = createTenantWithUserForOrderDetailItems();
 

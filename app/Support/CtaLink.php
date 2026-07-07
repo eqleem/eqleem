@@ -499,6 +499,48 @@ class CtaLink
             ->get(['id', 'title', 'slug', 'type']);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array{tab: string, item?: string}|null
+     */
+    public static function adminManageParamsFromData(array $data): ?array
+    {
+        $linkType = $data['link_type'] ?? null;
+        $contentType = $data['content_type'] ?? '';
+
+        if (! in_array($linkType, ['section', 'item'], true) || ! filled($contentType)) {
+            return null;
+        }
+
+        if (! is_array(config("content-types.{$contentType}"))) {
+            return null;
+        }
+
+        $params = ['tab' => 'content-'.$contentType];
+
+        if ($linkType === 'item' && filled($data['content_id'] ?? null)) {
+            $uuid = Content::query()->find($data['content_id'])?->uuid;
+
+            if (! filled($uuid)) {
+                return null;
+            }
+
+            $params['item'] = (string) $uuid;
+        }
+
+        return $params;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public static function adminManageUrlFromData(array $data): ?string
+    {
+        $params = self::adminManageParamsFromData($data);
+
+        return $params !== null ? route('admin.page.home', $params) : null;
+    }
+
     protected static function sectionUrl(string $contentType): ?string
     {
         $routeName = config('cta-link-types.routes.'.$contentType.'.index');

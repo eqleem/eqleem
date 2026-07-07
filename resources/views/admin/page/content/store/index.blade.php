@@ -7,13 +7,14 @@
         <ui:tab.group
             :active="$activeStoreTab"
             url-key="section"
-            :valid-tabs="['products', 'categories', 'customize', 'payment-options']"
+            :valid-tabs="['products', 'categories', 'customize', 'payment-options', 'shipping-options']"
         >
             <x-slot name="nav" class="border-b border-stone-200 px-px">
                 <ui:tab.nav name="products" label="المنتجات" icon="shopping-bag" activeClass="border-b-2 !border-primary-500 text-stone-900" />
                 <ui:tab.nav name="categories" label="تصنيفات المتجر" icon="category" activeClass="border-b-2 !border-primary-500 text-stone-900" />
                 <ui:tab.nav name="customize" label="تخصيص المتجر" icon="settings" activeClass="border-b-2 !border-primary-500 text-stone-900" />
                 <ui:tab.nav name="payment-options" :label="config('settings.payment-options.name')" icon="credit-card" activeClass="border-b-2 !border-primary-500 text-stone-900" />
+                <ui:tab.nav name="shipping-options" :label="config('settings.shipping-option.name')" icon="truck-delivery" activeClass="border-b-2 !border-primary-500 text-stone-900" />
             </x-slot>
 
             <x-slot name="content">
@@ -32,6 +33,10 @@
                 <ui:tab.content name="payment-options" class="!p-0 !rounded-none">
                     <livewire:dynamic-component :component="config('settings.payment-options.components.index')" lazy />
                 </ui:tab.content>
+
+                <ui:tab.content name="shipping-options" class="!p-0 !rounded-none">
+                    <livewire:dynamic-component :component="config('settings.shipping-option.components.index')" lazy />
+                </ui:tab.content>
             </x-slot>
         </ui:tab.group>
     </ui:mainbox>
@@ -47,7 +52,7 @@ new class extends \Livewire\Component
     public string $activeStoreTab = 'products';
 
     /** @var list<string> */
-    private const STORE_TABS = ['products', 'categories', 'customize', 'payment-options'];
+    private const STORE_TABS = ['products', 'categories', 'customize', 'payment-options', 'shipping-options'];
 
     public function mount(): void
     {

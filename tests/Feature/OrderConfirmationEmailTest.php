@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\CheckoutShippingService;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -69,15 +70,17 @@ it('queues an order confirmation email after checkout', function () {
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->set('quantity', 2)
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد محمد')
         ->set('phone', '0500000000')
         ->set('email', 'ahmad@example.com')
-        ->set('shippingMethod', 'express')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
@@ -101,18 +104,20 @@ it('does not queue an order confirmation email when client has no email', functi
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'عميل بدون بريد')
         ->set('phone', '0511111111')
         ->set('email', '')
-        ->set('shippingMethod', 'pickup')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
-    Mail::assertNothingQueued();
+    Mail::assertNotQueued(OrderConfirmation::class);
 });
 
 it('renders the order confirmation email with order details', function () {
@@ -136,17 +141,18 @@ it('renders the order confirmation email with order details', function () {
         'subtotal' => 50000,
         'discount_total' => 0,
         'tax_total' => 0,
-        'grand_total' => 53500,
+        'grand_total' => 52500,
         'paid_total' => 0,
-        'due_total' => 53500,
+        'due_total' => 52500,
         'payment_status' => 'unpaid',
         'issued_at' => now(),
         'financial_status' => 'open',
         'fulfillment_status' => 'unfulfilled',
         'meta' => [
             'payment_method' => 'card',
-            'shipping_method' => 'express',
-            'shipping_fee' => 3500,
+            'shipping_method' => app(CheckoutShippingService::class)->registryMethodKey('eqleem-ship'),
+            'shipping_method_label' => 'شحن إقليم',
+            'shipping_fee' => 2500,
             'source' => 'store_cart',
         ],
     ]);
@@ -188,6 +194,6 @@ it('renders the order confirmation email with order details', function () {
         ->toContain('متجر التأكيد')
         ->toContain('#000001')
         ->toContain('منتج التأكيد')
-        ->toContain('توصيل سريع (24-48 ساعة)')
+        ->toContain('شحن إقليم')
         ->toContain('البطاقة الائتمانية');
 });

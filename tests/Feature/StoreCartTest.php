@@ -149,15 +149,17 @@ it('creates an ecommerce order from checkout and clears the cart', function () {
         'label' => 'الدفع عند الاستلام',
     ], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->set('quantity', 2)
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد محمد')
         ->set('phone', '0500000000')
         ->set('email', 'ahmad@example.com')
-        ->set('shippingMethod', 'pickup')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
@@ -166,7 +168,7 @@ it('creates an ecommerce order from checkout and clears the cart', function () {
     expect(CartItem::query()->count())->toBe(0)
         ->and(Order::query()->count())->toBe(1)
         ->and($order->channel)->toBe('ecommerce')
-        ->and($order->grand_total)->toBe(50000)
+        ->and($order->grand_total)->toBe(52500)
         ->and(data_get($order->meta, 'payment_method'))->toBe('cash-on-delivery')
         ->and(DB::table('order_items')->where('order_id', $order->id)->count())->toBe(1);
 
@@ -191,11 +193,13 @@ it('resolves cart totals through the cart service', function () {
     app(CartService::class)->addProduct($product, 2);
 
     $cart = app(CartService::class);
+    $shippingMethod = enableStoreCheckoutShipping(25);
+    $address = checkoutShippingAddress();
 
     expect($cart->itemCount())->toBe(2)
         ->and($cart->subtotal())->toBe(50000)
-        ->and($cart->grandTotal('express'))->toBe(53500)
-        ->and($cart->grandTotal('pickup'))->toBe(50000);
+        ->and($cart->grandTotal($shippingMethod, ['country' => $address['country'], 'city_id' => $address['cityId']]))->toBe(52500)
+        ->and($cart->shippingFee($shippingMethod, ['country' => $address['country'], 'city_id' => $address['cityId']]))->toBe(2500);
 });
 
 it('merges guest cart into client cart after login', function () {
@@ -348,20 +352,26 @@ it('requires bank transfer reference before completing checkout', function () {
 });
 
 it('completes a free checkout without payment methods', function () {
-    ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
+    ['tenant' => $tenant] = createStoreCartContext();
 
     setCurrentTenant($tenant);
 
-    $product->update([
-        'data' => array_merge($product->data ?? [], ['price' => 0]),
+    $course = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('courses'),
+        'title' => 'دورة مجانية',
+        'slug' => 'free-course',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'active' => true,
+        'data' => ['price' => 0],
     ]);
 
-    app(CartService::class)->addProduct($product->fresh());
+    app(CartService::class)->addItem($course);
 
     Livewire::test(Checkout::class)
         ->set('name', 'أحمد')
         ->set('phone', '0500000000')
-        ->set('shippingMethod', 'pickup')
         ->call('placeFreeOrder');
 
     $order = Order::query()->firstOrFail();
@@ -382,11 +392,14 @@ it('rejects free checkout when order total is greater than zero', function () {
 
     setCurrentTenant($tenant);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     app(CartService::class)->addProduct($product);
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد')
         ->set('phone', '0500000000')
+        ->set('shippingMethod', $shippingMethod)
         ->call('placeFreeOrder')
         ->assertHasErrors(['paymentMethod']);
 });
@@ -397,12 +410,14 @@ it('redirects to order confirmation after checkout', function () {
     setCurrentTenant($tenant);
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
+    $shippingMethod = enableStoreCheckoutShipping(25);
 
     app(CartService::class)->addProduct($product);
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد')
         ->set('phone', '0500000000')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery')
         ->assertRedirect(route('tenant.pages.order-confirmation', [
@@ -427,12 +442,14 @@ it('denies viewing order confirmation without access', function () {
     setCurrentTenant($tenant);
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
+    $shippingMethod = enableStoreCheckoutShipping(25);
 
     app(CartService::class)->addProduct($product);
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد')
         ->set('phone', '0500000000')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
@@ -491,13 +508,16 @@ it('shows shipping options only when the cart contains shippable items', functio
     app(CartService::class)->addItem($course);
 
     Livewire::test(Checkout::class)
-        ->assertDontSee('خيارات الشحن والتسليم');
+        ->assertDontSee('عنوان الشحن');
+
+    enableStoreCheckoutShipping();
 
     app(CartService::class)->addProduct($product);
 
     Livewire::test(Checkout::class)
-        ->assertSee('خيارات الشحن والتسليم')
-        ->assertSee('توصيل سريع (24-48 ساعة)');
+        ->assertSee('عنوان الشحن')
+        ->assertSee('خيارات الشحن')
+        ->assertSee('شحن إقليم');
 });
 
 it('does not charge shipping for non-shippable checkout orders', function () {

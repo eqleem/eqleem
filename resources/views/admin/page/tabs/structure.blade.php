@@ -53,18 +53,33 @@
                             </button>
 
                             @if ($block['editable'])
-                                <button
-                                    type="button"
-                                    wire:click="openEditBlockModal({{ $block['id'] }})"
-                                    class="flex flex-1 min-w-0 items-center gap-2 text-start hover:text-primary-600 transition"
-                                >
-                                    <img
-                                        src="{{ $block['icon_url'] }}"
-                                        alt=""
-                                        class="w-6 h-6 shrink-0 rounded-md bg-gray-100 p-1"
+                                @if ($block['content_manage_url'])
+                                    <a
+                                        href="{{ $block['content_manage_url'] }}"
+                                        wire:navigate
+                                        class="flex flex-1 min-w-0 items-center gap-2 text-start hover:text-primary-600 transition"
                                     >
-                                    <span class="text-sm font-medium text-gray-800 truncate">{{ $block['title'] }}</span>
-                                </button>
+                                        <img
+                                            src="{{ $block['icon_url'] }}"
+                                            alt=""
+                                            class="w-6 h-6 shrink-0 rounded-md bg-gray-100 p-1"
+                                        >
+                                        <span class="text-sm font-medium text-gray-800 truncate">{{ $block['title'] }}</span>
+                                    </a>
+                                @else
+                                    <button
+                                        type="button"
+                                        wire:click="openEditBlockModal({{ $block['id'] }})"
+                                        class="flex flex-1 min-w-0 items-center gap-2 text-start hover:text-primary-600 transition"
+                                    >
+                                        <img
+                                            src="{{ $block['icon_url'] }}"
+                                            alt=""
+                                            class="w-6 h-6 shrink-0 rounded-md bg-gray-100 p-1"
+                                        >
+                                        <span class="text-sm font-medium text-gray-800 truncate">{{ $block['title'] }}</span>
+                                    </button>
+                                @endif
                             @else
                                 <div class="flex flex-1 min-w-0 items-center gap-2">
                                     <img
@@ -188,6 +203,7 @@
 
 use App\Models\Block;
 use App\Support\BlockTypeRegistry;
+use App\Support\CtaLink;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 
@@ -317,6 +333,9 @@ new class extends \Livewire\Component
 
         return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
             $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
+            $contentManageUrl = $block->type === 'block-link' && is_array($block->data)
+                ? CtaLink::adminManageUrlFromData($block->data)
+                : null;
 
             return [
                 'id' => $block->id,
@@ -327,6 +346,7 @@ new class extends \Livewire\Component
                 'editable' => filled($editors[$block->type] ?? null),
                 'active' => $block->active,
                 'icon_url' => asset($icon),
+                'content_manage_url' => $contentManageUrl,
             ];
         });
     }
@@ -349,7 +369,7 @@ new class extends \Livewire\Component
     {
         $blocks = Block::queryForTenantRoots()
             ->orderBy('sort_order')
-            ->get(['id', 'title', 'type', 'sort_order', 'is_default', 'active']);
+            ->get(['id', 'title', 'type', 'sort_order', 'is_default', 'active', 'data']);
 
         $mapped = $this->mapBlocks($blocks, $blockTypes);
         $system = $mapped->where('is_default', true)->values();

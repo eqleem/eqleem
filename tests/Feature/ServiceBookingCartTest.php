@@ -133,6 +133,8 @@ it('creates a mixed ecommerce order with product service and course items', func
         'label' => 'الدفع عند الاستلام',
     ], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(StoreDetail::class, ['slug' => $product->slug])
         ->call('addToCart');
 
@@ -145,20 +147,20 @@ it('creates a mixed ecommerce order with product service and course items', func
     Livewire::test(CourseDetail::class, ['slug' => $course->slug])
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
-        ->assertSee('خيارات الشحن والتسليم')
+    fillCheckoutShipping(Livewire::test(Checkout::class))
+        ->assertSee('خيارات الشحن')
         ->assertSee('6 يوليو 2026')
         ->assertSee('09:00 - 10:00')
         ->set('name', 'أحمد محمد')
         ->set('phone', '0500000000')
-        ->set('shippingMethod', 'pickup')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
     $order = Order::query()->firstOrFail();
 
     expect(CartItem::query()->count())->toBe(0)
-        ->and($order->grand_total)->toBe(49900)
+        ->and($order->grand_total)->toBe(52400)
         ->and(DB::table('order_items')->where('order_id', $order->id)->count())->toBe(3)
         ->and(Booking::query()->count())->toBe(1);
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CheckoutShippingService;
 use App\Support\Money;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
@@ -314,19 +315,19 @@ class Order extends Model
 
     public function shippingMethodLabel(): string
     {
+        $storedLabel = data_get($this->meta, 'shipping_method_label');
+
+        if (filled($storedLabel)) {
+            return (string) $storedLabel;
+        }
+
         $method = data_get($this->meta, 'shipping_method');
 
-        if (! $method) {
+        if (! $method || $method === 'none') {
             return '-';
         }
 
-        return match ($method) {
-            'express' => 'توصيل سريع (24-48 ساعة)',
-            'scheduled' => 'توصيل مجدول',
-            'pickup' => 'استلام من المعرض',
-            'none' => 'بدون شحن',
-            default => $method,
-        };
+        return app(CheckoutShippingService::class)->label((string) $method);
     }
 
     public function channelLabel(): string
@@ -342,6 +343,35 @@ class Order extends Model
     public function shippingFee(): int
     {
         return (int) data_get($this->meta, 'shipping_fee', 0);
+    }
+
+    public function shippingAddressLabel(): ?string
+    {
+        $address = data_get($this->meta, 'shipping_address');
+
+        if (blank($address)) {
+            return null;
+        }
+
+        if (is_string($address)) {
+            return $address;
+        }
+
+        if (! is_array($address)) {
+            return null;
+        }
+
+        $parts = collect([
+            data_get($address, 'address'),
+            data_get($address, 'neighborhood'),
+            data_get($address, 'city_label'),
+            data_get($address, 'country_label'),
+        ])
+            ->filter(fn (mixed $value): bool => filled($value))
+            ->map(fn (mixed $value): string => (string) $value)
+            ->values();
+
+        return $parts->isEmpty() ? null : $parts->implode('، ');
     }
 
     public function statusBadgeColor(): string

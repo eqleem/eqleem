@@ -166,6 +166,19 @@ it('renders the shipping options settings page', function () {
         ->assertSee('أضف خدمة شحن');
 });
 
+it('renders shipping options tab in store index using settings component', function () {
+    [$user] = createTenantWithUserForShippingOptions();
+
+    Livewire::actingAs($user)
+        ->withQueryParams(['section' => 'shipping-options'])
+        ->test('admin::page.content.store.index', [
+            'contentType' => config('content-types.store'),
+        ])
+        ->assertSet('activeStoreTab', 'shipping-options')
+        ->assertSee(config('settings.shipping-option.name'))
+        ->assertSeeHtml('wire:name="'.config('settings.shipping-option.components.index').'"');
+});
+
 it('orders countries with priority and all countries option', function () {
     $options = app(WorldLocationOptions::class)->countrySelectOptions();
 

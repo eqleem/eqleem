@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\CheckoutShippingService;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -72,15 +73,17 @@ it('queues a new order notification email to the tenant owner after checkout', f
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->set('quantity', 2)
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'أحمد محمد')
         ->set('phone', '0500000000')
         ->set('email', 'ahmad@example.com')
-        ->set('shippingMethod', 'express')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
@@ -112,14 +115,16 @@ it('does not queue a new order notification email when tenant owner has no email
 
     Setting::savePaymentMethod('cash-on-delivery', [], true);
 
+    $shippingMethod = enableStoreCheckoutShipping(25);
+
     Livewire::test(Detail::class, ['slug' => $product->slug])
         ->call('addToCart');
 
-    Livewire::test(Checkout::class)
+    fillCheckoutShipping(Livewire::test(Checkout::class))
         ->set('name', 'عميل')
         ->set('phone', '0511111111')
         ->set('email', 'client@example.com')
-        ->set('shippingMethod', 'pickup')
+        ->set('shippingMethod', $shippingMethod)
         ->set('paymentMethod', 'cash-on-delivery')
         ->call('confirmCashOnDelivery');
 
@@ -147,8 +152,8 @@ it('renders the new order notification email with order and payment details', fu
         'subtotal' => 50000,
         'discount_total' => 0,
         'tax_total' => 0,
-        'grand_total' => 53500,
-        'paid_total' => 53500,
+        'grand_total' => 52500,
+        'paid_total' => 52500,
         'due_total' => 0,
         'payment_status' => 'paid',
         'issued_at' => now(),
@@ -156,8 +161,9 @@ it('renders the new order notification email with order and payment details', fu
         'fulfillment_status' => 'unfulfilled',
         'meta' => [
             'payment_method' => 'credit-card',
-            'shipping_method' => 'express',
-            'shipping_fee' => 3500,
+            'shipping_method' => app(CheckoutShippingService::class)->registryMethodKey('eqleem-ship'),
+            'shipping_method_label' => 'شحن إقليم',
+            'shipping_fee' => 2500,
             'source' => 'store_cart',
         ],
     ]);

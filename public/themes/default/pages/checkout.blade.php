@@ -36,30 +36,105 @@
 
                 @if ($requiresShipping)
                     <div class="rounded-2xl border border-stone-200 bg-white p-5">
-                        <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الشحن والتسليم</h3>
-                        <div class="space-y-3">
-                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                                <input wire:model.live="shippingMethod" type="radio" value="express" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-stone-900">توصيل سريع (24-48 ساعة)</p>
-                                    <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
-                                </div>
-                            </label>
-                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                                <input wire:model.live="shippingMethod" type="radio" value="scheduled" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-stone-900">توصيل مجدول</p>
-                                    <p class="text-xs text-stone-500">رسوم الشحن: {{ money_format(3500) }}</p>
-                                </div>
-                            </label>
-                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
-                                <input wire:model.live="shippingMethod" type="radio" value="pickup" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-stone-900">استلام من المعرض</p>
-                                    <p class="text-xs text-stone-500">بدون رسوم شحن.</p>
-                                </div>
-                            </label>
+                        <h3 class="mb-4 text-lg font-bold text-stone-900">عنوان الشحن</h3>
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label class="mb-1 block text-sm text-stone-600">الدولة</label>
+                                <select wire:model.live="country" class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-stone-400">
+                                    @foreach ($countryOptions as $option)
+                                        @if ($option['selectable'] ?? true)
+                                            <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                @error('country') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-sm text-stone-600">المدينة</label>
+                                <input
+                                    wire:model.live.debounce.300ms="citySearch"
+                                    type="text"
+                                    placeholder="ابحث عن المدينة"
+                                    class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-stone-400"
+                                >
+                                @if (filled($citySearch) && $cityOptions !== [])
+                                    <div class="mt-2 max-h-44 overflow-y-auto rounded-xl border border-stone-200 bg-white shadow-sm">
+                                        @foreach ($cityOptions as $option)
+                                            @if ($option['selectable'] ?? true)
+                                                <button
+                                                    type="button"
+                                                    wire:key="checkout-city-{{ $option['id'] }}"
+                                                    wire:click="selectCity('{{ $option['id'] }}')"
+                                                    @class([
+                                                        'block w-full px-3 py-2 text-start text-sm transition hover:bg-stone-50',
+                                                        'bg-primary-50 font-semibold text-primary-700' => $cityId === $option['id'],
+                                                        'text-stone-700' => $cityId !== $option['id'],
+                                                    ])
+                                                >
+                                                    {{ $option['label'] }}
+                                                </button>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if (filled($selectedCityLabel))
+                                    <p class="mt-2 text-xs text-stone-500">المدينة المختارة: {{ $selectedCityLabel }}</p>
+                                @endif
+                                @error('cityId') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-sm text-stone-600">الحي</label>
+                                <input wire:model="neighborhood" type="text" placeholder="مثال: حي العليا" class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-stone-400">
+                                @error('neighborhood') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="mb-1 block text-sm text-stone-600">العنوان</label>
+                                <input wire:model="address" type="text" placeholder="اسم الشارع، رقم المبنى، تفاصيل إضافية" class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-stone-400">
+                                @error('address') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-stone-200 bg-white p-5">
+                        <h3 class="mb-4 text-lg font-bold text-stone-900">خيارات الشحن</h3>
+
+                        @if ($shippingOptions->isEmpty())
+                            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                                لا توجد وسائل شحن متاحة حالياً لهذا العنوان. يرجى التواصل مع المتجر أو تعديل بيانات الشحن.
+                            </div>
+                        @else
+                            <div class="space-y-3">
+                                @foreach ($shippingOptions as $option)
+                                    <label wire:key="shipping-option-{{ $option['key'] }}" class="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 p-3 hover:border-primary-300">
+                                        <input wire:model.live="shippingMethod" type="radio" value="{{ $option['key'] }}" class="h-4 w-4 border-stone-300 text-primary-600 focus:ring-primary-400">
+                                        <div class="flex min-w-0 flex-1 items-center gap-3">
+                                            @if (filled($option['icon_url'] ?? null))
+                                                <img src="{{ $option['icon_url'] }}" alt="" class="h-8 w-8 shrink-0 object-contain">
+                                            @endif
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-sm font-semibold text-stone-900">{{ $option['name'] }}</p>
+                                                @if (filled($option['description'] ?? null))
+                                                    <p class="text-xs text-stone-500">{{ $option['description'] }}</p>
+                                                @endif
+                                                <p class="mt-1 text-xs text-stone-500">
+                                                    @if (($option['requires_country'] ?? false) && blank($country))
+                                                        يُحسب حسب الدولة
+                                                    @elseif (($option['fee'] ?? 0) > 0)
+                                                        رسوم الشحن: {{ money_format($option['fee']) }}
+                                                    @else
+                                                        بدون رسوم شحن
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('shippingMethod') <p class="mt-3 text-xs text-red-600">{{ $message }}</p> @enderror
+                        @endif
                     </div>
                 @endif
 

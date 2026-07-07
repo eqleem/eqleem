@@ -7,7 +7,7 @@
         $totalQty = $items->sum('qty');
         $shippingFee = $order->shippingFee();
         $trackingNumber = data_get($order->meta, 'tracking_number');
-        $shippingAddress = data_get($order->meta, 'shipping_address');
+        $shippingAddressLabel = $order->shippingAddressLabel();
     @endphp
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -203,12 +203,12 @@
                                 <dd class="text-sm font-medium text-primary-600" dir="ltr">{{ $trackingNumber }}</dd>
                             </div>
                         @endif
-                        @if ($shippingAddress)
+                        @if (filled($shippingAddressLabel))
                             <div class="sm:col-span-2">
                                 <dt class="mb-1 text-xs text-gray-400">عنوان الشحن</dt>
                                 <dd class="flex items-start gap-1.5 text-sm text-gray-800">
                                     <ui:icon name="map-pin" class="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                                    {{ $shippingAddress }}
+                                    {{ $shippingAddressLabel }}
                                 </dd>
                             </div>
                         @endif
