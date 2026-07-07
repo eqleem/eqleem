@@ -6,19 +6,24 @@ use Illuminate\Support\Str;
 
 trait HasUuid
 {
-    protected static function bootHasUuid()
+    protected static function bootHasUuid(): void
     {
-        /**
-         * Attach to the 'creating' Model Event to provide a UUID
-         * for the `uuid` field
-         */
         static::creating(function ($model): void {
-            $columnName = static::getUuidColumn();
-
-            if (blank($model->{$columnName})) {
-                $model->{$columnName} = (string) Str::uuid();
-            }
+            static::assignUuidIfMissing($model);
         });
+
+        static::saving(function ($model): void {
+            static::assignUuidIfMissing($model);
+        });
+    }
+
+    protected static function assignUuidIfMissing(object $model): void
+    {
+        $columnName = static::getUuidColumn();
+
+        if (blank($model->{$columnName})) {
+            $model->{$columnName} = (string) Str::uuid();
+        }
     }
 
     public function ensureUuid(): static

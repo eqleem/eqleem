@@ -17,11 +17,13 @@ class SeedTenantDefaults
 
     public function handle(Tenant $tenant, ?BlockTypeRegistry $blockTypes = null): void
     {
+        setCurrentTenant($tenant);
+
+        $this->ensureContentUuids($tenant);
+
         if (data_get($tenant->meta, 'defaults_seeded')) {
             return;
         }
-
-        setCurrentTenant($tenant);
 
         $blockTypes ??= app(BlockTypeRegistry::class);
 
@@ -33,6 +35,16 @@ class SeedTenantDefaults
 
         $tenant->meta->set('defaults_seeded', true);
         $tenant->save();
+    }
+
+    protected function ensureContentUuids(Tenant $tenant): void
+    {
+        Content::query()
+            ->withoutGlobalScope('tenant')
+            ->where('tenant_id', $tenant->id)
+            ->whereNull('uuid')
+            ->orderBy('id')
+            ->each(fn (Content $content) => $content->ensureUuid());
     }
 
     protected function seedHeaderBlock(Tenant $tenant): void
