@@ -1,6 +1,6 @@
 <div>
 
-    <ui:mainbox title="الدومين المجاني" subtitle="تعديل الدومين الفرعي للمجاني من إقليم في حال كنت لا تملك دومين مخصص بعد.">
+    <ui:mainbox title="الدومين المجاني" subtitle="تعديل الدومين الفرعي المجاني من إقليم في حال كنت لا تملك دومين مخصص بعد.">
         <x-slot:icon>
             <img src="{{ asset('assets/icons/business/015-cloud-network.svg') }}" class="w-7 h-7" alt="">
         </x-slot:icon>

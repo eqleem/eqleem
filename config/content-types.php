@@ -144,19 +144,19 @@ return [
             'detail' => 'admin::page.content.unit-rental.detail',
         ],
     ],
-    'cv' => [
-        'order' => 12,
-        'slug' => 'cv',
-        'model_type' => 'cv',
-        'name' => 'السيرة الذاتية',
-        'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
-        'icon' => 'assets/icons/stationery/011-id-card.svg',
-        'color' => 'purple',
-        'components' => [
-            'index' => 'admin::page.content.cv.index',
-            'detail' => 'admin::page.content.cv.detail',
-        ],
-    ],
+    // 'cv' => [
+    //     'order' => 12,
+    //     'slug' => 'cv',
+    //     'model_type' => 'cv',
+    //     'name' => 'السيرة الذاتية',
+    //     'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
+    //     'icon' => 'assets/icons/stationery/011-id-card.svg',
+    //     'color' => 'purple',
+    //     'components' => [
+    //         'index' => 'admin::page.content.cv.index',
+    //         'detail' => 'admin::page.content.cv.detail',
+    //     ],
+    // ],
     'courses' => [
         'order' => 13,
         'slug' => 'courses',
