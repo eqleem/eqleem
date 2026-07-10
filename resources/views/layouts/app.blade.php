@@ -25,6 +25,33 @@
             [x-cloak] {
                 display: none !important;
             }
+
+            @font-face {
+  font-family: "saudi_riyal";
+  src: url("assets/fonts/saudi_riyal/saudi_riyal.woff2") format("woff2"),
+    url("assets/fonts/saudi_riyal/saudi_riyal.woff") format("woff"),
+    url("assets/fonts/saudi_riyal/saudi_riyal.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+ 
+/* Ensure the icon class correctly loads the Riyal symbol */
+.icon-saudi_riyal::before {
+  content: "\e900";
+  font-family: "saudi_riyal" !important;
+  font-size: inherit;
+  color: inherit;
+}
+ 
+.icon-saudi_riyal_new::after {
+  content: "\20c1";
+  font-family: "saudi_riyal" !important;
+  font-size: inherit;
+  color: inherit;
+}
+
+ 
+
         </style>
         @livewireStyles
     </head>

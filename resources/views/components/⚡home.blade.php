@@ -1095,7 +1095,7 @@
                 </span> --}}
               </div>
               <p class="relative text-5xl font-medium tracking-tight">
-                 99  &#8385;
+                 99  <span class="icon-saudi_riyal"></span>
                 <span class="text-base font-normal text-zinc-400">/شهرياً</span>
               </p>
               <p class="relative text-sm text-zinc-400 mt-3 leading-relaxed">
@@ -1137,7 +1137,7 @@
                 <p class="font-medium">نمو</p>
               </div>
               <p class="text-5xl font-medium tracking-tight">
-                299 &#8385;
+                299 <span class="icon-saudi_riyal"></span>
                 <span class="text-base font-normal text-zinc-500">/شهريا</span>
               </p>
               <p class="text-sm text-zinc-500 mt-3 leading-relaxed">
