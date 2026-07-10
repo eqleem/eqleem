@@ -57,7 +57,8 @@
                      أنشئ صفحة لأعمالك، تستقبل الزوار، تجيب عن أسئلتهم، تعرض المنتجات والخدمات، وتستقبل الطلبات والحجوزات على مدار الساعة.
                 </p>
                 <p class="font-thin -mt-4 opacity-60 max-w-[35rem]">
-                    حوّل كل زيارة إلى فرصة للبيع، أو الحجز، أو التواصل، من خلال صفحة أعمال احترافية تعزز ثقة عملائك وتبرز علامتك التجارية.
+
+                    اجعل كل زيارة فرصة للبيع أو الحجز أو التواصل، من خلال صفحة أعمال احترافية تعزز ثقة عملائك وتبرز علامتك التجارية.
                 </p>
                 <div class="">
                     <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800   Xhover:-translate-y-0.5 transition-all duration-300 group">
@@ -232,80 +233,178 @@
     </div>
 
 
-    <section class="bg-white border-b border-gray-100 py-16 lg:py-40 px-3">
+    <section class="bg-white border-b border-gray-100 py-16 lg:py-40 px-3 overflow-hidden">
         <div class="max-w-7xl mx-auto relative">
-            <div class="grid lg:grid-cols-12 gap-12">
-             
-              <div class="lg:col-span-9">
-                <p data-reveal="" class="text-base tracking-widest text-primary-500 flex items-center gap-2 mb-4" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    <span class="w-6 h-px bg-primary-500"></span>
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
+              <div class="lg:col-span-7 order-1">
+                <p data-reveal="" class="text-4xl font-thin tracking-widest text-stone-300 flex items-center gap-2 mb-4">
+                    <span class="w-6 h-px bg-stone-300"></span>
                     01
                   </p>
-                <h2 data-reveal="" class="text-4xl sm:text-5xl  lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    {{-- — --}}
+                <h2 data-reveal="" class="text-4xl sm:text-5xl  lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight">
                     صفحة تحوّل
                     <b class="font-bold"> زوارك  إلى عملاء،</b>
-                     
                      حتى وأنت نائم.
                 </h2>
-                <div class="gridX sm:grid-cols-2X max-w-2xl gap-6 mt-8 items-center">
-                 
-                  <div>
-                    <p class="text-lg text-zinc-600 leading-relaxed ">
-                        اجعل كل زيارة فرصة للبيع أو الحجز أو التواصل، من خلال تجربة واضحة تقود العميل إلى اتخاذ الإجراء المناسب دون تشتت.
+
+                <div class="max-w-2xl mt-8">
+                    <p class="text-lg text-zinc-600 leading-relaxed">
+                        حوّل كل زيارة إلى طلب، أو حجز، أو عملية شراء، عبر تجربة واضحة تقود العميل إلى الإجراء المناسب.
+                        
+                        {{-- اجعل كل زيارة فرصة للبيع أو الحجز أو التواصل، من خلال تجربة واضحة تقود العميل إلى اتخاذ الإجراء المناسب دون تشتت. --}}
                     </p>
-                  
-                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
-                        <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🛒</span> <span class="text-xs lg:text-sm">متجر إلكتروني</span>
+
+                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80  transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:shopping-cart-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm ">متجر إلكتروني</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📅</span> <span class="text-xs lg:text-sm">حجز المواعيد</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm">حجز المواعيد</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🧾</span> <span class="text-xs lg:text-sm">طلب الخدمات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2   rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white  hover:bg-primary-600 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:note-edit" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm">طلب خدمة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">💳</span> <span class="text-xs lg:text-sm">الدفع الإلكتروني</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:credit-card" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm">الدفع الإلكتروني</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📥</span> <span class="text-xs lg:text-sm">استقبال الطلبات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-xs lg:text-sm">المنتجات الرقمية</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📦</span> <span class="text-xs lg:text-sm">المنتجات الرقمية</span>
+                        <div class="flex px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:gift" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm">تأجير الوحدات</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🏠</span> <span class="text-xs lg:text-sm">تأجير الوحدات</span>
+                        <div class="flex px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:call" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm">تواصل مباشر</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🎯</span> <span class="text-xs lg:text-sm">أزرار اتخاذ الإجراء (CTA)</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:target-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm lg:text-sm font-bold">زر "احجز الآن"</span>
+                        </div>
+                        
+                    </div>
+                </div>
+              </div>
+
+              {{-- Floating order card: visual left on desktop (RTL), after copy on mobile --}}
+              <div class="lg:col-span-5 order-2 flex justify-center lg:justify-end pt-6 pb-8 lg:py-0">
+                <div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:-rotate-2 lg:hover:rotate-0 transition-transform duration-500">
+                    {{-- Soft glow --}}
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary-500/15 via-amber-200/20 to-transparent blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    {{-- Floating toast --}}
+                    <div
+                        class="absolute -top-3 start-3 z-20 inline-flex items-center gap-2 rounded-full bg-zinc-900 text-white px-3 py-1.5 text-xs font-medium shadow-lg shadow-zinc-900/20 animate-[home-float_5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.5s;"
+                    >
+                        <span class="relative flex size-2">
+                            <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex size-2 rounded-full bg-emerald-400"></span>
+                        </span>
+                        طلب جديد الآن
+                    </div>
+
+                    {{-- Main card --}}
+                    <div class="relative rounded-3xl bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] p-5 sm:p-6 animate-[home-float_6s_ease-in-out_infinite]">
+                        <div class="flex items-start justify-between gap-3 mb-5">
+                            <div>
+                                <p class="text-[11px] tracking-widest text-zinc-400 uppercase">طلب #2841</p>
+                                <h3 class="text-lg font-semibold text-zinc-900 mt-0.5">طلب جديد</h3>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-medium ring-1 ring-emerald-600/10">
+                                <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                مدفوع
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-3 rounded-2xl bg-stone-50 p-3 ring-1 ring-black/5">
+                            <div class="size-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-primary-500/25">
+                                <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-medium text-zinc-900 truncate">باقة التصميم الاحترافي</p>
+                                <p class="text-xs text-zinc-500 mt-0.5">سارة الأحمد · الرياض</p>
+                            </div>
+                            <p class="text-sm font-semibold text-zinc-900 shrink-0 tabular-nums">٤٩٠ ر.س</p>
+                        </div>
+
+                        <div class="mt-5 space-y-3">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-zinc-500">حالة الطلب</span>
+                                <span class="font-medium text-zinc-800">قيد التجهيز</span>
+                            </div>
+
+                            {{-- Progress with status icons at start / middle / end --}}
+                            <div class="relative pt-1 pb-6">
+                                <div class="absolute inset-x-3.5 top-[1.125rem] h-1.5 rounded-full bg-stone-100">
+                                    <div class="h-full w-[50%] rounded-full bg-gradient-to-l from-primary-500 to-primary-400"></div>
+                                </div>
+                                <div class="relative flex items-start justify-between">
+                                    <div class="flex flex-col items-center gap-1.5">
+                                        <span class="size-7 rounded-full bg-sky-100 text-sky-700 ring-2 ring-white shadow-sm flex items-center justify-center">
+                                            <iconify-icon icon="hugeicons:credit-card" class="text-sm"></iconify-icon>
+                                        </span>
+                                        <span class="text-[10px] text-zinc-500">مدفوع</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-1.5">
+                                        <span class="size-7 rounded-full bg-primary-500 text-white ring-2 ring-white shadow-sm shadow-primary-500/30 flex items-center justify-center">
+                                            <iconify-icon icon="hugeicons:package-01" class="text-sm"></iconify-icon>
+                                        </span>
+                                        <span class="text-[10px] font-medium text-primary-600">تجهيز</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-1.5">
+                                        <span class="size-7 rounded-full bg-stone-100 text-stone-400 ring-2 ring-white flex items-center justify-center">
+                                            <iconify-icon icon="hugeicons:tick-02" class="text-sm"></iconify-icon>
+                                        </span>
+                                        <span class="text-[10px] text-zinc-400">مكتمل</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <span class="text-[11px] text-zinc-400">منذ دقيقتين</span>
+                            </div>
                         </div>
                     </div>
-                
 
-                    <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-px mt-6">
-                        <span class="bg-zinc-900 text-white text-sm font-medium inline-flex items-center justify-center px-5 py-2.5 rounded-full transition-all duration-300 group-hover:bg-primary-700 xgroup-hover:pr-8">
-                            أنشئ صفحتي الآن، مجاناً
+                    {{-- Secondary floating chip --}}
+                    <div
+                        class="absolute -bottom-4 end-2 sm:end-6 z-20 inline-flex items-center gap-2 rounded-2xl bg-white border border-black/5 px-3 py-2 shadow-lg shadow-black/10 animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -3s;"
+                    >
+                        <span class="size-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:notification-01" class="text-base"></iconify-icon>
                         </span>
-                        <span class="size-10 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-                        </span>
-                    </a>
-
-                    
-
-                   
-                  </div>
-
-                   
+                        <div class="leading-tight">
+                            <p class="text-xs font-medium text-zinc-900">تم استلام الدفع</p>
+                            <p class="text-[10px] text-zinc-400">تلقائياً · بدون تدخل</p>
+                        </div>
+                    </div>
                 </div>
-
-               
               </div>
-              <!-- <div>.</div> -->
+
             </div>
         </div>
+
+        <style>
+            @keyframes home-float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            @media (max-width: 1023px) {
+                @keyframes home-float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-6px); }
+                }
+            }
+        </style>
     </section>
 
 
@@ -338,22 +437,22 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
                         <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🌐</span> <span class="text-xs lg:text-sm">دومين مخصص</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">✉️</span> <span class="text-xs lg:text-sm">بريد إلكتروني رسمي</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🎨</span> <span class="text-xs lg:text-sm">ألوان هويتك</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🖋️</span> <span class="text-xs lg:text-sm">الخطوط والشعار</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📱</span> <span class="text-xs lg:text-sm">تصميم متوافق مع الجوال</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">✨</span> <span class="text-xs lg:text-sm">واجهات احترافية</span>
                         </div>
                         <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
@@ -411,28 +510,26 @@
                     <p class="text-lg text-zinc-600 leading-relaxed">
                         أنشئ صفحة تحمل هويتك بالكامل، وتمنح عملاءك تجربة متناسقة واحترافية في كل زيارة.
                     </p>
-                    <p class="text-lg text-zinc-400 leading-relaxed">
-                        خصص كل تفاصيل الصفحة لتبدو امتدادًا لعلامتك، من الدومين والألوان إلى أسلوب العرض والتواصل.
-                    </p>
+                  
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
                         <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">👤</span> <span class="text-xs lg:text-sm">منطقة العميل</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">⭐</span> <span class="text-xs lg:text-sm">تقييمات العملاء</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🏆</span> <span class="text-xs lg:text-sm">الشهادات والاعتمادات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🖼️</span> <span class="text-xs lg:text-sm">معرض الأعمال</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🛡️</span> <span class="text-xs lg:text-sm">الضمانات والسياسات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📦</span> <span class="text-xs lg:text-sm">متابعة الطلبات</span>
                         </div>
                         <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
@@ -495,22 +592,22 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
                         <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">✍️</span> <span class="text-xs lg:text-sm">المدونة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📧</span> <span class="text-xs lg:text-sm">النشرة البريدية</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🎥</span> <span class="text-xs lg:text-sm">الفيديوهات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🎙️</span> <span class="text-xs lg:text-sm">البودكاست</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">▶️</span> <span class="text-xs lg:text-sm">قوائم التشغيل</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📚</span> <span class="text-xs lg:text-sm">المقالات والدلائل</span>
                         </div>
                         <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
@@ -571,19 +668,19 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
                         <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">🧩</span> <span class="text-xs lg:text-sm">أضف أقسامًا جديدة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📅</span> <span class="text-xs lg:text-sm">توسّع بخدمات جديدة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">👥</span> <span class="text-xs lg:text-sm">إدارة الفريق</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">📊</span> <span class="text-xs lg:text-sm">إحصاءات الأداء</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
+                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
                             <span class="text-xs lg:text-base leading-none">⚡</span> <span class="text-xs lg:text-sm">تكاملات خارجية</span>
                         </div>
                         <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
