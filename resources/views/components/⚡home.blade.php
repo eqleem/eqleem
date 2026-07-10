@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="flex flex-col gap-7 mt-6">
-                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.15] leading-[1.5] tracking-tighter text-[#111111]">
+                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.4] leading-[1.5] tracking-tighter text-[#111111]">
                         <span class="hero-line block">
                             ابنِ
                             <span class="relative inline-block text-[#C94309]">
