@@ -29,7 +29,7 @@
     </nav>
 
 
-    <section class="relative  w-full  px-6 flex items-center justify-start min-h-[calc(100vh-15.5rem)] py-7 lg:py-0">
+    <section class="relative  w-full  px-6 flex items-center justify-start min-h-[calc(100vh-9rem)] py-7 lg:py-0">
         <div class="glow-bg top-[10%] left-[50%] -translate-x-[50%]"></div>
         
         <div class="max-w-7xl mx-auto w-full gap-12 lg:gap-8">
