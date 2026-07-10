@@ -3,8 +3,7 @@
 it('renders compact mobile feature tags across all home sections', function () {
     $response = $this->get(route('home'))
         ->assertSuccessful()
-        ->assertSee('px-2 py-1 lg:px-4 lg:py-2', false)
-        ->assertSee('text-xs lg:text-sm', false)
+        ->assertSee('px-3 py-1.5 lg:px-4 lg:py-2', false)
         ->assertSee('gap-1.5 lg:gap-2', false);
 
     // Visible on mobile across sections
@@ -28,23 +27,33 @@ it('renders compact mobile feature tags across all home sections', function () {
         ->assertSee('الأسئلة الشائعة', false)
         ->assertSee('متابعة الطلب', false)
         ->assertSee('المدونة', false)
+        ->assertSee('النشرة البريدية', false)
+        ->assertSee('الفيديوهات', false)
+        ->assertSee('البودكاست', false)
+        ->assertSee('آخر الأخبار', false)
+        ->assertSee('المقالات والدلائل', false)
         ->assertSee('أضف أقسامًا جديدة', false)
+        ->assertSee('توسّع بخدمات جديدة', false)
+        ->assertSee('إدارة الفريق', false)
+        ->assertSee('إحصاءات الأداء', false)
+        ->assertSee('تكاملات خارجية', false)
         ->assertSee('hugeicons:shopping-cart-01', false)
         ->assertSee('hugeicons:globe', false)
         ->assertSee('hugeicons:star', false)
+        ->assertSee('hugeicons:quill-write-01', false)
+        ->assertSee('hugeicons:dashboard-square-add', false)
         ->assertSee('bg-primary-500', false);
 
-    // Hidden on mobile (last two tags in later sections)
+    // Hidden on mobile (last tags in later sections)
     $response
         ->assertSee('تواصل مباشر', false)
         ->assertSee('بدون شعار المنصة', false)
         ->assertSee('صور أغلفة مخصصة', false)
         ->assertSee('الفواتير', false)
         ->assertSee('معلومات التواصل', false)
-        ->assertSee('آخر الأخبار', false)
         ->assertSee('تحديثات النشاط', false)
         ->assertSee('ربط التطبيقات', false)
         ->assertSee('تحديثات مستمرة', false);
 
-    expect(substr_count($response->getContent(), 'hidden lg:flex'))->toBeGreaterThanOrEqual(8);
+    expect(substr_count($response->getContent(), 'hidden lg:flex'))->toBeGreaterThanOrEqual(7);
 });

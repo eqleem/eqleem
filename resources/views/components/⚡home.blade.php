@@ -721,74 +721,137 @@
 
     
 
-    <section class="bg-white/80 border-b border-gray-100 py-16 lg:py-40 px-3">
+    <section class="bg-white/80 border-b border-gray-100 py-16 lg:py-40 px-3 overflow-hidden">
         <div class="max-w-7xl mx-auto relative">
-            <div class="gridX sm:grid-cols-2X max-w-2xl gap-6 mt-8 items-center">
-             
-              <div class="lg:col-span-9">
-                <p data-reveal="" class="text-base tracking-widest text-amber-500 flex items-center gap-2 mb-4" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    <span class="w-6 h-px bg-amber-500"></span>
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
+              <div class="lg:col-span-7 order-1">
+                <p data-reveal="" class="text-4xl font-thin tracking-widest text-stone-300 flex items-center gap-2 mb-4">
+                    <span class="w-6 h-px bg-stone-300"></span>
                     04
                   </p>
-                <h2 data-reveal="" class="text-4xl sm:text-5xl  !leading-[4rem] max-w-2xl tracking-tight" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    {{-- — --}}
+                <h2 data-reveal="" class="text-4xl sm:text-5xl lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight">
                     صفحة
                     <b class="font-bold"> تُبقي علامتك حاضرة.</b>
                 </h2>
-                <div class="grid  gap-6 mt-8 items-center">
-                 
-                <div>
-                    <p class="text-lg text-zinc-600 leading-relaxed">
-                        حوّل كل محتوى تنشره إلى فرصة جديدة لبناء الوعي، وتعزيز الثقة، وجذب عملاء جدد.
-                    </p>
-                    <p class="text-lg text-zinc-400 leading-relaxed">
-                         اجعل المحتوى يعمل لصالحك؛ انشر مقالاتك، ونشراتك البريدية، وفيديوهاتك، في مكان واحد، ليبقى نشاطك حاضرًا في أذهان عملائك ويعودوا إليك مرة بعد أخرى.             
-                   </p>
 
-                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
-                        <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">✍️</span> <span class="text-xs lg:text-sm">المدونة</span>
+                <div class="max-w-2xl mt-8">
+                    <p class="text-lg text-zinc-600 leading-relaxed">
+                        لا تجعل العلاقة مع العميل تنتهي بعد الزيارة الأولى. انشر المحتوى، وابنِ جمهورًا يعود إليك باستمرار، من مكان واحد.
+                    </p>
+
+                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:quill-write-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">المدونة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📧</span> <span class="text-xs lg:text-sm">النشرة البريدية</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">النشرة البريدية</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🎥</span> <span class="text-xs lg:text-sm">الفيديوهات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:video-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الفيديوهات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🎙️</span> <span class="text-xs lg:text-sm">البودكاست</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:mic-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">البودكاست</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">▶️</span> <span class="text-xs lg:text-sm">قوائم التشغيل</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:news" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">آخر الأخبار</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📚</span> <span class="text-xs lg:text-sm">المقالات والدلائل</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:book-open-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">المقالات والدلائل</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📢</span> <span class="text-xs lg:text-sm">آخر الأخبار</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:notification-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">تحديثات النشاط</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🔔</span> <span class="text-xs lg:text-sm">تحديثات النشاط</span>
+                    </div>
+                </div>
+              </div>
+
+              {{-- Floating content feed card --}}
+              <div class="lg:col-span-5 order-2 flex justify-center lg:justify-end pt-6 pb-8 lg:py-0">
+                <div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:rotate-2 lg:hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-amber-200/30 via-primary-500/10 to-transparent blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    {{-- Floating activity chip --}}
+                    <div
+                        class="absolute -top-3 start-2 z-20 inline-flex items-center gap-2 rounded-full bg-white border border-black/5 text-zinc-800 px-3 py-1.5 text-xs font-medium shadow-lg shadow-black/10 animate-[home-float_5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.3s;"
+                    >
+                        <span class="relative flex size-2">
+                            <span class="absolute inline-flex size-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
+                            <span class="relative inline-flex size-2 rounded-full bg-primary-500"></span>
+                        </span>
+                        محتوى جديد نُشر
+                    </div>
+
+                    {{-- Main content feed --}}
+                    <div class="relative rounded-3xl bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] p-4 sm:p-5 animate-[home-float_6s_ease-in-out_infinite]">
+                        <div class="flex items-center justify-between gap-2 mb-4 px-1">
+                            <p class="text-sm font-semibold text-zinc-900">آخر التحديثات</p>
+                            <span class="text-[10px] text-zinc-400">مباشر</span>
+                        </div>
+
+                        <div class="space-y-0 divide-y divide-black/5">
+                            {{-- Article --}}
+                            <div class="flex items-start gap-3 py-3.5 first:pt-0">
+                                <span class="size-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 ring-1 ring-amber-500/10">
+                                    <iconify-icon icon="hugeicons:quill-write-01" class="text-lg"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[10px] font-medium text-amber-700 mb-0.5">أحدث المقالات</p>
+                                    <p class="text-sm font-medium text-zinc-900 leading-snug">كيف تختار الهوية البصرية؟</p>
+                                    <p class="text-[11px] text-zinc-400 mt-1">قبل يومين</p>
+                                </div>
+                            </div>
+
+                            {{-- Video --}}
+                            <div class="flex items-start gap-3 py-3.5">
+                                <span class="size-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 ring-1 ring-rose-500/10">
+                                    <iconify-icon icon="hugeicons:video-01" class="text-lg"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[10px] font-medium text-rose-600 mb-0.5">فيديو جديد</p>
+                                    <p class="text-sm font-medium text-zinc-900 leading-snug">كيف تزيد مبيعاتك في رمضان؟</p>
+                                    <p class="text-[11px] text-zinc-400 mt-1">12K مشاهدة</p>
+                                </div>
+                            </div>
+
+                            {{-- Newsletter --}}
+                            <div class="flex items-start gap-3 py-3.5 last:pb-0">
+                                <span class="size-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 ring-1 ring-sky-500/10">
+                                    <iconify-icon icon="hugeicons:mail-01" class="text-lg"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[10px] font-medium text-sky-600 mb-0.5">Newsletter</p>
+                                    <p class="text-sm font-medium text-zinc-900 leading-snug">اشترك الآن</p>
+                                    <p class="text-[11px] text-zinc-400 mt-1">18,000 مشترك</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-1 mt-8">
-                         
-                        <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-px mt-6">
-                            <span class="bg-zinc-900 text-white text-sm font-medium inline-flex items-center justify-center px-5 py-2.5 rounded-full transition-all duration-300 group-hover:bg-primary-700 xgroup-hover:pr-8">
-                                أنشئ صفحتي الآن، مجاناً
-                            </span>
-                            <span class="size-10 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-                            </span>
-                        </a>
- 
-                    </a>
-                  </div>
+                    {{-- Secondary floating chip --}}
+                    <div
+                        class="absolute -bottom-4 end-2 sm:end-6 z-20 inline-flex items-center gap-2 rounded-2xl bg-white border border-black/5 px-3 py-2 shadow-lg shadow-black/10 animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -2.7s;"
+                    >
+                        <span class="size-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:notification-01" class="text-base"></iconify-icon>
+                        </span>
+                        <div class="leading-tight">
+                            <p class="text-xs font-medium text-zinc-900">تحديثات النشاط</p>
+                            <p class="text-[10px] text-zinc-400">جمهورك يبقى قريبًا</p>
+                        </div>
+                    </div>
                 </div>
               </div>
-              <!-- <div>.</div> -->
+
             </div>
         </div>
     </section>
@@ -797,71 +860,162 @@
         
     
 
-    <section class="bg-white   py-16 lg:py-40 px-3">
+    <section class="bg-white border-b border-gray-100 py-16 lg:py-40 px-3 overflow-hidden">
         <div class="max-w-7xl mx-auto relative">
-            <div class="gridX sm:grid-cols-2X max-w-2xl gap-6 mt-8 items-center">
-             
-              <div class="lg:col-span-9">
-                <p data-reveal="" class="text-base tracking-widest text-lime-500 flex items-center gap-2 mb-4" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    <span class="w-6 h-px bg-lime-500"></span>
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
+              <div class="lg:col-span-7 order-1">
+                <p data-reveal="" class="text-4xl font-thin tracking-widest text-stone-300 flex items-center gap-2 mb-4">
+                    <span class="w-6 h-px bg-stone-300"></span>
                     05
                   </p>
-                <h2 data-reveal="" class="text-4xl sm:text-5xl  !leading-[4rem] max-w-2xl tracking-tight" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    {{-- — --}}
+                <h2 data-reveal="" class="text-4xl sm:text-5xl lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight">
                     صفحة
-                    <b class="font-bold"> تنمو  .</b>
+                    <b class="font-bold"> تنمو</b>
                       مع نشاطك.
-                      
                 </h2>
-                <div class="grid  gap-6 mt-8 items-center">
-                 
-                  <div >
+
+                <div class="max-w-2xl mt-8">
                     <p class="text-lg text-zinc-600 leading-relaxed">
                         ابدأ بما يحتاجه نشاطك اليوم، وأضف المزيد كلما توسعت أعمالك. من متجر وحجوزات إلى محتوى وفريق عمل وتكاملات، كل شيء جاهز لينمو معك دون الحاجة إلى البدء من جديد.
-                   </p>
-              
+                    </p>
 
-                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
-                        <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🧩</span> <span class="text-xs lg:text-sm">أضف أقسامًا جديدة</span>
+                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:dashboard-square-add" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">أضف أقسامًا جديدة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📅</span> <span class="text-xs lg:text-sm">توسّع بخدمات جديدة</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">توسّع بخدمات جديدة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">👥</span> <span class="text-xs lg:text-sm">إدارة الفريق</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:user-group" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">إدارة الفريق</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📊</span> <span class="text-xs lg:text-sm">إحصاءات الأداء</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:analytics-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">إحصاءات الأداء</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">⚡</span> <span class="text-xs lg:text-sm">تكاملات خارجية</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:flash" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">تكاملات خارجية</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🔌</span> <span class="text-xs lg:text-sm">ربط التطبيقات</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:plug-socket" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">ربط التطبيقات</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🚀</span> <span class="text-xs lg:text-sm">تحديثات مستمرة</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:rocket-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">تحديثات مستمرة</span>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+              {{-- Floating growth / modules card --}}
+              <div class="lg:col-span-5 order-2 flex justify-center lg:justify-end pt-6 pb-8 lg:py-0">
+                <div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:-rotate-2 lg:hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary-500/15 via-lime-200/25 to-transparent blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    {{-- Floating chip --}}
+                    <div
+                        class="absolute -top-3 start-2 z-20 inline-flex items-center gap-2 rounded-full bg-white border border-black/5 text-zinc-800 px-3 py-1.5 text-xs font-medium shadow-lg shadow-black/10 animate-[home-float_5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.2s;"
+                    >
+                        <span class="size-6 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:dashboard-square-add" class="text-sm"></iconify-icon>
+                        </span>
+                        قسم جديد مفعّل
+                    </div>
+
+                    {{-- Main growth card --}}
+                    <div class="relative rounded-3xl bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] p-5 sm:p-6 animate-[home-float_6s_ease-in-out_infinite]">
+                        <div class="flex items-start justify-between gap-3 mb-5">
+                            <div>
+                                <p class="text-[11px] tracking-widest text-zinc-400">نمو الصفحة</p>
+                                <h3 class="text-lg font-semibold text-zinc-900 mt-0.5">صفحتك تنمو معك</h3>
+                            </div>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-medium ring-1 ring-emerald-600/10">
+                                <iconify-icon icon="hugeicons:arrow-up-02" class="text-sm"></iconify-icon>
+                                +3 هذا الشهر
+                            </span>
+                        </div>
+
+                        {{-- Growth progress --}}
+                        <div class="rounded-2xl bg-stone-100 ring-1 ring-black/5 p-3.5 mb-4">
+                            <div class="flex items-center justify-between text-xs mb-2">
+                                <span class="text-zinc-500">الأقسام المفعّلة</span>
+                                <span class="font-semibold text-zinc-800 tabular-nums">6 / 12</span>
+                            </div>
+                            <div class="h-1.5 rounded-full bg-white overflow-hidden ring-1 ring-black/5">
+                                <div class="h-full w-1/2 rounded-full bg-gradient-to-l from-primary-500 to-primary-400"></div>
+                            </div>
+                        </div>
+
+                        {{-- Active modules --}}
+                        <div class="space-y-2.5">
+                            <div class="flex items-center gap-3 rounded-2xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5">
+                                <span class="size-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:shopping-cart-01" class="text-base"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium text-zinc-900">متجر إلكتروني</p>
+                                    <p class="text-[10px] text-zinc-400">نشط</p>
+                                </div>
+                                <span class="size-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-2xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5">
+                                <span class="size-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:calendar-03" class="text-base"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium text-zinc-900">حجز المواعيد</p>
+                                    <p class="text-[10px] text-zinc-400">نشط</p>
+                                </div>
+                                <span class="size-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            </div>
+                            <div class="flex items-center gap-3 rounded-2xl border border-dashed border-black/10 px-3 py-2.5">
+                                <span class="size-9 rounded-xl bg-stone-100 text-zinc-400 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:add-01" class="text-base"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium text-zinc-600">أضف قسمًا جديدًا</p>
+                                    <p class="text-[10px] text-zinc-400">مدونة · فريق · تكاملات</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Team row --}}
+                        <div class="mt-4 flex items-center justify-between gap-2 pt-1">
+                            <div class="flex items-center gap-2">
+                                <div class="flex -space-x-2 space-x-reverse">
+                                    <span class="size-7 rounded-full bg-primary-500 text-white text-[10px] font-bold ring-2 ring-white flex items-center justify-center">أ</span>
+                                    <span class="size-7 rounded-full bg-amber-400 text-white text-[10px] font-bold ring-2 ring-white flex items-center justify-center">س</span>
+                                    <span class="size-7 rounded-full bg-sky-500 text-white text-[10px] font-bold ring-2 ring-white flex items-center justify-center">م</span>
+                                </div>
+                                <span class="text-[11px] text-zinc-400">3 أعضاء</span>
+                            </div>
+                            <span class="text-[11px] font-medium text-primary-600">إدارة الفريق</span>
                         </div>
                     </div>
 
-                    <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-1 mt-8">
-                         
-                        <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-px mt-6">
-                            <span class="bg-zinc-900 text-white text-sm font-medium inline-flex items-center justify-center px-5 py-2.5 rounded-full transition-all duration-300 group-hover:bg-primary-700 xgroup-hover:pr-8">
-                                أنشئ صفحتي الآن، مجاناً
-                            </span>
-                            <span class="size-10 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-                            </span>
-                        </a>
- 
-                    </a>
-                  </div>
+                    {{-- Secondary floating chip --}}
+                    <div
+                        class="absolute -bottom-4 end-2 sm:end-6 z-20 inline-flex items-center gap-2 rounded-2xl bg-white border border-black/5 px-3 py-2 shadow-lg shadow-black/10 animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -2.8s;"
+                    >
+                        <span class="size-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:analytics-01" class="text-base"></iconify-icon>
+                        </span>
+                        <div class="leading-tight">
+                            <p class="text-xs font-medium text-zinc-900">+42% نمو</p>
+                            <p class="text-[10px] text-zinc-400">خلال 30 يومًا</p>
+                        </div>
+                    </div>
                 </div>
               </div>
-              <!-- <div>.</div> -->
+
             </div>
         </div>
     </section>
@@ -941,7 +1095,7 @@
                 </span> --}}
               </div>
               <p class="relative text-5xl font-medium tracking-tight">
-                 99 ⃁
+                 99  &#8385;
                 <span class="text-base font-normal text-zinc-400">/شهرياً</span>
               </p>
               <p class="relative text-sm text-zinc-400 mt-3 leading-relaxed">
@@ -983,7 +1137,7 @@
                 <p class="font-medium">نمو</p>
               </div>
               <p class="text-5xl font-medium tracking-tight">
-                299 ⃁
+                299 &#8385;
                 <span class="text-base font-normal text-zinc-500">/شهريا</span>
               </p>
               <p class="text-sm text-zinc-500 mt-3 leading-relaxed">
