@@ -410,75 +410,154 @@
 
     
 
-    <section class="bg-white/80 border-b border-gray-100 py-16 lg:py-40 px-3">
+    <section class="bg-white/80 border-b border-gray-100 py-16 lg:py-40 px-3 overflow-hidden">
         <div class="max-w-7xl mx-auto relative">
-            <div class="grid lg:grid-cols-12 gap-12">
-             
-              <div class="lg:col-span-9">
-                <p data-reveal="" class="text-base tracking-widest text-orange-500 flex items-center gap-2 mb-4" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    <span class="w-6 h-px bg-orange-500"></span>
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
+              <div class="lg:col-span-7 order-1">
+                <p data-reveal="" class="text-4xl font-thin tracking-widest text-stone-300 flex items-center gap-2 mb-4">
+                    <span class="w-6 h-px bg-stone-300"></span>
                     02
                   </p>
-                <h2 data-reveal="" class="text-4xl sm:text-5xl  !leading-[4rem] max-w-2xl tracking-tight" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    {{-- — --}}
+                <h2 data-reveal="" class="text-4xl sm:text-5xl lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight">
                     صفحة
                     <b class="font-bold"> ترسّخ علامتك التجارية</b>.
-                      
                 </h2>
-                <div class="gridX sm:grid-cols-2X max-w-2xl gap-6 mt-8 items-center">
-                 
-                  <div >
+
+                <div class="max-w-2xl mt-8">
                     <p class="text-lg text-zinc-600 leading-relaxed">
-                        أنشئ صفحة تحمل هويتك بالكامل، وتمنح عملاءك تجربة متناسقة واحترافية في كل زيارة.
-                    </p>
-                    <p class="text-lg text-zinc-400 leading-relaxed">
-                        خصص كل تفاصيل الصفحة لتبدو امتدادًا لعلامتك، من الدومين والألوان إلى أسلوب العرض والتواصل.
+                        أنشئ صفحة تحمل هويتك بالكامل، من الدومين والألوان إلى الشعار وطريقة العرض، لتبدو امتدادًا طبيعيًا لعلامتك في كل زيارة.
                     </p>
 
-                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
-                        <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🌐</span> <span class="text-xs lg:text-sm">دومين مخصص</span>
+                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:globe" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">دومين مخصص</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">✉️</span> <span class="text-xs lg:text-sm">بريد إلكتروني رسمي</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">بريد إلكتروني رسمي</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🎨</span> <span class="text-xs lg:text-sm">ألوان هويتك</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:paint-board" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">ألوان هويتك</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🖋️</span> <span class="text-xs lg:text-sm">الخطوط والشعار</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:text-font" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الخطوط والشعار</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📱</span> <span class="text-xs lg:text-sm">تصميم متوافق مع الجوال</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:smart-phone-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">تصميم متوافق مع الجوال</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">✨</span> <span class="text-xs lg:text-sm">واجهات احترافية</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:translate" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">دعم لغات متعددة</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🔗</span> <span class="text-xs lg:text-sm">رابط واحد دائم</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:unavailable" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">بدون شعار المنصة</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🌍</span> <span class="text-xs lg:text-sm">دعم لغات متعددة</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">صور أغلفة مخصصة</span>
                         </div>
                     </div>
-                    
-                    <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-1 ">
-                         
-                        <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-px mt-6">
-                            <span class="bg-zinc-900 text-white text-sm font-medium inline-flex items-center justify-center px-5 py-2.5 rounded-full transition-all duration-300 group-hover:bg-primary-700 xgroup-hover:pr-8">
-                                أنشئ صفحتي الآن، مجاناً
-                            </span>
-                            <span class="size-10 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-                            </span>
-                        </a>
- 
-                    </a>
-                  </div>
                 </div>
               </div>
-              <!-- <div>.</div> -->
+
+              {{-- Floating brand browser: visual left on desktop (RTL), after copy on mobile --}}
+              <div class="lg:col-span-5 order-2 flex justify-center lg:justify-end pt-6 pb-8 lg:py-0">
+                <div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:rotate-2 lg:hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary-500/15 via-orange-200/25 to-transparent blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    {{-- Floating brand toast --}}
+                    <div
+                        class="absolute -top-3 start-2 z-20 inline-flex items-center gap-2 rounded-full bg-white border border-black/5 text-zinc-800 px-3 py-1.5 text-xs font-medium shadow-lg shadow-black/10 animate-[home-float_5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.2s;"
+                    >
+                        <span class="size-6 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:paint-board" class="text-sm"></iconify-icon>
+                        </span>
+                        تم تطبيق هوية علامتك
+                    </div>
+
+                    {{-- Mini browser --}}
+                    <div class="relative rounded-2xl bg-white border border-black/5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] overflow-hidden animate-[home-float_6s_ease-in-out_infinite]">
+                        {{-- Chrome bar --}}
+                        <div class="flex items-center gap-2 border-b border-black/5 bg-stone-50 px-3 py-2.5">
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="size-2 rounded-full bg-red-400/80"></span>
+                                <span class="size-2 rounded-full bg-amber-400/80"></span>
+                                <span class="size-2 rounded-full bg-emerald-400/80"></span>
+                            </div>
+                            <div class="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-lg bg-white border border-black/5 px-2.5 py-1">
+                                <iconify-icon icon="hugeicons:security-check" class="text-emerald-500 text-sm shrink-0"></iconify-icon>
+                                <span class="text-[11px] text-zinc-600 truncate font-medium" dir="ltr">yourbrand.sa</span>
+                            </div>
+                        </div>
+
+                        {{-- Page preview --}}
+                        <div class="p-4 sm:p-5">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="size-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shadow-md shadow-primary-500/25 shrink-0">
+                                    <span class="text-sm font-bold tracking-tight">YB</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-zinc-900 truncate">Your Brand</p>
+                                    <p class="text-[11px] text-zinc-500 truncate">هوية متناسقة في كل زيارة</p>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl bg-gradient-to-br from-primary-500/10 via-orange-50 to-stone-50 ring-1 ring-black/5 p-3 mb-4">
+                                <div class="h-16 rounded-lg bg-gradient-to-l from-primary-500/30 to-primary-600/10 flex items-end p-2.5">
+                                    <div class="space-y-1.5 w-full">
+                                        <div class="h-2 w-2/3 rounded-full bg-white/80"></div>
+                                        <div class="h-1.5 w-1/2 rounded-full bg-white/50"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 rounded-xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5 mb-4">
+                                <span class="size-7 rounded-lg bg-white text-primary-600 flex items-center justify-center ring-1 ring-black/5 shrink-0">
+                                    <iconify-icon icon="hugeicons:mail-01" class="text-sm"></iconify-icon>
+                                </span>
+                                <div class="min-w-0 leading-tight">
+                                    <p class="text-[10px] text-zinc-400">بريد رسمي</p>
+                                    <p class="text-xs font-medium text-zinc-800 truncate" dir="ltr">email@yourbrand.sa</p>
+                                </div>
+                            </div>
+
+                            {{-- Brand colors --}}
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] text-zinc-400">ألوان الهوية</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="size-5 rounded-full bg-zinc-900 ring-2 ring-transparent"></span>
+                                    <span class="size-5 rounded-full bg-amber-400 ring-2 ring-transparent"></span>
+                                    <span class="size-6 rounded-full bg-primary-500 ring-2 ring-primary-500/30 ring-offset-2 ring-offset-white shadow-sm shadow-primary-500/40"></span>
+                                    <span class="size-5 rounded-full bg-sky-400 ring-2 ring-transparent"></span>
+                                    <span class="size-5 rounded-full bg-rose-400 ring-2 ring-transparent"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Secondary floating chip --}}
+                    <div
+                        class="absolute -bottom-4 end-2 sm:end-6 z-20 inline-flex items-center gap-2 rounded-2xl bg-zinc-900 text-white px-3 py-2 shadow-lg shadow-zinc-900/20 animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -2.8s;"
+                    >
+                        <span class="size-7 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center">
+                            <iconify-icon icon="hugeicons:security-check" class="text-sm"></iconify-icon>
+                        </span>
+                        <div class="leading-tight">
+                            <p class="text-xs font-medium">SSL · Secure</p>
+                            <p class="text-[10px] text-white/50" dir="ltr">yourbrand.sa</p>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
             </div>
         </div>
     </section>
@@ -488,74 +567,150 @@
 
     
 
-    <section class="bg-white border-b border-gray-100 py-16 lg:py-40 px-3">
+    <section class="bg-white border-b border-gray-100 py-16 lg:py-40 px-3 overflow-hidden">
         <div class="max-w-7xl mx-auto relative">
-            <div class="grid lg:grid-cols-12 gap-12">
-             
-              <div class="lg:col-span-9">
-                <p data-reveal="" class="text-base tracking-widest text-cyan-500 flex items-center gap-2 mb-4" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    <span class="w-6 h-px bg-cyan-500"></span>
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
+              <div class="lg:col-span-7 order-1">
+                <p data-reveal="" class="text-4xl font-thin tracking-widest text-stone-300 flex items-center gap-2 mb-4">
+                    <span class="w-6 h-px bg-stone-300"></span>
                     03
                   </p>
-                <h2 data-reveal="" class="text-4xl sm:text-5xl  !leading-[4rem] max-w-2xl tracking-tight" style="filter: blur(0px); translate: none; rotate: none; scale: none; opacity: 1; transform: translate(0px, 0px);">
-                    {{-- — --}}
+                <h2 data-reveal="" class="text-4xl sm:text-5xl lg:!leading-[4rem] max-w-md lg:max-w-2xl tracking-tight">
                     صفحة
                     <b class="font-bold"> تعزز ثقة عملائك</b>
                        بك.
-                      
                 </h2>
-                <div class="gridX sm:grid-cols-2X max-w-2xl gap-6 mt-8 items-center">
-                 
-                  <div >
-                    <p class="text-lg text-zinc-600 leading-relaxed">
-                        أنشئ صفحة تحمل هويتك بالكامل، وتمنح عملاءك تجربة متناسقة واحترافية في كل زيارة.
-                    </p>
-                  
 
-                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-2">
-                        <!-- Pill items -->
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">👤</span> <span class="text-xs lg:text-sm">منطقة العميل</span>
+                <div class="max-w-2xl mt-8">
+                    <p class="text-lg text-zinc-600 leading-relaxed">
+                        كل ما يحتاجه العميل ليطمئن ويقرر الشراء، في مكان واحد. 
+                    </p>
+                    <p class="text-sm text-zinc-500 leading-relaxed mt-4">
+                        ابنِ الثقة قبل أن يتواصل العميل معك. اعرض التقييمات، الاعتمادات، الضمانات، وتتبع الطلبات في صفحة واحدة.
+                    </p>
+
+                    <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:star" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">تقييمات العملاء</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">⭐</span> <span class="text-xs lg:text-sm">تقييمات العملاء</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:award-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الاعتمادات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🏆</span> <span class="text-xs lg:text-sm">الشهادات والاعتمادات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">معرض الأعمال</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🖼️</span> <span class="text-xs lg:text-sm">معرض الأعمال</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:shield-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الضمانات</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🛡️</span> <span class="text-xs lg:text-sm">الضمانات والسياسات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:help-circle" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الأسئلة الشائعة</span>
                         </div>
-                        <div class="px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">📦</span> <span class="text-xs lg:text-sm">متابعة الطلبات</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:location-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">معلومات التواصل</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">🧾</span> <span class="text-xs lg:text-sm">الفواتير والمشتريات</span>
+                        <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">متابعة الطلب</span>
                         </div>
-                        <div class="hidden lg:flex px-2 py-1 lg:px-4 lg:py-2 xborder border-black/10 rounded-md items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <span class="text-xs lg:text-base leading-none">❓</span> <span class="text-xs lg:text-sm">الأسئلة الشائعة</span>
+                        <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
+                            <iconify-icon icon="hugeicons:invoice-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <span class="text-sm">الفواتير</span>
+                        </div>
+                       
+                    </div>
+                </div>
+              </div>
+
+              {{-- Floating trust / reviews card --}}
+              <div class="lg:col-span-5 order-2 flex justify-center lg:justify-end pt-6 pb-8 lg:py-0">
+                <div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:-rotate-2 lg:hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-amber-300/25 via-primary-500/10 to-transparent blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    {{-- Verified floating chip --}}
+                    <div
+                        class="absolute -top-3 start-2 z-20 inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium shadow-lg shadow-emerald-600/25 animate-[home-float_5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.4s;"
+                    >
+                        <iconify-icon icon="solar:shield-check-bold" class="text-base"></iconify-icon>
+                        نشاط موثق
+                    </div>
+
+                    {{-- Main review card --}}
+                    <div class="relative rounded-3xl bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] p-5 sm:p-6 animate-[home-float_6s_ease-in-out_infinite]">
+
+                        {{-- Social proof hero --}}
+                        <div class="rounded-2xl bg-stone-100 ring-1 ring-black/5 p-4 mb-5">
+                            <div class="flex items-end justify-between gap-3">
+                                <div>
+                                    <div class="flex items-center gap-1 text-amber-400 mb-1.5">
+                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                    </div>
+                                    <p class="text-4xl font-bold tracking-tight tabular-nums leading-none text-zinc-900">
+                                        4.9<span class="text-lg font-medium text-zinc-400">/5</span>
+                                    </p>
+                                </div>
+                                <div class="text-end leading-tight">
+                                    <p class="text-sm font-semibold tabular-nums text-zinc-900">+1,280</p>
+                                    <p class="text-[11px] text-zinc-400">تقييم</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 grid grid-cols-2 gap-2">
+                                <div class="rounded-xl bg-white px-3 py-2.5 ring-1 ring-black/5">
+                                    <p class="text-lg font-bold tabular-nums leading-none text-zinc-900">97%</p>
+                                    <p class="text-[10px] text-zinc-400 mt-1 leading-snug">يوصون بالخدمة</p>
+                                </div>
+                                <div class="rounded-xl bg-white px-3 py-2.5 ring-1 ring-black/5">
+                                    <p class="text-lg font-bold tabular-nums leading-none text-zinc-900">+850</p>
+                                    <p class="text-[10px] text-zinc-400 mt-1 leading-snug">عميل سعيد</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <blockquote class="text-sm text-zinc-700 leading-relaxed">
+                            «كل شيء كان واضحًا، من الدفع حتى استلام الطلب.»
+                        </blockquote>
+                        <div class="mt-3 flex items-center gap-2.5">
+                            <span class="size-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0">نأ</span>
+                            <div class="min-w-0 leading-tight">
+                                <p class="text-xs font-medium text-zinc-900">نورة العتيبي</p>
+                                <p class="text-[10px] text-zinc-400">عميلة موثّقة</p>
+                            </div>
                         </div>
                     </div>
 
-                    <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-1 mt-8">
-                         
-                        <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-px mt-6">
-                            <span class="bg-zinc-900 text-white text-sm font-medium inline-flex items-center justify-center px-5 py-2.5 rounded-full transition-all duration-300 group-hover:bg-primary-700 xgroup-hover:pr-8">
-                                أنشئ صفحتي الآن، مجاناً
+                    {{-- Credentials floating stack --}}
+                    <div
+                        class="absolute -bottom-10 end-1 sm:end-4 z-20 flex flex-col gap-1.5 animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -2.6s;"
+                    >
+                        <div class="inline-flex items-center gap-2 rounded-xl bg-white border border-black/5 px-2 py-1 shadow-sm shadow-black/10">
+                            <span class="size-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                <iconify-icon icon="hugeicons:checkmark-badge-02" class="text-sm"></iconify-icon>
                             </span>
-                            <span class="size-10 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+                            <span class="text-xs font-medium text-zinc-800">سجل تجاري</span>
+                        </div>
+                        <div class="inline-flex items-center gap-2 rounded-xl bg-white border border-black/5 px-2 py-1 shadow-sm shadow-black/10 ms-4">
+                            <span class="size-7 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                <iconify-icon icon="hugeicons:file-validation" class="text-sm"></iconify-icon>
                             </span>
-                        </a>
- 
-                    </a>
-                  </div>
+                            <span class="text-xs font-medium text-zinc-800">وثيقة عمل حر</span>
+                        </div>
+                    </div>
                 </div>
               </div>
-              <!-- <div>.</div> -->  
+
             </div>
         </div>
     </section>
