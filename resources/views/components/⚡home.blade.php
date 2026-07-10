@@ -61,7 +61,7 @@
                     اجعل كل زيارة فرصة للبيع أو الحجز أو التواصل، من خلال صفحة أعمال احترافية تعزز ثقة عملائك وتبرز علامتك التجارية.
                 </p>
                 <div class="">
-                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800   Xhover:-translate-y-0.5 transition-all duration-300 group">
+                    <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800   Xhover:-translate-y-0.5 transition-all duration-300 group">
                         أنشئ صفحتي الآن، مجاناً
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </a>
@@ -1060,25 +1060,42 @@
                 
               </p>
               <ul class="space-y-3 mt-8 mb-8 text-sm text-zinc-600 flex-1">
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Brand identity kit
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>صفحة احترافية</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  One landing page
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>رابط ثابت مجاني</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  2 revision rounds
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>كيو آر كود QR Code</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Async support
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>استقبل الطلبات والمشتريات لمنتجاتك وخدماتك</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>خيارات شحن مخصصة</span>
+                </li>
+                <li class="flex items-start gap-2 text-zinc-400/70">
+                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <span>دومين مخصص</span>
+                </li>
+                <li class="flex items-start gap-2 text-zinc-400/70">
+                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <span>ايميل رسمي</span>
+                </li>
+                <li class="flex items-start gap-2 text-zinc-400/70">
+                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <span>تفعيل بوابات الدفع الرقمية</span>
                 </li>
               </ul>
-              <a href="#contact" class="inline-flex items-center justify-center rounded-full border border-zinc-300 py-3 text-sm font-medium hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all duration-300">
-                إبدأ الآن
+              <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
+                ابدأ الآن
+                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
             <div data-reveal="" class="liquid-border liquid-border-dark relative rounded-3xl bg-zinc-900 text-white p-8 flex flex-col   transition-transform duration-300 overflow-hidden ">
@@ -1103,29 +1120,46 @@
                 
               </p>
               <ul class="relative space-y-3 mt-8 mb-8 text-sm text-zinc-300 flex-1">
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-400"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Everything in Launch
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>كل مزايا باقة بداية، بالإضافة إلى</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-400"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Full website design
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>دومين مخصص</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-400"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Motion &amp; interaction
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>ايميل رسمي عدد 2 ايميلات رسمية</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-400"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Unlimited requests
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>استقبال جميع بوابات الدفع + تابي + تمارا</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-400"><path d="M20 6 9 17l-5-5"></path></svg>
-                  48h turnaround
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>ربط 240+ بوابة شحن لمنتجاتك الملموسة</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>إحصاءات متقدمة</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <span>تكاملات أساسية Integrations</span>
+                </li>
+                <li class="flex items-start gap-2 text-zinc-500">
+                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>إدارة الفريق والصلاحيات</span>
+                </li>
+                <li class="flex items-start gap-2 text-zinc-500">
+                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>إزالة شعار إقليم</span>
                 </li>
               </ul>
-              <a href="#contact" class="relative inline-flex items-center justify-center rounded-full bg-primary-600 text-white py-3 text-sm font-semibold hover:bg-primary-700 transition-colors duration-300">
-                أنشئ صفحتي 
+              <a href="{{ route('auth.register') }}" wire:navigate class="group relative mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all duration-300 hover:bg-primary-500">
+                اختر انطلاق
+                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
 
@@ -1144,25 +1178,34 @@
                 مزايا متقدمة لإدارة نشاطك وبناء حضور رقمي يدوم.
               </p>
               <ul class="space-y-3 mt-8 mb-8 text-sm text-zinc-600 flex-1">
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Everything in Studio
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>كل مزايا باقة انطلاق، بالإضافة إلى</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Product strategy
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>إدارة فريق العمل حتى 5 أعضاء</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Dedicated art director
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>ايميل رسمي عدد 25</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check w-4 h-4 text-primary-600"><path d="M20 6 9 17l-5-5"></path></svg>
-                  Quarterly brand audits
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>قوالب مخصصة</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>إزالة شعار إقليم</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <span>جميع التكاملات Integrations</span>
                 </li>
               </ul>
-              <a href="#contact" class="inline-flex items-center justify-center rounded-full border border-zinc-300 py-3 text-sm font-medium hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all duration-300">
-                أنشئ صفحتي
+              <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
+                اختر نمو
+                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
           </div>
@@ -1359,7 +1402,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 1 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">01.</span>
                     هل المنصة مناسبة لنشاطي؟
                   </span>
@@ -1380,7 +1423,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 2 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">02.</span>
                     هل أحتاج إلى خبرة تقنية؟
                   </span>
@@ -1401,7 +1444,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 3 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">03.</span>
                     هل أستطيع استخدام دومين خاص وهوية نشاطي؟
                   </span>
@@ -1422,7 +1465,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 4 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">04.</span>
                     هل أستطيع استقبال الطلبات والمدفوعات من الصفحة مباشرة؟
                   </span>
@@ -1443,7 +1486,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 5 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">05.</span>
                     هل سأحتاج إلى إعادة بناء صفحتي عندما يكبر نشاطي؟
                   </span>
@@ -1464,7 +1507,7 @@
                   class="accordion-btn w-full flex justify-between items-center text-start hover:text-stone-800 transition-colors"
                   :class="active === 6 ? 'text-stone-800' : ''"
                 >
-                  <span class="text-sm md:text-base font-normal flex gap-4">
+                  <span class="text-sm md:text-base font-bold flex gap-4">
                     <span class="text-[#2C2825]/40 text-xs">06.</span>
                     هل بيانات العملاء والطلبات ملك لي؟
                   </span>
@@ -1478,6 +1521,44 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+
+
+
+      {{-- Pre-footer CTA --}}
+      <section class="px-6 py-20 lg:py-32 bg-stone-200/80 border-y border-stone-300/40">
+        <div class="max-w-3xl mx-auto text-center">
+            <p class="text-sm text-stone-600 flex items-center justify-center gap-2 mb-6">
+                <span class="w-6 h-px bg-stone-500"></span>
+                استثمر في حضور رقمي يبقى معك، لا في حملة إعلانية تنتهي غداً
+            </p>
+
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.25] lg:!leading-[3.75rem] text-zinc-900 text-balance">
+                ماذا لو كانت صفحتك
+                <b class="font-bold">أفضل موظف مبيعات عندك؟</b>
+            </h2>
+
+            <div class="mt-6 space-y-3 text-base sm:text-lg text-zinc-500 leading-relaxed max-w-2xl mx-auto">
+                <p>
+                    كل ما يحتاجه عملاؤك في مكان واحد، وكل ما تحتاجه لإدارة حضورك الرقمي في منصة واحدة.
+                </p>
+                <p>
+                    صفحة تبيع، وتحجز، وتعزز الثقة، وتنمو معك... من أول يوم.
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center justify-center gap-px">
+                    <span class="bg-zinc-900 text-white text-base sm:text-lg font-medium inline-flex items-center justify-center px-7 py-3.5 rounded-full transition-all duration-300 group-hover:bg-primary-700">
+                        أنشئ صفحتي الآن، مجاناً
+                    </span>
+                    <span class="size-12 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+                    </span>
+                </a>
+            </div>
         </div>
       </section>
 
