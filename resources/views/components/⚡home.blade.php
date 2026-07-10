@@ -41,12 +41,12 @@
                 </div>
 
                 <div class="flex flex-col gap-7 mt-6">
-                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.15] leading-[1.3] tracking-tighter text-[#111111]">
+                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.15] leading-[1.5] tracking-tighter text-[#111111]">
                         <span class="hero-line block">
                             ابنِ
                             <span class="relative inline-block text-[#C94309]">
                                 صفحة أعمال
-                                <svg class="absolute bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
+                                <svg class="absolute -bottom-1 lg:-bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
                                     <path id="underline" d="M2 10 C 60 3, 80 3, 117 5" stroke="#C94309" stroke-width="2.5" stroke-linecap="round" style="stroke-dashoffset: 0px; stroke-dasharray: 114.391;"></path>
                                 </svg>
                             </span>
