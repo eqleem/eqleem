@@ -6,15 +6,21 @@ const route = useRoute();
 const linkClass =
     'h-9 text-sm md:text-base w-full md:w-auto justify-center flex items-center gap-x-2 p-1.5 px-3 rounded-sm hover:bg-gray-300 hover:text-gray-900';
 
-function activeClass(name) {
-    return route.name === name ? 'bg-gray-100 text-gray-900' : '';
+// A nav item stays lit across its whole section (base path + any nested route),
+// so detail/tab routes never drop the active state. Home ('/') matches exactly.
+function activeClass(base) {
+    const isActive = base === '/'
+        ? route.path === '/'
+        : route.path === base || route.path.startsWith(`${base}/`);
+
+    return isActive ? 'bg-gray-100 text-gray-900' : '';
 }
 </script>
 
 <template>
     <nav class="bg-primary-800 p-0.5 text-base text-white">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-x-0.5 md:justify-start">
-            <RouterLink to="/" :class="[linkClass, activeClass('home')]">
+            <RouterLink to="/" :class="[linkClass, activeClass('/')]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                     <path
                         d="m9.02 2.838-5.39 4.2c-.9.7-1.63 2.19-1.63 3.32v7.41c0 2.32 1.89 4.22 4.21 4.22h11.58c2.32 0 4.21-1.9 4.21-4.21v-7.28c0-1.21-.81-2.76-1.8-3.45l-6.18-4.33c-1.4-.98-3.65-.93-5 .12Z"
@@ -31,7 +37,7 @@ function activeClass(name) {
                 <span class="hidden md:block">الرئيسية</span>
             </RouterLink>
 
-            <RouterLink to="/orders" :class="[linkClass, activeClass('orders')]">
+            <RouterLink to="/orders" :class="[linkClass, activeClass('/orders')]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                     <path
                         d="M8.5 19H8c-4 0-6-1-6-6V8c0-4 2-6 6-6h8c4 0 6 2 6 6v5c0 4-2 6-6 6h-.5c-.31 0-.61.15-.8.4l-1.5 2c-.66.88-1.74.88-2.4 0l-1.5-2c-.16-.22-.53-.4-.8-.4Z"
@@ -53,7 +59,7 @@ function activeClass(name) {
                 <span>الطلبات</span>
             </RouterLink>
 
-            <RouterLink to="/clients" :class="[linkClass, activeClass('clients')]">
+            <RouterLink to="/clients" :class="[linkClass, activeClass('/clients')]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0z" fill="none" />
                     <circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4" />
@@ -64,7 +70,7 @@ function activeClass(name) {
                 <span>العملاء</span>
             </RouterLink>
 
-            <RouterLink to="/manage-page" :class="[linkClass, activeClass('page')]">
+            <RouterLink to="/manage" :class="[linkClass, activeClass('/manage')]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0z" fill="none" />
                     <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -82,7 +88,7 @@ function activeClass(name) {
                 <span class="md:hidden">الصفحة</span>
             </RouterLink>
 
-            <RouterLink to="/settings" :class="[linkClass, 'hidden md:flex', activeClass('settings')]">
+            <RouterLink to="/settings" :class="[linkClass, 'hidden md:flex', activeClass('/settings')]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                     <path
                         opacity=".34"

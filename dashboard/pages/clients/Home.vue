@@ -1,22 +1,12 @@
 <script setup>
-import { reactive } from 'vue';
-import Container from '../components/ui/Container.vue';
-import MainBox from '../components/ui/MainBox.vue';
-import Button from '../components/ui/Button.vue';
-import Modal from '../components/ui/Modal.vue';
-import Form from '../components/ui/Form.vue';
-import Input from '../components/ui/Input.vue';
-import { openModal, closeModal } from '../lib/modal.js';
-
-const form = reactive({ name: '', phone: '', email: '' });
-
-function saveClient() {
-    // Dummy submit — no backend yet.
-    form.name = '';
-    form.phone = '';
-    form.email = '';
-    closeModal('add-client');
-}
+// Ported from resources/views/admin/clients/home.blade.php.
+import Container from '../../components/ui/Container.vue';
+import MainBox from '../../components/ui/MainBox.vue';
+import Button from '../../components/ui/Button.vue';
+import Modal from '../../components/ui/Modal.vue';
+import Table from '../../components/clients/Table.vue';
+import AddClient from '../../components/clients/AddClient.vue';
+import { openModal } from '../../lib/modal.js';
 </script>
 
 <template>
@@ -55,19 +45,11 @@ function saveClient() {
                 </Button>
             </template>
 
-            <div class="p-12 text-center text-sm text-gray-400">لا يوجد عملاء لعرضهم بعد.</div>
+            <Table />
+
+            <Modal name="add-client" title="إضافة عميل جديد" size="2xl">
+                <AddClient />
+            </Modal>
         </MainBox>
-
-        <Modal name="add-client" title="إضافة عميل جديد" size="2xl">
-            <Form @submit="saveClient">
-                <Input v-model="form.name" name="name" label="الاسم" placeholder="الاسم" />
-                <Input v-model="form.phone" name="phone" type="number" label="رقم الجوال" placeholder="123456789" dir="ltr" />
-                <Input v-model="form.email" name="email" type="email" label="البريد الإلكتروني" placeholder="client@email.com" dir="ltr" />
-
-                <template #footer>
-                    <Button type="submit" label="حفظ" />
-                </template>
-            </Form>
-        </Modal>
     </Container>
 </template>

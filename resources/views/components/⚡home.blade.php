@@ -218,7 +218,7 @@
                     </div>
 
                     {{-- Orbit: top-start — new order (soft sky) --}}
-                    <div class="absolute top-2 start-0 z-20 scale-70 origin-top-start sm:scale-100 transition-transform">
+                    <div class="absolute top-2 start-0 z-20 scale-50 origin-top-start sm:scale-100 transition-transform">
                         <div
                             class="w-[12rem] sm:w-[14rem] rounded-2xl bg-sky-50/95 backdrop-blur-xl border border-sky-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(14,165,233,0.22)] animate-[home-float_5.5s_ease-in-out_infinite]"
                             style="animation-delay: -1.1s;"
@@ -246,7 +246,7 @@
                     </div>
 
                     {{-- Orbit: top-end — rating (soft amber) --}}
-                    <div class="absolute top-6 end-0 z-20 scale-70 origin-top-end sm:scale-100 transition-transform">
+                    <div class="absolute top-6 end-0 z-20 scale-50 origin-top-end sm:scale-100 transition-transform">
                         <div
                             class="rounded-2xl bg-amber-50/95 backdrop-blur-xl border border-amber-100/80 px-4 py-3.5 shadow-[0_16px_40px_-18px_rgba(245,158,11,0.2)] animate-[home-float_6.2s_ease-in-out_infinite]"
                             style="animation-delay: -2.6s;"
@@ -264,7 +264,7 @@
                     </div>
 
                     {{-- Orbit: mid-end — booking (soft peach) --}}
-                    <div class="absolute top-[48%] end-0 z-20 scale-70 origin-right sm:scale-100 transition-transform">
+                    <div class="absolute top-[48%] end-0 z-20 scale-50 origin-right sm:scale-100 transition-transform">
                         <div
                             class="w-[12rem] sm:w-[13.5rem] rounded-2xl bg-orange-50/95 backdrop-blur-xl border border-orange-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(249,115,22,0.18)] animate-[home-float_5.8s_ease-in-out_infinite]"
                             style="animation-delay: -0.4s;"
@@ -283,7 +283,7 @@
                     </div>
 
                     {{-- Orbit: bottom-start — visitors (soft teal) --}}
-                    <div class="absolute bottom-4 start-0 z-20 scale-70 origin-bottom-start sm:scale-100 transition-transform">
+                    <div class="absolute bottom-4 start-0 z-20 scale-50 origin-bottom-start sm:scale-100 transition-transform">
                         <div
                             class="rounded-2xl bg-teal-50/95 backdrop-blur-xl border border-teal-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(20,184,166,0.2)] animate-[home-float_6.5s_ease-in-out_infinite]"
                             style="animation-delay: -3.2s;"
@@ -301,7 +301,7 @@
                     </div>
 
                     {{-- Orbit: bottom-end — contact (soft sage) --}}
-                    <div class="absolute bottom-8 end-0 z-20 scale-70 origin-bottom-end sm:scale-100 transition-transform">
+                    <div class="absolute bottom-8 end-0 z-20 scale-50 origin-bottom-end sm:scale-100 transition-transform">
                         <div
                             class="rounded-2xl bg-emerald-50/95 backdrop-blur-xl border border-emerald-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(16,185,129,0.2)] animate-[home-float_5.2s_ease-in-out_infinite]"
                             style="animation-delay: -1.8s;"

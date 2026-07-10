@@ -1,20 +1,9 @@
 <script setup>
-// Ported from resources/views/admin/settings/home.blade.php.
-// Settings copied from config/settings.php as JSON data (the `components` keys,
-// which point at Livewire views, are omitted — not used by the display).
 import Container from '../components/ui/Container.vue';
 import MainBox from '../components/ui/MainBox.vue';
+import { settingsList } from '../data/settings.js';
 
-const settings = [
-    { order: 1, slug: 'general-info', name: 'معلومات النشاط', description: 'بيانات النشاط التجاري', icon: 'assets/icons/stationery/011-id-card.svg' },
-    { order: 2, slug: 'domain', name: 'الدومين', description: 'تخصيص نطاق الموقع', icon: 'assets/icons/business/015-cloud-network.svg' },
-    { order: 3, slug: 'analytics', name: 'ربط الإحصائيات', description: 'لتتبع إحصائيات صفحتك', icon: 'assets/icons/business/030-growth-chart.svg' },
-    { order: 4, slug: 'verification', name: 'توثيق الحساب', description: 'بيانات التوثيق بالمستندات الرسمية', icon: 'assets/icons/business/051-shield.svg' },
-    { order: 5, slug: 'language-currency', name: 'اللغة والعملة', description: 'اللغة والعملة الافتراضية والمتاحة لصفحتك', icon: 'assets/icons/business/009-web browser.svg' },
-    { order: 7, slug: 'branches', name: 'الفروع', description: 'الفروع والمستودعات.', icon: 'assets/icons/business/010-location.svg' },
-    { order: 10, slug: 'payment-options', name: 'وسائل الدفع', description: 'تخصيص وسائل الدفع.', icon: 'assets/icons/business/017-atm-card.svg' },
-    { order: 11, slug: 'shipping-option', name: 'وسائل الشحن', description: 'تخصيص طرق الشحن المتاحة.', icon: 'assets/icons/ecommerce/018-cart.svg' },
-];
+// Ported from resources/views/admin/settings/home.blade.php.
 </script>
 
 <template>
@@ -42,11 +31,11 @@ const settings = [
                 </svg>
             </template>
 
-            <div class="grid grid-cols-2 gap-5 border-stone-200 border-t-2 border-dotted p-4 px-4 lg:grid-cols-4 lg:p-6 lg:px-8">
+            <div class="grid grid-cols-2 gap-5 border-t-2 border-dotted border-stone-200 p-4 px-4 lg:grid-cols-4 lg:p-6 lg:px-8">
                 <RouterLink
-                    v-for="setting in settings"
+                    v-for="setting in settingsList"
                     :key="setting.slug"
-                    :to="{ path: `/settings/${setting.slug}`, query: { name: setting.name } }"
+                    :to="`/settings/${setting.slug}`"
                     class="flex items-center gap-x-3 rounded-xl bg-gray-100 p-2 hover:bg-gray-200/80"
                 >
                     <div class="shrink-0 rounded-xl bg-white p-2">

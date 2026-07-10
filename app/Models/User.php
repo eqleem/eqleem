@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -22,7 +23,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasUuid, InteractsWithMedia, Notifiable;
+    use HasApiTokens, HasFactory, HasUuid, InteractsWithMedia, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -57,6 +58,20 @@ class User extends Authenticatable implements HasMedia
     public function currentTenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class, 'current_tenant_id');
+    }
+
+    public function ownsTenant(Tenant $tenant): bool
+    {
+        return (int) $tenant->user_id === (int) $this->id;
+    }
+
+    public function canAccessDashboard(?Tenant $tenant = null): bool
+    {
+        $tenant ??= $this->currentTenant;
+
+        return $tenant instanceof Tenant
+            && $this->ownsTenant($tenant)
+            && (bool) $tenant->active;
     }
 
     public function getImageAttribute($value)

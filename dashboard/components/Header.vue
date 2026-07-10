@@ -1,24 +1,22 @@
 <script setup>
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Dropdown from './Dropdown.vue';
+import { useSession } from '../stores/session.js';
 
 const route = useRoute();
+const { user, tenant, app, loaded } = useSession();
 
-// Placeholder data (no real backend calls) — mirrors the admin header's tenant/user.
-const tenant = {
-    name: 'متجري',
-    logo: null,
-    url: '#',
-    plan: 'مجاني',
-};
-
-const user = {
-    name: 'أحمد الأحمدي',
-    email: 'contact@ahmad.tech',
-    image: 'https://www.gravatar.com/avatar/?d=mp',
-};
-
-const appName = 'Eqleem';
+const tenantName = computed(() => tenant.value?.name ?? '…');
+const tenantLogo = computed(() => tenant.value?.logo ?? null);
+const tenantUrl = computed(() => tenant.value?.url ?? '#');
+const tenantPlan = computed(() => tenant.value?.plan ?? 'مجاني');
+const userName = computed(() => user.value?.name ?? '');
+const userEmail = computed(() => user.value?.email ?? '');
+const userImage = computed(() => user.value?.image ?? 'https://www.gravatar.com/avatar/?d=mp');
+const appName = computed(() => app.value?.name ?? 'Eqleem');
+const homeUrl = computed(() => app.value?.home_url ?? '/');
+const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
 </script>
 
 <template>
@@ -27,24 +25,25 @@ const appName = 'Eqleem';
             <div class="flex items-center gap-x-3">
                 <RouterLink to="/" class="flex items-center justify-center gap-x-2 text-center">
                     <img
-                        :src="tenant.logo ?? '/assets/images/t-logo.png'"
+                        :src="tenantLogo ?? '/assets/images/t-logo.png'"
                         alt=""
                         class="ms-1 h-8 rounded-sm"
                     >
-                    <span class="hidden md:block">{{ tenant.name }}</span>
+                    <span class="hidden md:block">{{ loaded ? tenantName : '…' }}</span>
                 </RouterLink>
 
                 <RouterLink to="/plan" class="flex items-center justify-center gap-x-1 text-center">
                     <span class="rounded bg-purple-500 p-0.5 px-1.5 text-xs text-purple-100 hover:bg-purple-600">
-                        {{ tenant.plan }}
+                        {{ tenantPlan }}
                     </span>
                 </RouterLink>
             </div>
 
             <div class="flex items-center gap-x-3">
                 <a
-                    :href="tenant.url"
+                    :href="tenantUrl"
                     target="_blank"
+                    rel="noopener noreferrer"
                     class="flex items-center gap-x-2 rounded-full bg-green-600 p-1 px-3 text-sm text-white hover:bg-green-500"
                 >
                     معاينة <span class="hidden lg:block">الصفحة</span>
@@ -89,15 +88,15 @@ const appName = 'Eqleem';
                     <template #trigger>
                         <button type="button" class="flex items-center gap-2" aria-haspopup="menu">
                             <div class="flex items-center justify-center gap-x-2 text-center">
-                                <img :src="user.image" alt="" class="w-8 rounded-full">
+                                <img :src="userImage" alt="" class="w-8 rounded-full">
                                 <span class="-mt-2 opacity-50">⌄</span>
                             </div>
                         </button>
                     </template>
 
                     <div class="truncate p-3">
-                        <p>{{ user.name }}</p>
-                        <p class="opacity-50">{{ user.email }}</p>
+                        <p>{{ userName || '…' }}</p>
+                        <p class="opacity-50">{{ userEmail }}</p>
                     </div>
 
                     <RouterLink
@@ -148,7 +147,7 @@ const appName = 'Eqleem';
                         إدارة الاشتراك
                     </RouterLink>
 
-                    <a href="#" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
+                    <a :href="homeUrl" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                             <path
                                 stroke="currentColor"
@@ -177,7 +176,7 @@ const appName = 'Eqleem';
                         {{ appName }}
                     </a>
 
-                    <a href="#" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
+                    <a :href="logoutUrl" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                             <g opacity=".4">
                                 <path

@@ -1,8 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue';
-import Container from '../components/ui/Container.vue';
-import MainBox from '../components/ui/MainBox.vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import Container from '../../components/ui/Container.vue';
+import MainBox from '../../components/ui/MainBox.vue';
+import Table from '../../components/orders/Table.vue';
+import PaymentsTable from '../../components/payments/Table.vue';
+import InvoicesTable from '../../components/invoices/Table.vue';
+import FormSubmissionsTable from '../../components/form-submissions/Table.vue';
 
+// Ported from resources/views/admin/orders/home.blade.php.
+// Tabs are driven by the `tab` query param (like the blade's url-key="tab").
 const tabs = [
     { name: 'orders', label: 'الطلبات' },
     { name: 'payments', label: 'المبيعات' },
@@ -10,7 +17,8 @@ const tabs = [
     { name: 'form-submissions', label: 'ردود النماذج' },
 ];
 
-const active = ref('orders');
+const route = useRoute();
+const active = computed(() => (tabs.some((tab) => tab.name === route.query.tab) ? route.query.tab : 'orders'));
 const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)?.label);
 </script>
 
@@ -40,23 +48,23 @@ const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)
 
             <div>
                 <div class="flex border-b border-stone-200 px-px">
-                    <button
+                    <RouterLink
                         v-for="tab in tabs"
                         :key="tab.name"
-                        type="button"
+                        :to="{ query: { tab: tab.name } }"
                         class="px-4 py-3 text-sm transition"
                         :class="active === tab.name
                             ? 'border-b-2 border-primary-500 text-stone-900'
                             : 'text-gray-500 hover:text-gray-800'"
-                        @click="active = tab.name"
                     >
                         {{ tab.label }}
-                    </button>
+                    </RouterLink>
                 </div>
 
-                <div class="p-12 text-center text-sm text-gray-400">
-                    لا توجد {{ activeLabel }} لعرضها بعد.
-                </div>
+                <Table v-if="active === 'orders'" />
+                <PaymentsTable v-else-if="active === 'payments'" />
+                <InvoicesTable v-else-if="active === 'invoices'" />
+                <FormSubmissionsTable v-else-if="active === 'form-submissions'" />
             </div>
         </MainBox>
     </Container>

@@ -1,6 +1,12 @@
 <script setup>
+import { onMounted } from 'vue';
 import Header from './components/Header.vue';
 import Nav from './components/Nav.vue';
+import { loadDashboardContext } from './stores/session.js';
+
+onMounted(() => {
+    loadDashboardContext();
+});
 </script>
 
 <template>
