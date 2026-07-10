@@ -7,7 +7,9 @@ export default defineConfig({
     plugins: [
         laravel({
             hotFile: 'public/dashboard.hot',
-            buildDirectory: 'dashboard',
+            // Must NOT be "dashboard" — that path conflicts with the /dashboard Laravel
+            // route; nginx would serve public/dashboard/ as a static dir and 403.
+            buildDirectory: 'build-dashboard',
             input: ['dashboard/app.css', 'dashboard/main.js'],
             refresh: true,
         }),

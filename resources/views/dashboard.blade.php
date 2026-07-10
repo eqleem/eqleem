@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('Dashboard') }} - {{ config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-shape-white.webp') }}">
-    {{ Illuminate\Support\Facades\Vite::useHotFile(public_path('dashboard.hot'))->useBuildDirectory('dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }}
+    {{ Illuminate\Support\Facades\Vite::useHotFile(public_path('dashboard.hot'))->useBuildDirectory('build-dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }}
 </head>
 <body class="antialiased bg-stone-100">
     <div id="dashboard-app"></div>
