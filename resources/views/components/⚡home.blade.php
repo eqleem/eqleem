@@ -3,7 +3,7 @@
     <nav class="fixedX top-0 w-full z-50    transition-all duration-300">
         <div class="max-w-7xl mx-auto px-3 md:px-2 xl:px-0 h-[4.5rem] md:h-[5rem] flex items-center justify-between">
             <a href="{{ route('home') }}" wire:navigate class="font-display text-xl font-medium tracking-tighter text-[#111111] flex items-center gap-2">
-                <img class="w-auto h-7 md:h-8" src="{{ asset('assets/images/logo.webp') }}" alt="" />
+                <img class="w-auto h-8" src="{{ asset('assets/images/logo.webp') }}" alt="" />
             </a>
           
             <div class="flex items-center gap-4">
@@ -29,76 +29,229 @@
     </nav>
 
 
-    <section class="relative  w-full  px-6 flex items-center justify-start min-h-[calc(100vh-9rem)] py-7 lg:py-0">
-        <div class="glow-bg top-[10%] left-[50%] -translate-x-[50%]"></div>
-        
-        <div class="max-w-7xl mx-auto w-full gap-12 lg:gap-8">
-            <div class="flex flex-col gap-8 reveal-up active">
-                <p data-reveal="" class="text-xs tracking-widest text-stone-500 flex items-center gap-2">
-                    <span class="w-6 h-px bg-stone-500"></span>
-                     مصممة لأصحاب الأعمال في السعودية
-                     <span class="text-2xl">🇸🇦</span>
-                  </p>
-                <h1 class="-mt-3 text-[3.5rem] md:text-[4rem] 2xl:text-[4.5rem] leading-[1.2]   tracking-tighter text-[#111111]">
-                    <span class="hero-line block" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px);">
-                        ابنِ
-                        <span class="relative inline-block text-[#C94309]">
-                            صفحة
-                          <svg class="absolute -bottom-1 left-0 w-full" viewBox="0 0 120 12" fill="none">
-                            <path id="underline" d="M3 9 C 30 3, 80 3, 117 7" stroke="#C94309" stroke-width="2.5" stroke-linecap="round" style="stroke-dashoffset: 0px; stroke-dasharray: 114.391;"></path>
-                          </svg>
-                        </span>
-                      </span>
- 
-                    <b class="font-bold"> تبيع عنّك،</b>
-                     بدقائق.
-                </h1>
-                <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[35rem] font-normal">
-                     أنشئ صفحة لأعمالك، تستقبل الزوار، تجيب عن أسئلتهم، تعرض المنتجات والخدمات، وتستقبل الطلبات والحجوزات على مدار الساعة.
-                </p>
-                <p class="font-thin -mt-4 opacity-60 max-w-[35rem]">
+    <section class="relative w-full px-4 sm:px-6 flex items-center min-h-[calc(100vh-9rem)] py-12 lg:py-16 overflow-x-hidden">
+        <div class="glow-bg top-[8%] left-[50%] -translate-x-[50%]"></div>
 
-                    اجعل كل زيارة فرصة للبيع أو الحجز أو التواصل، من خلال صفحة أعمال احترافية تعزز ثقة عملائك وتبرز علامتك التجارية.
-                </p>
-                <div class="">
-                    <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800   Xhover:-translate-y-0.5 transition-all duration-300 group">
-                        أنشئ صفحتي الآن، مجاناً
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-                    </a>
-                    
-                    {{-- <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center gap-1 mt-6">
-                        <span class="bg-zinc-900 text-white text-lg font-medium inline-flex items-center justify-center h-14 px-8 px-6 py-3 rounded-full transition-all duration-300 group-hover:bg-primary-700 group-hover:pr-8">
-                            أنشئ صفحتي الآن، مجاناً
-                        </span>
-                        <span class="w-14 h-14 rounded-full bg-zinc-900 text-white flex items-center justify-center transition-all duration-300 rotate-[-135deg] group-hover:bg-primary-700 group-hover:rotate-[-130deg]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true" class="lucide lucide-arrow-up-right w-4 h-4"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-                        </span>
-                    </a> --}}
-
-                    {{-- <a href="#waitlist" class="inline-flex items-center justify-center h-14 px-8 rounded-full bg-[#111111] text-white text-lg font-normal hover:bg-[#333333] transition-colors">
-                        أنشئ صفحتي الآن، مجاناً
-                    </a> --}}
-
-                    <p class="mt-5 text-xs lg:text-sm text-stone-500 font-normal flex items-center gap-4">
-                        <span class="inline-flex items-center gap-1">
-                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-700 text-base"></iconify-icon>
-                            مجانًا 
-                        </span>
-                        <span class="inline-flex items-center gap-1">
-                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-700 text-base"></iconify-icon>
-                            بدون خبرة تقنية
-                        </span>
-                        <span class="inline-flex items-center gap-1">
-                          <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-700 text-base"></iconify-icon>
-                          جاهزة خلال دقائق
-                        </span>
-                    </p>
+        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 lg:gap-6 xl:gap-10 items-center">
+            {{-- Copy --}}
+            <div class="lg:col-span-6 order-1 relative z-10">
+                <div class="text-xs w-auto flex-shrink bg-stone-300/80 text-stone-600 px-4 py-1.5 rounded-full tracking-widest inline-flex items-center gap-2 backdrop-blur-sm">
+                    <span class="size-3 rounded-full bg-[#E35F26] animate-pulse -mx-1 me-1"></span>
+                    جاهزة للنشر خلال دقائق
                 </div>
 
+                <div class="flex flex-col gap-7 mt-6">
+                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] leading-[1.15] tracking-tighter text-[#111111]">
+                        <span class="hero-line block">
+                            ابنِ
+                            <span class="relative inline-block text-[#C94309]">
+                                صفحة أعمال
+                                <svg class="absolute -bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
+                                    <path id="underline" d="M2 10 C 60 3, 80 3, 117 5" stroke="#C94309" stroke-width="2.5" stroke-linecap="round" style="stroke-dashoffset: 0px; stroke-dasharray: 114.391;"></path>
+                                </svg>
+                            </span>
+                        </span>
+                        <b class="font-bold"> تبيع عنّك،</b>
+                        بدقائق.
+                    </h1>
+
+                    <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[34rem] font-normal">
+                        أنشئ صفحة لأعمالك، تستقبل الزوار، تجيب عن أسئلتهم، تعرض المنتجات والخدمات، وتستقبل الطلبات والحجوزات على مدار الساعة.
+                    </p>
+
+                    <div>
+                        <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
+                            أنشئ صفحتي الآن -  مجاناً
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </a>
+
+                        <p class="mt-5 text-xs lg:text-sm text-stone-400 font-normal flex flex-wrap items-center gap-x-3 gap-y-2">
+                            <span class="inline-flex items-center gap-0.5">
+                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                مجانًا
+                            </span>
+                            <span class="inline-flex items-center gap-0.5">
+                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                بدون خبرة تقنية
+                            </span>
+                            <span class="inline-flex items-center gap-0.5">
+                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                جاهزة خلال دقائق
+                            </span>
+                        </p>
+                        <div class="mt-6 flex items-center gap-4">
+                            <div class="flex x-space-x-3">
+                                <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/frst.webp') }}" alt="User avatar">
+                                <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/baderatg.jpg') }}" alt="User avatar">
+                                <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/crisp-burger.webp') }}" alt="User avatar">
+                                <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/aswar.avif') }}" alt="User avatar">
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-1 text-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                </div>
+                                <span class="text-xs font-medium text-stone-500 mt-1">
+                                    <span class="text-gray-900">4.9/5</span> تقييمات أصحاب الأعمال
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            
+            {{-- Visual stage --}}
+            <div class="lg:col-span-6 order-2 flex justify-center lg:justify-end mt-10 lg:mt-0">
+                <div class="relative w-full max-w-[30rem] sm:max-w-[34rem] mx-auto lg:ms-auto lg:me-0 min-h-[34rem] sm:min-h-[38rem] lg:min-h-[40rem]">
+                    {{-- Atmosphere --}}
+                    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle_at_center,rgba(201,67,9,0.12)_0%,rgba(255,255,255,0.35)_42%,transparent_72%)]"></div>
+                        <div class="absolute top-[12%] left-[18%] size-40 rounded-full bg-white/50 blur-3xl"></div>
+                        <div class="absolute bottom-[10%] right-[12%] size-48 rounded-full bg-orange-200/25 blur-3xl"></div>
+                        <div class="hidden sm:block absolute inset-[6%] rounded-full border border-black/[0.04]"></div>
+                        <div class="hidden sm:block absolute inset-[14%] rounded-full border border-dashed border-black/[0.055]"></div>
+                    </div>
+
+                    {{-- Phone --}}
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[54%] z-10 w-[15rem] sm:w-[17.5rem] md:w-[19rem] lg:w-[18.5rem] xl:w-[20rem]">
+                        <div class="relative transition-transform duration-700 ease-out hover:-translate-y-2">
+                            <div class="absolute -inset-8 rounded-[3rem] bg-stone-400/10 blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                            <div class="relative rounded-[2.75rem] bg-gradient-to-b from-zinc-100 via-zinc-700 to-zinc-950 p-[0.48rem] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.28)] animate-[home-float_7s_ease-in-out_infinite]">
+                                <div class="absolute inset-[1px] rounded-[2.65rem] bg-zinc-900 pointer-events-none" aria-hidden="true"></div>
+
+                                <span class="absolute -start-[3px] top-[22%] h-7 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
+                                <span class="absolute -start-[3px] top-[32%] h-12 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
+                                <span class="absolute -end-[3px] top-[28%] h-14 w-[3px] rounded-e-md bg-zinc-500" aria-hidden="true"></span>
+
+                                <div class="relative overflow-hidden rounded-[2.3rem] bg-white aspect-[9/17] ring-1 ring-white/15">
+                                    <div class="absolute top-3.5 left-1/2 -translate-x-1/2 z-20 h-6 w-[32%] max-w-[7rem] rounded-full bg-zinc-950 shadow-inner" aria-hidden="true"></div>
+
+                                    <img
+                                        src="{{ asset('assets/images/hero-phone-screen.webp') }}"
+                                        alt="مثال لصفحة أعمال على الجوال"
+                                        class="absolute top-0 left-0 w-full h-auto max-w-none"
+                                        width="736"
+                                        height="1376"
+                                        loading="eager"
+                                        decoding="async"
+                                    />
+
+                                    <div class="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white/60 to-transparent pointer-events-none" aria-hidden="true"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: top-start — new order --}}
+                    <div
+                        class="absolute top-2 start-0 z-20 w-[12rem] sm:w-[14rem] rounded-2xl bg-white/95 backdrop-blur-xl border border-white p-3.5 sm:p-4 shadow-[0_22px_55px_-18px_rgba(0,0,0,0.3)] animate-[home-float_5.5s_ease-in-out_infinite]"
+                        style="animation-delay: -1.1s;"
+                    >
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
+                                <span class="relative flex size-2">
+                                    <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+                                </span>
+                                طلب جديد
+                            </span>
+                            <span class="text-[10px] text-zinc-400">الآن</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="size-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-primary-500/30">
+                                <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-zinc-900 truncate">باقة التصميم</p>
+                                <p class="text-xs text-zinc-500 mt-0.5 tabular-nums">٤٩٠ ر.س · مدفوع</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: top-end — rating --}}
+                    <div
+                        class="absolute top-6 end-0 z-20 rounded-2xl bg-zinc-900 text-white px-4 py-3.5 shadow-[0_20px_45px_-12px_rgba(0,0,0,0.5)] animate-[home-float_6.2s_ease-in-out_infinite]"
+                        style="animation-delay: -2.6s;"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                <iconify-icon icon="solar:star-bold" class="text-amber-400 text-xl"></iconify-icon>
+                            </div>
+                            <div>
+                                <p class="text-base font-semibold leading-none">٤.٩</p>
+                                <p class="text-[11px] text-white/55 mt-1.5">تقييم العملاء</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: mid-end — booking --}}
+                    <div
+                        class="absolute top-[48%] end-0 z-20 w-[12rem] sm:w-[13.5rem] rounded-2xl bg-white/95 backdrop-blur-xl border border-white p-3.5 sm:p-4 shadow-[0_22px_55px_-18px_rgba(0,0,0,0.3)] animate-[home-float_5.8s_ease-in-out_infinite]"
+                        style="animation-delay: -0.4s;"
+                    >
+                        <div class="flex items-start gap-3">
+                            <div class="size-11 rounded-xl bg-orange-50 text-[#C94309] flex items-center justify-center shrink-0">
+                                <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-zinc-900">حجز موعد</p>
+                                <p class="text-xs text-zinc-500 mt-0.5">غداً · ٤:٣٠ م</p>
+                                <span class="mt-2 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">مؤكد</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: bottom-start — visitors --}}
+                    <div
+                        class="absolute bottom-4 start-0 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-white px-4 py-3 shadow-[0_18px_45px_-16px_rgba(0,0,0,0.28)] animate-[home-float_6.5s_ease-in-out_infinite]"
+                        style="animation-delay: -3.2s;"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                                <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
+                            </div>
+                            <div>
+                                <p class="text-[11px] text-zinc-400 leading-none">زوار الآن</p>
+                                <p class="text-sm font-semibold text-zinc-900 mt-1 tabular-nums">١٢+</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: bottom-end — WhatsApp --}}
+                    <div
+                        class="absolute bottom-8 end-0 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-white px-4 py-3 shadow-[0_18px_45px_-16px_rgba(0,0,0,0.28)] animate-[home-float_5.2s_ease-in-out_infinite]"
+                        style="animation-delay: -1.8s;"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/25">
+                                <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-zinc-900">تواصل مباشر</p>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">واتساب · رد فوري</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <style>
+            @keyframes home-float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-12px); }
+            }
+            @media (max-width: 1023px) {
+                @keyframes home-float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-7px); }
+                }
+            }
+        </style>
     </section>
 
 
@@ -220,15 +373,31 @@
 
 
 
-    <div class="w-full border-y border-black/5 bg-white py-5 reveal-up active">
-        <div class="mx-auto flex max-w-5xl items-center justify-center gap-x-8 gap-y-4 px-6 sm:gap-x-10 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <img src="{{ asset('assets/images/partners/tabby.svg') }}" alt="تابي" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/tamara.svg') }}" alt="تمارا" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/mada.svg') }}" alt="مدى" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/aramex.svg') }}" alt="أرامكس" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/fedex.svg') }}" alt="فيديكس" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/visa.svg') }}" alt="فيزا" class="h-5 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
-            <img src="{{ asset('assets/images/partners/mastercard.svg') }}" alt="ماستركارد" class="h-6 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-7" />
+    <div class="w-full border-y border-black/5 bg-white py-5 reveal-up active ">
+        <div class="mx-auto flex max-w-5xlx items-center justify-center gap-x-8 gap-y-4 opacity-50 hover:opacity-100 transition-opacity duration-300 px-6 sm:gap-x-10 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <img src="{{ asset('assets/images/partners/tabby.svg') }}" alt="تابي" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/tamara.svg') }}" alt="تمارا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mada.svg') }}" alt="مدى" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/aramex.svg') }}" alt="أرامكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/fedex.svg') }}" alt="فيديكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/visa.svg') }}" alt="فيزا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mastercard.svg') }}" alt="ماستركارد" class="h-6 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-7" />
+            <img src="{{ asset('assets/images/partners/tabby.svg') }}" alt="تابي" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/tamara.svg') }}" alt="تمارا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mada.svg') }}" alt="مدى" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/aramex.svg') }}" alt="أرامكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/fedex.svg') }}" alt="فيديكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/visa.svg') }}" alt="فيزا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mastercard.svg') }}" alt="ماستركارد" class="h-6 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-7" />
+                   <img src="{{ asset('assets/images/partners/mastercard.svg') }}" alt="ماستركارد" class="h-6 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-7" />
+            <img src="{{ asset('assets/images/partners/tabby.svg') }}" alt="تابي" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/tamara.svg') }}" alt="تمارا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mada.svg') }}" alt="مدى" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/aramex.svg') }}" alt="أرامكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/fedex.svg') }}" alt="فيديكس" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/visa.svg') }}" alt="فيزا" class="h-5 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-6" />
+            <img src="{{ asset('assets/images/partners/mastercard.svg') }}" alt="ماستركارد" class="h-6 grayscale hover:grayscale-0 w-auto opacity-80 transition-opacity hover:opacity-100 sm:h-7" />
+       
         </div>
     </div>
 
