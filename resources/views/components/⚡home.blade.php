@@ -1102,13 +1102,9 @@
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm font-normal text-[#6E6D7A]">
             
             <div class="flex items-center gap-4 flex-wrap justify-center">
-                {{-- <a href="{{ route('auth.register') }}" wire:navigate class="hover:text-[#0D0C22]">أنشئ صفحتك</a>
-                <a href="{{ route('auth.login') }}" wire:navigate class="hover:text-[#0D0C22]">تسجيل الدخول</a> --}}
-                <a href="#" class="hover:text-[#0D0C22]">الشروط والأحكام</a>
-                <a href="#" class="hover:text-[#0D0C22]">سياسة الخصوصية</a>
-
-                <a href="#faq" class="hover:text-[#0D0C22]">الدعم والمساعدة</a>
-                {{-- <a href="{{ route('admin.home') }}" wire:navigate class="hover:text-[#0D0C22]">لوحة التحكم</a> --}}
+                <a href="{{ route('terms') }}" wire:navigate class="hover:text-[#0D0C22]">الشروط والأحكام</a>
+                <a href="{{ route('privacy') }}" wire:navigate class="hover:text-[#0D0C22]">سياسة الخصوصية</a>
+                <a href="{{ route('contact') }}" wire:navigate class="hover:text-[#0D0C22]">اتصل بنا</a>
             </div>
             <div class="flex items-center gap-4">
                 <span>
