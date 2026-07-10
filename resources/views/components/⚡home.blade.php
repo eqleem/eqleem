@@ -29,7 +29,7 @@
     </nav>
 
 
-    <section class="relative w-full px-4 sm:px-6 flex items-center min-h-[calc(100vh-9rem)] pb-12 pt-24 lg:py-16 overflow-x-hidden">
+    <section class="relative w-full px-4 sm:px-6 flex items-center min-h-[calc(100vh-9rem)] pb-12 pt-32 lg:py-16 overflow-x-hidden">
         <div class="glow-bg top-[8%] left-[50%] -translate-x-[50%]"></div>
 
         <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 lg:gap-6 xl:gap-10 items-center">
@@ -41,12 +41,12 @@
                 </div>
 
                 <div class="flex flex-col gap-7 mt-6">
-                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.15] leading-[1.7] tracking-tighter text-[#111111]">
+                    <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.15] leading-[1.5] tracking-tighter text-[#111111]">
                         <span class="hero-line block">
                             ابنِ
                             <span class="relative inline-block text-[#C94309]">
                                 صفحة أعمال
-                                <svg class="absolute -bottom-2 lg:-bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
+                                <svg class="absolute -bottom-1 lg:-bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
                                     <path id="underline" d="M2 10 C 60 3, 80 3, 117 5" stroke="#C94309" stroke-width="2.5" stroke-linecap="round" style="stroke-dashoffset: 0px; stroke-dasharray: 114.391;"></path>
                                 </svg>
                             </span>
@@ -105,7 +105,7 @@
 
             {{-- Visual stage --}}
             <div class="lg:col-span-6 order-2 flex justify-center lg:justify-end mt-10 lg:mt-0">
-                <div class="relative w-full max-w-[30rem] sm:max-w-[34rem] mx-auto lg:ms-auto lg:me-0 min-h-[34rem] sm:min-h-[38rem] lg:min-h-[40rem]">
+                <div class="relative w-full max-w-[30rem] sm:max-w-[34rem] mx-auto lg:ms-auto lg:me-0 min-h-[38rem] sm:min-h-[40rem] lg:min-h-[42rem]">
                     {{-- Atmosphere --}}
                     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle_at_center,rgba(201,67,9,0.12)_0%,rgba(255,255,255,0.35)_42%,transparent_72%)]"></div>
@@ -116,7 +116,7 @@
                     </div>
 
                     {{-- Phone --}}
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[54%] z-10 w-[15rem] sm:w-[17.5rem] md:w-[19rem] lg:w-[18.5rem] xl:w-[20rem]">
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[54%] z-10 w-[17.5rem] sm:w-[18.5rem] md:w-[19.5rem] lg:w-[19rem] xl:w-[20.5rem]">
                         <div class="relative transition-transform duration-700 ease-out hover:-translate-y-2">
                             <div class="absolute -inset-8 rounded-[3rem] bg-stone-400/10 blur-2xl pointer-events-none" aria-hidden="true"></div>
 
@@ -217,93 +217,103 @@
                         </div>
                     </div>
 
-                    {{-- Orbit: top-start — new order --}}
-                    <div
-                        class="absolute top-2 start-0 z-20 w-[12rem] sm:w-[14rem] rounded-2xl bg-white/95 backdrop-blur-xl border border-white p-3.5 sm:p-4 shadow-[0_22px_55px_-18px_rgba(0,0,0,0.3)] animate-[home-float_5.5s_ease-in-out_infinite]"
-                        style="animation-delay: -1.1s;"
-                    >
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
-                                <span class="relative flex size-2">
-                                    <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span class="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+                    {{-- Orbit: top-start — new order (soft sky) --}}
+                    <div class="absolute top-2 start-0 z-20 scale-70 origin-top-start sm:scale-100 transition-transform">
+                        <div
+                            class="w-[12rem] sm:w-[14rem] rounded-2xl bg-sky-50/95 backdrop-blur-xl border border-sky-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(14,165,233,0.22)] animate-[home-float_5.5s_ease-in-out_infinite]"
+                            style="animation-delay: -1.1s;"
+                        >
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-sky-700/80">
+                                    <span class="relative flex size-2">
+                                        <span class="absolute inline-flex size-full animate-ping rounded-full bg-sky-400/70 opacity-75"></span>
+                                        <span class="relative inline-flex size-2 rounded-full bg-sky-400"></span>
+                                    </span>
+                                    طلب جديد
                                 </span>
-                                طلب جديد
-                            </span>
-                            <span class="text-[10px] text-zinc-400">الآن</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="size-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-primary-500/30">
-                                <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                                <span class="text-[10px] text-sky-600/50">الآن</span>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-zinc-900 truncate">باقة التصميم</p>
-                                <p class="text-xs text-zinc-500 mt-0.5 tabular-nums">٤٩٠ ر.س · مدفوع</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: top-end — rating --}}
-                    <div
-                        class="absolute top-6 end-0 z-20 rounded-2xl bg-zinc-900 text-white px-4 py-3.5 shadow-[0_20px_45px_-12px_rgba(0,0,0,0.5)] animate-[home-float_6.2s_ease-in-out_infinite]"
-                        style="animation-delay: -2.6s;"
-                    >
-                        <div class="flex items-center gap-3">
-                            <div class="size-10 rounded-xl bg-white/10 flex items-center justify-center">
-                                <iconify-icon icon="solar:star-bold" class="text-amber-400 text-xl"></iconify-icon>
-                            </div>
-                            <div>
-                                <p class="text-base font-semibold leading-none">٤.٩</p>
-                                <p class="text-[11px] text-white/55 mt-1.5">تقييم العملاء</p>
+                            <div class="flex items-center gap-3">
+                                <div class="size-11 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-sky-950/80 truncate">باقة التصميم</p>
+                                    <p class="text-xs text-sky-700/55 mt-0.5 tabular-nums">٤٩٠ ر.س · مدفوع</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Orbit: mid-end — booking --}}
-                    <div
-                        class="absolute top-[48%] end-0 z-20 w-[12rem] sm:w-[13.5rem] rounded-2xl bg-white/95 backdrop-blur-xl border border-white p-3.5 sm:p-4 shadow-[0_22px_55px_-18px_rgba(0,0,0,0.3)] animate-[home-float_5.8s_ease-in-out_infinite]"
-                        style="animation-delay: -0.4s;"
-                    >
-                        <div class="flex items-start gap-3">
-                            <div class="size-11 rounded-xl bg-orange-50 text-[#C94309] flex items-center justify-center shrink-0">
-                                <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-zinc-900">حجز موعد</p>
-                                <p class="text-xs text-zinc-500 mt-0.5">غداً · ٤:٣٠ م</p>
-                                <span class="mt-2 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">مؤكد</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: bottom-start — visitors --}}
-                    <div
-                        class="absolute bottom-4 start-0 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-white px-4 py-3 shadow-[0_18px_45px_-16px_rgba(0,0,0,0.28)] animate-[home-float_6.5s_ease-in-out_infinite]"
-                        style="animation-delay: -3.2s;"
-                    >
-                        <div class="flex items-center gap-3">
-                            <div class="size-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                                <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
-                            </div>
-                            <div>
-                                <p class="text-[11px] text-zinc-400 leading-none">زوار الآن</p>
-                                <p class="text-sm font-semibold text-zinc-900 mt-1 tabular-nums">١٢+</p>
+                    {{-- Orbit: top-end — rating (soft amber) --}}
+                    <div class="absolute top-6 end-0 z-20 scale-70 origin-top-end sm:scale-100 transition-transform">
+                        <div
+                            class="rounded-2xl bg-amber-50/95 backdrop-blur-xl border border-amber-100/80 px-4 py-3.5 shadow-[0_16px_40px_-18px_rgba(245,158,11,0.2)] animate-[home-float_6.2s_ease-in-out_infinite]"
+                            style="animation-delay: -2.6s;"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                                    <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="text-base font-semibold leading-none text-amber-950/80">٤.٩</p>
+                                    <p class="text-[11px] text-amber-700/55 mt-1.5">تقييم العملاء</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Orbit: bottom-end — WhatsApp --}}
-                    <div
-                        class="absolute bottom-8 end-0 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-white px-4 py-3 shadow-[0_18px_45px_-16px_rgba(0,0,0,0.28)] animate-[home-float_5.2s_ease-in-out_infinite]"
-                        style="animation-delay: -1.8s;"
-                    >
-                        <div class="flex items-center gap-3">
-                            <div class="size-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/25">
-                                <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                    {{-- Orbit: mid-end — booking (soft peach) --}}
+                    <div class="absolute top-[48%] end-0 z-20 scale-70 origin-right sm:scale-100 transition-transform">
+                        <div
+                            class="w-[12rem] sm:w-[13.5rem] rounded-2xl bg-orange-50/95 backdrop-blur-xl border border-orange-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(249,115,22,0.18)] animate-[home-float_5.8s_ease-in-out_infinite]"
+                            style="animation-delay: -0.4s;"
+                        >
+                            <div class="flex items-start gap-3">
+                                <div class="size-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-orange-950/80">حجز موعد</p>
+                                    <p class="text-xs text-orange-700/55 mt-0.5">غداً · ٤:٣٠ م</p>
+                                    <span class="mt-2 inline-flex items-center rounded-full bg-orange-100/80 text-orange-700/80 px-2 py-0.5 text-[10px] font-medium">مؤكد</span>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm font-semibold text-zinc-900">تواصل مباشر</p>
-                                <p class="text-[11px] text-zinc-400 mt-0.5">واتساب · رد فوري</p>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: bottom-start — visitors (soft teal) --}}
+                    <div class="absolute bottom-4 start-0 z-20 scale-70 origin-bottom-start sm:scale-100 transition-transform">
+                        <div
+                            class="rounded-2xl bg-teal-50/95 backdrop-blur-xl border border-teal-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(20,184,166,0.2)] animate-[home-float_6.5s_ease-in-out_infinite]"
+                            style="animation-delay: -3.2s;"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] text-teal-700/50 leading-none">زوار الآن</p>
+                                    <p class="text-sm font-semibold text-teal-950/80 mt-1 tabular-nums">١٢+</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orbit: bottom-end — contact (soft sage) --}}
+                    <div class="absolute bottom-8 end-0 z-20 scale-70 origin-bottom-end sm:scale-100 transition-transform">
+                        <div
+                            class="rounded-2xl bg-emerald-50/95 backdrop-blur-xl border border-emerald-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(16,185,129,0.2)] animate-[home-float_5.2s_ease-in-out_infinite]"
+                            style="animation-delay: -1.8s;"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                    <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-emerald-950/80">تواصل مباشر</p>
+                                    <p class="text-[11px] text-emerald-700/50 mt-0.5">واتساب · رد فوري</p>
+                                </div>
                             </div>
                         </div>
                     </div>
