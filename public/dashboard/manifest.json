@@ -1,0 +1,13 @@
+{
+  "dashboard/app.css": {
+    "file": "assets/app-Dx4iYEOM.css",
+    "src": "dashboard/app.css",
+    "isEntry": true
+  },
+  "dashboard/main.js": {
+    "file": "assets/main-BoOBOiKu.js",
+    "name": "main",
+    "src": "dashboard/main.js",
+    "isEntry": true
+  }
+}
