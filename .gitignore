@@ -17,7 +17,7 @@
 # /public/build
 /public/fonts-manifest.dev.json
 /public/hot
-/public/build-dashboard
+# /public/build-dashboard
 /public/dashboard.hot
 /public/storage
 /storage/*.key
