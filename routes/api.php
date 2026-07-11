@@ -13,6 +13,22 @@ use App\API\Dashboard\GetDashboardStats;
 use App\API\Dashboard\GetWelcomeWidget;
 use App\API\Dashboard\UpdateWelcomeBasicInfo;
 use App\API\Dashboard\UpdateWelcomeContact;
+use App\API\DigitalServices\CreateDigitalService;
+use App\API\DigitalServices\CreateDigitalServiceCategory;
+use App\API\DigitalServices\DeleteDigitalServiceCategory;
+use App\API\DigitalServices\DeleteDigitalServiceImage;
+use App\API\DigitalServices\DeleteDigitalServices;
+use App\API\DigitalServices\GetDigitalServiceSettings;
+use App\API\DigitalServices\ListDigitalServiceCategories;
+use App\API\DigitalServices\ListDigitalServices;
+use App\API\DigitalServices\ReorderDigitalServiceCategories;
+use App\API\DigitalServices\ReorderDigitalServiceImages;
+use App\API\DigitalServices\ShowDigitalService;
+use App\API\DigitalServices\UpdateDigitalService;
+use App\API\DigitalServices\UpdateDigitalServiceCategory;
+use App\API\DigitalServices\UpdateDigitalServiceSettings;
+use App\API\DigitalServices\UploadDigitalServiceEditorImage;
+use App\API\DigitalServices\UploadDigitalServiceImage;
 use App\API\FormSubmissions\ListFormSubmissions;
 use App\API\FormSubmissions\ShowFormSubmission;
 use App\API\Invoices\ListInvoices;
@@ -58,6 +74,27 @@ use App\API\Portfolio\UpdatePortfolioProject;
 use App\API\Portfolio\UpdatePortfolioSettings;
 use App\API\Portfolio\UploadPortfolioEditorImage;
 use App\API\Portfolio\UploadPortfolioImage;
+use App\API\Services\CreateService;
+use App\API\Services\CreateServiceCalendar;
+use App\API\Services\CreateServiceCategory;
+use App\API\Services\DeleteServiceCalendar;
+use App\API\Services\DeleteServiceCategory;
+use App\API\Services\DeleteServiceImage;
+use App\API\Services\DeleteServices;
+use App\API\Services\GetServiceSettings;
+use App\API\Services\ListServiceCalendars;
+use App\API\Services\ListServiceCategories;
+use App\API\Services\ListServices;
+use App\API\Services\ReorderServiceCategories;
+use App\API\Services\ReorderServiceImages;
+use App\API\Services\ShowService;
+use App\API\Services\ShowServiceCalendar;
+use App\API\Services\UpdateService;
+use App\API\Services\UpdateServiceCalendar;
+use App\API\Services\UpdateServiceCategory;
+use App\API\Services\UpdateServiceSettings;
+use App\API\Services\UploadServiceEditorImage;
+use App\API\Services\UploadServiceImage;
 use App\API\Settings\AddGeneralInfoSocialLink;
 use App\API\Settings\CreateBranch;
 use App\API\Settings\CreateCustomShippingOption;
@@ -451,4 +488,136 @@ Route::delete('/store/{uuid}/images/{mediaId}', DeleteStoreImage::class)
 
 Route::post('/store/{uuid}/editor-images', UploadStoreEditorImage::class)
     ->name('api.store.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/services', ListServices::class)
+    ->name('api.services.index');
+
+Route::post('/services', CreateService::class)
+    ->name('api.services.store');
+
+Route::delete('/services', DeleteServices::class)
+    ->name('api.services.destroy');
+
+Route::get('/services/settings', GetServiceSettings::class)
+    ->name('api.services.settings.show');
+
+Route::put('/services/settings', UpdateServiceSettings::class)
+    ->name('api.services.settings.update');
+
+Route::get('/services/categories', ListServiceCategories::class)
+    ->name('api.services.categories.index');
+
+Route::post('/services/categories', CreateServiceCategory::class)
+    ->name('api.services.categories.store');
+
+Route::put('/services/categories/reorder', ReorderServiceCategories::class)
+    ->name('api.services.categories.reorder');
+
+Route::put('/services/categories/{id}', UpdateServiceCategory::class)
+    ->name('api.services.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/services/categories/{id}', DeleteServiceCategory::class)
+    ->name('api.services.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/services/calendars', ListServiceCalendars::class)
+    ->name('api.services.calendars.index');
+
+Route::post('/services/calendars', CreateServiceCalendar::class)
+    ->name('api.services.calendars.store');
+
+Route::get('/services/calendars/{id}', ShowServiceCalendar::class)
+    ->name('api.services.calendars.show')
+    ->whereNumber('id');
+
+Route::put('/services/calendars/{id}', UpdateServiceCalendar::class)
+    ->name('api.services.calendars.update')
+    ->whereNumber('id');
+
+Route::delete('/services/calendars/{id}', DeleteServiceCalendar::class)
+    ->name('api.services.calendars.destroy')
+    ->whereNumber('id');
+
+Route::get('/services/{uuid}', ShowService::class)
+    ->name('api.services.show')
+    ->whereUuid('uuid');
+
+Route::put('/services/{uuid}', UpdateService::class)
+    ->name('api.services.update')
+    ->whereUuid('uuid');
+
+Route::post('/services/{uuid}/images', UploadServiceImage::class)
+    ->name('api.services.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/services/{uuid}/images/reorder', ReorderServiceImages::class)
+    ->name('api.services.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/services/{uuid}/images/{mediaId}', DeleteServiceImage::class)
+    ->name('api.services.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/services/{uuid}/editor-images', UploadServiceEditorImage::class)
+    ->name('api.services.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/digital-services', ListDigitalServices::class)
+    ->name('api.digital-services.index');
+
+Route::post('/digital-services', CreateDigitalService::class)
+    ->name('api.digital-services.store');
+
+Route::delete('/digital-services', DeleteDigitalServices::class)
+    ->name('api.digital-services.destroy');
+
+Route::get('/digital-services/settings', GetDigitalServiceSettings::class)
+    ->name('api.digital-services.settings.show');
+
+Route::put('/digital-services/settings', UpdateDigitalServiceSettings::class)
+    ->name('api.digital-services.settings.update');
+
+Route::get('/digital-services/categories', ListDigitalServiceCategories::class)
+    ->name('api.digital-services.categories.index');
+
+Route::post('/digital-services/categories', CreateDigitalServiceCategory::class)
+    ->name('api.digital-services.categories.store');
+
+Route::put('/digital-services/categories/reorder', ReorderDigitalServiceCategories::class)
+    ->name('api.digital-services.categories.reorder');
+
+Route::put('/digital-services/categories/{id}', UpdateDigitalServiceCategory::class)
+    ->name('api.digital-services.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/digital-services/categories/{id}', DeleteDigitalServiceCategory::class)
+    ->name('api.digital-services.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/digital-services/{uuid}', ShowDigitalService::class)
+    ->name('api.digital-services.show')
+    ->whereUuid('uuid');
+
+Route::put('/digital-services/{uuid}', UpdateDigitalService::class)
+    ->name('api.digital-services.update')
+    ->whereUuid('uuid');
+
+Route::post('/digital-services/{uuid}/images', UploadDigitalServiceImage::class)
+    ->name('api.digital-services.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/digital-services/{uuid}/images/reorder', ReorderDigitalServiceImages::class)
+    ->name('api.digital-services.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/digital-services/{uuid}/images/{mediaId}', DeleteDigitalServiceImage::class)
+    ->name('api.digital-services.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/digital-services/{uuid}/editor-images', UploadDigitalServiceEditorImage::class)
+    ->name('api.digital-services.editor-images.store')
     ->whereUuid('uuid');

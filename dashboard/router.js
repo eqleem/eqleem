@@ -18,6 +18,15 @@ import StoreSettings from './pages/page/store/Settings.vue';
 import StoreDetail from './pages/page/store/Detail.vue';
 import StorePaymentOptions from './pages/page/store/PaymentOptions.vue';
 import StoreShippingOptions from './pages/page/store/ShippingOptions.vue';
+import ServicesHome from './pages/page/services/Home.vue';
+import ServicesCategories from './pages/page/services/Categories.vue';
+import ServicesCalendars from './pages/page/services/Calendars.vue';
+import ServicesSettings from './pages/page/services/Settings.vue';
+import ServicesDetail from './pages/page/services/Detail.vue';
+import DigitalServicesHome from './pages/page/digital-services/Home.vue';
+import DigitalServicesCategories from './pages/page/digital-services/Categories.vue';
+import DigitalServicesSettings from './pages/page/digital-services/Settings.vue';
+import DigitalServicesDetail from './pages/page/digital-services/Detail.vue';
 import ContentIndex from './pages/page/ContentIndex.vue';
 import ContentDetail from './pages/page/ContentDetail.vue';
 import ContentCategories from './pages/page/ContentCategories.vue';
@@ -59,6 +68,19 @@ const routes = [
     { path: '/manage/store/payment-options', name: 'store-payment-options', component: StorePaymentOptions },
     { path: '/manage/store/shipping-options', name: 'store-shipping-options', component: StoreShippingOptions },
     { path: '/manage/store/detail/:id', name: 'store-detail', component: StoreDetail },
+
+    // Services — dedicated pages (before generic /manage/:type catch-alls).
+    { path: '/manage/services', name: 'services-home', component: ServicesHome },
+    { path: '/manage/services/categories', name: 'services-categories', component: ServicesCategories },
+    { path: '/manage/services/calendars', name: 'services-calendars', component: ServicesCalendars },
+    { path: '/manage/services/settings', name: 'services-settings', component: ServicesSettings },
+    { path: '/manage/services/detail/:id', name: 'services-detail', component: ServicesDetail },
+
+    // Digital services — dedicated pages (before generic /manage/:type catch-alls).
+    { path: '/manage/digital-services', name: 'digital-services-home', component: DigitalServicesHome },
+    { path: '/manage/digital-services/categories', name: 'digital-services-categories', component: DigitalServicesCategories },
+    { path: '/manage/digital-services/settings', name: 'digital-services-settings', component: DigitalServicesSettings },
+    { path: '/manage/digital-services/detail/:id', name: 'digital-services-detail', component: DigitalServicesDetail },
 
     // Generic content-type stubs (other types until they get dedicated pages).
     { path: '/manage/:type', name: 'manage-index', component: ContentIndex },
