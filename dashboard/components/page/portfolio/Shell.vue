@@ -2,10 +2,12 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import MainBox from '../../ui/MainBox.vue';
-import { portfolioType } from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
 
 // Portfolio-specific shell — labels match Livewire portfolio/index.blade.php tabs.
 const route = useRoute();
+const store = usePortfolioStore();
+const portfolioType = computed(() => store.type);
 
 const section = computed(() => {
     if (route.name === 'portfolio-categories') {

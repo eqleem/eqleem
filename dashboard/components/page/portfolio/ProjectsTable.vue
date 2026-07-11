@@ -1,30 +1,34 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Button from '../../ui/Button.vue';
 import Badge from '../../ui/Badge.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddProject from './AddProject.vue';
-import { projects, deleteProjects, portfolioType } from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
 import { openModal } from '../../../lib/modal.js';
 
+const store = usePortfolioStore();
 const search = ref('');
 const selectedIds = ref([]);
+let searchTimer = null;
 
-const results = computed(() => {
-    const query = search.value.trim().toLowerCase();
+onMounted(() => {
+    store.fetchProjects({ page: 1 });
+});
 
-    if (!query) {
-        return projects;
-    }
-
-    return projects.filter((item) => item.title.toLowerCase().includes(query));
+watch(search, (value) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        store.setSearch(value);
+        selectedIds.value = [];
+    }, 300);
 });
 
 const allSelected = computed({
-    get: () => results.value.length > 0 && results.value.every((item) => selectedIds.value.includes(String(item.id))),
+    get: () => store.items.length > 0 && store.items.every((item) => selectedIds.value.includes(String(item.id))),
     set: (value) => {
-        selectedIds.value = value ? results.value.map((item) => String(item.id)) : [];
+        selectedIds.value = value ? store.items.map((item) => String(item.id)) : [];
     },
 });
 
@@ -41,7 +45,7 @@ function toggleOne(id, checked) {
     selectedIds.value = selectedIds.value.filter((item) => item !== key);
 }
 
-function removeSelected() {
+async function removeSelected() {
     if (selectedIds.value.length === 0) {
         return;
     }
@@ -50,7 +54,7 @@ function removeSelected() {
         return;
     }
 
-    deleteProjects(selectedIds.value);
+    await store.deleteProjects(selectedIds.value);
     selectedIds.value = [];
 }
 </script>
@@ -84,6 +88,7 @@ function removeSelected() {
                 <button
                     type="button"
                     class="flex items-center gap-2 rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200"
+                    :disabled="store.saving"
                     @click="removeSelected"
                 >
                     حذف المحددة ({{ selectedIds.length }})
@@ -102,15 +107,23 @@ function removeSelected() {
         </div>
 
         <div class="relative p-1">
-            <div v-if="results.length === 0" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
-                <img :src="`/${portfolioType.icon}`" class="h-12 w-12 opacity-50" alt="">
+            <div v-if="store.loading && !store.loaded" class="flex items-center justify-center p-10 text-sm text-gray-500">
+                جاري التحميل…
+            </div>
+
+            <div v-else-if="store.error" class="p-6 text-center text-sm text-red-600">
+                {{ store.error }}
+            </div>
+
+            <div v-else-if="store.isEmpty" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
+                <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-12 w-12 opacity-50" alt="">
                 <p class="text-gray-700">لا توجد مشاريع.</p>
                 <small class="text-gray-500">سيتم عرض المشاريع هنا بعد إضافتها.</small>
             </div>
 
             <div v-else>
                 <div
-                    v-for="item in results"
+                    v-for="item in store.items"
                     :key="item.uuid"
                     class="flex w-full items-center justify-between gap-x-7 hover:bg-gray-50 last:rounded-b-2xl"
                 >
@@ -132,7 +145,7 @@ function removeSelected() {
                                     :alt="item.title"
                                     class="h-full w-full object-cover"
                                 >
-                                <img v-else :src="`/${portfolioType.icon}`" class="h-7 w-7 opacity-60" alt="">
+                                <img v-else-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-7 w-7 opacity-60" alt="">
                             </div>
                             <div class="min-w-0">
                                 <h2 class="truncate text-sm font-semibold text-gray-700">{{ item.title }}</h2>
@@ -145,7 +158,7 @@ function removeSelected() {
                                     <Badge :color="item.status === 'published' ? 'green' : 'gray'">
                                         {{ item.status === 'published' ? 'منشور' : 'مسودة' }}
                                     </Badge>
-                                    <span v-if="item.published_at" class="text-xs text-gray-500" dir="ltr">{{ item.published_at }}</span>
+                                    <span v-if="item.published_at_label" class="text-xs text-gray-500" dir="ltr">{{ item.published_at_label }}</span>
                                 </div>
                             </div>
                         </RouterLink>
@@ -166,6 +179,26 @@ function removeSelected() {
                             </RouterLink>
                         </Dropdown>
                     </div>
+                </div>
+
+                <div v-if="store.hasPages" class="flex items-center justify-center gap-2 border-t border-dotted border-gray-200 p-3">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        label="السابق"
+                        :disabled="store.meta.current_page <= 1 || store.loading"
+                        @click="store.goToPage(store.meta.current_page - 1)"
+                    />
+                    <span class="text-sm text-gray-500">
+                        {{ store.meta.current_page }} / {{ store.meta.last_page }}
+                    </span>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        label="التالي"
+                        :disabled="store.meta.current_page >= store.meta.last_page || store.loading"
+                        @click="store.goToPage(store.meta.current_page + 1)"
+                    />
                 </div>
             </div>
         </div>

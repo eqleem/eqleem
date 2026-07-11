@@ -42,6 +42,22 @@ use App\API\Page\UpdatePageBlock;
 use App\API\Page\UpsertPageBlockLink;
 use App\API\Payments\ListPayments;
 use App\API\Payments\ShowPayment;
+use App\API\Portfolio\CreatePortfolioCategory;
+use App\API\Portfolio\CreatePortfolioProject;
+use App\API\Portfolio\DeletePortfolioCategory;
+use App\API\Portfolio\DeletePortfolioImage;
+use App\API\Portfolio\DeletePortfolioProjects;
+use App\API\Portfolio\GetPortfolioSettings;
+use App\API\Portfolio\ListPortfolioCategories;
+use App\API\Portfolio\ListPortfolioProjects;
+use App\API\Portfolio\ReorderPortfolioCategories;
+use App\API\Portfolio\ReorderPortfolioImages;
+use App\API\Portfolio\ShowPortfolioProject;
+use App\API\Portfolio\UpdatePortfolioCategory;
+use App\API\Portfolio\UpdatePortfolioProject;
+use App\API\Portfolio\UpdatePortfolioSettings;
+use App\API\Portfolio\UploadPortfolioEditorImage;
+use App\API\Portfolio\UploadPortfolioImage;
 use App\API\Settings\AddGeneralInfoSocialLink;
 use App\API\Settings\CreateBranch;
 use App\API\Settings\CreateCustomShippingOption;
@@ -306,3 +322,60 @@ Route::put('/page/header/social/reorder', ReorderPageHeaderSocialLinks::class)
 
 Route::delete('/page/header/social/{id}', DeletePageHeaderSocialLink::class)
     ->name('api.page.header.social.destroy');
+
+Route::get('/portfolio', ListPortfolioProjects::class)
+    ->name('api.portfolio.index');
+
+Route::post('/portfolio', CreatePortfolioProject::class)
+    ->name('api.portfolio.store');
+
+Route::delete('/portfolio', DeletePortfolioProjects::class)
+    ->name('api.portfolio.destroy');
+
+Route::get('/portfolio/settings', GetPortfolioSettings::class)
+    ->name('api.portfolio.settings.show');
+
+Route::put('/portfolio/settings', UpdatePortfolioSettings::class)
+    ->name('api.portfolio.settings.update');
+
+Route::get('/portfolio/categories', ListPortfolioCategories::class)
+    ->name('api.portfolio.categories.index');
+
+Route::post('/portfolio/categories', CreatePortfolioCategory::class)
+    ->name('api.portfolio.categories.store');
+
+Route::put('/portfolio/categories/reorder', ReorderPortfolioCategories::class)
+    ->name('api.portfolio.categories.reorder');
+
+Route::put('/portfolio/categories/{id}', UpdatePortfolioCategory::class)
+    ->name('api.portfolio.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/portfolio/categories/{id}', DeletePortfolioCategory::class)
+    ->name('api.portfolio.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/portfolio/{uuid}', ShowPortfolioProject::class)
+    ->name('api.portfolio.show')
+    ->whereUuid('uuid');
+
+Route::put('/portfolio/{uuid}', UpdatePortfolioProject::class)
+    ->name('api.portfolio.update')
+    ->whereUuid('uuid');
+
+Route::post('/portfolio/{uuid}/images', UploadPortfolioImage::class)
+    ->name('api.portfolio.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/portfolio/{uuid}/images/reorder', ReorderPortfolioImages::class)
+    ->name('api.portfolio.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/portfolio/{uuid}/images/{mediaId}', DeletePortfolioImage::class)
+    ->name('api.portfolio.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/portfolio/{uuid}/editor-images', UploadPortfolioEditorImage::class)
+    ->name('api.portfolio.editor-images.store')
+    ->whereUuid('uuid');

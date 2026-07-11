@@ -1,28 +1,31 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Button from '../../ui/Button.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import CategoryForm from './CategoryForm.vue';
-import { categories, deleteCategory } from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
 import { openModal } from '../../../lib/modal.js';
 
+const store = usePortfolioStore();
 const search = ref('');
 const editingCategoryId = ref(null);
 const addingParentId = ref(null);
+const dragId = ref(null);
+let searchTimer = null;
 
-const results = computed(() => {
-    const query = search.value.trim().toLowerCase();
-
-    if (!query) {
-        return categories;
-    }
-
-    return categories.filter((item) => {
-        return item.name.toLowerCase().includes(query)
-            || String(item.description ?? '').toLowerCase().includes(query);
-    });
+onMounted(() => {
+    store.fetchCategories();
 });
+
+watch(search, (value) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        store.fetchCategories({ search: value });
+    }, 300);
+});
+
+const canReorder = computed(() => search.value.trim() === '');
 
 function openAdd(parentId = null) {
     addingParentId.value = parentId;
@@ -34,12 +37,52 @@ function openEdit(categoryId) {
     openModal('edit-portfolio-category');
 }
 
-function remove(categoryId) {
+async function remove(categoryId) {
     if (!confirm('هل أنت متأكد من حذف هذا التصنيف؟')) {
         return;
     }
 
-    deleteCategory(categoryId);
+    await store.deleteCategory(categoryId);
+}
+
+function onDragStart(event, id) {
+    if (!canReorder.value) {
+        return;
+    }
+
+    dragId.value = id;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(id));
+}
+
+async function onDrop(targetId) {
+    if (!canReorder.value) {
+        return;
+    }
+
+    const sourceId = dragId.value;
+    dragId.value = null;
+
+    if (sourceId == null || sourceId === targetId) {
+        return;
+    }
+
+    const order = store.categories.map((item) => item.id);
+    const from = order.indexOf(sourceId);
+    const to = order.indexOf(targetId);
+
+    if (from < 0 || to < 0) {
+        return;
+    }
+
+    order.splice(from, 1);
+    order.splice(to, 0, sourceId);
+
+    // Optimistic local reorder for siblings visual feedback
+    const byId = Object.fromEntries(store.categories.map((item) => [item.id, item]));
+    store.categories = order.map((id) => byId[id]).filter(Boolean);
+
+    await store.reorderCategories(order);
 }
 </script>
 
@@ -80,7 +123,15 @@ function remove(categoryId) {
         </div>
 
         <div class="relative p-1">
-            <div v-if="results.length === 0" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
+            <div v-if="store.categoriesLoading && !store.categoriesLoaded" class="flex items-center justify-center p-10 text-sm text-gray-500">
+                جاري التحميل…
+            </div>
+
+            <div v-else-if="store.categoriesError" class="p-6 text-center text-sm text-red-600">
+                {{ store.categoriesError }}
+            </div>
+
+            <div v-else-if="store.categoriesEmpty" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
                 <svg class="h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h10" /></svg>
                 <p class="text-gray-700">لا توجد تصنيفات.</p>
                 <small class="text-gray-500">سيتم عرض تصنيفات الأعمال هنا بعد إضافتها.</small>
@@ -88,9 +139,13 @@ function remove(categoryId) {
 
             <ul v-else class="pb-4">
                 <li
-                    v-for="category in results"
+                    v-for="category in store.categories"
                     :key="category.id"
                     class="group flex w-full items-center justify-between gap-x-4 hover:bg-gray-50 last:rounded-b-2xl"
+                    :draggable="canReorder"
+                    @dragstart="onDragStart($event, category.id)"
+                    @dragover.prevent
+                    @drop.prevent="onDrop(category.id)"
                 >
                     <div
                         class="min-w-0 w-full py-3"

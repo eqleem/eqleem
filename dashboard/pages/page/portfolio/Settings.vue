@@ -1,17 +1,19 @@
 <script setup>
-import { reactive } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Shell from '../../../components/page/portfolio/Shell.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import { settings } from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
+import { ApiError } from '../../../lib/api.js';
 
-// Port of resources/views/admin/page/content/portfolio/customize.blade.php
+const store = usePortfolioStore();
+
 const form = reactive({
-    sectionTitle: settings.sectionTitle,
-    sectionDescription: settings.sectionDescription,
+    sectionTitle: '',
+    sectionDescription: '',
 });
 const errors = reactive({
     sectionTitle: null,
@@ -19,7 +21,16 @@ const errors = reactive({
 });
 const saved = reactive({ show: false });
 
-function submit() {
+onMounted(() => {
+    store.fetchSettings();
+});
+
+watch(() => store.settings, (settings) => {
+    form.sectionTitle = settings.section_title ?? '';
+    form.sectionDescription = settings.section_description ?? '';
+}, { immediate: true, deep: true });
+
+async function submit() {
     const title = form.sectionTitle.trim();
     const description = form.sectionDescription.trim();
 
@@ -30,12 +41,22 @@ function submit() {
         return;
     }
 
-    settings.sectionTitle = title;
-    settings.sectionDescription = description;
-    saved.show = true;
-    setTimeout(() => {
-        saved.show = false;
-    }, 2000);
+    try {
+        await store.updateSettings({
+            section_title: title,
+            section_description: description,
+        });
+
+        saved.show = true;
+        setTimeout(() => {
+            saved.show = false;
+        }, 2000);
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.sectionTitle = error.errors?.section_title?.[0] ?? null;
+            errors.sectionDescription = error.errors?.section_description?.[0] ?? null;
+        }
+    }
 }
 </script>
 
@@ -43,7 +64,11 @@ function submit() {
     <ManageLayout>
         <Shell>
             <div class="p-4">
-                <Form class="!p-0" @submit="submit">
+                <div v-if="store.settingsLoading && !store.settingsLoaded" class="py-8 text-center text-sm text-gray-500">
+                    جاري التحميل…
+                </div>
+
+                <Form v-else class="!p-0" @submit="submit">
                     <div class="space-y-2">
                         <Input
                             v-model="form.sectionTitle"
@@ -66,7 +91,7 @@ function submit() {
                     <template #footer>
                         <div class="flex items-center gap-3">
                             <span v-if="saved.show" class="text-sm text-emerald-600">تم حفظ الإعدادات.</span>
-                            <Button type="submit" label="حفظ" />
+                            <Button type="submit" label="حفظ" :disabled="store.saving" />
                         </div>
                     </template>
                 </Form>

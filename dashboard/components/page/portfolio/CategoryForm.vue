@@ -1,15 +1,10 @@
 <script setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import Form from '../../ui/Form.vue';
 import Input from '../../ui/Input.vue';
 import Button from '../../ui/Button.vue';
-import {
-    addCategory,
-    updateCategory,
-    findCategory,
-    parentCategoryOptions,
-    descendantIds,
-} from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
+import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
 
 const props = defineProps({
@@ -18,19 +13,21 @@ const props = defineProps({
     modalName: { type: String, required: true },
 });
 
+const store = usePortfolioStore();
 const form = reactive({
     name: '',
     slug: '',
     parentId: '',
 });
 const errors = reactive({ name: null, slug: null });
+const submitting = ref(false);
 
 const isEdit = computed(() => props.categoryId != null);
 
 const parentOptions = computed(() => {
-    const excluded = isEdit.value ? descendantIds(props.categoryId) : [];
+    const excluded = isEdit.value ? store.descendantIds(props.categoryId) : [];
 
-    return parentCategoryOptions(excluded);
+    return store.parentOptionsFor(excluded);
 });
 
 function load() {
@@ -38,7 +35,7 @@ function load() {
     errors.slug = null;
 
     if (isEdit.value) {
-        const category = findCategory(props.categoryId);
+        const category = store.categories.find((item) => Number(item.id) === Number(props.categoryId));
 
         if (!category) {
             return;
@@ -55,9 +52,9 @@ function load() {
     form.parentId = props.defaultParentId != null ? String(props.defaultParentId) : '';
 }
 
-watch(() => [props.categoryId, props.defaultParentId], load, { immediate: true });
+watch(() => [props.categoryId, props.defaultParentId, store.categories], load, { immediate: true });
 
-function submit() {
+async function submit() {
     const name = form.name.trim();
 
     if (!name) {
@@ -66,29 +63,46 @@ function submit() {
     }
 
     errors.name = null;
+    submitting.value = true;
 
-    if (isEdit.value) {
-        const slug = form.slug.trim();
+    try {
+        if (isEdit.value) {
+            const slug = form.slug.trim();
 
-        if (!slug) {
-            errors.slug = 'نص الرابط مطلوب.';
-            return;
+            if (!slug) {
+                errors.slug = 'نص الرابط مطلوب.';
+                submitting.value = false;
+                return;
+            }
+
+            errors.slug = null;
+            await store.updateCategory(props.categoryId, {
+                name,
+                slug,
+                parent_id: form.parentId ? Number(form.parentId) : null,
+            });
+        } else {
+            await store.createCategory({
+                name,
+                parent_id: form.parentId ? Number(form.parentId) : null,
+            });
         }
 
-        errors.slug = null;
-        updateCategory(props.categoryId, {
-            name,
-            slug,
-            parent_id: form.parentId ? Number(form.parentId) : null,
-        });
-    } else {
-        addCategory({
-            name,
-            parent_id: form.parentId ? Number(form.parentId) : null,
-        });
-    }
+        closeModal(props.modalName);
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.name = error.errors?.name?.[0] ?? null;
+            errors.slug = error.errors?.slug?.[0] ?? null;
 
-    closeModal(props.modalName);
+            if (!errors.name && !errors.slug) {
+                errors.name = error.message;
+            }
+        } else {
+            errors.name = 'تعذر حفظ التصنيف.';
+        }
+    } finally {
+        submitting.value = false;
+    }
 }
 </script>
 
@@ -131,7 +145,7 @@ function submit() {
         </div>
 
         <template #footer>
-            <Button type="submit" label="حفظ" />
+            <Button type="submit" label="حفظ" :disabled="submitting || store.saving" />
         </template>
     </Form>
 </template>

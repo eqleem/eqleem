@@ -1,60 +1,101 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
+import Toggle from '../../../components/ui/Toggle.vue';
+import CkEditor from '../../../components/ui/CkEditor.vue';
+import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import NotFound from '../../NotFound.vue';
-import {
-    findProject,
-    updateProject,
-    categoryOptions,
-    portfolioType,
-} from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
+import { ApiError } from '../../../lib/api.js';
 
-// Port of resources/views/admin/page/content/portfolio/detail.blade.php (dummy data).
-const route = useRoute();
+const route = useRoute(); 
 const router = useRouter();
+const store = usePortfolioStore();
 const formTab = ref('edit');
 const saved = ref(false);
-
-const project = computed(() => findProject(route.params.id));
+const uploading = ref(false);
+const notFound = ref(false);
+const bodyEditor = ref(null);
+/** Body HTML loaded from the server — pushed into the editor only on load/save refresh. */
+const bodySeed = ref('');
 
 const form = reactive({
     title: '',
     subtitle: '',
-    body: '',
     slug: '',
     categoryIds: [],
     published: false,
+    images: [],
 });
 
 const errors = reactive({
     title: null,
     slug: null,
+    form: null,
 });
 
-const categories = computed(() => categoryOptions());
+const uuid = computed(() => String(route.params.id));
+const editorUploadUrl = computed(() => `/api/portfolio/${uuid.value}/editor-images`);
+const categories = computed(() => store.detail?.category_options ?? []);
+const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/portfolio/');
 
-function loadForm() {
-    if (!project.value) {
+function switchTab(tab) {
+    formTab.value = tab;
+}
+
+function loadForm(project, { syncEditor = true } = {}) {
+    if (!project) {
         return;
     }
 
-    form.title = project.value.title;
-    form.subtitle = project.value.subtitle ?? '';
-    form.body = project.value.body ?? '';
-    form.slug = project.value.slug;
-    form.categoryIds = [...(project.value.categoryIds ?? [])];
-    form.published = project.value.status === 'published';
+    form.title = project.title ?? '';
+    form.subtitle = project.subtitle ?? '';
+    form.slug = project.slug ?? '';
+    form.categoryIds = [...(project.category_ids ?? [])].map(String);
+    form.published = Boolean(project.published);
+    form.images = [...(project.images ?? [])];
     errors.title = null;
     errors.slug = null;
+    errors.form = null;
     saved.value = false;
+
+    if (syncEditor) {
+        bodySeed.value = project.body ?? '';
+        nextTick(() => {
+            bodyEditor.value?.setData?.(bodySeed.value);
+        });
+    }
 }
 
-watch(project, loadForm, { immediate: true });
+onMounted(async () => {
+    try {
+        const project = await store.fetchProject(uuid.value);
+        loadForm(project);
+    } catch (error) {
+        notFound.value = error instanceof ApiError && error.status === 404;
+    }
+});
+
+watch(() => route.params.id, async (id) => {
+    if (!id) {
+        return;
+    }
+
+    notFound.value = false;
+    formTab.value = 'edit';
+
+    try {
+        const project = await store.fetchProject(String(id));
+        loadForm(project);
+    } catch (error) {
+        notFound.value = error instanceof ApiError && error.status === 404;
+    }
+});
 
 function toggleCategory(id, checked) {
     const key = String(id);
@@ -69,42 +110,106 @@ function toggleCategory(id, checked) {
     form.categoryIds = form.categoryIds.filter((item) => item !== key);
 }
 
-function persist({ close = false } = {}) {
+async function uploadFiles(files) {
+    uploading.value = true;
+
+    try {
+        for (const file of files) {
+            form.images = await store.uploadImage(uuid.value, file);
+        }
+    } catch (error) {
+        errors.form = error instanceof ApiError ? error.message : 'تعذر رفع الصورة.';
+    } finally {
+        uploading.value = false;
+    }
+}
+
+async function reorderImages(order) {
+    try {
+        form.images = await store.reorderImages(uuid.value, order);
+    } catch (error) {
+        errors.form = error instanceof ApiError ? error.message : 'تعذر إعادة ترتيب الصور.';
+        form.images = [...(store.detail?.images ?? [])];
+    }
+}
+
+async function removeImage(mediaId) {
+    try {
+        form.images = await store.deleteImage(uuid.value, mediaId);
+    } catch (error) {
+        errors.form = error instanceof ApiError ? error.message : 'تعذر حذف الصورة.';
+    }
+}
+
+function readBody() {
+    try {
+        return bodyEditor.value?.getData?.() ?? bodySeed.value ?? '';
+    } catch {
+        return bodySeed.value ?? '';
+    }
+}
+
+async function persist({ close = false } = {}) {
+    // Capture editor HTML before any navigation/unmount can destroy CKEditor.
+    const body = readBody();
+    bodySeed.value = body;
+
     const title = form.title.trim();
     const slug = form.slug.trim();
 
     errors.title = title ? null : 'عنوان المشروع مطلوب.';
     errors.slug = slug ? null : 'نص الرابط مطلوب.';
+    errors.form = null;
 
     if (errors.title || errors.slug) {
-        formTab.value = errors.title ? 'edit' : 'advanced';
+        switchTab(errors.title ? 'edit' : 'advanced');
         return;
     }
 
-    const selectable = new Set(categories.value.filter((item) => item.selectable).map((item) => item.id));
-    const categoryIds = form.categoryIds.filter((id) => selectable.has(String(id)));
+    const selectable = new Set(categories.value.filter((item) => item.selectable).map((item) => String(item.id)));
+    const categoryIds = form.categoryIds
+        .filter((id) => selectable.has(String(id)))
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0);
 
-    updateProject(route.params.id, {
-        title,
-        subtitle: form.subtitle.trim(),
-        body: form.body,
-        slug,
-        categoryIds,
-        status: form.published ? 'published' : 'draft',
-        published_at: form.published
-            ? (project.value.published_at || new Date().toLocaleDateString('ar-SA', { day: 'numeric', month: 'long', year: 'numeric' }))
-            : null,
-    });
+    try {
+        const project = await store.updateProject(uuid.value, {
+            title,
+            subtitle: form.subtitle.trim(),
+            body,
+            slug,
+            category_ids: categoryIds,
+            published: Boolean(form.published),
+            editor_mode: 'html',
+        });
 
-    if (close) {
-        router.push('/manage/portfolio');
-        return;
+        if (close) {
+            router.push('/manage/portfolio');
+            return;
+        }
+
+        loadForm(project);
+        saved.value = true;
+        setTimeout(() => {
+            saved.value = false;
+        }, 2000);
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.title = error.errors?.title?.[0] ?? null;
+            errors.slug = error.errors?.slug?.[0] ?? null;
+            errors.form = (!errors.title && !errors.slug)
+                ? (error.message || 'تعذر حفظ المشروع.')
+                : null;
+
+            if (errors.title) {
+                switchTab('edit');
+            } else if (errors.slug) {
+                switchTab('advanced');
+            }
+        } else {
+            errors.form = 'تعذر حفظ المشروع.';
+        }
     }
-
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2000);
 }
 
 function save() {
@@ -117,9 +222,9 @@ function saveAndClose() {
 </script>
 
 <template>
-    <ManageLayout v-if="project">
+    <ManageLayout v-if="store.detail && !notFound">
         <div class="overflow-hidden rounded-2xl bg-white">
-            <div class="flex items-center justify-between gap-4 border-b border-stone-200 bg-stone-200/70 px-4 py-3">
+            <div class="relative z-20 flex items-center justify-between gap-4 border-b border-stone-200 bg-stone-200/70 px-4 py-3">
                 <div class="flex min-w-0 items-center gap-3">
                     <RouterLink
                         to="/manage/portfolio"
@@ -129,19 +234,19 @@ function saveAndClose() {
                         <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
                     <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
-                        <img :src="`/${portfolioType.icon}`" class="h-5 w-5 shrink-0" alt="">
-                        <span class="truncate font-semibold">{{ portfolioType.name }}</span>
+                        <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
+                        <span class="truncate font-semibold">{{ store.type?.name }}</span>
                         <span class="text-gray-400">/</span>
                         <span class="truncate text-gray-600">تحرير المشروع</span>
                     </div>
                 </div>
 
-                <nav class="flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
                         :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
-                        @click="formTab = 'edit'"
+                        @click.prevent.stop="switchTab('edit')"
                     >
                         تحرير
                     </button>
@@ -149,7 +254,7 @@ function saveAndClose() {
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
                         :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
-                        @click="formTab = 'advanced'"
+                        @click.prevent.stop="switchTab('advanced')"
                     >
                         متقدم
                     </button>
@@ -157,7 +262,12 @@ function saveAndClose() {
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
-                <div v-show="formTab === 'edit'" class="space-y-2">
+                <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
+
+                <div
+                    class="space-y-2"
+                    :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'"
+                >
                     <Input
                         v-model="form.title"
                         name="title"
@@ -165,33 +275,29 @@ function saveAndClose() {
                         :error="errors.title"
                     />
 
-                    <div class="rounded-md bg-gray-100/75 p-3">
-                        <p class="mb-2 text-sm font-semibold text-gray-500">صور المشروع</p>
-                        <div class="flex flex-wrap gap-2">
-                            <div
-                                v-if="project.image"
-                                class="h-20 w-20 overflow-hidden rounded-lg bg-gray-200"
-                            >
-                                <img :src="project.image" :alt="project.title" class="h-full w-full object-cover">
-                            </div>
-                            <div class="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400">
-                                رفع الصور<br>(قريباً)
-                            </div>
-                        </div>
-                    </div>
+                    <MediaGallery
+                        v-model="form.images"
+                        :uploading="uploading"
+                        :disabled="store.saving"
+                        @upload="uploadFiles"
+                        @remove="removeImage"
+                        @reorder="reorderImages"
+                    />
 
-                    <Textarea
-                        v-model="form.body"
+                    <CkEditor
+                        v-if="editorUploadUrl"
+                        ref="bodyEditor"
+                        :key="uuid"
+                        :model-value="bodySeed"
                         name="body"
-                        label="محتوى المشروع"
-                        placeholder="اكتب وصف المشروع…"
-                        :rows="8"
-                        block
+                        :upload-url="editorUploadUrl"
                     />
                 </div>
 
-                <div v-show="formTab === 'advanced'" class="space-y-2">
-                    <Textarea
+                <div
+                    class="space-y-2"
+                    :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
+                >                    <Textarea
                         v-model="form.subtitle"
                         name="subtitle"
                         placeholder="عنوان فرعي"
@@ -212,11 +318,12 @@ function saveAndClose() {
                                     type="checkbox"
                                     class="h-4 w-4 rounded border-gray-300"
                                     :disabled="!option.selectable"
-                                    :checked="form.categoryIds.includes(option.id)"
+                                    :checked="form.categoryIds.includes(String(option.id))"
                                     @change="toggleCategory(option.id, $event.target.checked)"
                                 >
                                 <span>{{ option.label }}</span>
                             </label>
+                            <p v-if="categories.length === 0" class="text-xs text-gray-400">لا توجد تصنيفات بعد.</p>
                         </div>
                     </div>
 
@@ -225,28 +332,25 @@ function saveAndClose() {
                         name="slug"
                         label="نص الرابط"
                         dir="ltr"
-                        prefix="/portfolio/"
+                        :prefix="slugPrefix"
                         :error="errors.slug"
                     />
 
-                    <div class="relative flex items-center gap-x-2 rounded-md bg-gray-100/75 p-1">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">حالة النشر</span>
-                        <label class="flex items-center gap-2 p-2 text-sm text-gray-700">
-                            <input v-model="form.published" type="checkbox" class="h-4 w-4 rounded border-gray-300">
-                            منشور
-                        </label>
-                    </div>
+                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
                 </div>
 
                 <template #footer>
                     <div class="flex items-center gap-2">
                         <span v-if="saved" class="me-auto text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="button" variant="secondary" label="حفظ وإغلاق" @click="saveAndClose" />
-                        <Button type="submit" label="حفظ" />
+                        <Button type="button" variant="secondary" label="حفظ وإغلاق" :disabled="store.saving" @click="saveAndClose" />
+                        <Button type="submit" label="حفظ" :disabled="store.saving" />
                     </div>
                 </template>
             </Form>
         </div>
     </ManageLayout>
-    <NotFound v-else />
+    <ManageLayout v-else-if="store.detailLoading">
+        <div class="rounded-2xl bg-white p-10 text-center text-sm text-gray-500">جاري التحميل…</div>
+    </ManageLayout>
+    <NotFound v-else-if="notFound" />
 </template>

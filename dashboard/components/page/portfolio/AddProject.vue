@@ -1,17 +1,20 @@
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Form from '../../ui/Form.vue';
 import Input from '../../ui/Input.vue';
 import Button from '../../ui/Button.vue';
-import { addProject } from '../../../data/portfolio.js';
+import { usePortfolioStore } from '../../../stores/portfolio.js';
+import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
 
+const store = usePortfolioStore();
 const router = useRouter();
 const form = reactive({ title: '' });
 const errors = reactive({ title: null });
+const submitting = ref(false);
 
-function submit() {
+async function submit() {
     const title = form.title.trim();
 
     if (!title) {
@@ -20,10 +23,20 @@ function submit() {
     }
 
     errors.title = null;
-    const project = addProject({ title });
-    form.title = '';
-    closeModal('add-portfolio-project');
-    router.push(`/manage/portfolio/detail/${project.uuid}`);
+    submitting.value = true;
+
+    try {
+        const project = await store.createProject(title);
+        form.title = '';
+        closeModal('add-portfolio-project');
+        router.push(`/manage/portfolio/detail/${project.uuid}`);
+    } catch (error) {
+        errors.title = error instanceof ApiError
+            ? (error.errors?.title?.[0] ?? error.message)
+            : 'تعذر إنشاء المشروع.';
+    } finally {
+        submitting.value = false;
+    }
 }
 </script>
 
@@ -38,7 +51,7 @@ function submit() {
         />
 
         <template #footer>
-            <Button type="submit" label="حفظ" />
+            <Button type="submit" label="حفظ" :disabled="submitting || store.saving" />
         </template>
     </Form>
 </template>

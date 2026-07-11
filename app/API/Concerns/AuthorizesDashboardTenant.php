@@ -29,7 +29,13 @@ trait AuthorizesDashboardTenant
 
         $tenant = $user->currentTenant;
 
-        return $tenant instanceof Tenant && $user->canAccessDashboard($tenant);
+        if (! $tenant instanceof Tenant || ! $user->canAccessDashboard($tenant)) {
+            return false;
+        }
+
+        setCurrentTenant($tenant);
+
+        return true;
     }
 
     protected function currentDashboardTenant(ActionRequest $request): Tenant
