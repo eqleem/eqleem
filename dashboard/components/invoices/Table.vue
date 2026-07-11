@@ -78,8 +78,8 @@ onMounted(() => {
 
                     <div class="hidden shrink-0 items-center gap-x-6 text-sm text-gray-600 sm:flex">
                         <div class="text-end">
-                            <div class="font-bold text-gray-800">{{ item.total_after_vat_formatted }}</div>
-                            <div class="mt-0.5 text-xs text-gray-400">مدفوع {{ item.amount_paid_formatted }}</div>
+                            <div class="font-bold text-gray-800"><Money :formatted="item.total_after_vat_formatted" /></div>
+                            <div class="mt-0.5 text-xs text-gray-400 inline-flex items-baseline gap-1">مدفوع <Money :formatted="item.amount_paid_formatted" class="inline-flex" /></div>
                         </div>
                         <div class="min-w-24 text-end">
                             <div>{{ item.date }}</div>

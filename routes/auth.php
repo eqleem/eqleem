@@ -51,5 +51,5 @@ Route::get('/auth/{social}/callback', function ($social) {
 
     auth()->login($user);
 
-    return redirect(route('admin.home'));
+    return redirect(route('dashboard'));
 });

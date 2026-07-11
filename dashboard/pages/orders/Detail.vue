@@ -55,30 +55,30 @@ onUnmounted(() => ordersStore.clearDetail());
                     <div class="space-y-3 p-5">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">المجموع الفرعي</span>
-                            <span class="font-medium text-gray-800">{{ order.subtotal_formatted }}</span>
+                            <span class="font-medium text-gray-800"><Money :formatted="order.subtotal_formatted" /></span>
                         </div>
                         <div v-if="order.discount_total > 0" class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">الخصومات</span>
-                            <span class="font-medium text-red-600">−{{ order.discount_total_formatted }}</span>
+                            <span class="font-medium text-red-600 inline-flex items-baseline">−<Money :formatted="order.discount_total_formatted" class="inline-flex" /></span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-500">الضريبة</span>
-                            <span class="font-medium text-gray-800">{{ order.tax_total_formatted }}</span>
+                            <span class="font-medium text-gray-800"><Money :formatted="order.tax_total_formatted" /></span>
                         </div>
                         <div class="border-t border-gray-100 pt-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-semibold text-gray-800">الإجمالي</span>
-                                <span class="text-xl font-bold text-primary-700">{{ order.grand_total_formatted }}</span>
+                                <span class="text-xl font-bold text-primary-700"><Money :formatted="order.grand_total_formatted" /></span>
                             </div>
                         </div>
                         <div class="space-y-2 border-t border-gray-100 pt-3">
                             <div class="flex items-center justify-between text-sm">
                                 <span class="text-gray-500">المدفوع</span>
-                                <span class="font-medium text-emerald-700">{{ order.paid_total_formatted }}</span>
+                                <span class="font-medium text-emerald-700"><Money :formatted="order.paid_total_formatted" /></span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
                                 <span class="text-gray-500">المتبقي</span>
-                                <span class="font-medium" :class="order.due_total > 0 ? 'text-amber-700' : 'text-gray-800'">{{ order.due_total_formatted }}</span>
+                                <span class="font-medium" :class="order.due_total > 0 ? 'text-amber-700' : 'text-gray-800'"><Money :formatted="order.due_total_formatted" /></span>
                             </div>
                         </div>
                     </div>
@@ -159,23 +159,23 @@ onUnmounted(() => ordersStore.clearDetail());
                                             <div class="min-w-0 space-y-1">
                                                 <p class="font-medium text-gray-900">{{ item.name }}</p>
                                                 <Badge :color="item.type_color">{{ item.type_label }}</Badge>
-                                                <p v-if="item.discount > 0" class="text-xs text-red-500">خصم {{ item.discount_formatted }}</p>
+                                                <p v-if="item.discount > 0" class="text-xs text-red-500 inline-flex items-baseline gap-1">خصم <Money :formatted="item.discount_formatted" class="inline-flex" /></p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-gray-600">{{ item.unit_price_formatted }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-gray-600"><Money :formatted="item.unit_price_formatted" /></td>
                                     <td class="px-3 py-4 text-center text-gray-800">{{ item.qty }}</td>
-                                    <td class="whitespace-nowrap px-5 py-4 text-end font-semibold text-gray-900">{{ item.line_total_formatted }}</td>
+                                    <td class="whitespace-nowrap px-5 py-4 text-end font-semibold text-gray-900"><Money :formatted="item.line_total_formatted" /></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="border-t border-gray-100 px-5 py-4">
                         <div class="ms-auto max-w-xs space-y-2">
-                            <div class="flex items-center justify-between text-sm"><span class="text-gray-500">المجموع الفرعي</span><span class="text-gray-800">{{ order.subtotal_formatted }}</span></div>
-                            <div v-if="order.discount_total > 0" class="flex items-center justify-between text-sm"><span class="text-gray-500">الخصومات</span><span class="text-red-600">−{{ order.discount_total_formatted }}</span></div>
-                            <div class="flex items-center justify-between text-sm"><span class="text-gray-500">الضريبة</span><span class="text-gray-800">{{ order.tax_total_formatted }}</span></div>
-                            <div class="flex items-center justify-between border-t border-gray-100 pt-2"><span class="font-semibold text-gray-800">الإجمالي</span><span class="text-lg font-bold text-primary-700">{{ order.grand_total_formatted }}</span></div>
+                            <div class="flex items-center justify-between text-sm"><span class="text-gray-500">المجموع الفرعي</span><span class="text-gray-800"><Money :formatted="order.subtotal_formatted" /></span></div>
+                            <div v-if="order.discount_total > 0" class="flex items-center justify-between text-sm"><span class="text-gray-500">الخصومات</span><span class="text-red-600 inline-flex items-baseline">−<Money :formatted="order.discount_total_formatted" class="inline-flex" /></span></div>
+                            <div class="flex items-center justify-between text-sm"><span class="text-gray-500">الضريبة</span><span class="text-gray-800"><Money :formatted="order.tax_total_formatted" /></span></div>
+                            <div class="flex items-center justify-between border-t border-gray-100 pt-2"><span class="font-semibold text-gray-800">الإجمالي</span><span class="text-lg font-bold text-primary-700"><Money :formatted="order.grand_total_formatted" /></span></div>
                         </div>
                     </div>
                 </Section>
@@ -212,7 +212,7 @@ onUnmounted(() => ordersStore.clearDetail());
                                     </div>
                                     <p class="mt-1 text-xs text-gray-400">{{ payment.created }}</p>
                                 </div>
-                                <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end">{{ payment.amount_formatted }}</p>
+                                <p class="shrink-0 text-base font-bold text-gray-900 sm:text-end"><Money :formatted="payment.amount_formatted" /></p>
                             </div>
                         </div>
                     </div>

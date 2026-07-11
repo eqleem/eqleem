@@ -47,10 +47,6 @@ function toggleOne(id, checked) {
     selectedIds.value = selectedIds.value.filter((item) => item !== key);
 }
 
-function itemImage(item) {
-    return item.image ?? item.avatar;
-}
-
 async function removeSelected() {
     if (selectedIds.value.length === 0) {
         return;
@@ -81,7 +77,7 @@ async function toggleActive(item) {
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
         <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
-            <div class="ps-3">
+            <div class="hidden ps-3 sm:block">
                 <input v-model="allSelected" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
             </div>
 
@@ -99,7 +95,7 @@ async function toggleActive(item) {
                 </div>
             </div>
 
-            <div v-if="selectedIds.length > 0" class="flex items-center gap-x-2">
+            <div v-if="selectedIds.length > 0" class="hidden items-center gap-x-2 sm:flex">
                 <div class="flex items-center gap-1 text-sm text-gray-600">
                     <span>{{ selectedIds.length }}</span>
                     <span>محددة</span>
@@ -144,9 +140,9 @@ async function toggleActive(item) {
                 <div
                     v-for="item in store.items"
                     :key="item.uuid"
-                    class="flex w-full items-center justify-between gap-x-7 hover:bg-gray-50 last:rounded-b-2xl"
+                    class="flex w-full items-center justify-between ps-3 sm:ps-0 gap-x-7 hover:bg-gray-50 last:rounded-b-2xl"
                 >
-                    <div class="ps-6">
+                    <div class="hidden ps-4 sm:block">
                         <div v-if="!item.is_system_page" class="flex items-center">
                             <input
                                 type="checkbox"
@@ -162,11 +158,14 @@ async function toggleActive(item) {
                             :to="`/manage/pages/detail/${item.uuid}`"
                             class="flex w-full items-center gap-x-3 text-start"
                         >
-                            <img
-                                class="h-12 w-12 flex-none rounded-xl bg-gray-100 object-cover"
-                                :src="itemImage(item)"
-                                :alt="item.title"
-                            >
+                            <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gray-100">
+                                <img
+                                    v-if="store.type?.icon"
+                                    :src="`/${store.type.icon}`"
+                                    class="h-6 w-6 opacity-60"
+                                    alt=""
+                                >
+                            </div>
                             <div class="min-w-0">
                                 <h2 class="truncate text-sm font-semibold text-gray-700">{{ item.title }}</h2>
                                 <div class="mt-1 flex items-center gap-x-2">
@@ -184,9 +183,6 @@ async function toggleActive(item) {
                                             class="inline-flex items-center gap-x-1 rounded-md bg-blue-50 p-1 px-2 text-xs text-blue-700"
                                         >
                                             {{ item.template_label }}
-                                        </span>
-                                        <span v-if="item.published_at_label" class="inline-block" dir="ltr">
-                                            {{ item.published_at_label }}
                                         </span>
                                     </p>
                                 </div>

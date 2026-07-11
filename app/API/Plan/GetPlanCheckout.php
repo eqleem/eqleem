@@ -29,7 +29,7 @@ class GetPlanCheckout
         return [
             'plan' => [
                 'id' => $plan->id,
-                'title' => $plan->label,
+                'title' => __((string) $plan->name),
                 'price' => $plan->price,
                 'price_formatted' => $plan->formattedPrice(),
                 'interval_label' => $plan->billingLabel(),

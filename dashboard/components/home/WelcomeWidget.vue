@@ -6,6 +6,7 @@ import CompletionBasicInfo from './CompletionBasicInfo.vue';
 import CompletionContact from './CompletionContact.vue';
 import CompletionSocial from './CompletionSocial.vue';
 import CompletionContent from './CompletionContent.vue';
+import CompletionContentAddModals from './CompletionContentAddModals.vue';
 import CompletionVerification from './CompletionVerification.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { openModal } from '../../lib/modal.js';
@@ -87,11 +88,17 @@ function openStep(modal) {
         class="mb-6 overflow-hidden rounded-2xl bg-primary-700 text-white"
         :class="{ 'animate-pulse opacity-80': loading && !loaded }"
     >
-        <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
-            <div class="p-5 sm:p-6">
+        <div
+            class="gap-0"
+            :class="percentage >= 100 ? 'flex flex-col' : 'grid lg:grid-cols-[1fr_auto]'"
+        >
+            <div
+                class="p-5 sm:p-6"
+                :class="percentage >= 100 ? 'border-b border-white/10 pb-4' : ''"
+            >
                 <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-medium text-primary-100">{{ greeting || '…' }}</p>
-                    <button
+                    <h2 class="text-xl font-bold  ">مرحباً، {{ userName || '…' }} 👋</h2>
+                    <button 
                         type="button"
                         class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
                         @click="openModal('home-step-content')"
@@ -100,7 +107,6 @@ function openStep(modal) {
                         إضافة محتوى
                     </button>
                 </div>
-                <h2 class="mt-1 text-xl font-bold sm:text-2xl">مرحباً، {{ userName || '…' }} 👋</h2>
 
                 <template v-if="percentage < 100">
                     <div class="mt-4">
@@ -129,7 +135,10 @@ function openStep(modal) {
                 <p v-else class="mt-2 text-sm text-primary-100/90">صفحتك جاهزة — شاركها مع عملائك.</p>
             </div>
 
-            <div class="border-t border-white/10 bg-black/10 p-5 sm:p-6 lg:w-96 lg:border-s lg:border-t-0">
+            <div
+                class="bg-black/10 p-5 sm:p-6"
+                :class="percentage >= 100 ? '' : 'border-t border-white/10 lg:w-96 lg:border-s lg:border-t-0'"
+            >
                 <p class="mb-2 text-xs font-medium text-primary-100">رابط صفحتك</p>
 
                 <div class="flex items-center gap-2 rounded-xl bg-white/10 p-2 ring-1 ring-white/10">
@@ -148,7 +157,7 @@ function openStep(modal) {
                         :href="pageUrl || '#'"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                        class="flex flex-col items-center justify-center gap-1 rounded-xl bg-green-500 p-2.5 text-center text-[11px] font-medium text-white transition hover:bg-green-600"
                         title="معاينة الصفحة"
                     >
                         <iconify-icon icon="solar:eye-bold" class="text-lg"></iconify-icon>
@@ -258,6 +267,8 @@ function openStep(modal) {
         <Modal title="إضافة محتوى" size="2xl" name="home-step-content">
             <CompletionContent />
         </Modal>
+
+        <CompletionContentAddModals />
 
         <Modal title="توثيق المتجر" size="lg" name="home-step-verification">
             <CompletionVerification />

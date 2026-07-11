@@ -129,7 +129,7 @@ async function saveOptions() {
                             <div class="rounded-b-lg bg-white px-2 py-1.5">
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="min-w-0 truncate text-[11px] font-medium text-stone-700">{{ theme.name }}</span>
-                                    <span class="shrink-0 text-[11px] font-semibold text-green-600">{{ theme.price_label }}</span>
+                                    <Money :formatted="theme.price_label" class="shrink-0 text-[11px] font-semibold text-green-600" />
                                 </div>
                             </div>
                         </button>
@@ -149,7 +149,7 @@ async function saveOptions() {
                                         <h3 class="truncate text-base font-semibold text-stone-900">{{ selectedTheme.name }}</h3>
                                         <Badge v-if="selectedTheme.is_active" color="green" size="sm">القالب النشط</Badge>
                                     </div>
-                                    <span class="shrink-0 text-sm font-semibold text-green-600">{{ selectedTheme.price_label }}</span>
+                                    <Money :formatted="selectedTheme.price_label" class="shrink-0 text-sm font-semibold text-green-600" />
                                 </div>
                             </div>
 
@@ -277,7 +277,7 @@ async function saveOptions() {
                                         </div>
                                         <div class="flex items-center justify-between gap-3 py-1.5">
                                             <dt class="text-xs text-stone-500">السعر</dt>
-                                            <dd class="text-xs font-semibold text-green-600">{{ selectedTheme.price_label }}</dd>
+                                            <dd class="text-xs font-semibold text-green-600"><Money :formatted="selectedTheme.price_label" /></dd>
                                         </div>
                                         <div class="flex items-center justify-between gap-3 py-1.5">
                                             <dt class="text-xs text-stone-500">الحالة</dt>

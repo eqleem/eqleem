@@ -34,7 +34,7 @@ new class extends \Livewire\Component {
                     session()->flash('success', 'تم تسجيل الدخول بنجاح! مرحباً بك مرة أخرى.');
                 }
                 
-                return redirect(route('admin.home') );
+                return redirect(route('dashboard'));
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             $message = collect($e->errors())->flatten()->first()

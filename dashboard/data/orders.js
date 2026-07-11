@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { formatMoneyAmount } from '../lib/money.js';
 
 // Shared dummy store — stands in for the Livewire Order model / events (updateOrderList).
 let nextId = 4;
@@ -74,7 +75,7 @@ export const paymentLabel = (status) => paymentMap[status]?.label ?? `حالة �
 export const paymentColor = (status) => paymentMap[status]?.color ?? 'gray';
 
 export function money(value) {
-    return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR', maximumFractionDigits: 0 }).format(value || 0);
+    return formatMoneyAmount(value || 0, { maximumFractionDigits: 0 });
 }
 
 export function addOrder(data) {

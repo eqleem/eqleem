@@ -117,7 +117,7 @@ onMounted(() => {
 
                     <div class="hidden shrink-0 items-center gap-x-6 text-sm text-gray-600 sm:flex">
                         <div class="text-end">
-                            <div class="font-bold text-gray-800">{{ item.grand_total_formatted }}</div>
+                            <div class="font-bold text-gray-800"><Money :formatted="item.grand_total_formatted" /></div>
                             <div class="mt-0.5 text-xs text-gray-400">{{ item.items_count }} منتج</div>
                         </div>
                         <div class="min-w-24 text-end">

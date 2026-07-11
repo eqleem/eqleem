@@ -172,7 +172,7 @@ onMounted(() => {
                                 <Badge color="gray">{{ item.created }}</Badge>
                                 <Badge :color="item.status_color">{{ item.status_label }}</Badge>
                                 <Badge :color="item.payment_status_color">{{ item.payment_status_label }}</Badge>
-                                <Badge color="gray">{{ item.grand_total_formatted }}</Badge>
+                                <Badge color="gray"><Money :formatted="item.grand_total_formatted" /></Badge>
                                 <Badge color="blue">{{ item.client ?? walkingClientLabel }}</Badge>
                             </div>
                         </div>

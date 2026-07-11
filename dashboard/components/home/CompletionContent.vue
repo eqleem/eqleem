@@ -1,13 +1,32 @@
 <script setup>
-import { useRouter } from 'vue-router';
 import { contentTypes } from '../../data/page.js';
-import { closeModal } from '../../lib/modal.js';
+import { closeModal, openModal } from '../../lib/modal.js';
 
-const router = useRouter();
+/** @type {Record<string, { modal: string }>} */
+const addForms = {
+    blog: { modal: 'add-blog-post' },
+    store: { modal: 'add-store-product' },
+    courses: { modal: 'add-course' },
+    portfolio: { modal: 'add-portfolio-project' },
+    pages: { modal: 'add-page' },
+    forms: { modal: 'add-form' },
+    services: { modal: 'add-service' },
+    'digital-products': { modal: 'add-digital-product' },
+    'digital-services': { modal: 'add-digital-service' },
+    newsletter: { modal: 'add-newsletter' },
+    menu: { modal: 'add-menu-item' },
+    'unit-rental': { modal: 'add-unit' },
+};
 
-function openType(slug) {
+function openAddModal(slug) {
+    const form = addForms[slug];
+
+    if (!form) {
+        return;
+    }
+
     closeModal('home-step-content');
-    router.push(`/manage/${slug}`);
+    openModal(form.modal);
 }
 </script>
 
@@ -17,8 +36,9 @@ function openType(slug) {
             v-for="type in contentTypes"
             :key="type.slug"
             type="button"
-            class="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50"
-            @click="openType(type.slug)"
+            class="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="!addForms[type.slug]"
+            @click="openAddModal(type.slug)"
         >
             <img :src="`/${type.icon}`" alt="" class="size-9 shrink-0 rounded-lg bg-gray-100 p-1.5">
             <span class="min-w-0">

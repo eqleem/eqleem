@@ -40,8 +40,15 @@
         },
     }"
 >
-    <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
-        <div class="p-5 sm:p-6">
+    <div @class([
+        'gap-0',
+        'flex flex-col' => $percentage >= 100,
+        'grid lg:grid-cols-[1fr_auto]' => $percentage < 100,
+    ])>
+        <div @class([
+            'p-5 sm:p-6',
+            'border-b border-white/10 pb-4' => $percentage >= 100,
+        ])>
             <div class="flex items-center justify-between gap-3">
                 <p class="text-sm font-medium text-primary-100">{{ $greeting }}</p>
                 <button
@@ -84,7 +91,10 @@
             @endif
         </div>
 
-        <div class="border-t border-white/10 bg-black/10 p-5 sm:p-6 lg:w-96 lg:border-s lg:border-t-0">
+        <div @class([
+            'bg-black/10 p-5 sm:p-6',
+            'border-t border-white/10 lg:w-96 lg:border-s lg:border-t-0' => $percentage < 100,
+        ])>
             <p class="mb-2 text-xs font-medium text-primary-100">رابط صفحتك</p>
 
             <div class="flex items-center gap-2 rounded-xl bg-white/10 p-2 ring-1 ring-white/10">

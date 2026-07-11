@@ -91,7 +91,7 @@ async function submit() {
     <Form class="!gap-4 !p-5 !py-6" @submit="submit">
         <div class="rounded-xl bg-gray-50 px-4 py-3">
             <p class="text-xs text-gray-400">المبلغ المتبقي</p>
-            <p class="mt-1 text-lg font-bold text-amber-700">{{ order.due_total_formatted }}</p>
+            <p class="mt-1 text-lg font-bold text-amber-700"><Money :formatted="order.due_total_formatted" /></p>
         </div>
 
         <Input

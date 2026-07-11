@@ -1,7 +1,10 @@
 <?php
 
+use App\Actions\SubscribeTenantToPlan;
+use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
+use Database\Seeders\PlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -76,6 +79,20 @@ test('foreign current tenant is not leaked and access is denied', function () {
         ->assertJsonPath('data.tenant', null)
         ->assertJsonPath('data.permissions.can_access_dashboard', false)
         ->assertJsonPath('data.permissions.can_manage_tenant', false);
+});
+
+test('authenticated owner receives arabic plan name in dashboard context', function () {
+    $this->seed(PlanSeeder::class);
+
+    [$user, $tenant] = createDashboardUserWithTenant();
+
+    $freePlan = Plan::query()->where('slug', 'free')->firstOrFail();
+    SubscribeTenantToPlan::run($tenant, $freePlan);
+
+    $this->actingAs($user)
+        ->getJson('/api/dashboard/context')
+        ->assertSuccessful()
+        ->assertJsonPath('data.tenant.plan', 'بداية');
 });
 
 test('user without current tenant gets null tenant and no access', function () {

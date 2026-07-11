@@ -44,9 +44,9 @@ onUnmounted(() => paymentsStore.clearDetail());
             <div class="space-y-6 lg:order-1">
                 <Section title="ملخص العملية" icon="coin">
                     <div class="space-y-3 p-5">
-                        <div class="flex items-center justify-between text-sm"><span class="text-gray-500">المبلغ</span><span class="font-medium text-gray-800">{{ payment.amount_formatted }}</span></div>
+                        <div class="flex items-center justify-between text-sm"><span class="text-gray-500">المبلغ</span><span class="font-medium text-gray-800"><Money :formatted="payment.amount_formatted" /></span></div>
                         <div class="border-t border-gray-100 pt-4">
-                            <div class="flex items-center justify-between"><span class="text-sm font-semibold text-gray-800">الإجمالي</span><span class="text-xl font-bold text-primary-700">{{ payment.amount_formatted }}</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm font-semibold text-gray-800">الإجمالي</span><span class="text-xl font-bold text-primary-700"><Money :formatted="payment.amount_formatted" /></span></div>
                         </div>
                         <div class="space-y-2 border-t border-gray-100 pt-3">
                             <div class="flex items-center justify-between text-sm"><span class="text-gray-500">العملة</span><span class="font-medium text-gray-800" dir="ltr">{{ payment.currency }}</span></div>
@@ -100,7 +100,7 @@ onUnmounted(() => paymentsStore.clearDetail());
                                 <p class="mt-1 text-sm text-gray-500">عرض تفاصيل الطلب</p>
                             </div>
                             <div class="text-end">
-                                <p class="font-bold text-gray-900">{{ payment.amount_formatted }}</p>
+                                <p class="font-bold text-gray-900"><Money :formatted="payment.amount_formatted" /></p>
                                 <Icon name="link" class="mt-2 h-4 w-4 text-primary-500" />
                             </div>
                         </RouterLink>

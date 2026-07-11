@@ -11,7 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="antialiased bg-stone-200">
+    <div class="antialiased bg-stone-200 min-h-screen">
         <Header />
         <Nav />
         <Notify />

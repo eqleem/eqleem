@@ -51,7 +51,7 @@ test('guests cannot access plans api', function () {
 test('owner can list subscription plans for billing period', function () {
     [$user, $tenant] = createDashboardOwnerForPlans();
 
-    $this->actingAs($user)
+    $response = $this->actingAs($user)
         ->getJson('/api/plans?billing_period=monthly')
         ->assertSuccessful()
         ->assertJsonPath('data.billing_period', 'monthly')
@@ -70,6 +70,11 @@ test('owner can list subscription plans for billing period', function () {
     $freePlan = Plan::query()->where('slug', 'free')->firstOrFail();
 
     expect($tenant->fresh(['subscription.plan'])->subscription?->plan_id)->toBe($freePlan->id);
+    expect(collect($response->json('data.plans'))->pluck('title', 'tier')->all())->toBe([
+        'free' => 'بداية',
+        'basic' => 'إنطلاق',
+        'pro' => 'نمو',
+    ]);
 });
 
 test('owner can subscribe to free plan via api', function () {
@@ -95,6 +100,7 @@ test('owner can fetch moyasar checkout config for paid plan', function () {
         ->getJson('/api/plans/'.$plan->id.'/checkout')
         ->assertSuccessful()
         ->assertJsonPath('data.plan.id', $plan->id)
+        ->assertJsonPath('data.plan.title', 'إنطلاق')
         ->assertJsonPath('data.checkout.amount', $plan->price)
         ->assertJsonPath('data.checkout.publishable_api_key', 'pk_test_example')
         ->assertJsonPath('data.checkout.metadata.plan_id', $plan->id)

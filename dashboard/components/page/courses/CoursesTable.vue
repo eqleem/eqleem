@@ -62,7 +62,7 @@ async function removeSelected() {
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
         <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
-            <div class="ps-3">
+            <div class="hidden ps-3 sm:block">
                 <input v-model="allSelected" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
             </div>
 
@@ -80,7 +80,7 @@ async function removeSelected() {
                 </div>
             </div>
 
-            <div v-if="selectedIds.length > 0" class="flex items-center gap-x-2">
+            <div v-if="selectedIds.length > 0" class="hidden items-center gap-x-2 sm:flex">
                 <div class="flex items-center gap-1 text-sm text-gray-600">
                     <span>{{ selectedIds.length }}</span>
                     <span>محددة</span>
@@ -125,9 +125,9 @@ async function removeSelected() {
                 <div
                     v-for="item in store.items"
                     :key="item.uuid"
-                    class="flex w-full items-center justify-between gap-x-7 hover:bg-gray-50 last:rounded-b-2xl"
+                    class="flex w-full items-center justify-between ps-3 sm:ps-0 gap-x-7 hover:bg-gray-50 last:rounded-b-2xl"
                 >
-                    <div class="ps-6">
+                    <div class="hidden ps-4 sm:block">
                         <input
                             type="checkbox"
                             class="h-4 w-4 rounded-xl border-gray-300 shadow-sm"
@@ -163,7 +163,7 @@ async function removeSelected() {
                                     <span v-if="item.lessons_count > 0" class="text-xs text-gray-500">
                                         {{ item.lessons_count }} {{ item.lessons_count === 1 ? 'درس' : 'دروس' }}
                                     </span>
-                                    <span v-if="item.price_label" class="text-xs font-medium text-gray-700" dir="ltr">{{ item.price_label }}</span>
+                                    <Money v-if="item.price_label" :formatted="item.price_label" class="text-xs font-medium text-gray-700" />
                                     <span v-if="item.published_at_label" class="text-xs text-gray-500" dir="ltr">{{ item.published_at_label }}</span>
                                 </div>
                             </div>

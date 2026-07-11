@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
                             <p class="mt-1 text-sm text-stone-400">بدون حد زمني</p>
                         </template>
                         <template v-else>
-                            <p class="text-4xl font-bold tracking-tight text-stone-900">{{ plan.price_formatted }}</p>
+                            <p class="text-4xl font-bold tracking-tight text-stone-900"><Money :formatted="plan.price_formatted" /></p>
                             <p class="mt-1 text-sm text-stone-400">{{ plan.interval_label }}</p>
                         </template>
                     </div>
@@ -275,7 +275,7 @@ onBeforeUnmount(() => {
                 <Alert v-else-if="planState.checkoutError" color="red" :text="planState.checkoutError" />
                 <template v-else-if="planState.checkoutPlan">
                     <p class="text-sm text-stone-500">
-                        {{ planState.checkoutPlan.price_formatted }} — {{ planState.checkoutPlan.interval_label }}
+                        <Money :formatted="planState.checkoutPlan.price_formatted" class="inline-flex" /> — {{ planState.checkoutPlan.interval_label }}
                     </p>
                     <div ref="moyasarMount" class="mt-4 min-h-[280px]"></div>
                 </template>

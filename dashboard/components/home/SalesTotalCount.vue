@@ -24,7 +24,7 @@ onMounted(() => {
             <RouterLink to="/orders" class="flex-1 truncate px-3 py-3 text-sm">
                 <span class="font-semibold text-stone-700 hover:text-stone-600"> المبيعات </span>
                 <p class="mt-1 text-stone-400">
-                    <b class="me-1 text-2xl font-bold text-pgray-800">{{ sales.value_formatted }}</b>
+                    <Money :formatted="sales.value_formatted" class="me-1 text-2xl font-bold text-pgray-800" />
                     <span class="ms-1 text-xs font-normal" :title="`${sales.growth}% مقارنة بنفس الفترة السابقة`">
                         <span v-if="sales.growth < 0" dir="ltr" class="text-red-500"> ⬇ {{ sales.growth }}%</span>
                         <span v-else dir="ltr" class="text-green-500"> ⬆ {{ sales.growth }}%</span>

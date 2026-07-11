@@ -29,7 +29,7 @@ it('creates a tenant when registering via github', function () {
         'avatar' => 'https://github.com/avatar.png',
     ]));
 
-    $this->get('/auth/github/callback')->assertRedirect(route('admin.home'));
+    $this->get('/auth/github/callback')->assertRedirect(route('dashboard'));
 
     $user = User::where('email', 'octocat@example.com')->first();
 
@@ -56,7 +56,7 @@ it('creates a tenant for an existing user without one', function () {
         'avatar' => 'https://github.com/avatar.png',
     ]));
 
-    $this->get('/auth/github/callback')->assertRedirect(route('admin.home'));
+    $this->get('/auth/github/callback')->assertRedirect(route('dashboard'));
 
     $user->refresh();
 

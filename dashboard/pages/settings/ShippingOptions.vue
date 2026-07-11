@@ -297,7 +297,7 @@ onMounted(load);
                                 {{ option.name }}
                             </p>
                             <p class="mt-0.5 truncate text-xs text-gray-500">
-                                {{ option.price }} ر.س · {{ option.country_label }}
+                                <Money :amount="option.price" class="inline-flex" /> · {{ option.country_label }}
                                 <template v-if="option.cities_summary"> · {{ option.cities_summary }}</template>
                             </p>
                         </div>

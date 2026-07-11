@@ -1,50 +1,102 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Dropdown from './Dropdown.vue';
+import HeaderUserMenu from './HeaderUserMenu.vue';
+import Icon from './ui/Icon.vue';
 import { useSession } from '../stores/session.js';
 
 const route = useRoute();
 const { user, tenant, app, loaded } = useSession();
 
+const mobileMenuOpen = ref(false);
+
 const tenantName = computed(() => tenant.value?.name ?? '…');
 const tenantLogo = computed(() => tenant.value?.logo ?? null);
 const tenantUrl = computed(() => tenant.value?.url ?? '#');
-const tenantPlan = computed(() => tenant.value?.plan ?? 'مجاني');
+const tenantPlan = computed(() => tenant.value?.plan ?? 'بداية');
 const userName = computed(() => user.value?.name ?? '');
 const userEmail = computed(() => user.value?.email ?? '');
 const userImage = computed(() => user.value?.image ?? 'https://www.gravatar.com/avatar/?d=mp');
 const appName = computed(() => app.value?.name ?? 'Eqleem');
 const homeUrl = computed(() => app.value?.home_url ?? '/');
 const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
+
+const menuProps = computed(() => ({
+    userName: userName.value,
+    userEmail: userEmail.value,
+    userImage: userImage.value,
+    tenantName: tenantName.value,
+    tenantLogo: tenantLogo.value,
+    tenantPlan: tenantPlan.value,
+    tenantUrl: tenantUrl.value,
+    appName: appName.value,
+    homeUrl: homeUrl.value,
+    logoutUrl: logoutUrl.value,
+}));
+
+function openMobileMenu() {
+    mobileMenuOpen.value = true;
+}
+
+function closeMobileMenu() {
+    mobileMenuOpen.value = false;
+}
+
+function onEscape(event) {
+    if (event.key === 'Escape') {
+        closeMobileMenu();
+    }
+}
+
+watch(mobileMenuOpen, (open) => {
+    document.body.style.overflow = open ? 'hidden' : '';
+});
+
+onMounted(() => {
+    window.addEventListener('keydown', onEscape);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', onEscape);
+    document.body.style.overflow = '';
+});
 </script>
 
 <template>
     <header class="fixed inset-x-0 top-0 z-40 bg-primary-700 p-2 text-white">
-        <div class="mx-auto flex max-w-7xl justify-between">
-            <div class="flex items-center gap-x-3">
-                <RouterLink to="/" class="flex items-center justify-center gap-x-2 text-center">
+        <div class="mx-auto flex max-w-7xl justify-between gap-x-2">
+            <div class="flex min-w-0 flex-1 items-center gap-x-2">
+                <RouterLink to="/" class="flex min-w-0 items-center gap-x-2">
                     <img
                         :src="tenantLogo ?? '/assets/images/user.png'"
                         alt=""
-                        class="ms-1 h-8 rounded-sm"
+                        class="ms-1 h-8 shrink-0 rounded-sm"
                     >
-                    <span class="hidden md:block">{{ loaded ? tenantName : '…' }}</span>
+                    <span class="truncate">{{ loaded ? tenantName : '…' }}</span>
                 </RouterLink>
 
-                <RouterLink to="/plan" class="flex items-center justify-center gap-x-1 text-center">
-                    <span class="rounded bg-purple-500 p-0.5 px-1.5 text-xs text-purple-100 hover:bg-purple-600">
+                <RouterLink
+                    to="/plan"
+                    class="shrink-0"
+                    :title="tenantPlan"
+                    :aria-label="`الباقة: ${tenantPlan}`"
+                >
+                    <span class="flex items-center justify-center rounded bg-purple-500 p-1 text-purple-100 hover:bg-purple-600 md:hidden">
+                        <Icon name="coin" class="h-4 w-4" />
+                    </span>
+                    <span class="hidden rounded bg-purple-500 p-0.5 px-1.5 text-xs text-purple-100 hover:bg-purple-600 md:inline">
                         {{ tenantPlan }}
                     </span>
                 </RouterLink>
             </div>
 
-            <div class="flex items-center gap-x-3">
+            <div class="flex shrink-0 items-center gap-x-3">
                 <a
                     :href="tenantUrl"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex items-center gap-x-2 rounded-full bg-green-600 p-1 px-3 text-sm text-white hover:bg-green-500"
+                    class="hidden items-center gap-x-2 rounded-full bg-green-600 p-1 px-3 text-sm text-white hover:bg-green-500 md:flex"
                 >
                     معاينة <span class="hidden lg:block">الصفحة</span>
                     <svg
@@ -84,123 +136,84 @@ const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
                     <span class="hidden lg:block">الإعدادات</span>
                 </RouterLink>
 
-                <Dropdown width="w-48" class="text-gray-800">
-                    <template #trigger>
-                        <button type="button" class="flex items-center gap-2" aria-haspopup="menu">
-                            <div class="flex items-center justify-center gap-x-2 text-center">
-                                <img :src="userImage" alt="" class="w-8 rounded-full">
-                                <span class="-mt-2 opacity-50">⌄</span>
-                            </div>
-                        </button>
-                    </template>
+                <button
+                    type="button"
+                    class="flex items-center gap-2 md:hidden"
+                    aria-haspopup="dialog"
+                    aria-label="فتح القائمة"
+                    @click="openMobileMenu"
+                >
+                    <img :src="userImage" alt="" class="w-8 rounded-full">
+                </button>
 
-                    <div class="truncate p-3">
-                        <p>{{ userName || '…' }}</p>
-                        <p class="opacity-50">{{ userEmail }}</p>
-                    </div>
+                <div class="hidden md:block">
+                    <Dropdown width="w-48" class="text-gray-800">
+                        <template #trigger>
+                            <button type="button" class="flex cursor-pointer items-center gap-2" aria-haspopup="menu">
+                                <div class="flex items-center justify-center gap-x-2 text-center">
+                                    <img :src="userImage" alt="" class="w-8 rounded-full">
+                                    <span class="-mt-2 text-white opacity-50">⌄</span>
+                                </div>
+                            </button>
+                        </template>
 
-                    <RouterLink
-                        to="/account"
-                        class="flex items-center gap-x-2 rounded bg-stone-100 p-1.5 hover:bg-stone-200"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                opacity=".4"
-                                d="M20.59 22c0-3.87-3.85-7-8.59-7s-8.59 3.13-8.59 7"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                        إدارة الحساب
-                    </RouterLink>
-
-                    <RouterLink
-                        to="/plan"
-                        class="flex items-center gap-x-2 rounded bg-stone-100 p-1.5 hover:bg-stone-200"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M12 15c3.728 0 6.75-2.91 6.75-6.5S15.728 2 12 2 5.25 4.91 5.25 8.5 8.272 15 12 15Z"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                opacity=".4"
-                                d="m7.52 13.52-.01 7.38c0 .9.63 1.34 1.41.97l2.68-1.27c.22-.11.59-.11.81 0l2.69 1.27c.77.36 1.41-.07 1.41-.97v-7.56"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                        إدارة الاشتراك
-                    </RouterLink>
-
-                    <a :href="homeUrl" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
-                            />
-                            <g opacity=".4">
-                                <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M8 3h1a28.424 28.424 0 000 18H8M15 3a28.424 28.424 0 010 18"
-                                />
-                                <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M3 16v-1a28.424 28.424 0 0018 0v1M3 9a28.424 28.424 0 0118 0"
-                                />
-                            </g>
-                        </svg>
-                        {{ appName }}
-                    </a>
-
-                    <a :href="logoutUrl" class="flex items-center gap-x-2 rounded bg-gray-100 p-1.5 hover:bg-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                            <g opacity=".4">
-                                <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-miterlimit="10"
-                                    stroke-width="1.5"
-                                    d="M17.44 14.62L20 12.06 17.44 9.5M9.76 12.06h10.17"
-                                />
-                            </g>
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-miterlimit="10"
-                                stroke-width="1.5"
-                                d="M11.76 20c-4.42 0-8-3-8-8s3.58-8 8-8"
-                            />
-                        </svg>
-                        <span>تسجيل الخروج</span>
-                    </a>
-                </Dropdown>
+                        <HeaderUserMenu variant="compact" v-bind="menuProps" />
+                    </Dropdown>
+                </div>
             </div>
         </div>
     </header>
+
+    <Teleport to="body">
+        <Transition
+            enter-active-class="transition-opacity ease-out duration-300"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition-opacity ease-in duration-200"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="mobileMenuOpen"
+                class="fixed inset-0 z-[60] bg-black/40 md:hidden"
+                aria-hidden="true"
+                @click="closeMobileMenu"
+            ></div>
+        </Transition>
+
+        <Transition
+            enter-active-class="transform transition ease-out duration-300"
+            enter-from-class="-translate-x-full"
+            enter-to-class="translate-x-0"
+            leave-active-class="transform transition ease-in duration-200"
+            leave-from-class="translate-x-0"
+            leave-to-class="-translate-x-full"
+        >
+            <aside
+                v-if="mobileMenuOpen"
+                class="fixed bottom-0 left-0 top-0 z-[60] flex w-72 max-w-[85vw] flex-col overflow-y-auto overscroll-y-contain rounded-e-2xl bg-stone-100 shadow-2xl md:hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-label="قائمة الحساب"
+            >
+                <div class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+                    <p class="text-sm font-medium text-gray-700">القائمة</p>
+                    <button
+                        type="button"
+                        class="rounded-lg p-1.5 text-gray-500 transition hover:bg-stone-100 hover:text-gray-800"
+                        aria-label="إغلاق القائمة"
+                        @click="closeMobileMenu"
+                    >
+                        <Icon name="x" class="h-5 w-5" />
+                    </button>
+                </div>
+
+                <HeaderUserMenu
+                    variant="panel"
+                    v-bind="menuProps"
+                    @navigate="closeMobileMenu"
+                />
+            </aside>
+        </Transition>
+    </Teleport>
 </template>

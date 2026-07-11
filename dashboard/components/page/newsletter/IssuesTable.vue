@@ -79,7 +79,7 @@ async function removeSelected() {
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
         <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
-            <div class="ps-3">
+            <div class="hidden ps-3 sm:block">
                 <input v-model="allSelected" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
             </div>
 
@@ -97,7 +97,7 @@ async function removeSelected() {
                 </div>
             </div>
 
-            <div v-if="selectedIds.length > 0" class="flex items-center gap-x-2">
+            <div v-if="selectedIds.length > 0" class="hidden items-center gap-x-2 sm:flex">
                 <div class="flex items-center gap-1 text-sm text-gray-600">
                     <span>{{ selectedIds.length }}</span>
                     <span>محددة</span>
@@ -141,7 +141,7 @@ async function removeSelected() {
             <table v-else class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500">
                     <tr>
-                        <th class="w-10 px-6 py-3 text-start font-medium"></th>
+                        <th class="hidden w-10 px-6 py-3 text-start font-medium sm:table-cell"></th>
                         <th class="px-4 py-3 text-start font-medium">النشرة</th>
                         <th class="px-4 py-3 text-start font-medium">حالة الإرسال</th>
                         <th class="px-4 py-3 text-start font-medium">التاريخ</th>
@@ -152,7 +152,7 @@ async function removeSelected() {
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     <tr v-for="item in store.items" :key="item.uuid" class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
+                        <td class="hidden px-6 py-4 sm:table-cell">
                             <input
                                 type="checkbox"
                                 class="h-4 w-4 rounded-xl border-gray-300 shadow-sm"

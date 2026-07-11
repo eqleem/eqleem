@@ -101,7 +101,7 @@ class PlanCatalog
 
         return [
             'id' => $plan->id,
-            'title' => $plan->label,
+            'title' => __((string) $plan->name),
             'description' => (string) data_get($plan->meta, 'description', ''),
             'price' => $plan->price,
             'price_formatted' => $plan->formattedPrice(),

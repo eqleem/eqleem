@@ -125,7 +125,7 @@ new class extends \Livewire\Component {
                     $this->reset(['user_email', 'user_name', 'user_password']);
                     
                     // Redirect to dashboard
-                    return redirect(route('admin.home'));
+                    return redirect(route('dashboard'));
                 } else {
                     $this->addError('user_email', 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.');
                 }

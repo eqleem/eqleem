@@ -26,7 +26,7 @@ class TenantResource extends JsonResource
             'logo' => $this->logo,
             'url' => $this->url,
             'active' => (bool) $this->active,
-            'plan' => filled($planName) ? (string) $planName : __('Free'),
+            'plan' => filled($planName) ? __((string) $planName) : __('free'),
             'custom_domain' => $this->custom_domain,
             'custom_domain_status' => $this->custom_domain_status,
             'app_domain' => (string) config('app.domain'),

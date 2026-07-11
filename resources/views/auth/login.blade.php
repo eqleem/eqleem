@@ -101,7 +101,7 @@ new class extends \Livewire\Component {
                     ]);
 
                     // Redirect to dashboard
-                    return $this->redirect(route('admin.home')) ;
+                    return $this->redirect(route('dashboard'));
                 } else {
                     $this->addError('email', 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
                     return;

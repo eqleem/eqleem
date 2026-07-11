@@ -9,7 +9,7 @@ import { ApiError } from '../../lib/api.js';
 import { closeModal } from '../../lib/modal.js';
 import { useClientsStore } from '../../stores/clients.js';
 import { useOrdersStore } from '../../stores/orders.js';
-import { addItemTypeOptions, itemTypeOptions, itemSearchPlaceholders, walkingClientLabel, money } from '../../data/orders.js';
+import { addItemTypeOptions, itemTypeOptions, itemSearchPlaceholders, walkingClientLabel } from '../../data/orders.js';
 
 const router = useRouter();
 const clientsStore = useClientsStore();
@@ -510,7 +510,7 @@ onBeforeUnmount(() => {
                                             @click="selectContent(item, product)"
                                         >
                                             <p class="text-sm font-semibold text-gray-800">{{ product.name }}</p>
-                                            <p class="mt-0.5 text-xs text-gray-500">{{ money(product.unit_price) }}</p>
+                                            <p class="mt-0.5 text-xs text-gray-500"><Money :amount="product.unit_price" /></p>
                                         </button>
                                         <button
                                             type="button"
@@ -559,7 +559,7 @@ onBeforeUnmount(() => {
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs text-gray-500">الإجمالي</label>
-                                    <div class="rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm font-bold text-gray-800">{{ money(lineTotal(item)) }}</div>
+                                    <div class="rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm font-bold text-gray-800"><Money :amount="lineTotal(item)" /></div>
                                 </div>
                             </div>
                         </div>
@@ -572,19 +572,19 @@ onBeforeUnmount(() => {
                 <div class="ms-auto max-w-sm space-y-2">
                     <div class="flex items-center justify-between text-sm text-gray-600">
                         <span>المجموع الفرعي</span>
-                        <span class="font-semibold text-gray-800">{{ money(totals.subtotal) }}</span>
+                        <span class="font-semibold text-gray-800"><Money :amount="totals.subtotal" /></span>
                     </div>
                     <div class="flex items-center justify-between text-sm text-gray-600">
                         <span>الخصومات</span>
-                        <span class="font-semibold text-gray-800">{{ money(totals.discount) }}</span>
+                        <span class="font-semibold text-gray-800"><Money :amount="totals.discount" /></span>
                     </div>
                     <div class="flex items-center justify-between text-sm text-gray-600">
                         <span>الضريبة</span>
-                        <span class="font-semibold text-gray-800">{{ money(totals.tax) }}</span>
+                        <span class="font-semibold text-gray-800"><Money :amount="totals.tax" /></span>
                     </div>
                     <div class="flex items-center justify-between border-t border-gray-100 pt-2 text-base font-bold text-gray-800">
                         <span>الإجمالي النهائي</span>
-                        <span>{{ money(totals.grand) }}</span>
+                        <span><Money :amount="totals.grand" /></span>
                     </div>
                 </div>
             </div>
