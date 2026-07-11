@@ -1,0 +1,285 @@
+<?php
+
+namespace App\API\Page;
+
+use App\API\Concerns\AuthorizesDashboardTenant;
+use App\API\Page\Concerns\MapsPageBlocks;
+use App\Models\Block;
+use App\Models\Content;
+use App\Models\Tenant;
+use App\Services\TenantProfileService;
+use App\Support\BlockTypeRegistry;
+use App\Support\BusinessDocuments;
+use App\Support\CtaLink;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\Rule;
+use Lorisleiva\Actions\ActionRequest;
+use Lorisleiva\Actions\Concerns\AsAction;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+
+/**
+ * Updates a page block's settings (type-specific).
+ */
+class UpdatePageBlock
+{
+    use AsAction;
+    use AuthorizesDashboardTenant;
+    use MapsPageBlocks;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $block = $this->blockFromRequest();
+
+        if (! $block) {
+            return [];
+        }
+
+        return match ($block->type) {
+            'top-nav' => [
+                'show_share_button' => ['required', 'boolean'],
+                'show_theme_toggle' => ['required', 'boolean'],
+                'show_language_switcher' => ['required', 'boolean'],
+                'show_back_button' => ['required', 'boolean'],
+                'show_pages_menu' => ['required', 'boolean'],
+                'show_client_login' => ['required', 'boolean'],
+                'client_login_label' => ['nullable', 'string', 'max:100', 'required_if:show_client_login,true'],
+            ],
+            'float-links' => [
+                'position' => ['required', 'string', Rule::in(['bottom-start', 'bottom-end'])],
+                'show_whatsapp' => ['required', 'boolean'],
+                'whatsapp_number' => ['nullable', 'string', 'max:30'],
+                'show_phone' => ['required', 'boolean'],
+                'phone_number' => ['nullable', 'string', 'max:30'],
+                'show_scroll_top' => ['required', 'boolean'],
+            ],
+            'header' => [
+                'name' => ['required', 'string', 'min:2', 'max:255'],
+                'bio' => ['nullable', 'string', 'max:250'],
+                'country' => ['nullable', 'string', 'max:100'],
+                'city' => ['nullable', 'string', 'max:100'],
+                'show_avatar' => ['sometimes', 'boolean'],
+                'show_verified_badge' => ['sometimes', 'boolean'],
+                'logo' => ['nullable', 'image', 'max:15024'],
+            ],
+            'footer' => [
+                'show_documents_warranties' => ['required', 'boolean'],
+                'document_numbers' => ['sometimes', 'array'],
+                'document_numbers.*' => ['nullable', 'string', 'max:50'],
+            ],
+            'block-link' => [
+                'link_type' => ['required', 'string', Rule::in(array_keys(CtaLink::linkTypeOptions('block')))],
+                'title' => ['nullable', 'string', 'max:255'],
+                'description' => ['nullable', 'string', 'max:500'],
+                'content_id' => ['nullable', 'integer'],
+            ],
+            'cta' => [],
+            default => [
+                'data' => ['sometimes', 'array'],
+            ],
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public function handle(Tenant $tenant, int $id, array $data, BlockTypeRegistry $blockTypes): array
+    {
+        setCurrentTenant($tenant);
+
+        $block = $this->findTenantRootBlock($id);
+
+        if (! $block) {
+            throw new NotFoundHttpException;
+        }
+
+        match ($block->type) {
+            'top-nav' => $this->updateTopNav($block, $data),
+            'float-links' => $this->updateFloatLinks($block, $data),
+            'header' => $this->updateHeader($block, $tenant, $data),
+            'footer' => $this->updateFooter($block, $data),
+            'block-link' => $this->updateBlockLink($block, $data),
+            'cta' => null,
+            default => $block->update(['data' => $data['data'] ?? $block->data]),
+        };
+
+        return ShowPageBlock::make()->handle($tenant, $block->id, $blockTypes);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function asController(ActionRequest $request, int $id, BlockTypeRegistry $blockTypes): array
+    {
+        $tenant = $this->currentDashboardTenant($request);
+
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validated();
+
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo');
+        }
+
+        return $this->handle($tenant, $id, $validated, $blockTypes);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public function jsonResponse(array $payload): JsonResponse
+    {
+        return response()->json([
+            'data' => $payload,
+            'message' => __('Settings updated successfully.'),
+        ]);
+    }
+
+    protected function blockFromRequest(): ?Block
+    {
+        $id = (int) request()->route('id');
+
+        if ($id <= 0) {
+            return null;
+        }
+
+        $user = request()->user();
+        $tenant = $user?->currentTenant;
+
+        if (! $tenant instanceof Tenant) {
+            return null;
+        }
+
+        setCurrentTenant($tenant);
+
+        return $this->findTenantRootBlock($id);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function updateTopNav(Block $block, array $data): void
+    {
+        $block->update([
+            'data' => [
+                'show_share_button' => (bool) $data['show_share_button'],
+                'show_theme_toggle' => (bool) $data['show_theme_toggle'],
+                'show_language_switcher' => (bool) $data['show_language_switcher'],
+                'show_back_button' => (bool) $data['show_back_button'],
+                'show_pages_menu' => (bool) $data['show_pages_menu'],
+                'show_client_login' => (bool) $data['show_client_login'],
+                'client_login_label' => (string) ($data['client_login_label'] ?? 'دخول العملاء'),
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function updateFloatLinks(Block $block, array $data): void
+    {
+        $block->update([
+            'data' => [
+                'position' => $data['position'],
+                'show_whatsapp' => (bool) $data['show_whatsapp'],
+                'whatsapp_number' => (string) ($data['whatsapp_number'] ?? ''),
+                'show_phone' => (bool) $data['show_phone'],
+                'phone_number' => (string) ($data['phone_number'] ?? ''),
+                'show_scroll_top' => (bool) $data['show_scroll_top'],
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function updateHeader(Block $block, Tenant $tenant, array $data): void
+    {
+        $tenant->name = $data['name'];
+
+        $logo = $data['logo'] ?? null;
+
+        if ($logo instanceof UploadedFile) {
+            $path = $logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
+            app(TenantProfileService::class)->saveLogo($tenant, $path);
+        } else {
+            $tenant->save();
+        }
+
+        app(TenantProfileService::class)->saveContact($tenant, [
+            'country' => $data['country'] ?? '',
+            'city' => $data['city'] ?? '',
+        ]);
+
+        $block->update([
+            'data' => [
+                'show_avatar' => (bool) ($data['show_avatar'] ?? true),
+                'show_verified_badge' => (bool) ($data['show_verified_badge'] ?? true),
+                'bio' => (string) ($data['bio'] ?? ''),
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function updateFooter(Block $block, array $data): void
+    {
+        $documentNumbers = BusinessDocuments::sanitizeNumbers(
+            is_array($data['document_numbers'] ?? null) ? $data['document_numbers'] : []
+        );
+
+        $block->update([
+            'data' => [
+                'show_documents_warranties' => (bool) $data['show_documents_warranties'],
+                'show_eqleem_logo' => true,
+                'document_numbers' => $documentNumbers,
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function updateBlockLink(Block $block, array $data): void
+    {
+        $linkType = (string) $data['link_type'];
+        $parsed = CtaLink::parseTypeKey($linkType);
+        $needsPicker = CtaLink::needsContentPicker($linkType);
+        $contentId = $needsPicker ? (int) ($data['content_id'] ?? 0) : null;
+
+        if ($needsPicker) {
+            if (! $contentId) {
+                throw new UnprocessableEntityHttpException('يرجى اختيار عنصر صالح من القائمة.');
+            }
+
+            $contentType = substr($linkType, 5);
+            $content = Content::query()->type(CtaLink::modelType($contentType))->whereKey($contentId)->first();
+
+            if (! $content) {
+                throw new UnprocessableEntityHttpException('يرجى اختيار عنصر صالح من القائمة.');
+            }
+        }
+
+        $payload = [
+            'link_type' => $parsed['link_type'],
+            'content_type' => $parsed['content_type'],
+            'content_id' => $contentId,
+            'title' => (string) ($data['title'] ?? ''),
+            'description' => (string) ($data['description'] ?? ''),
+        ];
+
+        $blockTitle = filled($payload['title'])
+            ? $payload['title']
+            : CtaLink::titleFromData($payload);
+
+        $block->update([
+            'title' => $blockTitle ?: $block->title,
+            'data' => $payload,
+        ]);
+    }
+}

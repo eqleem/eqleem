@@ -79,7 +79,7 @@ test('owner can create a draft order with product item and client', function () 
         'slug' => 'test-product-'.Str::lower(Str::random(4)),
         'status' => 'published',
         'active' => true,
-        'data' => ['price' => 5000],
+        'price' => 5000,
     ]);
 
     $response = $this->actingAs($user)
@@ -159,7 +159,7 @@ test('content search returns matching products for order type', function () {
         'slug' => 'arabic-coffee-'.Str::lower(Str::random(4)),
         'status' => 'published',
         'active' => true,
-        'data' => ['price' => 1500],
+        'price' => 1500,
     ]);
 
     $response = $this->actingAs($user)
@@ -228,7 +228,7 @@ test('owner can create draft content for available order item types', function (
     expect($content)->not->toBeNull()
         ->and($content->status)->toBe('draft')
         ->and($content->title)->toBe('منتج مسودة جديد')
-        ->and((int) data_get($content->data, 'price'))->toBe(4250);
+        ->and((int) $content->price)->toBe(4250);
 
     $this->actingAs($user)
         ->postJson('/api/orders', [
@@ -247,7 +247,7 @@ test('owner can create draft content for available order item types', function (
         ->assertJsonPath('data.items.0.name', 'منتج مسودة جديد');
 });
 
-test('updating draft content price syncs data.price', function () {
+test('updating draft content price syncs contents.price', function () {
     [$user, $tenant] = createOrderApiUser();
 
     $this->actingAs($user)
@@ -273,7 +273,7 @@ test('updating draft content price syncs data.price', function () {
     $content = Content::query()->where('title', 'منتج بدون سعر')->first();
 
     expect($content)->not->toBeNull()
-        ->and((int) data_get($content->data, 'price'))->toBe(7500);
+        ->and((int) $content->price)->toBe(7500);
 });
 
 test('other item type cannot be created as system content', function () {

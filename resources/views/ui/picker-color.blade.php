@@ -5,7 +5,13 @@
     'subtitle' => '',
     'placeholder' => '',
     'options' => [],
+    'allowCustom' => false,
 ])
+
+@php
+    $isCustom = is_string($value) && preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value);
+    $customHex = $isCustom ? $value : '#3d5ccc';
+@endphp
 
 <div class="bg-black/5 p-1 rounded-lg">
     <div class=" sm:flex items-center">
@@ -15,7 +21,20 @@
                     class=" ">{{ $label }}</span> </label>
         @endif
 
-        <div class="flex flex-wrap gap-0.5" x-data="{ model: @entangle($name) }">
+        <div
+            class="flex flex-wrap items-center gap-0.5"
+            x-data="{
+                model: @entangle($name),
+                customHex: @js($customHex),
+                isHex(value) {
+                    return typeof value === 'string' && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);
+                },
+                selectCustom(event) {
+                    this.customHex = event.target.value;
+                    this.model = event.target.value;
+                },
+            }"
+        >
             @if ($options == array_values($options))
                 @foreach ($options as $item)
                     <div>
@@ -31,6 +50,31 @@
                     </div>
                 @endforeach
             @endif
+
+            @if ($allowCustom)
+                <label
+                    class="relative block cursor-pointer rounded-lg border-2 p-0.5 transition hover:bg-black/10"
+                    :class="isHex(model) ? 'border-black scale-105' : 'border-transparent'"
+                    title="لون مخصص"
+                >
+                    <span
+                        class="flex h-7 w-7 items-center justify-center rounded-md border border-stone-300"
+                        :style="{ backgroundColor: isHex(model) ? model : customHex }"
+                    ></span>
+                    <input
+                        type="color"
+                        class="absolute inset-0 cursor-pointer opacity-0"
+                        :value="isHex(model) ? model : customHex"
+                        @input="selectCustom($event)"
+                    >
+                </label>
+            @endif
+
+            <span
+                x-show="model"
+                x-text="model"
+                class="ms-1 text-xs font-medium text-stone-600"
+            ></span>
         </div>
 
     </div>

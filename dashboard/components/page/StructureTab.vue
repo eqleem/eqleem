@@ -1,8 +1,145 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
 import MainBox from '../ui/MainBox.vue';
 import Button from '../ui/Button.vue';
 import Icon from '../ui/Icon.vue';
-import { systemTopBlocks, userBlocks, systemBottomBlocks } from '../../data/page.js';
+import Modal from '../ui/Modal.vue';
+import Switch from '../settings/Switch.vue';
+import BlockEditor from './editors/BlockEditor.vue';
+import { openModal, closeModal } from '../../lib/modal.js';
+import { usePageStructureStore } from '../../stores/pageStructure.js';
+
+const store = usePageStructureStore();
+const {
+    topBlocks,
+    userBlocks,
+    bottomBlocks,
+    blockTypes,
+    loading,
+    error,
+    saving,
+    editing,
+    editingLoading,
+    editingError,
+} = storeToRefs(store);
+
+const dragId = ref(null);
+const busyId = ref(null);
+const editTitle = ref('إعدادات البلوك');
+
+onMounted(() => {
+    store.fetchStructure();
+});
+
+function openAddModal() {
+    openModal('add-block');
+}
+
+async function addBlock(type) {
+    try {
+        const block = await store.createBlock(type);
+        closeModal('add-block');
+
+        if (block?.id) {
+            await openEdit(block.id, block.title);
+        }
+    } catch {
+        // error surfaced via store
+    }
+}
+
+async function openEdit(id, title = null) {
+    editTitle.value = title || 'إعدادات البلوك';
+    openModal('edit-block');
+
+    try {
+        const payload = await store.fetchBlock(id);
+        editTitle.value = payload?.block?.title || title || 'إعدادات البلوك';
+    } catch {
+        // error surfaced via store
+    }
+}
+
+async function onSaved(payload) {
+    if (payload?.block?.title) {
+        editTitle.value = payload.block.title;
+    }
+
+    closeModal('edit-block');
+    store.clearEditing();
+}
+
+async function toggleActive(block) {
+    busyId.value = block.id;
+
+    try {
+        await store.toggleActive(block.id, !block.active);
+    } catch {
+        // error surfaced via store
+    } finally {
+        busyId.value = null;
+    }
+}
+
+async function removeBlock(block) {
+    if (!window.confirm('هل أنت متأكد من حذف هذا البلوك؟')) {
+        return;
+    }
+
+    busyId.value = block.id;
+
+    try {
+        await store.deleteBlock(block.id);
+    } catch {
+        // error surfaced via store
+    } finally {
+        busyId.value = null;
+    }
+}
+
+function onDragStart(event, id) {
+    dragId.value = id;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(id));
+}
+
+function onDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+}
+
+async function onDrop(event, targetId) {
+    event.preventDefault();
+
+    const sourceId = dragId.value ?? Number(event.dataTransfer.getData('text/plain'));
+    dragId.value = null;
+
+    if (!sourceId || sourceId === targetId) {
+        return;
+    }
+
+    const ids = userBlocks.value.map((block) => block.id);
+    const from = ids.indexOf(sourceId);
+    const to = ids.indexOf(targetId);
+
+    if (from === -1 || to === -1) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, sourceId);
+
+    try {
+        await store.reorderBlocks(ids);
+    } catch {
+        // error surfaced via store
+    }
+}
+
+function blockHref(block) {
+    return block.content_manage_url || null;
+}
 </script>
 
 <template>
@@ -11,59 +148,206 @@ import { systemTopBlocks, userBlocks, systemBottomBlocks } from '../../data/page
             <img :src="'/assets/icons/tabler/puzzle-2.svg'" class="h-7 w-7" alt="">
         </template>
 
-        <div class="space-y-4 p-4">
-            <!-- System (top) blocks -->
-            <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+        <p v-if="loading && !topBlocks.length && !userBlocks.length" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+        <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
+
+        <div v-else class="space-y-4 p-4">
+            <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
                 <ul class="space-y-1.5 p-2">
-                    <li v-for="block in systemTopBlocks" :key="block.id" class="flex items-center gap-2 rounded-lg bg-white px-2 py-2">
-                        <span class="rounded-md p-1 text-gray-300"><Icon name="list" class="h-4 w-4" /></span>
-                        <img :src="`/${block.icon}`" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                        <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
-                        <span class="ms-auto rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400">نظام</span>
+                    <li
+                        v-for="block in topBlocks"
+                        :key="block.id"
+                        class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
+                    >
+                        <div class="rounded-md p-1 text-gray-200">
+                            <Icon name="lock" class="h-4 w-4" />
+                        </div>
+
+                        <button
+                            v-if="block.editable"
+                            type="button"
+                            class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                            @click="openEdit(block.id, block.title)"
+                        >
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        </button>
+                        <div v-else class="flex min-w-0 flex-1 items-center gap-2">
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        </div>
+
+                        <button
+                            v-if="block.editable"
+                            type="button"
+                            class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            aria-label="خيارات البلوك"
+                            @click="openEdit(block.id, block.title)"
+                        >
+                            <Icon name="settings" class="h-5 w-5" />
+                        </button>
                     </li>
                 </ul>
             </div>
 
-            <!-- User blocks -->
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
                     <div class="min-w-0">
                         <p class="text-sm font-medium text-gray-700">بلوكات الصفحة</p>
                         <p class="text-xs text-gray-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
                     </div>
-                    <Button label="إضافة بلوك" variant="secondary" class="shrink-0">
+                    <Button label="إضافة بلوك" variant="secondary" class="shrink-0" :disabled="saving" @click="openAddModal">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
                     </Button>
                 </div>
 
-                <ul class="space-y-1.5 p-2">
-                    <li
-                        v-for="block in userBlocks"
-                        :key="block.id"
-                        class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
-                        :class="{ 'opacity-50': !block.active }"
+                <div class="relative min-h-20">
+                    <ul class="space-y-1.5 p-2">
+                        <li
+                            v-for="block in userBlocks"
+                            :key="block.id"
+                            class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
+                            :class="{ 'opacity-50': !block.active }"
+                            draggable="true"
+                            @dragstart="onDragStart($event, block.id)"
+                            @dragover="onDragOver"
+                            @drop="onDrop($event, block.id)"
+                        >
+                            <button
+                                type="button"
+                                class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing"
+                                aria-label="سحب لإعادة الترتيب"
+                            >
+                                <Icon name="grip-vertical" class="h-4 w-4" />
+                            </button>
+
+                            <a
+                                v-if="block.editable && blockHref(block)"
+                                :href="blockHref(block)"
+                                class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                            >
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            </a>
+                            <button
+                                v-else-if="block.editable"
+                                type="button"
+                                class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                                @click="openEdit(block.id, block.title)"
+                            >
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            </button>
+                            <div v-else class="flex min-w-0 flex-1 items-center gap-2">
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="pointer-events-none shrink-0 rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
+                                aria-label="حذف البلوك"
+                                :disabled="busyId === block.id"
+                                @click.stop="removeBlock(block)"
+                            >
+                                <Icon name="trash" class="h-4 w-4" />
+                            </button>
+
+                            <button
+                                v-if="block.editable"
+                                type="button"
+                                class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                                aria-label="خيارات البلوك"
+                                @click="openEdit(block.id, block.title)"
+                            >
+                                <Icon name="settings" class="h-5 w-5" />
+                            </button>
+
+                            <Switch
+                                :model-value="block.active"
+                                :label="block.active ? 'تعطيل البلوك' : 'تفعيل البلوك'"
+                                :disabled="busyId === block.id"
+                                @update:model-value="toggleActive(block)"
+                            />
+                        </li>
+                    </ul>
+
+                    <p
+                        v-if="!userBlocks.length"
+                        class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-gray-400"
                     >
-                        <button type="button" class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing" aria-label="سحب لإعادة الترتيب">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
-                        </button>
-                        <img :src="`/${block.icon}`" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                        <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
-                        <span v-if="!block.active" class="ms-auto text-xs text-gray-400">غير مفعّل</span>
-                    </li>
-                </ul>
+                        لا توجد بلوكات بعد. اضغط «إضافة بلوك» لإضافة أول بلوك في هذا القسم.
+                    </p>
+                </div>
             </div>
 
-            <!-- System (bottom) blocks -->
-            <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+            <div v-if="bottomBlocks.length" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
                 <ul class="space-y-1.5 p-2">
-                    <li v-for="block in systemBottomBlocks" :key="block.id" class="flex items-center gap-2 rounded-lg bg-white px-2 py-2">
-                        <span class="rounded-md p-1 text-gray-300"><Icon name="list" class="h-4 w-4" /></span>
-                        <img :src="`/${block.icon}`" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                        <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
-                        <span class="ms-auto rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400">نظام</span>
+                    <li
+                        v-for="block in bottomBlocks"
+                        :key="block.id"
+                        class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
+                    >
+                        <div class="rounded-md p-1 text-gray-200">
+                            <Icon name="lock" class="h-4 w-4" />
+                        </div>
+
+                        <button
+                            v-if="block.editable"
+                            type="button"
+                            class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                            @click="openEdit(block.id, block.title)"
+                        >
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        </button>
+                        <div v-else class="flex min-w-0 flex-1 items-center gap-2">
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
+                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        </div>
+
+                        <button
+                            v-if="block.editable"
+                            type="button"
+                            class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            aria-label="خيارات البلوك"
+                            @click="openEdit(block.id, block.title)"
+                        >
+                            <Icon name="settings" class="h-5 w-5" />
+                        </button>
                     </li>
                 </ul>
             </div>
         </div>
+
+        <Modal title="إضافة بلوك" size="lg" name="add-block">
+            <div class="space-y-2 p-4">
+                <button
+                    v-for="blockType in blockTypes"
+                    :key="blockType.slug"
+                    type="button"
+                    class="flex w-full items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+                    :disabled="saving"
+                    @click="addBlock(blockType.slug)"
+                >
+                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-gray-100 p-1.5">
+                    <span class="min-w-0">
+                        <span class="block text-sm font-medium text-gray-800">{{ blockType.name }}</span>
+                        <span class="block text-xs text-gray-400">{{ blockType.description }}</span>
+                    </span>
+                </button>
+            </div>
+        </Modal>
+
+        <Modal :title="editTitle" size="lg" name="edit-block">
+            <p v-if="editingLoading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <p v-else-if="editingError" class="px-4 py-4 text-sm text-red-500">{{ editingError }}</p>
+            <BlockEditor
+                v-else-if="editing"
+                :payload="editing"
+                @saved="onSaved"
+                @close="closeModal('edit-block'); store.clearEditing()"
+            />
+        </Modal>
     </MainBox>
 </template>

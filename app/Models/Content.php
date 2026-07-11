@@ -28,6 +28,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'title',
     'slug',
     'data',
+    'price',
     'meta',
     'active',
     'status',
@@ -42,6 +43,7 @@ class Content extends Model implements HasMedia
     {
         return [
             'data' => 'array',
+            'price' => 'integer',
             'meta' => 'array',
             'active' => 'boolean',
             'published_at' => 'datetime',

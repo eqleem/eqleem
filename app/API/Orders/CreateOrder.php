@@ -226,15 +226,24 @@ class CreateOrder
                 $content = $this->findOrCreateContentForItem($tenant, $type, $name, (string) $unitPrice);
                 $productId = $content?->id;
             } elseif ($productId !== null) {
-                $belongs = Content::query()
+                $content = Content::query()
                     ->whereKey($productId)
                     ->where('tenant_id', $tenant->id)
-                    ->exists();
+                    ->first();
 
-                if (! $belongs) {
+                if (! $content instanceof Content) {
                     throw ValidationException::withMessages([
                         "items.{$index}.product_id" => [__('The selected content is invalid.')],
                     ]);
+                }
+
+                if ($content->status === 'draft') {
+                    $priceMinor = Order::minorFromDecimal((string) $unitPrice);
+                    $currentPrice = (int) ($content->price ?? 0);
+
+                    if ($priceMinor > 0 && $currentPrice !== $priceMinor) {
+                        $content->forceFill(['price' => $priceMinor])->save();
+                    }
                 }
             }
 
@@ -284,29 +293,25 @@ class CreateOrder
         if ($existing instanceof Content) {
             if ($existing->status === 'draft') {
                 $priceMinor = Order::minorFromDecimal($unitPriceDecimal);
-                $currentPrice = (int) data_get($existing->data, 'price', 0);
+                $currentPrice = (int) ($existing->price ?? 0);
 
                 if ($priceMinor > 0 && $currentPrice !== $priceMinor) {
-                    $data = is_array($existing->data) ? $existing->data : [];
-                    $data['price'] = $priceMinor;
-                    $existing->forceFill(['data' => $data])->save();
+                    $existing->forceFill(['price' => $priceMinor])->save();
                 }
             }
 
             return $existing->refresh();
         }
 
-        $data = [
-            'price' => Order::minorFromDecimal($unitPriceDecimal),
-        ];
+        $data = [];
 
         if ($orderItemType === 'course') {
-            $data = array_merge($data, [
+            $data = [
                 'level' => 'beginner',
                 'course_type' => 'recorded',
                 'hours' => 0,
                 'chapters' => [],
-            ]);
+            ];
         }
 
         if ($orderItemType === 'digital_service') {
@@ -320,7 +325,8 @@ class CreateOrder
             'slug' => $this->uniqueContentSlug($title, $orderItemType),
             'status' => 'draft',
             'active' => true,
-            'data' => $data,
+            'price' => Order::minorFromDecimal($unitPriceDecimal),
+            'data' => $data === [] ? null : $data,
         ]);
     }
 

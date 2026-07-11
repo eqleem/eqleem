@@ -2,6 +2,7 @@
     "primaryColor": {
         "type": "picker-color",
         "label": "لون القالب",
+        "allowCustom": true,
         "options": [
             "blue",
             "cyan",

@@ -29,6 +29,7 @@
             :label="__($fieldLabel)"
             :options="$fieldOptions"
             :value="$value"
+            :allowCustom="(bool) ($field['allowCustom'] ?? false)"
         />
         @break
 

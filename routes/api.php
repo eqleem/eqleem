@@ -23,6 +23,23 @@ use App\API\Orders\ListOrders;
 use App\API\Orders\RecordOrderPayment;
 use App\API\Orders\SearchOrderContent;
 use App\API\Orders\ShowOrder;
+use App\API\Page\AddPageHeaderSocialLink;
+use App\API\Page\CreatePageBlock;
+use App\API\Page\DeletePageBlock;
+use App\API\Page\DeletePageBlockLink;
+use App\API\Page\DeletePageHeaderSocialLink;
+use App\API\Page\GetPageDesign;
+use App\API\Page\GetPageStructure;
+use App\API\Page\ReorderPageBlockLinks;
+use App\API\Page\ReorderPageBlocks;
+use App\API\Page\ReorderPageHeaderSocialLinks;
+use App\API\Page\SavePageThemeOptions;
+use App\API\Page\SearchPageLinkContent;
+use App\API\Page\SetDefaultPageTheme;
+use App\API\Page\ShowPageBlock;
+use App\API\Page\TogglePageBlockActive;
+use App\API\Page\UpdatePageBlock;
+use App\API\Page\UpsertPageBlockLink;
 use App\API\Payments\ListPayments;
 use App\API\Payments\ShowPayment;
 use App\API\Settings\AddGeneralInfoSocialLink;
@@ -225,3 +242,67 @@ Route::delete('/settings/shipping-options/custom/{id}', DeleteCustomShippingOpti
 
 Route::put('/settings/shipping-options/custom/{id}/active', UpdateCustomShippingOptionActive::class)
     ->name('api.settings.shipping-options.custom.active');
+
+Route::get('/page/structure', GetPageStructure::class)
+    ->name('api.page.structure');
+
+Route::get('/page/design', GetPageDesign::class)
+    ->name('api.page.design');
+
+Route::put('/page/design/theme', SetDefaultPageTheme::class)
+    ->name('api.page.design.theme');
+
+Route::match(['put', 'post'], '/page/design/options', SavePageThemeOptions::class)
+    ->name('api.page.design.options');
+
+Route::post('/page/blocks', CreatePageBlock::class)
+    ->name('api.page.blocks.store');
+
+Route::put('/page/blocks/reorder', ReorderPageBlocks::class)
+    ->name('api.page.blocks.reorder');
+
+Route::get('/page/blocks/{id}', ShowPageBlock::class)
+    ->name('api.page.blocks.show')
+    ->whereNumber('id');
+
+Route::match(['put', 'post'], '/page/blocks/{id}', UpdatePageBlock::class)
+    ->name('api.page.blocks.update')
+    ->whereNumber('id');
+
+Route::put('/page/blocks/{id}/active', TogglePageBlockActive::class)
+    ->name('api.page.blocks.active')
+    ->whereNumber('id');
+
+Route::delete('/page/blocks/{id}', DeletePageBlock::class)
+    ->name('api.page.blocks.destroy')
+    ->whereNumber('id');
+
+Route::post('/page/blocks/{id}/links', UpsertPageBlockLink::class)
+    ->name('api.page.blocks.links.store')
+    ->whereNumber('id');
+
+Route::put('/page/blocks/{id}/links/reorder', ReorderPageBlockLinks::class)
+    ->name('api.page.blocks.links.reorder')
+    ->whereNumber('id');
+
+Route::put('/page/blocks/{id}/links/{linkId}', UpsertPageBlockLink::class)
+    ->name('api.page.blocks.links.update')
+    ->whereNumber('id')
+    ->whereNumber('linkId');
+
+Route::delete('/page/blocks/{id}/links/{linkId}', DeletePageBlockLink::class)
+    ->name('api.page.blocks.links.destroy')
+    ->whereNumber('id')
+    ->whereNumber('linkId');
+
+Route::get('/page/link-content', SearchPageLinkContent::class)
+    ->name('api.page.link-content');
+
+Route::post('/page/header/social', AddPageHeaderSocialLink::class)
+    ->name('api.page.header.social.store');
+
+Route::put('/page/header/social/reorder', ReorderPageHeaderSocialLinks::class)
+    ->name('api.page.header.social.reorder');
+
+Route::delete('/page/header/social/{id}', DeletePageHeaderSocialLink::class)
+    ->name('api.page.header.social.destroy');

@@ -5,6 +5,7 @@ import Form from '../ui/Form.vue';
 import Input from '../ui/Input.vue';
 import Textarea from '../ui/Textarea.vue';
 import Button from '../ui/Button.vue';
+import FileCrop from '../ui/FileCrop.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { useSession, updateTenant } from '../../stores/session.js';
 
@@ -31,16 +32,8 @@ watch(
     { immediate: true, deep: true },
 );
 
-function onLogoChange(event) {
-    const file = event.target.files?.[0] ?? null;
-    logoFile.value = file;
+function onLogoChange() {
     errors.logo = null;
-
-    if (logoPreview.value && logoPreview.value.startsWith('blob:')) {
-        URL.revokeObjectURL(logoPreview.value);
-    }
-
-    logoPreview.value = file ? URL.createObjectURL(file) : forms.value.basic_info?.logo || null;
 }
 
 async function submit() {
@@ -84,25 +77,17 @@ async function submit() {
     <Form class="!p-4" form-class="!space-y-2" @submit="submit">
         <Input v-model="form.name" name="name" label="اسم الصفحة" placeholder="اسم الصفحة" :error="errors.name" />
 
-        <div class="relative items-center gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-            <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">الشعار</span>
-            <div class="flex flex-1 items-center gap-3 p-2">
-                <div class="flex size-20 items-center justify-center overflow-hidden rounded-lg bg-white">
-                    <img
-                        v-if="logoPreview"
-                        :src="logoPreview"
-                        alt=""
-                        class="size-20 object-cover"
-                    >
-                    <img v-else :src="'/assets/images/user.png'" alt="" class="size-12 opacity-60">
-                </div>
-                <label class="cursor-pointer text-sm font-medium text-primary-700 hover:underline">
-                    رفع شعار
-                    <input type="file" accept="image/*" class="hidden" @change="onLogoChange">
-                </label>
-            </div>
-        </div>
-        <p v-if="errors.logo" class="text-sm text-red-600">{{ errors.logo }}</p>
+        <FileCrop
+            v-model="logoFile"
+            v-model:preview="logoPreview"
+            name="logo"
+            label="الشعار"
+            upload-label="رفع شعار"
+            crop-title="قص الشعار"
+            shape="square"
+            :error="errors.logo"
+            @change="onLogoChange"
+        />
 
         <Textarea
             v-model="form.bio"

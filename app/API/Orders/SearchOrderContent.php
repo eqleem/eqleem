@@ -56,11 +56,11 @@ class SearchOrderContent
             ->where('title', 'like', $like)
             ->orderBy('title')
             ->limit(8)
-            ->get(['id', 'title', 'data', 'status'])
+            ->get(['id', 'title', 'data', 'price', 'status'])
             ->map(fn (Content $content): array => [
                 'name' => $content->title,
                 'product_id' => $content->id,
-                'unit_price' => Money::fromMinor((int) data_get($content->data, 'price', 0)),
+                'unit_price' => Money::fromMinor((int) ($content->price ?? 0)),
                 'duration_minutes' => (int) (data_get($content->data, 'duration_minutes') ?: 60),
                 'status' => (string) $content->status,
             ])

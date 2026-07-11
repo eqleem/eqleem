@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 // Fixed page tabs — from config/page-tabs.php.
 export const fixedTabs = [
     { id: 'structure', slug: 'structure', label: 'هيكل الصفحة', icon: 'assets/icons/tabler/puzzle-2.svg' },
@@ -48,29 +46,8 @@ export const colorHover = {
     amber: 'hover:bg-amber-50', lime: 'hover:bg-lime-50', pink: 'hover:bg-pink-50', gray: 'hover:bg-gray-50',
 };
 
-// Structure tab — dummy blocks.
-export const systemTopBlocks = [
-    { id: 't1', title: 'الشريط العلوي', icon: 'assets/icons/tabler/layout-navbar.svg', system: true },
-    { id: 't2', title: 'الهيدر', icon: 'assets/icons/tabler/layout-bottombar.svg', system: true },
-];
-
-export const userBlocks = reactive([
-    { id: 'b1', title: 'قسم البطل (Hero)', icon: 'assets/icons/business/011-presentation.svg', active: true },
-    { id: 'b2', title: 'المميزات', icon: 'assets/icons/business/030-growth-chart.svg', active: true },
-    { id: 'b3', title: 'دعوة لإجراء (CTA)', icon: 'assets/icons/business/045-message.svg', active: false },
-]);
-
-export const systemBottomBlocks = [
-    { id: 'f1', title: 'الفوتر', icon: 'assets/icons/tabler/layout-bottombar.svg', system: true },
-];
-
-// Design tab — dummy themes.
-export const themes = reactive([
-    { id: 1, name: 'كلاسيك', price_label: 'مجاني', is_active: true },
-    { id: 2, name: 'مودرن', price_label: 'مجاني', is_active: false },
-    { id: 3, name: 'أنيق', price_label: '٤٩ ر.س', is_active: false },
-    { id: 4, name: 'جريء', price_label: '٤٩ ر.س', is_active: false },
-]);
+// Structure tab — live data comes from /api/page/structure (see stores/pageStructure.js).
+// Design tab — live data comes from /api/page/design (see stores/pageDesign.js).
 
 // Generic dummy content items for a content-type index.
 export function itemsFor(slug) {

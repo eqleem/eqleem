@@ -62,7 +62,7 @@ class CreateOrderContent
         return [
             'name' => $content->title,
             'product_id' => $content->id,
-            'unit_price' => Money::fromMinor((int) data_get($content->data, 'price', Order::minorFromDecimal($unitPriceDecimal))),
+            'unit_price' => Money::fromMinor((int) ($content->price ?? Order::minorFromDecimal($unitPriceDecimal))),
             'status' => (string) $content->status,
             'duration_minutes' => (int) (data_get($content->data, 'duration_minutes') ?: 60),
         ];
@@ -110,17 +110,15 @@ class CreateOrderContent
             return $this->syncDraftPrice($existing, $priceMinor);
         }
 
-        $data = [
-            'price' => $priceMinor,
-        ];
+        $data = [];
 
         if ($orderItemType === 'course') {
-            $data = array_merge($data, [
+            $data = [
                 'level' => 'beginner',
                 'course_type' => 'recorded',
                 'hours' => 0,
                 'chapters' => [],
-            ]);
+            ];
         }
 
         if ($orderItemType === 'digital_service') {
@@ -138,7 +136,8 @@ class CreateOrderContent
             'slug' => $this->uniqueContentSlug($title, $orderItemType),
             'status' => 'draft',
             'active' => true,
-            'data' => $data,
+            'price' => $priceMinor,
+            'data' => $data === [] ? null : $data,
         ]);
     }
 
@@ -148,15 +147,13 @@ class CreateOrderContent
             return $content;
         }
 
-        $currentPrice = (int) data_get($content->data, 'price', 0);
+        $currentPrice = (int) ($content->price ?? 0);
 
         if ($priceMinor <= 0 || $currentPrice === $priceMinor) {
             return $content;
         }
 
-        $data = is_array($content->data) ? $content->data : [];
-        $data['price'] = $priceMinor;
-        $content->forceFill(['data' => $data])->save();
+        $content->forceFill(['price' => $priceMinor])->save();
 
         return $content->refresh();
     }
