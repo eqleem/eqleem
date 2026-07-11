@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-    --dashboard-chrome-h: 5.5rem;
+    --dashboard-header-h: 3rem;
+    --dashboard-nav-h: 3.25rem;
+    --dashboard-chrome-h: calc(var(--dashboard-header-h) + var(--dashboard-nav-h));
 
     --color-primary-50: #ebeefa;
     --color-primary-100: #d7ddf4;
@@ -25,6 +27,12 @@
     --color-pgray-700: #44403c;
     --color-pgray-800: #292524;
     --color-pgray-900: #1c1917;
+}
+
+@media (min-width: 48rem) {
+    :root {
+        --dashboard-nav-h: 2.5rem;
+    }
 }
 
 @font-face {

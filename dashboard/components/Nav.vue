@@ -20,7 +20,7 @@ function activeClass(base) {
 </script>
 
 <template>
-    <nav class="fixed inset-x-0 top-12 z-30 bg-primary-800 p-0.5 text-base text-white">
+    <nav class="fixed inset-x-0 top-[var(--dashboard-header-h)] z-30 bg-primary-800 p-0.5 text-base text-white">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-x-0.5 md:justify-start">
             <RouterLink to="/" :class="[linkClass, activeClass('/')]">
                 <svg xmlns="http://www.w3.org/2000/svg" :class="iconClass" viewBox="0 0 24 24" fill="none">
