@@ -307,6 +307,7 @@ export const usePagesStore = defineStore('pages', {
         },
 
         async fetchBlock(uuid, id) {
+            this.editingBlock = null;
             this.editingBlockLoading = true;
             this.editingBlockError = null;
 

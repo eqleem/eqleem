@@ -502,7 +502,7 @@ function saveAndClose() {
         </div>
     </ManageLayout>
     <ManageLayout v-else-if="menu.detailLoading">
-        <div class="rounded-2xl bg-white p-10 text-center text-sm text-gray-500">جاري التحميل…</div>
+        <div class="flex items-center justify-center rounded-2xl bg-white p-10"><LoadingSpinner size="lg" /></div>
     </ManageLayout>
     <NotFound v-else-if="notFound" />
 </template>

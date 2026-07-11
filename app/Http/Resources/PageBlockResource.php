@@ -18,7 +18,7 @@ class PageBlockResource extends JsonResource
         /** @var array<string, mixed> $block */
         $block = $this->resource;
 
-        return [
+        $payload = [
             'id' => $block['id'],
             'uuid' => $block['uuid'] ?? null,
             'title' => $block['title'],
@@ -31,5 +31,11 @@ class PageBlockResource extends JsonResource
             'icon_url' => $block['icon_url'] ?? null,
             'content_manage_url' => $block['content_manage_url'] ?? null,
         ];
+
+        if (array_key_exists('editor', $block)) {
+            $payload['editor'] = $block['editor'];
+        }
+
+        return $payload;
     }
 }

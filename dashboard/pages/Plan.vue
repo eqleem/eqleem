@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
             </div>
         </div>
 
-        <p v-if="planState.loading && !planState.plans.length" class="mt-10 text-center text-sm text-stone-400">جاري التحميل...</p>
+        <div v-if="planState.loading && !planState.plans.length" class="mt-10 flex items-center justify-center"><LoadingSpinner /></div>
 
         <div v-else class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             <div
@@ -178,10 +178,7 @@ onBeforeUnmount(() => {
                     <div class="mb-5 flex items-start justify-between gap-4">
                         <div>
                             <span v-if="plan.free" class="inline-flex rounded-md border border-stone-900 bg-white px-2.5 py-1 text-sm font-bold text-stone-900">{{ plan.title }}</span>
-                            <h3 v-else class="text-lg font-bold text-stone-900">
-                                <span>{{ planState.appName }}</span>
-                                <span :class="plan.accent_class">{{ plan.title }}</span>
-                            </h3>
+                            <h3 v-else class="text-lg font-bold" :class="plan.accent_class">{{ plan.title }}</h3>
                         </div>
                         <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600"><Icon name="user" class="h-5 w-5" /></div>
                     </div>
@@ -271,7 +268,7 @@ onBeforeUnmount(() => {
             name="plan-checkout"
         >
             <div class="p-4">
-                <p v-if="planState.checkoutLoading" class="py-8 text-center text-sm text-stone-400">جاري تحميل نموذج الدفع...</p>
+                <div v-if="planState.checkoutLoading" class="flex items-center justify-center py-8"><LoadingSpinner /></div>
                 <Alert v-else-if="planState.checkoutError" color="red" :text="planState.checkoutError" />
                 <template v-else-if="planState.checkoutPlan">
                     <p class="text-sm text-stone-500">

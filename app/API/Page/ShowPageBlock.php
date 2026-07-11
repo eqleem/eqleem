@@ -80,19 +80,7 @@ class ShowPageBlock
                 'show_client_login' => (bool) ($data['show_client_login'] ?? true),
                 'client_login_label' => (string) ($data['client_login_label'] ?? 'دخول العملاء'),
             ],
-            'float-links' => [
-                'type' => 'float-links',
-                'position' => (string) ($data['position'] ?? 'bottom-end'),
-                'show_whatsapp' => (bool) ($data['show_whatsapp'] ?? true),
-                'whatsapp_number' => (string) ($data['whatsapp_number'] ?? ''),
-                'show_phone' => (bool) ($data['show_phone'] ?? false),
-                'phone_number' => (string) ($data['phone_number'] ?? ''),
-                'show_scroll_top' => (bool) ($data['show_scroll_top'] ?? true),
-                'position_options' => [
-                    'bottom-start' => 'أسفل اليسار',
-                    'bottom-end' => 'أسفل اليمين',
-                ],
-            ],
+            'float-links' => $this->floatLinksEditorPayload($block),
             'header' => $this->headerEditorPayload($block, $tenant, $data),
             'footer' => $this->footerEditorPayload($block, $data),
             'cta' => $this->ctaEditorPayload($block),
@@ -160,18 +148,6 @@ class ShowPageBlock
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    protected function ctaEditorPayload(Block $block): array
-    {
-        return [
-            'type' => 'cta',
-            'links' => $this->mapBlockLinks($block, 'cta-link'),
-            'link_type_options' => CtaLink::linkTypeOptions('nav'),
-        ];
-    }
-
-    /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
@@ -196,30 +172,5 @@ class ShowPageBlock
                 : '',
             'link_type_options' => $options,
         ];
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    protected function mapBlockLinks(Block $block, string $contentType): array
-    {
-        return Content::query()
-            ->where('block_id', $block->id)
-            ->type($contentType)
-            ->orderBy('sort_order')
-            ->get()
-            ->map(function (Content $link): array {
-                return [
-                    'id' => $link->id,
-                    'title' => $link->title,
-                    'label' => CtaLink::label($link),
-                    'type_label' => CtaLink::typeLabel($link),
-                    'summary' => CtaLink::summary($link),
-                    'icon' => CtaLink::icon($link),
-                    'data' => $link->data ?? [],
-                    'sort_order' => $link->sort_order,
-                ];
-            })
-            ->all();
     }
 }

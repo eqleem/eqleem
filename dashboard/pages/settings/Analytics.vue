@@ -114,7 +114,7 @@ onMounted(load);
                 <img :src="`/assets/icons/business/030-growth-chart.svg`" class="h-7 w-7" alt="">
             </template>
 
-            <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <div v-if="loading" class="px-4 py-6 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
             <p v-else-if="message" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
 
             <Form v-if="!loading" @submit="submit">

@@ -9,6 +9,7 @@ import Icon from '../../components/ui/Icon.vue';
 import Button from '../../components/ui/Button.vue';
 import Modal from '../../components/ui/Modal.vue';
 import AddPayment from '../../components/orders/AddPayment.vue';
+import ChangeStatus from '../../components/orders/ChangeStatus.vue';
 import { walkingClientLabel } from '../../data/orders.js';
 import { openModal } from '../../lib/modal.js';
 import { useOrdersStore } from '../../stores/orders.js';
@@ -110,6 +111,19 @@ onUnmounted(() => ordersStore.clearDetail());
 
             <div class="space-y-6 lg:order-2 lg:col-span-2">
                 <Section title="تفاصيل الطلب" icon="package">
+                    <template #action>
+                        <Button
+                            type="button"
+                            label="تغيير الحالة"
+                            variant="outline"
+                            class="!h-8 !px-3 !text-xs"
+                            @click="openModal('change-order-status')"
+                        >
+                            <template #icon>
+                                <Icon name="refresh" class="h-3.5 w-3.5" />
+                            </template>
+                        </Button>
+                    </template>
                     <div class="p-5">
                         <dl class="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
                             <div>
@@ -241,6 +255,10 @@ onUnmounted(() => ordersStore.clearDetail());
 
         <Modal v-if="order" name="add-order-payment" title="تسجيل دفعة" size="lg">
             <AddPayment :order="order" />
+        </Modal>
+
+        <Modal v-if="order" name="change-order-status" title="تغيير حالة الطلب" size="lg">
+            <ChangeStatus :order="order" />
         </Modal>
     </Container>
 </template>

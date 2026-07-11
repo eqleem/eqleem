@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Container from '../../components/ui/Container.vue';
+import Icon from '../../components/ui/Icon.vue';
 import MainBox from '../../components/ui/MainBox.vue';
 import Table from '../../components/orders/Table.vue';
 import PaymentsTable from '../../components/payments/Table.vue';
@@ -11,10 +12,10 @@ import FormSubmissionsTable from '../../components/form-submissions/Table.vue';
 // Ported from resources/views/admin/orders/home.blade.php.
 // Tabs are driven by the `tab` query param (like the blade's url-key="tab").
 const tabs = [
-    { name: 'orders', label: 'الطلبات' },
-    { name: 'payments', label: 'المبيعات' },
-    { name: 'invoices', label: 'الفواتير' },
-    { name: 'form-submissions', label: 'ردود النماذج' },
+    { name: 'orders', label: 'الطلبات', icon: 'message-2' },
+    { name: 'payments', label: 'المبيعات', icon: 'receipt' },
+    { name: 'invoices', label: 'الفواتير', icon: 'file-invoice' },
+    { name: 'form-submissions', label: 'ردود النماذج', icon: 'clipboard-list' },
 ];
 
 const route = useRoute();
@@ -52,11 +53,12 @@ const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)
                         v-for="tab in tabs"
                         :key="tab.name"
                         :to="{ query: { tab: tab.name } }"
-                        class="px-4 py-3 text-sm transition"
+                        class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition"
                         :class="active === tab.name
                             ? 'border-b-2 border-primary-500 text-stone-900'
                             : 'text-gray-500 hover:text-gray-800'"
                     >
+                        <Icon :name="tab.icon" class="h-4 w-4 opacity-75" />
                         {{ tab.label }}
                     </RouterLink>
                 </div>

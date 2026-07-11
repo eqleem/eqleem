@@ -5,6 +5,7 @@ import Icon from '../../ui/Icon.vue';
 import Modal from '../../ui/Modal.vue';
 import Switch from '../../settings/Switch.vue';
 import BlockEditor from '../editors/BlockEditor.vue';
+import BlockEditorSkeleton from '../editors/BlockEditorSkeleton.vue';
 import { openModal, closeModal } from '../../../lib/modal.js';
 import { notifyApiSuccess } from '../../../lib/notify.js';
 import { usePagesStore } from '../../../stores/pages.js';
@@ -151,7 +152,7 @@ async function onDrop(event, targetId) {
             </Button>
         </div>
 
-        <p v-if="store.blocksLoading && !store.blocks.length" class="text-sm text-gray-400">جاري التحميل…</p>
+        <div v-if="store.blocksLoading && !store.blocks.length" class="flex items-center justify-center"><LoadingSpinner /></div>
         <p v-else-if="store.blocksError" class="text-sm text-red-500">{{ store.blocksError }}</p>
 
         <div v-else class="relative min-h-20 rounded-xl border border-gray-200 bg-gray-50/80">
@@ -245,7 +246,7 @@ async function onDrop(event, targetId) {
         </Modal>
 
         <Modal :title="editTitle" size="lg" name="edit-page-block">
-            <p v-if="store.editingBlockLoading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <BlockEditorSkeleton v-if="store.editingBlockLoading" />
             <p v-else-if="store.editingBlockError" class="px-4 py-4 text-sm text-red-500">{{ store.editingBlockError }}</p>
             <BlockEditor
                 v-else-if="store.editingBlock"

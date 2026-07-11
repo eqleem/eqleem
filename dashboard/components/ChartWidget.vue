@@ -57,9 +57,9 @@ onBeforeUnmount(() => chart?.destroy());
         <div class="relative min-h-48 p-3">
             <div
                 v-if="loading || !options"
-                class="absolute inset-0 z-10 flex items-center justify-center text-sm text-stone-400"
+                class="absolute inset-0 z-10 flex items-center justify-center"
             >
-                جاري التحميل…
+                <LoadingSpinner />
             </div>
             <canvas ref="canvas" :class="{ invisible: !options }"></canvas>
         </div>

@@ -14,6 +14,7 @@ const props = defineProps({
     editor: { type: Object, required: true },
     contentType: { type: String, default: 'cta-link' },
     showSettings: { type: Boolean, default: false },
+    embedded: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['saved', 'close', 'updated']);
@@ -119,6 +120,14 @@ function selectContent(item) {
     showContentResults.value = false;
 }
 
+async function refreshLinks() {
+    const payload = await api(`/page/blocks/${props.blockId}`);
+    const editor = payload?.data?.editor ?? null;
+    links.value = [...(editor?.links ?? [])];
+
+    return editor;
+}
+
 async function saveLink() {
     linkError.value = null;
     linkSaving.value = true;
@@ -141,9 +150,8 @@ async function saveLink() {
             body,
         });
 
-        const refreshed = await store.fetchBlock(props.blockId);
-        links.value = [...(refreshed?.editor?.links ?? [])];
-        emit('updated', refreshed);
+        const editor = await refreshLinks();
+        emit('updated', { editor });
         notifySuccess('Saved');
         linkModal.value = false;
     } catch (error) {
@@ -192,6 +200,7 @@ async function onDrop(event, targetId) {
             method: 'PUT',
             body: { order: ids },
         });
+        emit('updated', { editor: { ...props.editor, links: links.value } });
     } catch {
         // ignore
     }
@@ -217,10 +226,12 @@ async function saveSettings() {
         saving.value = false;
     }
 }
+
+defineExpose({ openAdd });
 </script>
 
 <template>
-    <div class="space-y-4 !p-4">
+    <div :class="embedded ? 'relative min-h-20' : 'space-y-4 !p-4'">
         <template v-if="showSettings">
             <Toggle v-model="form.show_documents_warranties" name="show_documents_warranties" label="إظهار الوثائق والضمانات" />
             <div v-if="form.show_documents_warranties" class="space-y-2">
@@ -234,39 +245,51 @@ async function saveSettings() {
             </div>
         </template>
 
-        <div class="flex items-center justify-between gap-3">
+        <div v-if="!embedded" class="flex items-center justify-between gap-3">
             <p class="text-xs font-semibold text-gray-500">الروابط</p>
             <Button type="button" variant="secondary" label="إضافة رابط" class="w-auto" @click="openAdd">
                 <template #icon><Icon name="plus" class="h-4 w-4" /></template>
             </Button>
         </div>
 
-        <p v-if="!links.length" class="py-2 text-xs text-gray-400">لا توجد روابط بعد. أضف أول زر إجراء.</p>
-        <ul v-else class="space-y-1.5">
+        <p
+            v-if="!links.length"
+            :class="embedded
+                ? 'pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-gray-400'
+                : 'py-2 text-xs text-gray-400'"
+        >
+            {{ embedded
+                ? 'لا توجد روابط بعد. اضغط «إضافة رابط» لإضافة أول زر إجراء.'
+                : 'لا توجد روابط بعد. أضف أول زر إجراء.' }}
+        </p>
+        <ul v-else :class="embedded ? 'space-y-1.5 p-2' : 'space-y-1.5'">
             <li
                 v-for="link in links"
                 :key="link.id"
-                class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 transition hover:border-gray-200"
+                class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
                 draggable="true"
                 @dragstart="dragId = link.id"
                 @dragover.prevent
                 @drop="onDrop($event, link.id)"
             >
-                <button type="button" class="cursor-grab rounded-md p-1 text-gray-300">
+                <button type="button" class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing">
                     <Icon name="grip-vertical" class="h-4 w-4" />
                 </button>
-                <button type="button" class="flex min-w-0 flex-1 flex-col items-start text-start hover:text-primary-600" @click="openEdit(link)">
+                <button type="button" class="flex min-w-0 flex-1 cursor-pointer flex-col items-start text-start hover:text-primary-600" @click="openEdit(link)">
                     <span class="truncate text-sm font-medium text-gray-800">{{ link.label }}</span>
                     <span class="truncate text-xs text-gray-400">{{ link.type_label }} · {{ link.summary }}</span>
                 </button>
-                <button type="button" class="shrink-0 rounded-lg p-1 text-red-400/80 hover:bg-red-50 hover:text-red-500" @click="deleteLink(link.id)">
+                <button
+                    type="button"
+                    class="pointer-events-none shrink-0 rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
+                    @click="deleteLink(link.id)"
+                >
                     <Icon name="trash" class="h-4 w-4" />
                 </button>
             </li>
         </ul>
 
-
-        <div class="flex justify-end pt-2">
+        <div v-if="!embedded" class="flex justify-end pt-2">
             <Button
                 v-if="showSettings"
                 type="button"

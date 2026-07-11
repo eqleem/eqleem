@@ -141,7 +141,7 @@ onMounted(load);
 <template>
     <SettingsShell title="اللغة والعملة">
         <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
-        <p v-if="loading" class="mb-4 text-sm text-gray-400">جاري التحميل...</p>
+        <div v-if="loading" class="mb-4 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
 
         <MainBox title="اللغة" subtitle="حدد اللغة الافتراضية واللغات المتاحة لزوار صفحتك.">
             <Form @submit="submitLanguage">

@@ -122,6 +122,7 @@ use App\API\Orders\ListOrders;
 use App\API\Orders\RecordOrderPayment;
 use App\API\Orders\SearchOrderContent;
 use App\API\Orders\ShowOrder;
+use App\API\Orders\UpdateOrderStatus;
 use App\API\Page\AddPageHeaderSocialLink;
 use App\API\Page\CreatePageBlock;
 use App\API\Page\DeletePageBlock;
@@ -259,7 +260,9 @@ use App\API\UnitRental\UpdateUnitRentalCategory;
 use App\API\UnitRental\UpdateUnitRentalSettings;
 use App\API\UnitRental\UploadUnitRentalEditorImage;
 use App\API\UnitRental\UploadUnitRentalImage;
+use App\API\User\UpdateAccountPassword;
 use App\API\User\UpdateAccountProfile;
+use App\API\User\UploadAccountAvatar;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard/context', GetDashboardContext::class)
@@ -318,6 +321,10 @@ Route::post('/orders/{uuid}/payments', RecordOrderPayment::class)
     ->name('api.orders.payments.store')
     ->whereUuid('uuid');
 
+Route::patch('/orders/{uuid}/status', UpdateOrderStatus::class)
+    ->name('api.orders.status.update')
+    ->whereUuid('uuid');
+
 Route::get('/payments', ListPayments::class)
     ->name('api.payments.index');
 
@@ -359,6 +366,12 @@ Route::get('/clients/{uuid}/invoices', ListClientInvoices::class)
 
 Route::put('/account/profile', UpdateAccountProfile::class)
     ->name('api.account.profile.update');
+
+Route::post('/account/avatar', UploadAccountAvatar::class)
+    ->name('api.account.avatar.upload');
+
+Route::put('/account/password', UpdateAccountPassword::class)
+    ->name('api.account.password.update');
 
 Route::put('/settings/domain/handle', UpdateTenantHandle::class)
     ->name('api.settings.domain.handle');

@@ -238,7 +238,31 @@ onMounted(load);
                 <img :src="`/assets/icons/business/017-atm-card.svg`" alt="" class="h-6 w-6">
             </template>
 
-            <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <div
+                v-if="loading"
+                class="animate-pulse divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200"
+                aria-busy="true"
+                aria-label="جاري تحميل وسائل الدفع"
+            >
+                <div
+                    v-for="n in 5"
+                    :key="`skeleton-${n}`"
+                    class="flex items-center gap-4 px-4 py-4"
+                >
+                    <div class="min-w-0 flex-1 space-y-2">
+                        <div
+                            class="h-4 rounded-md bg-gray-200"
+                            :class="n % 2 === 0 ? 'w-28' : 'w-36'"
+                        ></div>
+                        <div
+                            class="h-3 rounded-md bg-gray-100"
+                            :class="n % 3 === 0 ? 'w-48' : n % 2 === 0 ? 'w-64' : 'w-56'"
+                        ></div>
+                    </div>
+                    <div class="h-12 w-[88px] shrink-0 rounded-lg bg-gray-100"></div>
+                    <div class="h-6 w-11 shrink-0 rounded-full bg-gray-200"></div>
+                </div>
+            </div>
 
             <div v-else class="divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200">
                 <div

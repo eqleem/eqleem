@@ -77,7 +77,7 @@ onUnmounted(() => clientsStore.clearDetail());
             </div>
 
             <div class="mt-6">
-                <div class="flex border-b">
+                <div class="flex border-b border-stone-200 px-px">
                     <RouterLink
                         v-for="tab in tabs"
                         :key="tab.name"

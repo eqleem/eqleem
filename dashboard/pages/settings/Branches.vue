@@ -241,7 +241,7 @@ onMounted(load);
                     </div>
                 </div>
 
-                <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+                <div v-if="loading" class="px-4 py-6 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
 
                 <Empty v-else-if="results.length === 0" subtitle="سيتم عرض الفروع هنا بعد إضافتها.">
                     لا توجد فروع.

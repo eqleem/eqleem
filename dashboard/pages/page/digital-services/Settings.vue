@@ -62,9 +62,7 @@ async function submit() {
     <ManageLayout>
         <Shell>
             <div class="p-4">
-                <div v-if="store.settingsLoading && !store.settingsLoaded" class="py-8 text-center text-sm text-gray-500">
-                    جاري التحميل…
-                </div>
+                <div v-if="store.settingsLoading && !store.settingsLoaded" class="py-8 flex items-center justify-center"><LoadingSpinner /></div>
 
                 <Form v-else class="!p-0" @submit="submit">
                     <div class="space-y-2">

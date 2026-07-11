@@ -19,6 +19,15 @@ export const paymentMethodOptions = {
     online: 'دفع إلكتروني',
 };
 
+// From Order::statusOptions().
+export const statusOptions = {
+    draft: 'مسودة',
+    open: 'مفتوح',
+    confirmed: 'مؤكد',
+    completed: 'مكتمل',
+    cancelled: 'ملغى',
+};
+
 // From Order::addItemTypeOptions() / itemTypeOptions().
 export const addItemTypeOptions = {
     product: 'أضف منتج',

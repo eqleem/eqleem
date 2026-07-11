@@ -510,6 +510,8 @@
     "Add option type": "أضف نوع الاختيار",
     "Option type": "نوع الاختيار",
     "Account info updated successfully.": "تم تحديث بيانات الحساب بنجاح.",
+    "Password updated successfully.": "تم تحديث كلمة المرور بنجاح.",
+    "Profile photo updated successfully.": "تم تحديث صورة الحساب بنجاح.",
     "showLogoOnly": "عرض اللوقو فقط",
     "headerImage": "صورة الهيدر",
     "logoRadius": "شكل انحناء الشعار",

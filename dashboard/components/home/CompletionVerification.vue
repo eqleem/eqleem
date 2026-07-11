@@ -125,7 +125,7 @@ onMounted(load);
 
 <template>
     <div class="space-y-3 p-4 text-gray-800" dir="rtl">
-        <p v-if="loading" class="py-4 text-sm text-gray-400">جاري التحميل...</p>
+        <div v-if="loading" class="py-4 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
 
         <template v-else>
             <Alert

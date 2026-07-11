@@ -100,15 +100,51 @@ onMounted(() => {
         <div class="relative overflow-visible p-1">
             <div
                 v-if="loading"
-                class="absolute inset-0 z-10 flex items-center justify-center bg-white/50"
+                class="animate-pulse"
+                aria-busy="true"
+                aria-label="جاري تحميل العملاء"
             >
-                <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
-                </svg>
+                <div
+                    v-for="n in 6"
+                    :key="`skeleton-${n}`"
+                    class="flex w-full items-center justify-between gap-x-7"
+                >
+                    <div class="ps-6">
+                        <div class="h-4 w-4 rounded-xl bg-gray-200"></div>
+                    </div>
+
+                    <div class="w-full py-3">
+                        <div class="flex items-center gap-x-2">
+                            <div class="h-10 w-10 flex-none rounded-full bg-gray-200"></div>
+                            <div class="min-w-0 flex-1 space-y-2">
+                                <div
+                                    class="h-5 rounded-md bg-gray-200"
+                                    :class="n % 3 === 0 ? 'w-28' : n % 2 === 0 ? 'w-40' : 'w-36'"
+                                ></div>
+                                <div class="flex items-center gap-x-2">
+                                    <div class="h-2 w-2 rounded-full bg-gray-200"></div>
+                                    <div
+                                        class="h-5 rounded-md bg-gray-100"
+                                        :class="n % 2 === 0 ? 'w-32' : 'w-40'"
+                                    ></div>
+                                    <div class="h-4 w-20 rounded-md bg-gray-100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pe-6">
+                        <div class="flex flex-col items-center gap-1 px-1.5 py-1.5">
+                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div
-                v-if="error && !loading"
+                v-else-if="error"
                 class="flex flex-col items-center justify-center gap-2 p-10 text-center"
             >
                 <p class="text-sm text-red-600">{{ error }}</p>

@@ -47,18 +47,31 @@ class UpdateAccountProfile
                 'max:255',
                 Rule::unique('users', 'email')->ignore($this->getAuthUserId()),
             ],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:14',
+                Rule::unique('users', 'phone')->ignore($this->getAuthUserId()),
+            ],
         ];
     }
 
     /**
-     * @param  array{name: string, email: string}  $data
+     * @param  array{name: string, email: string, phone?: string|null}  $data
      */
     public function handle(User $user, array $data): User
     {
+        $emailChanged = $user->email !== $data['email'];
+
         $user->fill([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => filled($data['phone'] ?? null) ? $data['phone'] : null,
         ]);
+
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
 
         $user->save();
 
@@ -70,7 +83,7 @@ class UpdateAccountProfile
         /** @var User $user */
         $user = $request->user();
 
-        /** @var array{name: string, email: string} $validated */
+        /** @var array{name: string, email: string, phone?: string|null} $validated */
         $validated = $request->validated();
 
         return $this->handle($user, $validated);

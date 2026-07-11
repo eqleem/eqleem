@@ -45,11 +45,55 @@ onMounted(() => {
         </div>
 
         <div class="relative p-1">
-            <div v-if="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50">
-                <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" /></svg>
+            <div
+                v-if="loading"
+                class="animate-pulse"
+                aria-busy="true"
+                aria-label="جاري تحميل الفواتير"
+            >
+                <div
+                    v-for="n in 6"
+                    :key="`skeleton-${n}`"
+                    class="flex w-full items-center justify-between gap-x-4 px-4 sm:px-6"
+                >
+                    <div class="min-w-0 flex-1 space-y-2 py-3">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <div
+                                class="h-5 rounded-md bg-gray-200"
+                                :class="n % 2 === 0 ? 'w-28' : 'w-36'"
+                            ></div>
+                            <div class="h-5 w-16 rounded-md bg-gray-100"></div>
+                            <div class="h-5 w-14 rounded-md bg-gray-100"></div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <div
+                                class="h-5 rounded-md bg-gray-100"
+                                :class="n % 3 === 0 ? 'w-24' : 'w-32'"
+                            ></div>
+                            <div class="h-3 w-20 rounded-md bg-gray-100"></div>
+                        </div>
+                    </div>
+
+                    <div class="hidden shrink-0 items-center gap-x-6 sm:flex">
+                        <div class="space-y-1.5 text-end">
+                            <div class="ms-auto h-4 w-20 rounded-md bg-gray-200"></div>
+                            <div class="ms-auto h-3 w-16 rounded-md bg-gray-100"></div>
+                        </div>
+                        <div class="min-w-24 space-y-1.5 text-end">
+                            <div class="ms-auto h-4 w-16 rounded-md bg-gray-200"></div>
+                            <div class="ms-auto h-3 w-12 rounded-md bg-gray-100"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex shrink-0 flex-col items-center gap-1 pe-2 px-1.5 py-1.5">
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                    </div>
+                </div>
             </div>
 
-            <div v-if="error && !loading" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
+            <div v-else-if="error" class="flex flex-col items-center justify-center gap-2 p-10 text-center">
                 <p class="text-sm text-red-600">{{ error }}</p>
                 <button type="button" class="rounded-lg border bg-white px-3 py-1.5 text-sm" @click="invoicesStore.fetchList({ page: meta.current_page })">إعادة المحاولة</button>
             </div>

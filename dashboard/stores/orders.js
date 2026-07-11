@@ -319,6 +319,36 @@ export const useOrdersStore = defineStore('orders', {
             }
         },
 
+        async updateStatus(uuid, data) {
+            try {
+                const payload = await api(`/orders/${uuid}/status`, {
+                    method: 'PATCH',
+                    body: data,
+                });
+
+                const order = payload?.data ?? payload;
+                this.detail = order;
+
+                const index = this.items.findIndex((item) => item.uuid === uuid);
+                if (index !== -1) {
+                    this.items[index] = {
+                        ...this.items[index],
+                        status: order.status,
+                        status_label: order.status_label,
+                        status_color: order.status_color,
+                    };
+                }
+
+                return { order, message: payload?.message ?? null };
+            } catch (error) {
+                if (error instanceof ApiError && error.status === 401) {
+                    window.location.href = '/login';
+                }
+
+                throw error;
+            }
+        },
+
         removeLocal(ids) {
             const set = new Set(ids);
             this.items = this.items.filter((item) => !set.has(item.id));

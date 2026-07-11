@@ -24,7 +24,6 @@ const form = reactive({
     whatsapp_number: props.editor.whatsapp_number ?? '',
     show_phone: Boolean(props.editor.show_phone),
     phone_number: props.editor.phone_number ?? '',
-    show_scroll_top: Boolean(props.editor.show_scroll_top),
 });
 
 const errors = reactive({});
@@ -65,7 +64,6 @@ async function submit() {
             <Separator />
             <Toggle v-model="form.show_whatsapp" name="show_whatsapp" label="زر واتساب" />
             <Toggle v-model="form.show_phone" name="show_phone" label="زر الاتصال" />
-            <Toggle v-model="form.show_scroll_top" name="show_scroll_top" label="زر العودة للأعلى" />
             <Input
                 v-if="form.show_whatsapp"
                 v-model="form.whatsapp_number"

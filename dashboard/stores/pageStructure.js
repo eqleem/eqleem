@@ -4,8 +4,10 @@ import { api, ApiError } from '../lib/api.js';
 function emptyStructure() {
     return {
         top_blocks: [],
+        cta_block: null,
         user_blocks: [],
         bottom_blocks: [],
+        float_links_block: null,
         block_types: [],
     };
 }
@@ -13,8 +15,10 @@ function emptyStructure() {
 export const usePageStructureStore = defineStore('pageStructure', {
     state: () => ({
         topBlocks: [],
+        ctaBlock: null,
         userBlocks: [],
         bottomBlocks: [],
+        floatLinksBlock: null,
         blockTypes: [],
         loading: false,
         loaded: false,
@@ -33,10 +37,34 @@ export const usePageStructureStore = defineStore('pageStructure', {
         applyStructure(payload) {
             const data = payload?.data ?? payload ?? emptyStructure();
             this.topBlocks = Array.isArray(data.top_blocks) ? data.top_blocks : [];
+            this.ctaBlock = data.cta_block ?? null;
             this.userBlocks = Array.isArray(data.user_blocks) ? data.user_blocks : [];
             this.bottomBlocks = Array.isArray(data.bottom_blocks) ? data.bottom_blocks : [];
+            this.floatLinksBlock = data.float_links_block ?? null;
             this.blockTypes = Array.isArray(data.block_types) ? data.block_types : [];
             this.loaded = true;
+        },
+
+        setCtaEditor(editor) {
+            if (!this.ctaBlock) {
+                return;
+            }
+
+            this.ctaBlock = {
+                ...this.ctaBlock,
+                editor: editor ?? this.ctaBlock.editor,
+            };
+        },
+
+        setFloatLinksEditor(editor) {
+            if (!this.floatLinksBlock) {
+                return;
+            }
+
+            this.floatLinksBlock = {
+                ...this.floatLinksBlock,
+                editor: editor ?? this.floatLinksBlock.editor,
+            };
         },
 
         async fetchStructure({ force = false } = {}) {
@@ -151,6 +179,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
         },
 
         async fetchBlock(id) {
+            this.editing = null;
             this.editingLoading = true;
             this.editingError = null;
 

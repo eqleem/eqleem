@@ -155,9 +155,7 @@ async function submit() {
 </script>
 
 <template>
-    <div v-if="loading" class="flex items-center justify-center p-10 text-sm text-gray-500">
-        جاري التحميل…
-    </div>
+    <div v-if="loading" class="flex items-center justify-center p-10"><LoadingSpinner size="lg" /></div>
 
     <Form v-else class="!rounded-none" @submit="submit">
         <div class="mb-4">

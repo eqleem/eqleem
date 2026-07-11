@@ -18,21 +18,67 @@ test('authenticated users can update their profile', function () {
         'uuid' => (string) Str::uuid(),
         'name' => 'Old Name',
         'email' => 'old@example.com',
+        'phone' => '0500000001',
+        'email_verified_at' => now(),
     ]);
 
     $this->actingAs($user)
         ->putJson('/api/account/profile', [
             'name' => 'أحمد الأحمدي',
             'email' => 'contact@ahmad.tech',
+            'phone' => '0555555555',
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.name', 'أحمد الأحمدي')
         ->assertJsonPath('data.email', 'contact@ahmad.tech')
+        ->assertJsonPath('data.phone', '0555555555')
+        ->assertJsonPath('data.email_verified', false)
         ->assertJsonStructure(['message']);
 
     expect($user->fresh())
         ->name->toBe('أحمد الأحمدي')
-        ->email->toBe('contact@ahmad.tech');
+        ->email->toBe('contact@ahmad.tech')
+        ->phone->toBe('0555555555')
+        ->email_verified_at->toBeNull();
+});
+
+test('profile update can clear the phone number', function () {
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'phone' => '0501234567',
+    ]);
+
+    $this->actingAs($user)
+        ->putJson('/api/account/profile', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => null,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.phone', null);
+
+    expect($user->fresh()->phone)->toBeNull();
+});
+
+test('profile update rejects phones already taken by another user', function () {
+    User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'phone' => '0599999999',
+    ]);
+
+    $user = User::factory()->create([
+        'uuid' => (string) Str::uuid(),
+        'phone' => '0511111111',
+    ]);
+
+    $this->actingAs($user)
+        ->putJson('/api/account/profile', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => '0599999999',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['phone']);
 });
 
 test('profile update validates required fields', function () {

@@ -7,6 +7,9 @@ import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
 import Switch from '../settings/Switch.vue';
 import BlockEditor from './editors/BlockEditor.vue';
+import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
+import BlockLinksPanel from './editors/BlockLinksPanel.vue';
+import FloatLinksPanel from './editors/FloatLinksPanel.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
@@ -14,8 +17,10 @@ import { usePageStructureStore } from '../../stores/pageStructure.js';
 const store = usePageStructureStore();
 const {
     topBlocks,
+    ctaBlock,
     userBlocks,
     bottomBlocks,
+    floatLinksBlock,
     blockTypes,
     loading,
     error,
@@ -28,6 +33,8 @@ const {
 const dragId = ref(null);
 const busyId = ref(null);
 const editTitle = ref('إعدادات البلوك');
+const ctaLinksPanel = ref(null);
+const floatLinksPanel = ref(null);
 
 onMounted(() => {
     store.fetchStructure();
@@ -35,6 +42,26 @@ onMounted(() => {
 
 function openAddModal() {
     openModal('add-block');
+}
+
+function openAddCtaLink() {
+    ctaLinksPanel.value?.openAdd?.();
+}
+
+function openFloatLinksPosition() {
+    floatLinksPanel.value?.openPosition?.();
+}
+
+function onCtaUpdated(payload) {
+    if (payload?.editor) {
+        store.setCtaEditor(payload.editor);
+    }
+}
+
+function onFloatLinksUpdated(payload) {
+    if (payload?.editor) {
+        store.setFloatLinksEditor(payload.editor);
+    }
 }
 
 async function addBlock(type) {
@@ -150,7 +177,7 @@ function blockHref(block) {
             <img :src="'/assets/icons/tabler/puzzle-2.svg'" class="h-7 w-7" alt="">
         </template>
 
-        <p v-if="loading && !topBlocks.length && !userBlocks.length" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+        <div v-if="loading && !topBlocks.length && !userBlocks.length" class="px-4 py-6 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
         <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
 
         <div v-else class="space-y-4 p-4">
@@ -168,7 +195,7 @@ function blockHref(block) {
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
                             @click="openEdit(block.id, block.title)"
                         >
                             <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
@@ -182,7 +209,7 @@ function blockHref(block) {
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            class="cursor-pointer rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
                             aria-label="خيارات البلوك"
                             @click="openEdit(block.id, block.title)"
                         >
@@ -190,6 +217,26 @@ function blockHref(block) {
                         </button>
                     </li>
                 </ul>
+            </div>
+
+            <div v-if="ctaBlock?.editor" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-700">أزرار الإجراء</p>
+                        <p class="text-xs text-gray-400">هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين</p>
+                    </div>
+                    <Button label="إضافة رابط" variant="secondary" class="shrink-0" @click="openAddCtaLink">
+                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                    </Button>
+                </div>
+
+                <BlockLinksPanel
+                    ref="ctaLinksPanel"
+                    embedded
+                    :block-id="ctaBlock.id"
+                    :editor="ctaBlock.editor"
+                    @updated="onCtaUpdated"
+                />
             </div>
 
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
@@ -297,7 +344,7 @@ function blockHref(block) {
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
+                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
                             @click="openEdit(block.id, block.title)"
                         >
                             <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
@@ -311,7 +358,7 @@ function blockHref(block) {
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            class="cursor-pointer rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
                             aria-label="خيارات البلوك"
                             @click="openEdit(block.id, block.title)"
                         >
@@ -319,6 +366,25 @@ function blockHref(block) {
                         </button>
                     </li>
                 </ul>
+            </div>
+
+            <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-700">الأزرار الطافية</p>
+                        <p class="text-xs text-gray-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
+                    </div>
+                    <Button label="الموضع" variant="secondary" class="shrink-0" @click="openFloatLinksPosition">
+                        <template #icon><Icon name="settings" class="h-4 w-4" /></template>
+                    </Button>
+                </div>
+
+                <FloatLinksPanel
+                    ref="floatLinksPanel"
+                    :block-id="floatLinksBlock.id"
+                    :editor="floatLinksBlock.editor"
+                    @updated="onFloatLinksUpdated"
+                />
             </div>
         </div>
 
@@ -342,7 +408,7 @@ function blockHref(block) {
         </Modal>
 
         <Modal :title="editTitle" size="lg" name="edit-block">
-            <p v-if="editingLoading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <BlockEditorSkeleton v-if="editingLoading" />
             <p v-else-if="editingError" class="px-4 py-4 text-sm text-red-500">{{ editingError }}</p>
             <BlockEditor
                 v-else-if="editing"

@@ -26,10 +26,22 @@ function createUserWithThemesForPageDesign(): array
         'slug' => 'default',
         'meta' => [
             'label_ar' => 'إفتراضي',
-            'preview' => 'assets/themes/default.svg',
-            'gallery' => ['assets/themes/default.svg'],
+            'preview' => 'assets/wjeez/themes/default.svg',
+            'gallery' => [
+                'https://api.dicebear.com/10.x/stripes/svg?seed=default-home',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=default-store',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=default-blog',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=default-services',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=default-contact',
+            ],
             'designer' => 'فريق إقليم',
             'price' => 0,
+            'version' => '2.1.0',
+            'description' => 'قالب متكامل بتصميم عصري.',
+            'features' => [
+                'تصميم متجاوب',
+                'ألوان قابلة للتخصيص',
+            ],
         ],
         'type' => 'all',
         'app' => 'all',
@@ -44,10 +56,22 @@ function createUserWithThemesForPageDesign(): array
         'slug' => 'minimal',
         'meta' => [
             'label_ar' => 'بسيط',
-            'preview' => 'assets/themes/minimal.svg',
-            'gallery' => ['assets/themes/minimal.svg'],
+            'preview' => 'assets/wjeez/themes/minimal.svg',
+            'gallery' => [
+                'https://api.dicebear.com/10.x/stripes/svg?seed=minimal-home',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=minimal-store',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=minimal-blog',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=minimal-services',
+                'https://api.dicebear.com/10.x/stripes/svg?seed=minimal-contact',
+            ],
             'designer' => 'استوديو بسيط',
             'price' => 99,
+            'version' => '1.4.2',
+            'description' => 'قالب بسيط بأناقة عالية.',
+            'features' => [
+                'مظهر نظيف',
+                'مساحات بيضاء مدروسة',
+            ],
         ],
         'type' => 'all',
         'app' => 'all',
@@ -88,12 +112,35 @@ test('owner can list themes and default theme options schema', function () {
         ->assertJsonPath('data.selected_theme_id', $default->id)
         ->assertJsonPath('data.tenant_theme_id', $default->id)
         ->assertJsonPath('data.selected_theme.is_active', true)
+        ->assertJsonPath('data.selected_theme.is_free', true)
+        ->assertJsonPath('data.selected_theme.price_label', 'مجاني')
+        ->assertJsonPath('data.selected_theme.version', '2.1.0')
+        ->assertJsonPath('data.selected_theme.designer', 'فريق إقليم')
+        ->assertJsonPath('data.selected_theme.description', 'قالب متكامل بتصميم عصري.')
+        ->assertJsonPath('data.selected_theme.features.0', 'تصميم متجاوب')
         ->assertJsonPath('data.options_schema.primaryColor.type', 'picker-color')
         ->assertJsonPath('data.options_schema.primaryColor.allowCustom', true)
         ->assertJsonPath('data.options.primaryColor', 'blue')
         ->assertJsonPath('data.options.logoRadius', 'full')
         ->assertJsonFragment(['slug' => 'default'])
         ->assertJsonFragment(['slug' => 'minimal']);
+});
+
+test('theme info payload includes gallery and paid theme pricing', function () {
+    [$user, $tenant, $default, $minimal] = createUserWithThemesForPageDesign();
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/page/design?theme_id='.$minimal->id)
+        ->assertSuccessful()
+        ->assertJsonPath('data.selected_theme.is_free', false)
+        ->assertJsonPath('data.selected_theme.version', '1.4.2')
+        ->assertJsonPath('data.selected_theme.designer', 'استوديو بسيط');
+
+    $gallery = $response->json('data.selected_theme.gallery');
+
+    expect($gallery)->toBeArray()
+        ->and(count($gallery))->toBeGreaterThanOrEqual(5)
+        ->and($response->json('data.selected_theme.features'))->toHaveCount(2);
 });
 
 test('owner can inspect another theme without activating it', function () {

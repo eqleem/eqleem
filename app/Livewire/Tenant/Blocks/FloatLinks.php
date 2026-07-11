@@ -30,7 +30,6 @@ class FloatLinks extends Component
             'whatsappUrl' => $whatsappNumber !== '' ? 'https://wa.me/'.$whatsappNumber : null,
             'showPhoneButton' => $showPhone && $phoneNumber !== '',
             'phoneNumber' => $phoneNumber,
-            'showScrollTop' => (bool) ($blockData['show_scroll_top'] ?? true),
         ]);
     }
 }

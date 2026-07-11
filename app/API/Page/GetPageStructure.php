@@ -30,8 +30,10 @@ class GetPageStructure
 
         return [
             'top_blocks' => $grouped['top']->all(),
+            'cta_block' => $grouped['cta'],
             'user_blocks' => $grouped['user']->all(),
             'bottom_blocks' => $grouped['bottom']->all(),
+            'float_links_block' => $grouped['float_links'],
             'block_types' => $blockTypes->options(addableOnly: true),
         ];
     }

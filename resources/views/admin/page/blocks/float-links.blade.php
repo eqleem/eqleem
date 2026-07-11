@@ -17,7 +17,6 @@
 
         <ui:toggle name="showWhatsapp" label="زر واتساب" live />
         <ui:toggle name="showPhone" label="زر الاتصال" live />
-        <ui:toggle name="showScrollTop" label="زر العودة للأعلى" />
 
         @if ($showWhatsapp)
             <ui:input name="whatsappNumber" label="رقم واتساب" placeholder="966500000000" dir="ltr" />
@@ -51,8 +50,6 @@ new class extends \Livewire\Component
 
     public string $phoneNumber = '';
 
-    public bool $showScrollTop = true;
-
     protected function blockType(): string
     {
         return 'float-links';
@@ -69,7 +66,6 @@ new class extends \Livewire\Component
         $this->whatsappNumber = (string) ($data['whatsapp_number'] ?? '');
         $this->showPhone = (bool) ($data['show_phone'] ?? false);
         $this->phoneNumber = (string) ($data['phone_number'] ?? '');
-        $this->showScrollTop = (bool) ($data['show_scroll_top'] ?? true);
     }
 
     /**
@@ -94,7 +90,6 @@ new class extends \Livewire\Component
             'whatsapp_number' => $this->whatsappNumber,
             'show_phone' => $this->showPhone,
             'phone_number' => $this->phoneNumber,
-            'show_scroll_top' => $this->showScrollTop,
         ]);
     }
 }; ?>

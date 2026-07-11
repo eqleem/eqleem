@@ -64,16 +64,63 @@ test('owner can list page structure with system and user blocks', function () {
         ->assertJsonStructure([
             'data' => [
                 'top_blocks',
+                'cta_block',
                 'user_blocks',
                 'bottom_blocks',
+                'float_links_block',
                 'block_types',
             ],
         ])
         ->assertJsonFragment(['id' => $block->id, 'title' => 'بطاقة تجريبية'])
         ->assertJsonPath('data.block_types.0.slug', 'block-link')
-        ->assertJsonPath('data.top_blocks.0.type', 'top-nav');
+        ->assertJsonPath('data.top_blocks.0.type', 'top-nav')
+        ->assertJsonPath('data.cta_block.type', 'cta')
+        ->assertJsonPath('data.float_links_block.type', 'float-links')
+        ->assertJsonStructure([
+            'data' => [
+                'cta_block' => [
+                    'id',
+                    'editor' => [
+                        'type',
+                        'links',
+                        'link_type_options',
+                    ],
+                ],
+                'float_links_block' => [
+                    'id',
+                    'editor' => [
+                        'type',
+                        'position',
+                        'show_whatsapp',
+                        'show_phone',
+                    ],
+                ],
+            ],
+        ]);
 });
 
+test('cta block is not included among locked top blocks', function () {
+    [$user] = createUserWithTenantForPageStructure();
+
+    $types = $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful()
+        ->json('data.top_blocks.*.type');
+
+    expect($types)->not->toContain('cta');
+});
+
+test('float links block is not included among locked bottom blocks', function () {
+    [$user] = createUserWithTenantForPageStructure();
+
+    $types = $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful()
+        ->json('data.bottom_blocks.*.type');
+
+    expect($types)->not->toContain('float-links');
+    expect($types)->toContain('footer');
+});
 test('owner can create reorder toggle and delete user blocks', function () {
     [$user, $tenant] = createUserWithTenantForPageStructure();
 

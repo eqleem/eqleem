@@ -21,7 +21,10 @@ class UserResource extends JsonResource
             'uuid' => $this->uuid,
             'name' => $this->name,
             'email' => $this->email,
+            'phone' => $this->phone,
             'image' => $this->image,
+            'email_verified' => $this->email_verified_at !== null,
+            'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 }

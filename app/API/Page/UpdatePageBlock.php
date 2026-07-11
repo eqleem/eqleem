@@ -55,7 +55,6 @@ class UpdatePageBlock
                 'whatsapp_number' => ['nullable', 'string', 'max:30'],
                 'show_phone' => ['required', 'boolean'],
                 'phone_number' => ['nullable', 'string', 'max:30'],
-                'show_scroll_top' => ['required', 'boolean'],
             ],
             'header' => [
                 'name' => ['required', 'string', 'min:2', 'max:255'],
@@ -189,7 +188,6 @@ class UpdatePageBlock
                 'whatsapp_number' => (string) ($data['whatsapp_number'] ?? ''),
                 'show_phone' => (bool) $data['show_phone'],
                 'phone_number' => (string) ($data['phone_number'] ?? ''),
-                'show_scroll_top' => (bool) $data['show_scroll_top'],
             ],
         ]);
     }

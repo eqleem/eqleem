@@ -10,20 +10,4 @@
             <iconify-icon icon="hugeicons:call-02" class="text-2xl" stroke-width="1.5"></iconify-icon>
         </a>
     @endif
-
-    @if ($showScrollTop)
-        <button
-            type="button"
-            x-data="{ shown: false }"
-            x-init="shown = window.scrollY > 300"
-            x-on:scroll.window="shown = window.scrollY > 300"
-            x-show="shown"
-            x-transition
-            x-on:click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-            aria-label="العودة للأعلى"
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-stone-800 text-white shadow-lg transition hover:bg-stone-900"
-        >
-            <iconify-icon icon="hugeicons:arrow-up-01" class="text-2xl" stroke-width="1.5"></iconify-icon>
-        </button>
-    @endif
 </div>

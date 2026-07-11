@@ -230,7 +230,7 @@ onMounted(load);
 <template>
     <SettingsShell title="وسائل الشحن" :embedded="embedded">
         <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
-        <p v-if="loading" class="mb-4 text-sm text-gray-400">جاري التحميل...</p>
+        <div v-if="loading" class="mb-4 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
 
         <MainBox title="وسائل الشحن" subtitle="قم بتفعيل وتخصيص طرق الشحن المتاحة لعملائك.">
             <template #icon>

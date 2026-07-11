@@ -122,9 +122,7 @@ async function toggleActive(item) {
         </div>
 
         <div class="relative p-1">
-            <div v-if="store.loading && !store.loaded" class="flex items-center justify-center p-10 text-sm text-gray-500">
-                جاري التحميل…
-            </div>
+            <div v-if="store.loading && !store.loaded" class="flex items-center justify-center p-10"><LoadingSpinner size="lg" /></div>
 
             <div v-else-if="store.error" class="p-6 text-center text-sm text-red-600">
                 {{ store.error }}

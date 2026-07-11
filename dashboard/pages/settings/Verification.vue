@@ -121,7 +121,7 @@ onMounted(load);
 <template>
     <SettingsShell title="توثيق الحساب">
         <MainBox title="توثيق المتجر" subtitle="بيانات توثيق المتجر بالمستندات الرسمية.">
-            <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <div v-if="loading" class="px-4 py-6 flex items-center justify-center"><LoadingSpinner size="sm" /></div>
             <p v-else-if="message" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
 
             <template v-if="!loading">

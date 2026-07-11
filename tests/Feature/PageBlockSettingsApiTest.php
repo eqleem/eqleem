@@ -77,11 +77,12 @@ test('owner can update float-links settings', function () {
             'whatsapp_number' => '966500000000',
             'show_phone' => false,
             'phone_number' => '',
-            'show_scroll_top' => false,
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.editor.position', 'bottom-start')
-        ->assertJsonPath('data.editor.show_scroll_top', false);
+        ->assertJsonPath('data.editor.show_whatsapp', true)
+        ->assertJsonPath('data.editor.whatsapp_number', '966500000000')
+        ->assertJsonMissingPath('data.editor.show_scroll_top');
 });
 
 test('owner can update header settings', function () {
