@@ -20,7 +20,7 @@ const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
 </script>
 
 <template>
-    <header class="bg-primary-700 p-2 text-white">
+    <header class="fixed inset-x-0 top-0 z-40 bg-primary-700 p-2 text-white">
         <div class="mx-auto flex max-w-7xl justify-between">
             <div class="flex items-center gap-x-3">
                 <RouterLink to="/" class="flex items-center justify-center gap-x-2 text-center">
