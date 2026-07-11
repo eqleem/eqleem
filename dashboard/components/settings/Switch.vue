@@ -3,6 +3,7 @@
 defineProps({
     modelValue: { type: Boolean, default: false },
     label: { type: String, default: null },
+    disabled: { type: Boolean, default: false },
 });
 
 defineEmits(['update:modelValue']);
@@ -11,10 +12,11 @@ defineEmits(['update:modelValue']);
 <template>
     <button
         type="button"
-        class="shrink-0 rounded-lg p-1 transition hover:bg-gray-100 disabled:opacity-50"
+        class="shrink-0 rounded-lg p-1 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         role="switch"
         :aria-checked="modelValue ? 'true' : 'false'"
         :aria-label="label"
+        :disabled="disabled"
         @click="$emit('update:modelValue', !modelValue)"
     >
         <span

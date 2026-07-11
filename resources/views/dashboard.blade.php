@@ -6,10 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('Dashboard') }} - {{ config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-shape-white.webp') }}">
-    {{-- @vite(['dashboard/app.css', 'dashboard/main.js']) --}}
-
-    {{-- {{ Illuminate\Support\Facades\Vite::useHotFile(public_path('dashboard.hot'))->useBuildDirectory('build-dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }} --}}
-    {{ Illuminate\Support\Facades\Vite::useBuildDirectory('build-dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }}
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    {{ Illuminate\Support\Facades\Vite::useHotFile(public_path('dashboard.hot'))->useBuildDirectory('build-dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }}
 </head>
 <body class="antialiased bg-stone-100">
     <div id="dashboard-app"></div>

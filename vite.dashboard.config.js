@@ -13,7 +13,13 @@ export default defineConfig({
             input: ['dashboard/app.css', 'dashboard/main.js'],
             refresh: true,
         }),
-        vue(),
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag === 'iconify-icon',
+                },
+            },
+        }),
         tailwindcss(),
     ],
 });

@@ -1,11 +1,18 @@
 <script setup>
-// Port of resources/views/admin/home/⚡visits-count.blade.php (dummy data).
-const value = 3542;
-const growth = -4;
+import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
+import { useDashboardStatsStore } from '../../stores/dashboardStats.js';
+
+const store = useDashboardStatsStore();
+const { visits, loading, loaded } = storeToRefs(store);
+
+onMounted(() => {
+    store.fetchStats();
+});
 </script>
 
 <template>
-    <div class="group relative col-span-1 flex rounded-xl shadow-sm">
+    <div class="group relative col-span-1 flex rounded-xl shadow-sm" :class="{ 'animate-pulse opacity-70': loading && !loaded }">
         <RouterLink
             to="/manage-page"
             class="flex w-16 flex-shrink-0 items-center justify-center rounded-s-xl bg-pgray-100 text-sm font-medium text-white group-hover:bg-opacity-75"
@@ -17,10 +24,10 @@ const growth = -4;
             <RouterLink to="/manage-page" class="flex-1 truncate px-3 py-3 text-sm">
                 <span class="font-semibold text-stone-700 hover:text-stone-600"> الزيارات </span>
                 <p class="mt-1 text-stone-400">
-                    <b class="me-1 text-2xl font-bold text-pgray-800">{{ value }}</b>
-                    <span class="ms-1 text-xs font-normal" :title="`${growth}% مقارنة بنفس الفترة السابقة`">
-                        <span v-if="growth < 0" dir="ltr" class="text-red-500"> ⬇ {{ growth }}%</span>
-                        <span v-else dir="ltr" class="text-green-500"> ⬆ {{ growth }}%</span>
+                    <b class="me-1 text-2xl font-bold text-pgray-800">{{ visits.value }}</b>
+                    <span class="ms-1 text-xs font-normal" :title="`${visits.growth}% مقارنة بنفس الفترة السابقة`">
+                        <span v-if="visits.growth < 0" dir="ltr" class="text-red-500"> ⬇ {{ visits.growth }}%</span>
+                        <span v-else dir="ltr" class="text-green-500"> ⬆ {{ visits.growth }}%</span>
                     </span>
                 </p>
             </RouterLink>

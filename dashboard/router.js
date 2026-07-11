@@ -4,6 +4,7 @@ import Orders from './pages/orders/Home.vue';
 import OrderDetail from './pages/orders/Detail.vue';
 import PaymentDetail from './pages/payments/Detail.vue';
 import InvoiceDetail from './pages/invoices/Detail.vue';
+import FormSubmissionDetail from './pages/form-submissions/Detail.vue';
 import Clients from './pages/clients/Home.vue';
 import ClientDetail from './pages/clients/Detail.vue';
 import ManagePage from './pages/page/Home.vue';
@@ -34,6 +35,7 @@ const routes = [
     { path: '/orders/:uuid', name: 'order-detail', component: OrderDetail },
     { path: '/payments/:uuid', name: 'payment-detail', component: PaymentDetail },
     { path: '/invoices/:uuid', name: 'invoice-detail', component: InvoiceDetail },
+    { path: '/form-submissions/:id', name: 'form-submission-detail', component: FormSubmissionDetail },
     { path: '/clients', name: 'clients', component: Clients },
     { path: '/clients/:uuid', name: 'client-detail', component: ClientDetail },
     { path: '/manage', name: 'manage-home', component: ManagePage },

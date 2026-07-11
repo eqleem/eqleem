@@ -11,6 +11,13 @@ export const orders = reactive([
 
 export const walkingClientLabel = 'عميل نقدي';
 
+export const paymentMethodOptions = {
+    cash: 'نقداً',
+    card: 'بطاقة',
+    bank_transfer: 'تحويل بنكي',
+    online: 'دفع إلكتروني',
+};
+
 // From Order::addItemTypeOptions() / itemTypeOptions().
 export const addItemTypeOptions = {
     product: 'أضف منتج',

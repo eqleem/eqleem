@@ -1,31 +1,116 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import SettingsShell from '../../components/settings/SettingsShell.vue';
 import MainBox from '../../components/ui/MainBox.vue';
 import Form from '../../components/ui/Form.vue';
 import Input from '../../components/ui/Input.vue';
 import Toggle from '../../components/ui/Toggle.vue';
 import Button from '../../components/ui/Button.vue';
-import { analyticsProviders } from '../../data/settings.js';
+import { analyticsProviders as fallbackProviders } from '../../data/settings.js';
+import { api, ApiError } from '../../lib/api.js';
 
-// Port of resources/views/admin/settings/info/analytics.blade.php (dummy data).
-const integrations = reactive(
-    Object.fromEntries(
-        analyticsProviders.map((provider) => [
-            provider.key,
-            { identifier: '', active: false },
-        ]),
-    ),
-);
-
+const providers = ref(fallbackProviders.map((provider) => ({ ...provider })));
+const integrations = reactive({});
+const loading = ref(true);
+const saving = ref(false);
 const saved = ref(false);
+const message = ref(null);
+const errors = reactive({});
 
-function submit() {
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2000);
+function ensureIntegrations(list) {
+    for (const provider of list) {
+        if (!integrations[provider.key]) {
+            integrations[provider.key] = { identifier: '', active: false };
+        }
+    }
 }
+
+ensureIntegrations(providers.value);
+
+function applyPayload(payload) {
+    const data = payload?.data ?? payload;
+    const providerMap = data.providers ?? {};
+
+    providers.value = Object.entries(providerMap).map(([key, meta]) => ({
+        key,
+        name: meta.name,
+        label: meta.label,
+        placeholder: meta.placeholder ?? '',
+    }));
+
+    if (providers.value.length === 0) {
+        providers.value = fallbackProviders.map((provider) => ({ ...provider }));
+    }
+
+    ensureIntegrations(providers.value);
+
+    for (const provider of providers.value) {
+        const row = data.integrations?.[provider.key] ?? {};
+        integrations[provider.key] = {
+            identifier: row.identifier ?? '',
+            active: Boolean(row.active),
+        };
+        errors[provider.key] = null;
+    }
+}
+   
+async function load() {
+    loading.value = true;
+    message.value = null; 
+
+    try {
+        applyPayload(await api('/settings/analytics'));
+    } catch (error) {
+        message.value = error instanceof ApiError ? error.message : 'تعذر تحميل إعدادات الإحصائيات.';
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function submit() {
+    saving.value = true;
+    saved.value = false;
+    message.value = null;
+    Object.keys(errors).forEach((key) => {
+        errors[key] = null;
+    });
+
+    try {
+        const body = {
+            integrations: Object.fromEntries(
+                providers.value.map((provider) => [
+                    provider.key,
+                    {
+                        identifier: integrations[provider.key]?.identifier ?? '',
+                        active: Boolean(integrations[provider.key]?.active),
+                    },
+                ]),
+            ),
+        };
+
+        applyPayload(await api('/settings/analytics', { method: 'PUT', body }));
+        saved.value = true;
+        setTimeout(() => {
+            saved.value = false;
+        }, 2000);
+    } catch (error) {
+        if (error instanceof ApiError) {
+            message.value = error.message;
+            for (const provider of providers.value) {
+                const field = error.errors?.[`integrations.${provider.key}.identifier`]?.[0]
+                    ?? error.errors?.[`integrations.${provider.key}.active`]?.[0]
+                    ?? null;
+                errors[provider.key] = field;
+            }
+        } else {
+            message.value = 'تعذر حفظ إعدادات الإحصائيات.';
+        }
+    } finally {
+        saving.value = false;
+    }
+}
+
+onMounted(load);
 </script>
 
 <template>
@@ -35,10 +120,13 @@ function submit() {
                 <img :src="`/assets/icons/business/030-growth-chart.svg`" class="h-7 w-7" alt="">
             </template>
 
-            <Form @submit="submit">
+            <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
+            <p v-else-if="message && !saved" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
+
+            <Form v-if="!loading" @submit="submit">
                 <div class="flex flex-col gap-3">
                     <div
-                        v-for="provider in analyticsProviders"
+                        v-for="provider in providers"
                         :key="provider.key"
                         class="rounded-xl border border-gray-100 bg-gray-50/50 p-4"
                     >
@@ -56,6 +144,7 @@ function submit() {
                             :name="`${provider.key}-identifier`"
                             :label="provider.label"
                             :placeholder="provider.placeholder"
+                            :error="errors[provider.key]"
                             dir="ltr"
                             block
                         />
@@ -70,7 +159,7 @@ function submit() {
                 <template #footer>
                     <div class="flex items-center gap-3">
                         <span v-if="saved" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" />
+                        <Button type="submit" label="حفظ" :disabled="saving" />
                     </div>
                 </template>
             </Form>

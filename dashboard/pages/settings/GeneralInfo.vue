@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import SettingsShell from '../../components/settings/SettingsShell.vue';
 import MainBox from '../../components/ui/MainBox.vue';
 import Form from '../../components/ui/Form.vue';
@@ -7,30 +7,44 @@ import Input from '../../components/ui/Input.vue';
 import Select from '../../components/ui/Select.vue';
 import Button from '../../components/ui/Button.vue';
 import Modal from '../../components/ui/Modal.vue';
-import { socialNetworks } from '../../data/settings.js';
+import { socialNetworks as fallbackNetworks } from '../../data/settings.js';
 import { openModal, closeModal } from '../../lib/modal.js';
+import { api, ApiError } from '../../lib/api.js';
+import { updateTenant, useSession } from '../../stores/session.js';
 
-// Port of resources/views/admin/settings/info/general-info.blade.php (dummy data).
+const { tenant } = useSession();
+
 const profile = reactive({
-    name: 'متجري',
+    name: '',
     logoPreview: null,
 });
 
 const contact = reactive({
-    phone: '0501234567',
-    email: 'hello@example.com',
-    whatsapp: '966500000000',
-    country: 'السعودية',
-    city: 'الرياض',
+    phone: '',
+    email: '',
+    whatsapp: '',
+    country: '',
+    city: '',
 });
 
-const socialLinks = ref([
-    { id: '1', network: 'instagram', url: 'https://instagram.com/mystore' },
-    { id: '2', network: 'twitter', url: 'https://x.com/mystore' },
-]);
-
+const socialLinks = ref([]);
+const socialNetworks = ref({ ...fallbackNetworks });
 const newSocial = reactive({ network: 'twitter', url: '' });
+
+const loading = ref(true);
+const saving = reactive({ profile: false, contact: false, social: false });
 const saved = ref(null);
+const message = ref(null);
+const errors = reactive({
+    name: null,
+    phone: null,
+    email: null,
+    whatsapp: null,
+    country: null,
+    city: null,
+    network: null,
+    url: null,
+});
 
 function flash(key) {
     saved.value = key;
@@ -41,43 +55,177 @@ function flash(key) {
     }, 2000);
 }
 
-function submitProfile() {
-    flash('profile');
-}
+function applyPayload(payload) {
+    const data = payload?.data ?? payload;
 
-function submitContact() {
-    flash('contact');
-}
+    profile.name = data.name ?? '';
+    profile.logoPreview = data.logo ?? null;
 
-function addSocialLink() {
-    if (!newSocial.url.trim()) {
-        return;
+    Object.assign(contact, {
+        phone: data.contact?.phone ?? '',
+        email: data.contact?.email ?? '',
+        whatsapp: data.contact?.whatsapp ?? '',
+        country: data.contact?.country ?? '',
+        city: data.contact?.city ?? '',
+    });
+
+    socialLinks.value = [...(data.social_links ?? [])];
+
+    if (data.social_networks) {
+        socialNetworks.value = Object.fromEntries(
+            Object.entries(data.social_networks).map(([key, value]) => [
+                key,
+                typeof value === 'string' ? value : (value?.label ?? key),
+            ]),
+        );
     }
 
-    socialLinks.value.push({
-        id: String(Date.now()),
-        network: newSocial.network,
-        url: newSocial.url.trim(),
-    });
-    newSocial.url = '';
-    newSocial.network = 'twitter';
-    closeModal('add-social-link');
+    if (!Object.keys(socialNetworks.value).includes(newSocial.network)) {
+        newSocial.network = Object.keys(socialNetworks.value)[0] ?? 'twitter';
+    }
+
+    if (tenant.value) {
+        updateTenant({
+            ...tenant.value,
+            name: profile.name,
+            logo: profile.logoPreview,
+        });
+    }
 }
 
-function deleteSocialLink(id) {
+async function load() {
+    loading.value = true;
+    message.value = null;
+
+    try {
+        applyPayload(await api('/settings/general-info'));
+    } catch (error) {
+        message.value = error instanceof ApiError ? error.message : 'تعذر تحميل معلومات النشاط.';
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function submitProfile() {
+    saving.profile = true;
+    message.value = null;
+    errors.name = null;
+
+    try {
+        applyPayload(await api('/settings/general-info/basic', {
+            method: 'PUT',
+            body: { name: profile.name.trim() },
+        }));
+        flash('profile');
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.name = error.errors?.name?.[0] ?? null;
+            message.value = error.message;
+        } else {
+            message.value = 'تعذر حفظ معلومات الصفحة.';
+        }
+    } finally {
+        saving.profile = false;
+    }
+}
+
+async function submitContact() {
+    saving.contact = true;
+    message.value = null;
+    errors.phone = null;
+    errors.email = null;
+    errors.whatsapp = null;
+    errors.country = null;
+    errors.city = null;
+
+    try {
+        applyPayload(await api('/settings/general-info/contact', {
+            method: 'PUT',
+            body: {
+                phone: contact.phone.trim() || null,
+                email: contact.email.trim() || null,
+                whatsapp: contact.whatsapp.trim() || null,
+                country: contact.country.trim() || null,
+                city: contact.city.trim() || null,
+            },
+        }));
+        flash('contact');
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.phone = error.errors?.phone?.[0] ?? null;
+            errors.email = error.errors?.email?.[0] ?? null;
+            errors.whatsapp = error.errors?.whatsapp?.[0] ?? null;
+            errors.country = error.errors?.country?.[0] ?? null;
+            errors.city = error.errors?.city?.[0] ?? null;
+            message.value = error.message;
+        } else {
+            message.value = 'تعذر حفظ بيانات الاتصال.';
+        }
+    } finally {
+        saving.contact = false;
+    }
+}
+
+async function addSocialLink() {
+    saving.social = true;
+    message.value = null;
+    errors.network = null;
+    errors.url = null;
+
+    try {
+        applyPayload(await api('/settings/general-info/social', {
+            method: 'POST',
+            body: {
+                network: newSocial.network,
+                url: newSocial.url.trim(),
+            },
+        }));
+        newSocial.url = '';
+        closeModal('add-social-link');
+    } catch (error) {
+        if (error instanceof ApiError) {
+            errors.network = error.errors?.network?.[0] ?? null;
+            errors.url = error.errors?.url?.[0] ?? null;
+            message.value = error.message;
+        } else {
+            message.value = 'تعذر إضافة الرابط.';
+        }
+    } finally {
+        saving.social = false;
+    }
+}
+
+async function deleteSocialLink(id) {
     if (!confirm('هل أنت متأكد من حذف هذا الرابط؟')) {
         return;
     }
 
-    socialLinks.value = socialLinks.value.filter((item) => item.id !== id);
+    message.value = null;
+
+    try {
+        applyPayload(await api(`/settings/general-info/social/${id}`, { method: 'DELETE' }));
+    } catch (error) {
+        message.value = error instanceof ApiError ? error.message : 'تعذر حذف الرابط.';
+    }
 }
+
+onMounted(load);
 </script>
 
 <template>
     <SettingsShell title="معلومات النشاط">
+        <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
+        <p v-if="loading" class="mb-4 text-sm text-gray-400">جاري التحميل...</p>
+
         <MainBox title="معلومات الصفحة" subtitle="تعديل اسم وشعار الصفحة .">
             <Form @submit="submitProfile">
-                <Input v-model="profile.name" name="name" label="اسم الصفحة" placeholder="اسم الصفحة" />
+                <Input
+                    v-model="profile.name"
+                    name="name"
+                    label="اسم الصفحة"
+                    placeholder="اسم الصفحة"
+                    :error="errors.name"
+                />
 
                 <div class="relative items-center gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
                     <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">الشعار</span>
@@ -89,7 +237,7 @@ function deleteSocialLink(id) {
                                 alt=""
                                 class="size-20 object-cover"
                             >
-                            <img v-else :src="`/assets/images/t-logo.png`" alt="" class="size-12 opacity-60">
+                            <img v-else :src="`/assets/images/user.png`" alt="" class="size-12 opacity-60">
                         </div>
                         <p class="text-xs text-gray-400">رفع الشعار (قريباً)</p>
                     </div>
@@ -98,7 +246,7 @@ function deleteSocialLink(id) {
                 <template #footer>
                     <div class="flex items-center gap-3">
                         <span v-if="saved === 'profile'" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" />
+                        <Button type="submit" label="حفظ" :disabled="loading || saving.profile" />
                     </div>
                 </template>
             </Form>
@@ -106,16 +254,16 @@ function deleteSocialLink(id) {
 
         <MainBox title="بيانات الاتصال" subtitle="معلومات التواصل التي تظهر في صفحتك.">
             <Form @submit="submitContact">
-                <Input v-model="contact.phone" name="phone" label="رقم الجوال للاتصال" placeholder="05xxxxxxxx" dir="ltr" />
-                <Input v-model="contact.email" name="email" label="البريد الإلكتروني" placeholder="hello@example.com" dir="ltr" />
-                <Input v-model="contact.whatsapp" name="whatsapp" label="جوال الواتساب" placeholder="966500000000" dir="ltr" />
-                <Input v-model="contact.country" name="country" label="الدولة" placeholder="السعودية" />
-                <Input v-model="contact.city" name="city" label="المدينة" placeholder="الرياض" />
+                <Input v-model="contact.phone" name="phone" label="رقم الجوال للاتصال" placeholder="05xxxxxxxx" dir="ltr" :error="errors.phone" />
+                <Input v-model="contact.email" name="email" label="البريد الإلكتروني" placeholder="hello@example.com" dir="ltr" :error="errors.email" />
+                <Input v-model="contact.whatsapp" name="whatsapp" label="جوال الواتساب" placeholder="966500000000" dir="ltr" :error="errors.whatsapp" />
+                <Input v-model="contact.country" name="country" label="الدولة" placeholder="السعودية" :error="errors.country" />
+                <Input v-model="contact.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
 
                 <template #footer>
                     <div class="flex items-center gap-3">
                         <span v-if="saved === 'contact'" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" />
+                        <Button type="submit" label="حفظ" :disabled="loading || saving.contact" />
                     </div>
                 </template>
             </Form>
@@ -155,12 +303,12 @@ function deleteSocialLink(id) {
 
         <Modal title="إضافة رابط تواصل" size="md" name="add-social-link">
             <div class="space-y-3 p-4">
-                <Select v-model="newSocial.network" name="newNetwork" label="الشبكة" :options="socialNetworks" />
-                <Input v-model="newSocial.url" name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" />
+                <Select v-model="newSocial.network" name="newNetwork" label="الشبكة" :options="socialNetworks" :error="errors.network" />
+                <Input v-model="newSocial.url" name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" :error="errors.url" />
             </div>
             <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4">
                 <Button type="button" variant="ghost" label="إلغاء" @click="closeModal('add-social-link')" />
-                <Button type="button" label="إضافة" @click="addSocialLink" />
+                <Button type="button" label="إضافة" :disabled="saving.social" @click="addSocialLink" />
             </div>
         </Modal>
     </SettingsShell>

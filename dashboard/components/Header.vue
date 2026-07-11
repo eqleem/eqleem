@@ -25,7 +25,7 @@ const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
             <div class="flex items-center gap-x-3">
                 <RouterLink to="/" class="flex items-center justify-center gap-x-2 text-center">
                     <img
-                        :src="tenantLogo ?? '/assets/images/t-logo.png'"
+                        :src="tenantLogo ?? '/assets/images/user.png'"
                         alt=""
                         class="ms-1 h-8 rounded-sm"
                     >

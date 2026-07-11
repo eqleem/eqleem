@@ -10,7 +10,7 @@ defineProps({
     <div class="w-full rounded-xl bg-white">
         <div
             v-if="title"
-            class="flex items-center justify-between rounded-t-xl border-b-2 border-gray-100 bg-gray-50 p-4 text-gray-600"
+            class="relative z-40 flex items-center justify-between overflow-visible rounded-t-xl border-b-2 border-gray-100 bg-gray-50 p-4 text-gray-600"
         >
             <div>
                 <div class="flex items-center gap-x-2">

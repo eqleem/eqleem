@@ -1,43 +1,63 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import Modal from '../ui/Modal.vue';
+import CompletionBasicInfo from './CompletionBasicInfo.vue';
+import CompletionContact from './CompletionContact.vue';
+import CompletionSocial from './CompletionSocial.vue';
+import CompletionContent from './CompletionContent.vue';
+import CompletionVerification from './CompletionVerification.vue';
+import { useWelcomeStore } from '../../stores/welcome.js';
+import { openModal } from '../../lib/modal.js';
 
-// Port of resources/views/admin/home/⚡welcome-widget.blade.php — dummy data.
-const userName = 'أحمد الأحمدي';
-const pageUrl = 'https://eqleem.com/my-store';
-const shareText = 'شاهد صفحة متجري';
-
-const completedSteps = 2;
-const totalSteps = 4;
-const percentage = Math.round((completedSteps / totalSteps) * 100);
-const nextStep = { label: 'أضف بيانات الاتصال', modal: 'home-step-contact' };
-
-const greeting = computed(() => {
-    const hour = new Date().getHours();
-    return hour < 12 ? 'صباح الخير' : 'مساء الخير';
-});
-
-const qrImageUrl = (size = 220) =>
-    `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(pageUrl)}`;
+const store = useWelcomeStore();
+const {
+    greeting,
+    userName,
+    pageUrl,
+    shareText,
+    percentage,
+    completedSteps,
+    totalSteps,
+    nextStep,
+    loading,
+    loaded,
+} = storeToRefs(store);
 
 const copied = ref(false);
 const shareInput = ref(null);
-const shareOpen = ref(false);
-const qrOpen = ref(false);
+
+const qrImageUrl = (size = 220) =>
+    `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(pageUrl.value || '')}`;
+
+const socials = [
+    { platform: 'whatsapp', label: 'واتساب', icon: 'mdi:whatsapp', class: 'text-green-600' },
+    { platform: 'telegram', label: 'تيلجرام', icon: 'mdi:telegram', class: 'text-sky-500' },
+    { platform: 'x', label: 'X', icon: 'ri:twitter-x-fill', class: 'text-gray-900' },
+    { platform: 'facebook', label: 'فيسبوك', icon: 'ic:baseline-facebook', class: 'text-blue-600' },
+];
+
+onMounted(() => {
+    store.fetchWelcome();
+});
 
 async function copyLink() {
     try {
-        await navigator.clipboard.writeText(pageUrl);
+        await navigator.clipboard.writeText(pageUrl.value);
     } catch {
         shareInput.value?.select();
         document.execCommand('copy');
     }
+
     copied.value = true;
-    setTimeout(() => (copied.value = false), 2500);
+    setTimeout(() => {
+        copied.value = false;
+    }, 2500);
 }
 
 function shareLink(platform) {
-    const url = encodeURIComponent(pageUrl);
-    const text = encodeURIComponent(shareText);
+    const url = encodeURIComponent(pageUrl.value);
+    const text = encodeURIComponent(shareText.value);
 
     switch (platform) {
         case 'whatsapp':
@@ -49,33 +69,38 @@ function shareLink(platform) {
         case 'facebook':
             return `https://www.facebook.com/sharer/sharer.php?u=${url}`;
         default:
-            return pageUrl;
+            return pageUrl.value;
     }
 }
 
-const socials = [
-    { platform: 'whatsapp', label: 'واتساب' },
-    { platform: 'telegram', label: 'تيلجرام' },
-    { platform: 'x', label: 'X' },
-    { platform: 'facebook', label: 'فيسبوك' },
-];
+function openStep(modal) {
+    if (!modal) {
+        return;
+    }
+
+    openModal(modal);
+}
 </script>
 
 <template>
-    <div class="mb-6 overflow-hidden rounded-2xl bg-primary-700 text-white">
+    <div
+        class="mb-6 overflow-hidden rounded-2xl bg-primary-700 text-white"
+        :class="{ 'animate-pulse opacity-80': loading && !loaded }"
+    >
         <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
             <div class="p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-medium text-primary-100">{{ greeting }}</p>
+                    <p class="text-sm font-medium text-primary-100">{{ greeting || '…' }}</p>
                     <button
                         type="button"
                         class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                        @click="openModal('home-step-content')"
                     >
-                        <span class="text-base leading-none">＋</span>
+                        <iconify-icon icon="solar:add-circle-bold" class="text-base"></iconify-icon>
                         إضافة محتوى
                     </button>
                 </div>
-                <h2 class="mt-1 text-xl font-bold sm:text-2xl">مرحباً، {{ userName }} 👋</h2>
+                <h2 class="mt-1 text-xl font-bold sm:text-2xl">مرحباً، {{ userName || '…' }} 👋</h2>
 
                 <template v-if="percentage < 100">
                     <div class="mt-4">
@@ -95,8 +120,9 @@ const socials = [
                         v-if="nextStep"
                         type="button"
                         class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 sm:w-auto"
+                        @click="openStep(nextStep.modal)"
                     >
-                        <span class="leading-none">←</span>
+                        <iconify-icon icon="solar:arrow-left-bold" class="text-base"></iconify-icon>
                         {{ nextStep.label }}
                     </button>
                 </template>
@@ -119,13 +145,13 @@ const socials = [
 
                 <div class="mt-3 grid grid-cols-4 gap-2">
                     <a
-                        :href="pageUrl"
+                        :href="pageUrl || '#'"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="معاينة الصفحة"
                     >
-                        <span class="text-lg leading-none">👁</span>
+                        <iconify-icon icon="solar:eye-bold" class="text-lg"></iconify-icon>
                         معاينة
                     </a>
 
@@ -135,17 +161,17 @@ const socials = [
                         title="نسخ الرابط"
                         @click="copyLink"
                     >
-                        <span class="text-lg leading-none">{{ copied ? '✓' : '⧉' }}</span>
-                        {{ copied ? 'تم النسخ' : 'نسخ' }}
+                        <iconify-icon :icon="copied ? 'solar:check-circle-bold' : 'solar:copy-bold'" class="text-lg"></iconify-icon>
+                        {{ copied ? 'تم' : 'نسخ' }}
                     </button>
 
                     <button
                         type="button"
                         class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="مشاركة الصفحة"
-                        @click="shareOpen = true"
+                        @click="openModal('home-share-page')"
                     >
-                        <span class="text-lg leading-none">↗</span>
+                        <iconify-icon icon="solar:share-bold" class="text-lg"></iconify-icon>
                         مشاركة
                     </button>
 
@@ -153,7 +179,7 @@ const socials = [
                         type="button"
                         class="flex items-center justify-center rounded-xl bg-white p-1 ring-1 ring-white/20 transition hover:bg-white/90"
                         title="رمز QR — اضغط للتكبير"
-                        @click="qrOpen = true"
+                        @click="openModal('home-page-qr')"
                     >
                         <img :src="qrImageUrl(120)" alt="رمز QR للصفحة" class="size-16 rounded-md" loading="lazy">
                     </button>
@@ -161,20 +187,11 @@ const socials = [
             </div>
         </div>
 
-        <!-- Share modal -->
-        <div
-            v-if="shareOpen"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            @click.self="shareOpen = false"
-        >
-            <div class="w-full max-w-lg rounded-2xl bg-white p-4 text-gray-800" dir="rtl">
-                <div class="mb-3 flex items-center justify-between">
-                    <h3 class="font-semibold">مشاركة الصفحة</h3>
-                    <button type="button" class="text-gray-400 hover:text-gray-700" @click="shareOpen = false">✕</button>
-                </div>
+        <Modal title="مشاركة الصفحة" size="lg" name="home-share-page">
+            <div class="space-y-4 p-4 text-gray-800" dir="rtl">
                 <p class="text-sm text-gray-600">انسخ الرابط أو شاركه مباشرة عبر المنصات.</p>
 
-                <div class="mt-4 flex items-center gap-2">
+                <div class="flex items-center gap-2">
                     <input
                         type="text"
                         dir="ltr"
@@ -187,11 +204,12 @@ const socials = [
                         class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
                         @click="copyLink"
                     >
-                        {{ copied ? 'تم النسخ ✓' : 'نسخ' }}
+                        <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                        {{ copied ? 'تم النسخ' : 'نسخ' }}
                     </button>
                 </div>
 
-                <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <a
                         v-for="social in socials"
                         :key="social.platform"
@@ -200,23 +218,15 @@ const socials = [
                         rel="noopener noreferrer"
                         class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                     >
+                        <iconify-icon :icon="social.icon" class="text-lg" :class="social.class"></iconify-icon>
                         {{ social.label }}
                     </a>
                 </div>
             </div>
-        </div>
+        </Modal>
 
-        <!-- QR modal -->
-        <div
-            v-if="qrOpen"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            @click.self="qrOpen = false"
-        >
-            <div class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-4 text-center text-gray-800" dir="rtl">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-semibold">رمز QR للصفحة</h3>
-                    <button type="button" class="text-gray-400 hover:text-gray-700" @click="qrOpen = false">✕</button>
-                </div>
+        <Modal title="رمز QR للصفحة" size="md" name="home-page-qr">
+            <div class="space-y-4 p-4 text-center text-gray-800" dir="rtl">
                 <p class="text-sm text-gray-600">امسح الرمز لمشاركة صفحتك بسرعة.</p>
                 <div class="mx-auto inline-block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
                     <img :src="qrImageUrl(220)" alt="رمز QR للصفحة" class="mx-auto size-[220px]" loading="lazy">
@@ -227,9 +237,30 @@ const socials = [
                     class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
                     @click="copyLink"
                 >
-                    {{ copied ? 'تم النسخ ✓' : 'نسخ الرابط' }}
+                    <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                    {{ copied ? 'تم النسخ' : 'نسخ الرابط' }}
                 </button>
             </div>
-        </div>
+        </Modal>
+
+        <Modal title="البيانات الأساسية" size="lg" name="home-step-basic-info">
+            <CompletionBasicInfo />
+        </Modal>
+
+        <Modal title="بيانات الاتصال" size="lg" name="home-step-contact">
+            <CompletionContact />
+        </Modal>
+
+        <Modal title="السوشال ميديا" size="lg" name="home-step-social">
+            <CompletionSocial />
+        </Modal>
+
+        <Modal title="إضافة محتوى" size="2xl" name="home-step-content">
+            <CompletionContent />
+        </Modal>
+
+        <Modal title="توثيق المتجر" size="lg" name="home-step-verification">
+            <CompletionVerification />
+        </Modal>
     </div>
 </template>

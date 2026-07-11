@@ -1,38 +1,61 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import Dropdown from '../Dropdown.vue';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import Modal from '../ui/Modal.vue';
 import AddOrder from './AddOrder.vue';
-import { orders, removeOrders, money, statusLabel, statusColor, paymentLabel, paymentColor, walkingClientLabel } from '../../data/orders.js';
+import { walkingClientLabel } from '../../data/orders.js';
 import { openModal } from '../../lib/modal.js';
+import { useOrdersStore } from '../../stores/orders.js';
 
-// Port of resources/views/admin/orders/table.blade.php (dummy data).
-const search = ref('');
+const ordersStore = useOrdersStore();
+const { items, meta, search, loading, loaded, error, isEmpty, hasPages } = storeToRefs(ordersStore);
+
 const selectedIds = ref([]);
-
-const results = computed(() => {
-    const query = search.value.trim().toLowerCase();
-    if (!query) {
-        return orders;
-    }
-    return orders.filter(
-        (item) => item.number.includes(query) || (item.client || '').toLowerCase().includes(query),
-    );
-});
+const searchInput = ref('');
+let searchTimer = null;
 
 const allChecked = computed({
-    get: () => results.value.length > 0 && results.value.every((item) => selectedIds.value.includes(item.id)),
+    get: () => items.value.length > 0 && items.value.every((item) => selectedIds.value.includes(item.id)),
     set: (checked) => {
-        selectedIds.value = checked ? results.value.map((item) => item.id) : [];
+        selectedIds.value = checked ? items.value.map((item) => item.id) : [];
     },
 });
 
+watch(searchInput, (value) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        selectedIds.value = [];
+        ordersStore.setSearch(value);
+    }, 300);
+});
+
+watch(items, () => {
+    selectedIds.value = selectedIds.value.filter((id) => items.value.some((item) => item.id === id));
+});
+
 function deleteSelected() {
-    removeOrders(selectedIds.value);
+    ordersStore.removeLocal(selectedIds.value);
     selectedIds.value = [];
 }
+
+function goToPage(page) {
+    if (page < 1 || page > meta.value.last_page || page === meta.value.current_page) {
+        return;
+    }
+
+    selectedIds.value = [];
+    ordersStore.goToPage(page);
+}
+
+onMounted(() => {
+    searchInput.value = search.value;
+    if (!loaded.value) {
+        ordersStore.fetchOrders();
+    }
+});
 </script>
 
 <template>
@@ -43,7 +66,7 @@ function deleteSelected() {
                     <input v-model="allChecked" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
                 </div>
             </div>
-
+ 
             <div class="flex-grow">
                 <div class="relative col-span-3 text-sm text-gray-800">
                     <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
@@ -53,7 +76,7 @@ function deleteSelected() {
                         </svg>
                     </div>
                     <input
-                        v-model="search"
+                        v-model="searchInput"
                         type="text"
                         placeholder="ابحث .."
                         class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
@@ -92,7 +115,30 @@ function deleteSelected() {
 
         <div class="relative p-1">
             <div
-                v-if="results.length === 0"
+                v-if="loading"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/50"
+            >
+                <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
+                </svg>
+            </div>
+
+            <div
+                v-if="error && !loading"
+                class="flex flex-col items-center justify-center gap-2 p-10 text-center"
+            >
+                <p class="text-sm text-red-600">{{ error }}</p>
+                <button
+                    type="button"
+                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                    @click="ordersStore.fetchOrders({ page: meta.current_page })"
+                >
+                    إعادة المحاولة
+                </button>
+            </div>
+
+            <div
+                v-else-if="isEmpty"
                 class="flex flex-col items-center justify-center gap-2 p-10 text-center"
             >
                 <svg class="h-12 w-12 p-0.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -102,9 +148,9 @@ function deleteSelected() {
                 <small class="text-gray-500">سيتم عرض الطلبات هنا بعد إنشائها أو استلامها من المتجر.</small>
             </div>
 
-            <div v-else>
+            <div v-else-if="items.length > 0">
                 <div
-                    v-for="item in results"
+                    v-for="item in items"
                     :key="item.id"
                     class="flex w-full items-center gap-x-4 px-4 py-3 last:rounded-b-2xl hover:bg-gray-50 sm:px-6"
                 >
@@ -124,9 +170,9 @@ function deleteSelected() {
 
                             <div class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                 <Badge color="gray">{{ item.created }}</Badge>
-                                <Badge :color="statusColor(item.status)">{{ statusLabel(item.status) }}</Badge>
-                                <Badge :color="paymentColor(item.payment_status)">{{ paymentLabel(item.payment_status) }}</Badge>
-                                <Badge color="gray">{{ money(item.grand_total) }}</Badge>
+                                <Badge :color="item.status_color">{{ item.status_label }}</Badge>
+                                <Badge :color="item.payment_status_color">{{ item.payment_status_label }}</Badge>
+                                <Badge color="gray">{{ item.grand_total_formatted }}</Badge>
                                 <Badge color="blue">{{ item.client ?? walkingClientLabel }}</Badge>
                             </div>
                         </div>
@@ -147,6 +193,36 @@ function deleteSelected() {
                         </Dropdown>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div
+            v-if="hasPages"
+            class="flex items-center justify-between rounded-b-2xl bg-gray-50 p-4 px-6"
+        >
+            <div class="text-sm text-gray-500">
+                النتائج : <b>{{ meta.total.toLocaleString('ar-SA') }}</b>
+            </div>
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
+                    :disabled="meta.current_page <= 1 || loading"
+                    @click="goToPage(meta.current_page - 1)"
+                >
+                    السابق
+                </button>
+                <span class="text-sm text-gray-500">
+                    {{ meta.current_page }} / {{ meta.last_page }}
+                </span>
+                <button
+                    type="button"
+                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
+                    :disabled="meta.current_page >= meta.last_page || loading"
+                    @click="goToPage(meta.current_page + 1)"
+                >
+                    التالي
+                </button>
             </div>
         </div>
     </div>

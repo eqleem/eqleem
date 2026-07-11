@@ -3,6 +3,8 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 defineProps({
     width: { type: String, default: 'w-48' },
+    // "bottom" opens below the trigger; "top" opens above (avoids being clipped by footers).
+    placement: { type: String, default: 'bottom' },
 });
 
 const open = ref(false);
@@ -23,15 +25,18 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutside));
 </script>
 
 <template>
-    <div ref="root" class="relative">
+    <div ref="root" class="relative z-50">
         <div @click="toggle">
             <slot name="trigger" />
         </div>
 
         <div
             v-show="open"
-            :class="width"
-            class="absolute z-50 mt-2 space-y-1 rounded-lg bg-white p-1 text-gray-800 shadow-lg ring-1 ring-black/5 ltr:right-0 rtl:left-0"
+            :class="[
+                width,
+                placement === 'top' ? 'bottom-full mb-2' : 'mt-2',
+            ]"
+            class="absolute z-[100] space-y-1 rounded-lg bg-white p-1 text-gray-800 shadow-lg ring-1 ring-black/5 ltr:right-0 rtl:left-0"
             @click="open = false"
         >
             <slot />

@@ -6,6 +6,7 @@ defineProps({
     target: { type: String, default: null },
     variant: { type: String, default: 'primary' },
     disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
 });
 
 const variants = {
@@ -26,11 +27,22 @@ const variants = {
         :href="href"
         :target="target"
         :role="href ? null : 'button'"
-        :disabled="!href && disabled ? true : null"
+        :disabled="!href && (disabled || loading) ? true : null"
         class="inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
         :class="variants[variant] ?? 'bg-gray-300 text-black/50'"
     >
-        <slot name="icon" />
+        <svg
+            v-if="loading"
+            class="h-5 w-5 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            aria-hidden="true"
+        >
+            <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
+        </svg>
+        <slot v-else name="icon" />
         <span v-if="label">{{ label }}</span>
         <slot />
     </component>

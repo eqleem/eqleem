@@ -32,7 +32,7 @@ const monthLabel = new Intl.DateTimeFormat('ar', { month: 'long', year: 'numeric
             <OrdersChart />
             <VisitsChart />
             <ClientsChart />
-            <SalesChart />
+            <SalesChart /> 
         </div>
     </Container>
 </template>

@@ -1,12 +1,23 @@
 <script setup>
-// Port of resources/views/admin/home/clients-chart.blade.php (dummy data).
+import { computed, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import ChartWidget from '../ChartWidget.vue';
-import { lineChartOptions, dummyTrend } from './chartOptions.js';
+import { useDashboardChartsStore } from '../../stores/dashboardCharts.js';
 
-const { labels, data } = dummyTrend(14, 0, 10);
-const options = lineChartOptions('العدد', data, labels);
+const store = useDashboardChartsStore();
+const { charts } = storeToRefs(store);
+
+const slot = computed(() => charts.value.clients);
+
+onMounted(() => {
+    store.fetchChart('clients');
+});
 </script>
 
 <template>
-    <ChartWidget chart-title="العملاء" :options="options" />
+    <ChartWidget
+        chart-title="العملاء"
+        :options="slot.options"
+        :loading="slot.loading && !slot.loaded"
+    />
 </template>

@@ -7,7 +7,7 @@
                 @if (tenant('logo'))
                     <img src="{{ tenant('logo') }}?p=logo" alt="" class="h-8 rounded-sm ms-1">
                 @else
-                    <img src="{{ asset('assets/images/t-logo.png') }}" alt="" class="h-8 rounded-sm ms-1">
+                    <img src="{{ asset('assets/images/user.png') }}" alt="" class="h-8 rounded-sm ms-1">
                 @endif
  
                 <span class="hidden md:block">{{ tenant('name') }}</span>

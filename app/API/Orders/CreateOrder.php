@@ -1,0 +1,376 @@
+<?php
+
+namespace App\API\Orders;
+
+use App\API\Concerns\AuthorizesDashboardTenant;
+use App\Http\Resources\OrderResource;
+use App\Models\Client;
+use App\Models\Content;
+use App\Models\Order;
+use App\Models\Tenant;
+use App\Support\DashboardStats;
+use App\Support\Money;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Lorisleiva\Actions\ActionRequest;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+/**
+ * Creates a manual draft order for the authenticated user's current tenant.
+ */
+class CreateOrder
+{
+    use AsAction;
+    use AuthorizesDashboardTenant;
+
+    /**
+     * @return list<string>
+     */
+    public function getControllerMiddleware(): array
+    {
+        return [
+            'auth:sanctum',
+            'throttle:30,1',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $types = array_keys(Order::itemTypeOptions());
+
+        return [
+            'client_id' => ['nullable', 'integer'],
+            'currency_code' => ['sometimes', 'nullable', 'string', 'size:3'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.type' => ['required', 'string', Rule::in($types)],
+            'items.*.name' => ['required', 'string', 'min:1', 'max:255'],
+            'items.*.product_id' => ['nullable', 'integer'],
+            'items.*.qty' => ['required', 'integer', 'min:1'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.discount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'items.*.description' => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+
+    /**
+     * @param  array{
+     *     client_id?: int|null,
+     *     currency_code?: string|null,
+     *     items: list<array{
+     *         type: string,
+     *         name: string,
+     *         product_id?: int|null,
+     *         qty: int,
+     *         unit_price: float|string|int,
+     *         discount?: float|string|int|null,
+     *         description?: string|null
+     *     }>
+     * }  $data
+     */
+    public function handle(Tenant $tenant, array $data, ?int $createdBy = null): Order
+    {
+        setCurrentTenant($tenant);
+
+        $clientId = $data['client_id'] ?? null;
+
+        if ($clientId !== null) {
+            $clientExists = Client::withoutGlobalScope('tenantable')
+                ->whereKey($clientId)
+                ->whereHas('tenants', fn ($query) => $query->where('tenants.id', $tenant->id))
+                ->exists();
+
+            if (! $clientExists) {
+                throw ValidationException::withMessages([
+                    'client_id' => [__('The selected client is invalid.')],
+                ]);
+            }
+        }
+
+        $items = $this->normalizeItems($tenant, $data['items']);
+        $totals = Order::calculateTotalsMinor($items);
+        $currency = strtoupper((string) ($data['currency_code'] ?? Money::defaultCurrencyCode()));
+
+        $order = DB::transaction(function () use ($tenant, $clientId, $items, $totals, $currency, $createdBy): Order {
+            $number = $this->generateOrderNumber($tenant->id);
+
+            $order = Order::query()->create([
+                'tenant_id' => $tenant->id,
+                'type' => 'order',
+                'status' => 'draft',
+                'channel' => 'manual',
+                'number' => $number,
+                'client_id' => $clientId,
+                'currency_code' => $currency,
+                'subtotal' => $totals['subtotal'],
+                'discount_total' => $totals['discount_total'],
+                'tax_total' => $totals['tax_total'],
+                'grand_total' => $totals['grand_total'],
+                'paid_total' => 0,
+                'due_total' => $totals['grand_total'],
+                'payment_status' => 'unpaid',
+                'issued_at' => now(),
+                'created_by' => $createdBy,
+                'notes' => null,
+                'financial_status' => 'draft',
+                'fulfillment_status' => 'unfulfilled',
+                'meta' => [
+                    'payment_method' => 'cash',
+                ],
+            ]);
+
+            foreach ($items as $item) {
+                $qty = (int) $item['qty'];
+                $unitPrice = Order::minorFromDecimal($item['unit_price']);
+                $discount = Order::minorFromDecimal($item['discount'] ?? 0);
+                $lineTotal = max(0, ($qty * $unitPrice) - $discount);
+
+                DB::table('order_items')->insert([
+                    'order_id' => $order->id,
+                    'product_id' => $item['type'] === 'other' ? null : ($item['product_id'] ?? null),
+                    'name' => $item['name'],
+                    'qty' => $qty,
+                    'unit_price' => $unitPrice,
+                    'discount_total' => $discount,
+                    'tax_total' => 0,
+                    'line_total' => $lineTotal,
+                    'meta' => json_encode([
+                        'type' => $item['type'],
+                        'description' => $item['type'] === 'other' ? ($item['description'] ?? $item['name']) : null,
+                    ]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            return $order;
+        });
+
+        DashboardStats::forget($tenant);
+
+        return app(ShowOrder::class)->handle($tenant, $order->uuid);
+    }
+
+    public function asController(ActionRequest $request): Order
+    {
+        $tenant = $this->currentDashboardTenant($request);
+
+        /** @var array{
+         *     client_id?: int|null,
+         *     currency_code?: string|null,
+         *     items: list<array{
+         *         type: string,
+         *         name: string,
+         *         product_id?: int|null,
+         *         qty: int,
+         *         unit_price: float|string|int,
+         *         discount?: float|string|int|null,
+         *         description?: string|null
+         *     }>
+         * } $validated
+         */
+        $validated = $request->validated();
+
+        return $this->handle($tenant, $validated, $request->user()?->id);
+    }
+
+    public function jsonResponse(Order $order): OrderResource
+    {
+        return (new OrderResource($order))
+            ->additional([
+                'message' => __('Order created successfully.'),
+            ]);
+    }
+
+    /**
+     * @param  list<array{
+     *     type: string,
+     *     name: string,
+     *     product_id?: int|null,
+     *     qty: int,
+     *     unit_price: float|string|int,
+     *     discount?: float|string|int|null,
+     *     description?: string|null
+     * }>  $items
+     * @return list<array{
+     *     type: string,
+     *     name: string,
+     *     product_id: int|null,
+     *     qty: int,
+     *     unit_price: float|string,
+     *     discount: float|string,
+     *     description: string|null
+     * }>
+     */
+    private function normalizeItems(Tenant $tenant, array $items): array
+    {
+        $normalized = [];
+
+        foreach ($items as $index => $item) {
+            $type = (string) $item['type'];
+            $name = trim((string) $item['name']);
+            $productId = $item['product_id'] ?? null;
+            $qty = max(1, (int) $item['qty']);
+            $unitPrice = $item['unit_price'] ?? 0;
+            $discount = $item['discount'] ?? 0;
+            $description = isset($item['description']) ? trim((string) $item['description']) : null;
+
+            if ($type === 'other') {
+                $name = $description !== null && $description !== '' ? $description : $name;
+                $productId = null;
+            } elseif ($productId === null && $name !== '') {
+                $content = $this->findOrCreateContentForItem($tenant, $type, $name, (string) $unitPrice);
+                $productId = $content?->id;
+            } elseif ($productId !== null) {
+                $belongs = Content::query()
+                    ->whereKey($productId)
+                    ->where('tenant_id', $tenant->id)
+                    ->exists();
+
+                if (! $belongs) {
+                    throw ValidationException::withMessages([
+                        "items.{$index}.product_id" => [__('The selected content is invalid.')],
+                    ]);
+                }
+            }
+
+            if ($name === '') {
+                throw ValidationException::withMessages([
+                    "items.{$index}.name" => [__('Item name is required.')],
+                ]);
+            }
+
+            if (Order::isBookingItemType($type)) {
+                $qty = 1;
+            }
+
+            $normalized[] = [
+                'type' => $type,
+                'name' => $name,
+                'product_id' => $productId,
+                'qty' => $qty,
+                'unit_price' => $unitPrice,
+                'discount' => $discount === null || $discount === '' ? 0 : $discount,
+                'description' => $type === 'other' ? $name : null,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    private function findOrCreateContentForItem(Tenant $tenant, string $orderItemType, string $title, string $unitPriceDecimal = '0'): ?Content
+    {
+        $contentType = $this->orderItemContentType($orderItemType);
+
+        if ($contentType === null) {
+            return null;
+        }
+
+        $title = trim($title);
+
+        if ($title === '') {
+            return null;
+        }
+
+        $existing = Content::query()
+            ->where('type', $contentType)
+            ->where('title', $title)
+            ->first();
+
+        if ($existing instanceof Content) {
+            if ($existing->status === 'draft') {
+                $priceMinor = Order::minorFromDecimal($unitPriceDecimal);
+                $currentPrice = (int) data_get($existing->data, 'price', 0);
+
+                if ($priceMinor > 0 && $currentPrice !== $priceMinor) {
+                    $data = is_array($existing->data) ? $existing->data : [];
+                    $data['price'] = $priceMinor;
+                    $existing->forceFill(['data' => $data])->save();
+                }
+            }
+
+            return $existing->refresh();
+        }
+
+        $data = [
+            'price' => Order::minorFromDecimal($unitPriceDecimal),
+        ];
+
+        if ($orderItemType === 'course') {
+            $data = array_merge($data, [
+                'level' => 'beginner',
+                'course_type' => 'recorded',
+                'hours' => 0,
+                'chapters' => [],
+            ]);
+        }
+
+        if ($orderItemType === 'digital_service') {
+            $data['delivery_days'] = null;
+        }
+
+        return Content::query()->create([
+            'tenant_id' => $tenant->id,
+            'type' => $contentType,
+            'title' => $title,
+            'slug' => $this->uniqueContentSlug($title, $orderItemType),
+            'status' => 'draft',
+            'active' => true,
+            'data' => $data,
+        ]);
+    }
+
+    private function uniqueContentSlug(string $title, string $orderItemType): string
+    {
+        $baseSlug = Str::slug($title);
+        $fallback = match ($orderItemType) {
+            'product' => 'product',
+            'digital_product' => 'digital-product',
+            'service' => 'service',
+            'course' => 'course',
+            'digital_service' => 'digital-service',
+            'menu' => 'menu-item',
+            'unit_rental' => 'unit',
+            default => 'item',
+        };
+        $slug = $baseSlug !== '' ? $baseSlug : $fallback;
+        $counter = 1;
+
+        while (Content::query()->where('slug', $slug)->exists()) {
+            $slug = ($baseSlug !== '' ? $baseSlug : $fallback).'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    private function orderItemContentType(string $type): ?string
+    {
+        return match ($type) {
+            'product' => contentTypeModel('store'),
+            'digital_product' => contentTypeModel('digital-products'),
+            'service' => contentTypeModel('services'),
+            'course' => contentTypeModel('courses'),
+            'digital_service' => contentTypeModel('digital-services'),
+            'menu' => contentTypeModel('menu'),
+            'unit_rental' => contentTypeModel('unit-rental'),
+            default => null,
+        };
+    }
+
+    private function generateOrderNumber(int $tenantId): string
+    {
+        $lastId = Order::query()
+            ->where('tenant_id', $tenantId)
+            ->where('type', 'order')
+            ->orderByDesc('id')
+            ->lockForUpdate()
+            ->value('id');
+
+        return str_pad((string) (($lastId ?? 0) + 1), 6, '0', STR_PAD_LEFT);
+    }
+}
