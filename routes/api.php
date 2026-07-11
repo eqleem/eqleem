@@ -155,6 +155,9 @@ use App\API\Pages\UpdatePageBlock as StandaloneUpdatePageBlock;
 use App\API\Pages\UploadPageEditorImage;
 use App\API\Payments\ListPayments;
 use App\API\Payments\ShowPayment;
+use App\API\Plan\GetPlanCheckout;
+use App\API\Plan\ListPlans;
+use App\API\Plan\SubscribeFreePlan;
 use App\API\Portfolio\CreatePortfolioCategory;
 use App\API\Portfolio\CreatePortfolioProject;
 use App\API\Portfolio\DeletePortfolioCategory;
@@ -284,6 +287,16 @@ Route::put('/dashboard/welcome/contact', UpdateWelcomeContact::class)
 
 Route::post('/dashboard/welcome/social', AddWelcomeSocialLink::class)
     ->name('api.dashboard.welcome.social');
+
+Route::get('/plans', ListPlans::class)
+    ->name('api.plans.index');
+
+Route::post('/plans/subscribe-free', SubscribeFreePlan::class)
+    ->name('api.plans.subscribe-free');
+
+Route::get('/plans/{plan}/checkout', GetPlanCheckout::class)
+    ->name('api.plans.checkout')
+    ->whereNumber('plan');
 
 Route::get('/orders', ListOrders::class)
     ->name('api.orders.index');

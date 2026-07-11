@@ -13,7 +13,7 @@ onMounted(() => {
     <div class="antialiased bg-stone-200">
         <Header />
         <Nav />
-        <main class="min-h-[calc(100vh-5.5rem)] pt-[5.5rem]">
+        <main class="min-h-[calc(100vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
             <RouterView />
         </main>
     </div>

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
 @theme {
+    --dashboard-chrome-h: 5.5rem;
+
     --color-primary-50: #ebeefa;
     --color-primary-100: #d7ddf4;
     --color-primary-200: #b2bfeb;

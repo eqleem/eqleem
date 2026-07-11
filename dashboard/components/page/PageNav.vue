@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <nav class="w-auto shrink-0 space-y-0.5 rounded-xl bg-gray-300/30 p-0.5 lg:w-48">
+    <nav class="sticky top-[var(--dashboard-chrome-h)] z-20 max-h-[calc(100vh-var(--dashboard-chrome-h))] w-auto shrink-0 self-start space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-y-contain rounded-xl bg-gray-300/30 p-0.5 lg:w-48">
         <button
             type="button"
             class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-gray-600 transition hover:bg-white/60 hover:text-gray-800 lg:hidden"
@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
         >
             <nav
                 v-if="mobileNavOpen"
-                class="fixed bottom-0 right-0 top-0 z-50 w-72 max-w-[85vw] space-y-0.5 overflow-y-auto rounded-e-2xl bg-stone-100 p-3 shadow-2xl lg:hidden"
+                class="fixed bottom-0 right-0 top-[var(--dashboard-chrome-h)] z-50 w-72 max-w-[85vw] space-y-0.5 overflow-y-auto overscroll-y-contain rounded-e-2xl bg-stone-100 p-3 shadow-2xl lg:hidden"
                 role="dialog"
                 aria-modal="true"
                 aria-label="قائمة التبويبات"

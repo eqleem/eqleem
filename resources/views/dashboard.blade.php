@@ -7,6 +7,8 @@
     <title>{{ __('Dashboard') }} - {{ config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo-shape-white.webp') }}">
     <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/moyasar/moyasar.css') }}">
+    <script src="{{ asset('assets/vendor/moyasar/moyasar.js') }}"></script>
     {{ Illuminate\Support\Facades\Vite::useHotFile(public_path('dashboard.hot'))->useBuildDirectory('build-dashboard')->withEntryPoints(['dashboard/app.css', 'dashboard/main.js']) }}
 </head>
 <body class="antialiased bg-stone-100">
