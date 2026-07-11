@@ -12,6 +12,12 @@ import PortfolioHome from './pages/page/portfolio/Home.vue';
 import PortfolioCategories from './pages/page/portfolio/Categories.vue';
 import PortfolioSettings from './pages/page/portfolio/Settings.vue';
 import PortfolioDetail from './pages/page/portfolio/Detail.vue';
+import StoreHome from './pages/page/store/Home.vue';
+import StoreCategories from './pages/page/store/Categories.vue';
+import StoreSettings from './pages/page/store/Settings.vue';
+import StoreDetail from './pages/page/store/Detail.vue';
+import StorePaymentOptions from './pages/page/store/PaymentOptions.vue';
+import StoreShippingOptions from './pages/page/store/ShippingOptions.vue';
 import ContentIndex from './pages/page/ContentIndex.vue';
 import ContentDetail from './pages/page/ContentDetail.vue';
 import ContentCategories from './pages/page/ContentCategories.vue';
@@ -45,6 +51,14 @@ const routes = [
     { path: '/manage/portfolio/categories', name: 'portfolio-categories', component: PortfolioCategories },
     { path: '/manage/portfolio/settings', name: 'portfolio-settings', component: PortfolioSettings },
     { path: '/manage/portfolio/detail/:id', name: 'portfolio-detail', component: PortfolioDetail },
+
+    // Store — dedicated pages (before generic /manage/:type catch-alls).
+    { path: '/manage/store', name: 'store-home', component: StoreHome },
+    { path: '/manage/store/categories', name: 'store-categories', component: StoreCategories },
+    { path: '/manage/store/settings', name: 'store-settings', component: StoreSettings },
+    { path: '/manage/store/payment-options', name: 'store-payment-options', component: StorePaymentOptions },
+    { path: '/manage/store/shipping-options', name: 'store-shipping-options', component: StoreShippingOptions },
+    { path: '/manage/store/detail/:id', name: 'store-detail', component: StoreDetail },
 
     // Generic content-type stubs (other types until they get dedicated pages).
     { path: '/manage/:type', name: 'manage-index', component: ContentIndex },

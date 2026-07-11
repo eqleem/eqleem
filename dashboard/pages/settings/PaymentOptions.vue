@@ -10,6 +10,10 @@ import Switch from '../../components/settings/Switch.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
 
+defineProps({
+    embedded: { type: Boolean, default: false },
+});
+
 const methods = ref([]);
 const activeSlug = ref(null);
 const loading = ref(true);
@@ -231,7 +235,7 @@ onMounted(load);
 </script>
 
 <template>
-    <SettingsShell title="وسائل الدفع">
+    <SettingsShell title="وسائل الدفع" :embedded="embedded">
         <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
         <p v-if="saved" class="mb-4 text-sm text-emerald-600">تم الحفظ.</p>
 

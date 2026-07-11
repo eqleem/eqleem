@@ -85,6 +85,22 @@ use App\API\Settings\UpdateShippingMethodSettings;
 use App\API\Settings\UpdateTenantCustomDomain;
 use App\API\Settings\UpdateTenantHandle;
 use App\API\Settings\UpdateVerificationSettings;
+use App\API\Store\CreateStoreCategory;
+use App\API\Store\CreateStoreProduct;
+use App\API\Store\DeleteStoreCategory;
+use App\API\Store\DeleteStoreImage;
+use App\API\Store\DeleteStoreProducts;
+use App\API\Store\GetStoreSettings;
+use App\API\Store\ListStoreCategories;
+use App\API\Store\ListStoreProducts;
+use App\API\Store\ReorderStoreCategories;
+use App\API\Store\ReorderStoreImages;
+use App\API\Store\ShowStoreProduct;
+use App\API\Store\UpdateStoreCategory;
+use App\API\Store\UpdateStoreProduct;
+use App\API\Store\UpdateStoreSettings;
+use App\API\Store\UploadStoreEditorImage;
+use App\API\Store\UploadStoreImage;
 use App\API\User\UpdateAccountProfile;
 use Illuminate\Support\Facades\Route;
 
@@ -378,4 +394,61 @@ Route::delete('/portfolio/{uuid}/images/{mediaId}', DeletePortfolioImage::class)
 
 Route::post('/portfolio/{uuid}/editor-images', UploadPortfolioEditorImage::class)
     ->name('api.portfolio.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/store', ListStoreProducts::class)
+    ->name('api.store.index');
+
+Route::post('/store', CreateStoreProduct::class)
+    ->name('api.store.store');
+
+Route::delete('/store', DeleteStoreProducts::class)
+    ->name('api.store.destroy');
+
+Route::get('/store/settings', GetStoreSettings::class)
+    ->name('api.store.settings.show');
+
+Route::put('/store/settings', UpdateStoreSettings::class)
+    ->name('api.store.settings.update');
+
+Route::get('/store/categories', ListStoreCategories::class)
+    ->name('api.store.categories.index');
+
+Route::post('/store/categories', CreateStoreCategory::class)
+    ->name('api.store.categories.store');
+
+Route::put('/store/categories/reorder', ReorderStoreCategories::class)
+    ->name('api.store.categories.reorder');
+
+Route::put('/store/categories/{id}', UpdateStoreCategory::class)
+    ->name('api.store.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/store/categories/{id}', DeleteStoreCategory::class)
+    ->name('api.store.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/store/{uuid}', ShowStoreProduct::class)
+    ->name('api.store.show')
+    ->whereUuid('uuid');
+
+Route::put('/store/{uuid}', UpdateStoreProduct::class)
+    ->name('api.store.update')
+    ->whereUuid('uuid');
+
+Route::post('/store/{uuid}/images', UploadStoreImage::class)
+    ->name('api.store.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/store/{uuid}/images/reorder', ReorderStoreImages::class)
+    ->name('api.store.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/store/{uuid}/images/{mediaId}', DeleteStoreImage::class)
+    ->name('api.store.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/store/{uuid}/editor-images', UploadStoreEditorImage::class)
+    ->name('api.store.editor-images.store')
     ->whereUuid('uuid');

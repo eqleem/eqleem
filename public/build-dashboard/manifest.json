@@ -5,9 +5,12 @@
     "isEntry": true
   },
   "dashboard/main.js": {
-    "file": "assets/main-BEvdBuEM.js",
+    "file": "assets/main-DsGSPhn6.js",
     "name": "main",
     "src": "dashboard/main.js",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "assets/main-CPSO5G97.css"
+    ]
   }
 }

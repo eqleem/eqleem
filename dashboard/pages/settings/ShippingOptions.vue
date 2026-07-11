@@ -13,6 +13,10 @@ import Switch from '../../components/settings/Switch.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
 
+defineProps({
+    embedded: { type: Boolean, default: false },
+});
+
 const methods = ref([]);
 const customOptions = ref([]);
 const countryOptions = ref({
@@ -223,7 +227,7 @@ onMounted(load);
 </script>
 
 <template>
-    <SettingsShell title="وسائل الشحن">
+    <SettingsShell title="وسائل الشحن" :embedded="embedded">
         <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
         <p v-if="loading" class="mb-4 text-sm text-gray-400">جاري التحميل...</p>
 
