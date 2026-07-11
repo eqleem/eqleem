@@ -5,13 +5,13 @@ import Form from '../ui/Form.vue';
 import Input from '../ui/Input.vue';
 import Button from '../ui/Button.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
+import { notifySuccess, notifyError } from '../../lib/notify.js';
 
 const store = useWelcomeStore();
 const { forms, saving } = storeToRefs(store);
 
 const form = reactive({ phone: '', email: '', country: '', city: '' });
 const errors = reactive({ phone: null, email: null, country: null, city: null });
-const message = ref(null);
 
 watch(
     () => forms.value.contact,
@@ -28,7 +28,6 @@ async function submit() {
     Object.keys(errors).forEach((key) => {
         errors[key] = null;
     });
-    message.value = null;
 
     const result = await store.saveContact({
         phone: form.phone.trim(),
@@ -42,9 +41,11 @@ async function submit() {
         errors.email = result.errors?.email?.[0] ?? null;
         errors.country = result.errors?.country?.[0] ?? null;
         errors.city = result.errors?.city?.[0] ?? null;
-        message.value = result.message ?? 'تعذر الحفظ';
+        notifyError(result.message ?? 'تعذر الحفظ');
         return;
     }
+
+    notifySuccess('Saved');
 
     await store.afterStepSaved('home-step-contact');
 }
@@ -64,7 +65,6 @@ async function submit() {
         />
         <Input v-model="form.country" name="country" label="الدولة" placeholder="السعودية" :error="errors.country" />
         <Input v-model="form.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
-        <p v-if="message" class="text-sm text-red-600">{{ message }}</p>
         <template #footer>
             <Button type="submit" label="حفظ" :loading="saving" />
         </template>

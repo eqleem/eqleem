@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { usePortfolioStore } from '../../../stores/portfolio.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = usePortfolioStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const project = await store.createProject(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-portfolio-project');
         router.push(`/manage/portfolio/detail/${project.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء المشروع.';
+        notifyApiError(error, 'تعذر إنشاء المشروع.');
     } finally {
         submitting.value = false;
     }

@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useNewsletterStore } from '../../../stores/newsletter.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useNewsletterStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const issue = await store.createIssue(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-newsletter');
         router.push(`/manage/newsletter/detail/${issue.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء النشرة.';
+        notifyApiError(error, 'تعذر إنشاء النشرة.');
     } finally {
         submitting.value = false;
     }

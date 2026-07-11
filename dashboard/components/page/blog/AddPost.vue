@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useBlogStore } from '../../../stores/blog.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useBlogStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const post = await store.createPost(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-blog-post');
         router.push(`/manage/blog/detail/${post.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء التدوينة.';
+        notifyApiError(error, 'تعذر إنشاء التدوينة.');
     } finally {
         submitting.value = false;
     }

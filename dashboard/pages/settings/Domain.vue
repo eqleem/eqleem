@@ -7,6 +7,7 @@ import Input from '../../components/ui/Input.vue';
 import Button from '../../components/ui/Button.vue';
 import Badge from '../../components/ui/Badge.vue';
 import { api, ApiError } from '../../lib/api.js';
+import { notifyApiSuccess, notifyApiError } from '../../lib/notify.js';
 import { useSession, updateTenant } from '../../stores/session.js';
 import { appDomain as fallbackDomain } from '../../data/settings.js';
 
@@ -29,7 +30,6 @@ const saving = reactive({
     custom: false,
 });
 
-const saved = ref(null);
 const message = ref(null);
 
 const appDomain = computed(() => tenant.value?.app_domain || fallbackDomain);
@@ -74,15 +74,6 @@ const customDomainHost = computed(() => {
     return parts.length <= 2 ? '@' : parts.slice(0, -2).join('.');
 });
 
-function flash(key) {
-    saved.value = key;
-    setTimeout(() => {
-        if (saved.value === key) {
-            saved.value = null;
-        }
-    }, 2000);
-}
-
 function applyTenant(payload) {
     const data = payload?.data ?? payload;
     updateTenant(data);
@@ -103,14 +94,12 @@ async function submitHandle() {
             body: { handle: form.handle.trim() },
         });
         applyTenant(payload);
-        flash('handle');
+        notifyApiSuccess(payload, 'تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.handle = error.errors?.handle?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ الرابط.';
         }
+        notifyApiError(error, 'تعذر حفظ الرابط.');
     } finally {
         saving.handle = false;
     }
@@ -130,14 +119,13 @@ async function submitCustomDomain() {
             body: { custom_domain: value || null },
         });
         applyTenant(payload);
-        flash('custom');
+        notifyApiSuccess(payload, 'تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.custom_domain = error.errors?.custom_domain?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ الدومين المخصص.';
         }
+
+        notifyApiError(error, 'تعذر حفظ الدومين المخصص.');
     } finally {
         saving.custom = false;
     }
@@ -165,7 +153,6 @@ async function submitCustomDomain() {
 
                 <template #footer>
                     <div class="flex items-center gap-3">
-                        <span v-if="saved === 'handle'" class="text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="submit" label="حفظ" :disabled="saving.handle" />
                     </div>
                 </template>
@@ -215,7 +202,6 @@ async function submitCustomDomain() {
 
                 <template #footer>
                     <div class="flex items-center gap-3">
-                        <span v-if="saved === 'custom'" class="text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="submit" label="حفظ" :disabled="saving.custom" />
                     </div>
                 </template>

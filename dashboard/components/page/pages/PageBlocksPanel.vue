@@ -6,6 +6,7 @@ import Modal from '../../ui/Modal.vue';
 import Switch from '../../settings/Switch.vue';
 import BlockEditor from '../editors/BlockEditor.vue';
 import { openModal, closeModal } from '../../../lib/modal.js';
+import { notifyApiSuccess } from '../../../lib/notify.js';
 import { usePagesStore } from '../../../stores/pages.js';
 
 const props = defineProps({
@@ -61,6 +62,7 @@ async function onSaved(payload) {
 
     closeModal('edit-page-block');
     store.clearEditingBlock();
+    notifyApiSuccess(payload, 'Saved');
 }
 
 async function toggleActive(block) {

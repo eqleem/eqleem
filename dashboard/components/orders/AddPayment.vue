@@ -7,6 +7,7 @@ import Textarea from '../ui/Textarea.vue';
 import Button from '../ui/Button.vue';
 import { ApiError } from '../../lib/api.js';
 import { closeModal } from '../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 import { paymentMethodOptions } from '../../data/orders.js';
 import { useOrdersStore } from '../../stores/orders.js';
 
@@ -28,7 +29,6 @@ const errors = reactive({
     notes: null,
 });
 
-const message = ref(null);
 const saving = ref(false);
 
 const dueMajor = () => Math.max(0, (Number(props.order?.due_total) || 0) / 100);
@@ -40,7 +40,6 @@ function resetForm() {
     errors.amount = null;
     errors.method = null;
     errors.notes = null;
-    message.value = null;
 }
 
 watch(
@@ -60,7 +59,6 @@ watch(
 
 async function submit() {
     saving.value = true;
-    message.value = null;
     errors.amount = null;
     errors.method = null;
     errors.notes = null;
@@ -72,6 +70,7 @@ async function submit() {
             notes: form.notes.trim() || null,
         });
 
+        notifySuccess('Saved');
         closeModal('add-order-payment');
         resetForm();
     } catch (error) {
@@ -79,10 +78,9 @@ async function submit() {
             errors.amount = error.errors?.amount?.[0] ?? error.errors?.paymentAmount?.[0] ?? null;
             errors.method = error.errors?.method?.[0] ?? error.errors?.paymentMethod?.[0] ?? null;
             errors.notes = error.errors?.notes?.[0] ?? error.errors?.paymentNotes?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر تسجيل الدفعة.';
         }
+
+        notifyApiError(error, 'تعذر تسجيل الدفعة.');
     } finally {
         saving.value = false;
     }
@@ -95,8 +93,6 @@ async function submit() {
             <p class="text-xs text-gray-400">المبلغ المتبقي</p>
             <p class="mt-1 text-lg font-bold text-amber-700">{{ order.due_total_formatted }}</p>
         </div>
-
-        <p v-if="message" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ message }}</p>
 
         <Input
             v-model="form.amount"

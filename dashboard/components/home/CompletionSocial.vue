@@ -6,18 +6,17 @@ import Input from '../ui/Input.vue';
 import Select from '../ui/Select.vue';
 import Button from '../ui/Button.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
+import { notifySuccess, notifyError } from '../../lib/notify.js';
 
 const store = useWelcomeStore();
 const { forms, saving } = storeToRefs(store);
 
 const form = reactive({ network: 'twitter', url: '' });
 const errors = reactive({ network: null, url: null });
-const message = ref(null);
 
 async function submit() {
     errors.network = null;
     errors.url = null;
-    message.value = null;
 
     const result = await store.addSocialLink({
         network: form.network,
@@ -27,9 +26,11 @@ async function submit() {
     if (!result.ok) {
         errors.network = result.errors?.network?.[0] ?? null;
         errors.url = result.errors?.url?.[0] ?? null;
-        message.value = result.message ?? 'تعذر الحفظ';
+        notifyError(result.message ?? 'تعذر الحفظ');
         return;
     }
+
+    notifySuccess('Saved');
 
     form.url = '';
     form.network = 'twitter';
@@ -54,7 +55,6 @@ async function submit() {
             dir="ltr"
             :error="errors.url"
         />
-        <p v-if="message" class="text-sm text-red-600">{{ message }}</p>
         <template #footer>
             <Button type="submit" label="إضافة" :loading="saving" />
         </template>

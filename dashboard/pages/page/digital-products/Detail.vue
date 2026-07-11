@@ -14,12 +14,12 @@ import FileGallery from '../../../components/ui/FileGallery.vue';
 import NotFound from '../../NotFound.vue';
 import { useDigitalProductsStore } from '../../../stores/digital-products.js';
 import { ApiError } from '../../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useDigitalProductsStore();
 const formTab = ref('edit');
-const saved = ref(false);
 const uploading = ref(false);
 const uploadingDownloads = ref(false);
 const notFound = ref(false);
@@ -70,7 +70,6 @@ function loadForm(product, { syncEditor = true } = {}) {
     errors.title = null;
     errors.slug = null;
     errors.form = null;
-    saved.value = false;
 
     if (syncEditor) {
         bodySeed.value = product.body ?? '';
@@ -237,10 +236,7 @@ async function persist({ close = false } = {}) {
         }
 
         loadForm(product);
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifySuccess('Saved');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.title = error.errors?.title?.[0] ?? null;
@@ -257,6 +253,8 @@ async function persist({ close = false } = {}) {
         } else {
             errors.form = 'تعذر حفظ المنتج.';
         }
+
+        notifyApiError(error, 'تعذر حفظ المنتج.');
     }
 }
 
@@ -443,7 +441,6 @@ function saveAndClose() {
 
                 <template #footer>
                     <div class="flex items-center gap-2">
-                        <span v-if="saved" class="me-auto text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="button" variant="secondary" label="حفظ وإغلاق" :disabled="store.saving" @click="saveAndClose" />
                         <Button type="submit" label="حفظ" :disabled="store.saving" />
                     </div>

@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useDigitalServicesStore } from '../../../stores/digital-services.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useDigitalServicesStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const product = await store.createDigitalService(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-digital-service');
         router.push(`/manage/digital-services/detail/${product.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء الخدمة.';
+        notifyApiError(error, 'تعذر إنشاء الخدمة.');
     } finally {
         submitting.value = false;
     }

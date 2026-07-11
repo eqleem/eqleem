@@ -8,6 +8,7 @@ import Modal from '../ui/Modal.vue';
 import Switch from '../settings/Switch.vue';
 import BlockEditor from './editors/BlockEditor.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
+import { notifyApiSuccess } from '../../lib/notify.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
 
 const store = usePageStructureStore();
@@ -68,6 +69,7 @@ async function onSaved(payload) {
 
     closeModal('edit-block');
     store.clearEditing();
+    notifyApiSuccess(payload, 'Saved');
 }
 
 async function toggleActive(block) {

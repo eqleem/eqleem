@@ -12,6 +12,7 @@ import Button from '../../components/ui/Button.vue';
 import Switch from '../../components/settings/Switch.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 
 defineProps({
     embedded: { type: Boolean, default: false },
@@ -166,15 +167,15 @@ async function saveMethod(slug) {
         }
 
         closeModal(`shipping-method-${slug}`);
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             for (const [key, messages] of Object.entries(error.errors ?? {})) {
                 errors[key] = messages?.[0] ?? null;
             }
-        } else {
-            message.value = 'تعذر حفظ إعدادات الشحن.';
         }
+
+        notifyApiError(error, 'تعذر حفظ إعدادات الشحن.');
     } finally {
         saving.method = false;
     }
@@ -209,15 +210,15 @@ async function saveCustom() {
 
         closeModal('custom-shipping-form');
         await load();
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             for (const [key, messages] of Object.entries(error.errors ?? {})) {
                 errors[key] = messages?.[0] ?? null;
             }
-        } else {
-            message.value = 'تعذر حفظ خدمة الشحن.';
         }
+
+        notifyApiError(error, 'تعذر حفظ خدمة الشحن.');
     } finally {
         saving.custom = false;
     }

@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useFormsStore } from '../../../stores/forms.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useFormsStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const item = await store.createForm(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-form');
         router.push(`/manage/forms/detail/${item.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء النموذج.';
+        notifyApiError(error, 'تعذر إنشاء النموذج.');
     } finally {
         submitting.value = false;
     }

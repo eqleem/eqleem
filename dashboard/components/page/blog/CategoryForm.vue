@@ -6,6 +6,7 @@ import Button from '../../ui/Button.vue';
 import { useBlogStore } from '../../../stores/blog.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     categoryId: { type: [Number, String], default: null },
@@ -88,6 +89,7 @@ async function submit() {
             });
         }
 
+        notifySuccess('Saved');
         closeModal(props.modalName);
     } catch (error) {
         if (error instanceof ApiError) {

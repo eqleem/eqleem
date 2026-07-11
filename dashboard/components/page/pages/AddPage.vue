@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { usePagesStore } from '../../../stores/pages.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = usePagesStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const page = await store.createPage(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-page');
         router.push(`/manage/pages/detail/${page.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء الصفحة.';
+        notifyApiError(error, 'تعذر إنشاء الصفحة.');
     } finally {
         submitting.value = false;
     }

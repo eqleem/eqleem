@@ -8,6 +8,7 @@ import Button from '../ui/Button.vue';
 import Form from '../ui/Form.vue';
 import ThemeOptionField from './editors/ThemeOptionField.vue';
 import { usePageDesignStore } from '../../stores/pageDesign.js';
+import { notifySuccess, notifyError } from '../../lib/notify.js';
 
 const store = usePageDesignStore();
 const {
@@ -28,8 +29,6 @@ const {
 const activeTab = ref('customize');
 const uploads = reactive({});
 const fieldErrors = reactive({});
-const saveMessage = ref(null);
-
 onMounted(() => {
     store.fetchDesign();
 });
@@ -38,12 +37,7 @@ watch(selectedTheme, (theme) => {
     activeTab.value = theme?.is_active ? 'customize' : 'info';
     Object.keys(uploads).forEach((key) => delete uploads[key]);
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
-    saveMessage.value = null;
 }, { immediate: true });
-
-watch(message, (value) => {
-    saveMessage.value = value;
-});
 
 const selectedBorderClass = computed(() => 'border-primary-500 border-primary-500/15 shadow-md');
 
@@ -70,7 +64,6 @@ function onUpload({ key, file }) {
 
 async function saveOptions() {
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
-    saveMessage.value = null;
 
     const result = await store.saveOptions(uploads);
 
@@ -81,10 +74,11 @@ async function saveOptions() {
                 fieldErrors[match[1]] = messages?.[0] ?? null;
             }
         });
-        saveMessage.value = result.message ?? 'تعذر الحفظ';
+        notifyError(result.message ?? 'تعذر الحفظ');
         return;
     }
 
+    notifySuccess('Settings updated successfully.');
     Object.keys(uploads).forEach((key) => delete uploads[key]);
 }
 </script>
@@ -315,9 +309,6 @@ async function saveOptions() {
                                     @upload="onUpload"
                                 />
 
-                                <p v-if="saveMessage" class="text-sm" :class="error ? 'text-red-600' : 'text-green-600'">
-                                    {{ saveMessage }}
-                                </p>
 
                                 <template #footer>
                                     <Button type="submit" label="حفظ" :loading="saving" />

@@ -2,6 +2,7 @@
 import { onMounted } from 'vue';
 import Header from './components/Header.vue';
 import Nav from './components/Nav.vue';
+import Notify from './components/ui/Notify.vue';
 import { loadDashboardContext } from './stores/session.js';
 
 onMounted(() => {
@@ -13,6 +14,7 @@ onMounted(() => {
     <div class="antialiased bg-stone-200">
         <Header />
         <Nav />
+        <Notify />
         <main class="min-h-[calc(100vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
             <RouterView />
         </main>

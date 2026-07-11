@@ -9,6 +9,7 @@ import Select from '../../ui/Select.vue';
 import FileCrop from '../../ui/FileCrop.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
+import { notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -40,7 +41,6 @@ const socialError = ref(null);
 const socialSaving = ref(false);
 
 const errors = reactive({});
-const message = ref(null);
 const saving = ref(false);
 const dragSocialId = ref(null);
 
@@ -61,7 +61,6 @@ function networkMeta(key) {
 
 async function submit() {
     saving.value = true;
-    message.value = null;
     Object.keys(errors).forEach((key) => delete errors[key]);
 
     try {
@@ -78,13 +77,11 @@ async function submit() {
         emit('saved', payload);
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             Object.assign(errors, Object.fromEntries(
                 Object.entries(error.errors || {}).map(([key, value]) => [key, value?.[0] ?? null]),
             ));
-        } else {
-            message.value = 'تعذر الحفظ.';
         }
+        notifyApiError(error, 'تعذر الحفظ.');
     } finally {
         saving.value = false;
     }
@@ -217,7 +214,6 @@ async function onSocialDrop(event, targetId) {
             </div>
         </div>
 
-        <p v-if="message" class="mt-3 text-sm text-red-500">{{ message }}</p>
 
         <template #footer>
             <Button type="submit" label="حفظ" :loading="saving" />

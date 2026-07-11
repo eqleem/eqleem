@@ -7,6 +7,7 @@ import Select from '../../components/ui/Select.vue';
 import Button from '../../components/ui/Button.vue';
 import { languages as fallbackLanguages, currencies as fallbackCurrencies } from '../../data/settings.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 
 const languages = ref({ ...fallbackLanguages });
 const currencies = ref({ ...fallbackCurrencies });
@@ -20,7 +21,6 @@ const form = reactive({
 
 const loading = ref(true);
 const saving = reactive({ language: false, currency: false });
-const saved = ref(null);
 const message = ref(null);
 const errors = reactive({
     default_language: null,
@@ -58,15 +58,6 @@ watch(
         }
     },
 );
-
-function flash(key) {
-    saved.value = key;
-    setTimeout(() => {
-        if (saved.value === key) {
-            saved.value = null;
-        }
-    }, 2000);
-}
 
 function applyPayload(payload) {
     const data = payload?.data ?? payload;
@@ -121,17 +112,16 @@ async function save(section) {
             },
         });
         applyPayload(payload);
-        flash(section);
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             errors.default_language = error.errors?.default_language?.[0] ?? null;
             errors.default_currency = error.errors?.default_currency?.[0] ?? null;
             errors.available_languages = error.errors?.available_languages?.[0] ?? null;
             errors.available_currencies = error.errors?.available_currencies?.[0] ?? null;
-        } else {
-            message.value = 'تعذر حفظ الإعدادات.';
         }
+
+        notifyApiError(error, 'تعذر حفظ الإعدادات.');
     } finally {
         saving[section] = false;
     }
@@ -180,7 +170,6 @@ onMounted(load);
 
                 <template #footer>
                     <div class="flex items-center gap-3">
-                        <span v-if="saved === 'language'" class="text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="submit" label="حفظ" :disabled="loading || saving.language" />
                     </div>
                 </template>
@@ -214,7 +203,6 @@ onMounted(load);
 
                 <template #footer>
                     <div class="flex items-center gap-3">
-                        <span v-if="saved === 'currency'" class="text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="submit" label="حفظ" :disabled="loading || saving.currency" />
                     </div>
                 </template>

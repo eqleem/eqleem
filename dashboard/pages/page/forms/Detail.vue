@@ -11,12 +11,12 @@ import Select from '../../../components/ui/Select.vue';
 import NotFound from '../../NotFound.vue';
 import { useFormsStore, fieldTypeHasOptions, makeField } from '../../../stores/forms.js';
 import { ApiError } from '../../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useFormsStore();
 const formTab = ref('edit');
-const saved = ref(false);
 const notFound = ref(false);
 const addFieldOpen = ref(false);
 const fieldModal = ref(false);
@@ -103,7 +103,6 @@ function loadForm(item) {
     errors.slug = null;
     errors.fields = null;
     errors.form = null;
-    saved.value = false;
 }
 
 onMounted(async () => {
@@ -289,10 +288,7 @@ async function persist({ close = false } = {}) {
         }
 
         loadForm(item);
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifySuccess('Saved');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.title = error.errors?.title?.[0] ?? null;
@@ -310,6 +306,8 @@ async function persist({ close = false } = {}) {
         } else {
             errors.form = 'تعذر حفظ النموذج.';
         }
+
+        notifyApiError(error, 'تعذر حفظ النموذج.');
     }
 }
 
@@ -498,7 +496,6 @@ function saveAndClose() {
 
                 <template #footer>
                     <div class="flex items-center gap-2">
-                        <span v-if="saved" class="me-auto text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="button" variant="secondary" label="حفظ وإغلاق" :disabled="store.saving" @click="saveAndClose" />
                         <Button type="submit" label="حفظ" :disabled="store.saving" />
                     </div>

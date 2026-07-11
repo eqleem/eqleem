@@ -12,6 +12,7 @@ import Modal from '../../components/ui/Modal.vue';
 import { weekdayLabels as fallbackWeekdays } from '../../data/settings.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 
 const search = ref('');
 const branches = ref([]);
@@ -177,15 +178,15 @@ async function submit() {
 
         closeModal('branch-form');
         await load();
+        notifySuccess('Saved');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             for (const [key, messages] of Object.entries(error.errors ?? {})) {
                 errors[key] = messages?.[0] ?? null;
             }
-        } else {
-            message.value = 'تعذر حفظ الفرع.';
         }
+
+        notifyApiError(error, 'تعذر حفظ الفرع.');
     } finally {
         saving.value = false;
     }

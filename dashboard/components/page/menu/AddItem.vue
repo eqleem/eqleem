@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useMenuStore } from '../../../stores/menu.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useMenuStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const item = await store.createItem(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-menu-item');
         router.push(`/manage/menu/detail/${item.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء الطبق.';
+        notifyApiError(error, 'تعذر إنشاء الطبق.');
     } finally {
         submitting.value = false;
     }

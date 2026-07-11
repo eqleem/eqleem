@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -42,7 +43,6 @@ const showContentResults = ref(false);
 const linkError = ref(null);
 const linkSaving = ref(false);
 const saving = ref(false);
-const message = ref(null);
 const dragId = ref(null);
 
 watch(() => props.editor, (value) => {
@@ -144,9 +144,11 @@ async function saveLink() {
         const refreshed = await store.fetchBlock(props.blockId);
         links.value = [...(refreshed?.editor?.links ?? [])];
         emit('updated', refreshed);
+        notifySuccess('Saved');
         linkModal.value = false;
     } catch (error) {
         linkError.value = error instanceof ApiError ? error.message : 'تعذر حفظ الرابط.';
+        notifyApiError(error, 'تعذر حفظ الرابط.');
     } finally {
         linkSaving.value = false;
     }
@@ -202,7 +204,6 @@ async function saveSettings() {
     }
 
     saving.value = true;
-    message.value = null;
 
     try {
         const payload = await store.updateBlock(props.blockId, {
@@ -211,7 +212,7 @@ async function saveSettings() {
         });
         emit('saved', payload);
     } catch (error) {
-        message.value = error instanceof ApiError ? error.message : 'تعذر الحفظ.';
+        notifyApiError(error, 'تعذر الحفظ.');
     } finally {
         saving.value = false;
     }
@@ -264,7 +265,6 @@ async function saveSettings() {
             </li>
         </ul>
 
-        <p v-if="message" class="text-sm text-red-500">{{ message }}</p>
 
         <div class="flex justify-end pt-2">
             <Button

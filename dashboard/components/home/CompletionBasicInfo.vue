@@ -7,6 +7,7 @@ import Textarea from '../ui/Textarea.vue';
 import Button from '../ui/Button.vue';
 import FileCrop from '../ui/FileCrop.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
+import { notifySuccess, notifyError } from '../../lib/notify.js';
 import { useSession, updateTenant } from '../../stores/session.js';
 
 const store = useWelcomeStore();
@@ -17,7 +18,6 @@ const form = reactive({ name: '', bio: '' });
 const logoFile = ref(null);
 const logoPreview = ref(null);
 const errors = reactive({ name: null, bio: null, logo: null });
-const message = ref(null);
 
 watch(
     () => forms.value.basic_info,
@@ -40,7 +40,6 @@ async function submit() {
     errors.name = null;
     errors.bio = null;
     errors.logo = null;
-    message.value = null;
 
     const body = new FormData();
     body.append('name', form.name.trim());
@@ -56,9 +55,11 @@ async function submit() {
         errors.name = result.errors?.name?.[0] ?? null;
         errors.bio = result.errors?.bio?.[0] ?? null;
         errors.logo = result.errors?.logo?.[0] ?? null;
-        message.value = result.message ?? 'تعذر الحفظ';
+        notifyError(result.message ?? 'تعذر الحفظ');
         return;
     }
+
+    notifySuccess('Saved');
 
     if (tenant.value) {
         updateTenant({
@@ -97,7 +98,6 @@ async function submit() {
             :rows="3"
             :error="errors.bio"
         />
-        <p v-if="message" class="text-sm text-red-600">{{ message }}</p>
         <template #footer>
             <Button type="submit" label="حفظ" :loading="saving" />
         </template>

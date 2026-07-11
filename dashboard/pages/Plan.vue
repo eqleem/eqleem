@@ -6,6 +6,7 @@ import MainBox from '../components/ui/MainBox.vue';
 import Button from '../components/ui/Button.vue';
 import Icon from '../components/ui/Icon.vue';
 import Alert from '../components/ui/Alert.vue';
+import { notifySuccess, notifyError } from '../lib/notify.js';
 import Modal from '../components/ui/Modal.vue';
 import { openModal } from '../lib/modal.js';
 import { loadDashboardContext } from '../stores/session.js';
@@ -21,7 +22,6 @@ const route = useRoute();
 const router = useRouter();
 const { state: planState } = usePlanStore();
 
-const statusAlert = ref(null);
 const activeFaq = ref(1);
 const moyasarMount = ref(null);
 
@@ -41,17 +41,11 @@ async function handlePaymentReturn() {
     const status = route.query.status;
 
     if (status === 'success') {
-        statusAlert.value = {
-            color: 'green',
-            text: 'تم تفعيل الباقة بنجاح.',
-        };
+        notifySuccess('تم تفعيل الباقة بنجاح.');
         await loadDashboardContext();
         await fetchPlans(planState.billingPeriod);
     } else if (status === 'error') {
-        statusAlert.value = {
-            color: 'red',
-            text: 'عملية الدفع فشلت، الرجاء المحاولة مرة أخرى.',
-        };
+        notifyError('عملية الدفع فشلت، الرجاء المحاولة مرة أخرى.');
     }
 
     if (status) {
@@ -70,7 +64,7 @@ async function changeBillingPeriod(period) {
 async function handleSubscribeFree() {
     try {
         const message = await subscribeFreePlan();
-        statusAlert.value = { color: 'green', text: message };
+        notifySuccess(message);
         await loadDashboardContext();
     } catch {
         // surfaced via planState.error
@@ -138,8 +132,7 @@ onBeforeUnmount(() => {
             </template>
         </MainBox>
 
-        <Alert v-if="statusAlert" class="mt-6" :color="statusAlert.color" :text="statusAlert.text" />
-        <Alert v-else-if="planState.error" class="mt-6" color="red" :text="planState.error" />
+        <Alert v-if="planState.error" class="mt-6" color="red" :text="planState.error" />
 
         <div class="mt-10 flex flex-col items-center gap-3">
             <div class="flex items-center">

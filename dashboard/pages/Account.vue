@@ -6,13 +6,13 @@ import Form from '../components/ui/Form.vue';
 import Input from '../components/ui/Input.vue';
 import Button from '../components/ui/Button.vue';
 import { api, ApiError } from '../lib/api.js';
+import { notifyApiSuccess, notifyApiError } from '../lib/notify.js';
 import { useSession, updateUser } from '../stores/session.js';
 
 const { user } = useSession();
 const form = reactive({ name: '', email: '' });
 const errors = reactive({ name: null, email: null });
 const saving = ref(false);
-const message = ref(null);
 
 watch(
     user,
@@ -31,7 +31,6 @@ const canSubmit = computed(() => !saving.value && form.name.trim().length >= 2 &
 
 async function submit() {
     saving.value = true;
-    message.value = null;
     errors.name = null;
     errors.email = null;
 
@@ -46,15 +45,14 @@ async function submit() {
 
         const updated = payload?.data ?? payload;
         updateUser(updated);
-        message.value = payload?.message ?? 'تم تحديث معلومات الحساب بنجاح.';
+        notifyApiSuccess(payload, 'Account info updated successfully.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.name = error.errors?.name?.[0] ?? null;
             errors.email = error.errors?.email?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ التعديلات.';
         }
+
+        notifyApiError(error, 'Could not save changes.');
     } finally {
         saving.value = false;
     }
@@ -89,12 +87,7 @@ async function submit() {
                 />
 
                 <template #footer>
-                    <div class="flex items-center gap-3">
-                        <p v-if="message" class="text-sm" :class="errors.name || errors.email ? 'text-red-600' : 'text-emerald-600'">
-                            {{ message }}
-                        </p>
-                        <Button type="submit" label="حفظ" :disabled="!canSubmit" />
-                    </div>
+                    <Button type="submit" label="حفظ" :disabled="!canSubmit" />
                 </template>
             </Form>
         </MainBox>

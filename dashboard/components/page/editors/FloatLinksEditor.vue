@@ -8,6 +8,7 @@ import Separator from '../../ui/Separator.vue';
 import Button from '../../ui/Button.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { ApiError } from '../../../lib/api.js';
+import { notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -27,12 +28,10 @@ const form = reactive({
 });
 
 const errors = reactive({});
-const message = ref(null);
 const saving = ref(false);
 
 async function submit() {
     saving.value = true;
-    message.value = null;
     Object.keys(errors).forEach((key) => delete errors[key]);
 
     try {
@@ -40,13 +39,11 @@ async function submit() {
         emit('saved', payload);
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             Object.assign(errors, Object.fromEntries(
                 Object.entries(error.errors || {}).map(([key, value]) => [key, value?.[0] ?? null]),
             ));
-        } else {
-            message.value = 'تعذر الحفظ.';
         }
+        notifyApiError(error, 'تعذر الحفظ.');
     } finally {
         saving.value = false;
     }
@@ -89,7 +86,6 @@ async function submit() {
             />
         </div>
 
-        <p v-if="message" class="mt-3 text-sm text-red-500">{{ message }}</p>
 
         <template #footer>
             <Button type="submit" label="حفظ" :loading="saving" />

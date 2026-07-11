@@ -9,6 +9,7 @@ import Button from '../../components/ui/Button.vue';
 import Switch from '../../components/settings/Switch.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 
 defineProps({
     embedded: { type: Boolean, default: false },
@@ -20,7 +21,6 @@ const loading = ref(true);
 const saving = ref(false);
 const toggling = ref(null);
 const message = ref(null);
-const saved = ref(false);
 
 const modalForm = reactive({
     label: '',
@@ -196,7 +196,6 @@ async function saveMethod() {
     }
 
     saving.value = true;
-    saved.value = false;
     message.value = null;
     clearErrors();
 
@@ -213,19 +212,15 @@ async function saveMethod() {
         }
 
         closeModal(`payment-method-${activeSlug.value}`);
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             for (const [key, messages] of Object.entries(error.errors ?? {})) {
                 errors[key] = messages?.[0] ?? null;
             }
-        } else {
-            message.value = 'تعذر حفظ إعدادات الوسيلة.';
         }
+
+        notifyApiError(error, 'تعذر حفظ إعدادات الوسيلة.');
     } finally {
         saving.value = false;
     }
@@ -237,7 +232,6 @@ onMounted(load);
 <template>
     <SettingsShell title="وسائل الدفع" :embedded="embedded">
         <p v-if="message" class="mb-4 text-sm text-red-500">{{ message }}</p>
-        <p v-if="saved" class="mb-4 text-sm text-emerald-600">تم الحفظ.</p>
 
         <MainBox title="وسائل الدفع" subtitle="قم بتفعيل وتخصيص وسائل الدفع المناسبة لجمهورك.">
             <template #icon>

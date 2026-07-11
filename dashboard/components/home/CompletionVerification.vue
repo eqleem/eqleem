@@ -9,6 +9,7 @@ import Button from '../ui/Button.vue';
 import { identityTypes as fallbackTypes, verificationCountries as fallbackCountries } from '../../data/settings.js';
 import { api, ApiError } from '../../lib/api.js';
 import { useWelcomeStore } from '../../stores/welcome.js';
+import { notifyApiSuccess, notifyApiError } from '../../lib/notify.js';
 
 const store = useWelcomeStore();
 
@@ -81,7 +82,6 @@ function onFileChange(event) {
 
 async function submit() {
     saving.value = true;
-    message.value = null;
     errors.identity_type = null;
     errors.identity_number = null;
     errors.country = null;
@@ -104,6 +104,7 @@ async function submit() {
             fileInput.value.value = '';
         }
 
+        notifyApiSuccess({ message: 'تم إرسال طلب التوثيق.' }, 'تم إرسال طلب التوثيق.');
         await store.afterStepSaved('home-step-verification');
     } catch (error) {
         if (error instanceof ApiError) {
@@ -111,10 +112,9 @@ async function submit() {
             errors.identity_number = error.errors?.identity_number?.[0] ?? null;
             errors.country = error.errors?.country?.[0] ?? null;
             errors.file = error.errors?.file?.[0] ?? null;
-            message.value = error.message;
         } else {
-            message.value = 'تعذر حفظ طلب التوثيق.';
         }
+        notifyApiError(error, 'تعذر حفظ طلب التوثيق.');
     } finally {
         saving.value = false;
     }
@@ -187,7 +187,6 @@ onMounted(load);
                     </div>
                 </div>
 
-                <p v-if="message" class="text-sm text-red-600">{{ message }}</p>
 
                 <template #footer>
                     <Button type="submit" label="حفظ" :loading="saving" />

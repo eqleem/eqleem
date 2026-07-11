@@ -8,6 +8,7 @@ import Alert from '../../ui/Alert.vue';
 import { useUnitRentalStore } from '../../../stores/unit-rental.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     calendarId: { type: [Number, String], default: null },
@@ -132,6 +133,7 @@ async function submit() {
             await store.createCalendar(payload);
         }
 
+        notifySuccess('Saved');
         closeModal(props.modalName);
     } catch (error) {
         if (error instanceof ApiError) {
@@ -145,6 +147,7 @@ async function submit() {
         } else {
             errors.name = 'تعذر حفظ وحدة المخزون.';
         }
+        notifyApiError(error, 'تعذر حفظ الأصل.');
     } finally {
         submitting.value = false;
     }

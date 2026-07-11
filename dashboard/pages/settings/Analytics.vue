@@ -8,12 +8,12 @@ import Toggle from '../../components/ui/Toggle.vue';
 import Button from '../../components/ui/Button.vue';
 import { analyticsProviders as fallbackProviders } from '../../data/settings.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 
 const providers = ref(fallbackProviders.map((provider) => ({ ...provider })));
 const integrations = reactive({});
 const loading = ref(true);
 const saving = ref(false);
-const saved = ref(false);
 const message = ref(null);
 const errors = reactive({});
 
@@ -69,7 +69,6 @@ async function load() {
 
 async function submit() {
     saving.value = true;
-    saved.value = false;
     message.value = null;
     Object.keys(errors).forEach((key) => {
         errors[key] = null;
@@ -89,22 +88,17 @@ async function submit() {
         };
 
         applyPayload(await api('/settings/analytics', { method: 'PUT', body }));
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
-            message.value = error.message;
             for (const provider of providers.value) {
                 const field = error.errors?.[`integrations.${provider.key}.identifier`]?.[0]
                     ?? error.errors?.[`integrations.${provider.key}.active`]?.[0]
                     ?? null;
                 errors[provider.key] = field;
             }
-        } else {
-            message.value = 'تعذر حفظ إعدادات الإحصائيات.';
         }
+        notifyApiError(error, 'تعذر حفظ إعدادات الإحصائيات.');
     } finally {
         saving.value = false;
     }
@@ -121,7 +115,7 @@ onMounted(load);
             </template>
 
             <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
-            <p v-else-if="message && !saved" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
+            <p v-else-if="message" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
 
             <Form v-if="!loading" @submit="submit">
                 <div class="flex flex-col gap-3">
@@ -157,10 +151,7 @@ onMounted(load);
                 </div>
 
                 <template #footer>
-                    <div class="flex items-center gap-3">
-                        <span v-if="saved" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" :disabled="saving" />
-                    </div>
+                    <Button type="submit" label="حفظ" :disabled="saving" />
                 </template>
             </Form>
         </MainBox>

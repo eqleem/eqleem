@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useUnitRentalStore } from '../../../stores/unit-rental.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useUnitRentalStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const product = await store.createUnit(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-unit');
         router.push(`/manage/unit-rental/detail/${product.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء نوع الوحدة.';
+        notifyApiError(error, 'تعذر إنشاء نوع الوحدة.');
     } finally {
         submitting.value = false;
     }

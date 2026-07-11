@@ -10,6 +10,7 @@ import Modal from '../../components/ui/Modal.vue';
 import { socialNetworks as fallbackNetworks } from '../../data/settings.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../lib/notify.js';
 import { updateTenant, useSession } from '../../stores/session.js';
 
 const { tenant } = useSession();
@@ -33,7 +34,6 @@ const newSocial = reactive({ network: 'twitter', url: '' });
 
 const loading = ref(true);
 const saving = reactive({ profile: false, contact: false, social: false });
-const saved = ref(null);
 const message = ref(null);
 const errors = reactive({
     name: null,
@@ -45,15 +45,6 @@ const errors = reactive({
     network: null,
     url: null,
 });
-
-function flash(key) {
-    saved.value = key;
-    setTimeout(() => {
-        if (saved.value === key) {
-            saved.value = null;
-        }
-    }, 2000);
-}
 
 function applyPayload(payload) {
     const data = payload?.data ?? payload;
@@ -116,14 +107,13 @@ async function submitProfile() {
             method: 'PUT',
             body: { name: profile.name.trim() },
         }));
-        flash('profile');
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.name = error.errors?.name?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ معلومات الصفحة.';
         }
+
+        notifyApiError(error, 'تعذر حفظ معلومات الصفحة.');
     } finally {
         saving.profile = false;
     }
@@ -149,7 +139,7 @@ async function submitContact() {
                 city: contact.city.trim() || null,
             },
         }));
-        flash('contact');
+        notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.phone = error.errors?.phone?.[0] ?? null;
@@ -157,10 +147,9 @@ async function submitContact() {
             errors.whatsapp = error.errors?.whatsapp?.[0] ?? null;
             errors.country = error.errors?.country?.[0] ?? null;
             errors.city = error.errors?.city?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ بيانات الاتصال.';
         }
+
+        notifyApiError(error, 'تعذر حفظ بيانات الاتصال.');
     } finally {
         saving.contact = false;
     }
@@ -181,15 +170,15 @@ async function addSocialLink() {
             },
         }));
         newSocial.url = '';
+        notifySuccess('تم الحفظ.');
         closeModal('add-social-link');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.network = error.errors?.network?.[0] ?? null;
             errors.url = error.errors?.url?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر إضافة الرابط.';
         }
+
+        notifyApiError(error, 'تعذر إضافة الرابط.');
     } finally {
         saving.social = false;
     }
@@ -244,10 +233,7 @@ onMounted(load);
                 </div>
 
                 <template #footer>
-                    <div class="flex items-center gap-3">
-                        <span v-if="saved === 'profile'" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" :disabled="loading || saving.profile" />
-                    </div>
+                    <Button type="submit" label="حفظ" :disabled="loading || saving.profile" />
                 </template>
             </Form>
         </MainBox>
@@ -261,10 +247,7 @@ onMounted(load);
                 <Input v-model="contact.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
 
                 <template #footer>
-                    <div class="flex items-center gap-3">
-                        <span v-if="saved === 'contact'" class="text-sm text-emerald-600">تم الحفظ.</span>
-                        <Button type="submit" label="حفظ" :disabled="loading || saving.contact" />
-                    </div>
+                    <Button type="submit" label="حفظ" :disabled="loading || saving.contact" />
                 </template>
             </Form>
         </MainBox>

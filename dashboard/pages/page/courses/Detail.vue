@@ -13,12 +13,12 @@ import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import NotFound from '../../NotFound.vue';
 import { useCoursesStore } from '../../../stores/courses.js';
 import { ApiError } from '../../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useCoursesStore();
 const formTab = ref('edit');
-const saved = ref(false);
 const uploading = ref(false);
 const uploadingLesson = ref(null);
 const notFound = ref(false);
@@ -129,7 +129,6 @@ function loadForm(course, { syncEditor = true } = {}) {
     errors.title = null;
     errors.slug = null;
     errors.form = null;
-    saved.value = false;
     openChapters.value = {};
     openLessons.value = {};
 
@@ -381,10 +380,7 @@ async function persist({ close = false } = {}) {
         }
 
         loadForm(course);
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifySuccess('Saved');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.title = error.errors?.title?.[0] ?? null;
@@ -401,6 +397,8 @@ async function persist({ close = false } = {}) {
         } else {
             errors.form = 'تعذر حفظ الدورة.';
         }
+
+        notifyApiError(error, 'تعذر حفظ الدورة.');
     }
 }
 
@@ -671,7 +669,6 @@ function saveAndClose() {
 
                 <template #footer>
                     <div class="flex items-center gap-2">
-                        <span v-if="saved" class="me-auto text-sm text-emerald-600">تم الحفظ.</span>
                         <Button type="button" variant="secondary" label="حفظ وإغلاق" :disabled="store.saving" @click="saveAndClose" />
                         <Button type="submit" label="حفظ" :disabled="store.saving" />
                     </div>

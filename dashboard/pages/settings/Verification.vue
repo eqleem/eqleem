@@ -10,6 +10,7 @@ import Alert from '../../components/ui/Alert.vue';
 import Button from '../../components/ui/Button.vue';
 import { identityTypes as fallbackTypes, verificationCountries as fallbackCountries } from '../../data/settings.js';
 import { api, ApiError } from '../../lib/api.js';
+import { notifyApiSuccess, notifyApiError } from '../../lib/notify.js';
 
 const form = reactive({
     identity_type: 'individual',
@@ -28,7 +29,6 @@ const selectedFile = ref(null);
 
 const loading = ref(true);
 const saving = ref(false);
-const saved = ref(false);
 const message = ref(null);
 const errors = reactive({
     identity_type: null,
@@ -80,7 +80,6 @@ function onFileChange(event) {
 
 async function submit() {
     saving.value = true;
-    saved.value = false;
     message.value = null;
     errors.identity_type = null;
     errors.identity_number = null;
@@ -102,20 +101,15 @@ async function submit() {
         if (fileInput.value) {
             fileInput.value.value = '';
         }
-        saved.value = true;
-        setTimeout(() => {
-            saved.value = false;
-        }, 2000);
+        notifyApiSuccess({ message: 'تم إرسال طلب التوثيق.' }, 'تم إرسال طلب التوثيق.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.identity_type = error.errors?.identity_type?.[0] ?? null;
             errors.identity_number = error.errors?.identity_number?.[0] ?? null;
             errors.country = error.errors?.country?.[0] ?? null;
             errors.file = error.errors?.file?.[0] ?? null;
-            message.value = error.message;
-        } else {
-            message.value = 'تعذر حفظ طلب التوثيق.';
         }
+        notifyApiError(error, 'تعذر حفظ طلب التوثيق.');
     } finally {
         saving.value = false;
     }
@@ -128,7 +122,7 @@ onMounted(load);
     <SettingsShell title="توثيق الحساب">
         <MainBox title="توثيق المتجر" subtitle="بيانات توثيق المتجر بالمستندات الرسمية.">
             <p v-if="loading" class="px-4 py-6 text-sm text-gray-400">جاري التحميل...</p>
-            <p v-else-if="message && !saved" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
+            <p v-else-if="message" class="px-4 pt-3 text-sm text-red-500">{{ message }}</p>
 
             <template v-if="!loading">
                 <div v-if="!form.is_confirmed && form.confirm_status !== 'pending'" class="mt-3 px-4">
@@ -182,10 +176,7 @@ onMounted(load);
                     </div>
 
                     <template #footer>
-                        <div class="flex items-center gap-3">
-                            <span v-if="saved" class="text-sm text-emerald-600">تم إرسال طلب التوثيق.</span>
-                            <Button type="submit" label="حفظ" :disabled="saving" />
-                        </div>
+                        <Button type="submit" label="حفظ" :disabled="saving" />
                     </template>
                 </Form>
             </template>

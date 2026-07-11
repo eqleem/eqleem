@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useStoreStore } from '../../../stores/store.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useStoreStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const product = await store.createProduct(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-store-product');
         router.push(`/manage/store/detail/${product.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء المنتج.';
+        notifyApiError(error, 'تعذر إنشاء المنتج.');
     } finally {
         submitting.value = false;
     }

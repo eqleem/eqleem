@@ -8,6 +8,7 @@ import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
 import { useMenuStore } from '../../../stores/menu.js';
 import { ApiError } from '../../../lib/api.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useMenuStore();
 
@@ -19,8 +20,6 @@ const errors = reactive({
     sectionTitle: null,
     sectionDescription: null,
 });
-const saved = reactive({ show: false });
-
 onMounted(() => {
     store.fetchSettings();
 });
@@ -47,15 +46,14 @@ async function submit() {
             section_description: description,
         });
 
-        saved.show = true;
-        setTimeout(() => {
-            saved.show = false;
-        }, 2000);
+        notifySuccess('Settings updated successfully.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.sectionTitle = error.errors?.section_title?.[0] ?? null;
             errors.sectionDescription = error.errors?.section_description?.[0] ?? null;
         }
+
+        notifyApiError(error, 'تعذر حفظ الإعدادات.');
     }
 }
 </script>
@@ -89,10 +87,7 @@ async function submit() {
                     </div>
 
                     <template #footer>
-                        <div class="flex items-center gap-3">
-                            <span v-if="saved.show" class="text-sm text-emerald-600">تم حفظ الإعدادات.</span>
-                            <Button type="submit" label="حفظ" :disabled="store.saving" />
-                        </div>
+                        <Button type="submit" label="حفظ" :disabled="store.saving" />
                     </template>
                 </Form>
             </div>

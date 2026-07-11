@@ -7,6 +7,7 @@ import Button from '../../ui/Button.vue';
 import { useCoursesStore } from '../../../stores/courses.js';
 import { ApiError } from '../../../lib/api.js';
 import { closeModal } from '../../../lib/modal.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = useCoursesStore();
 const router = useRouter();
@@ -28,12 +29,15 @@ async function submit() {
     try {
         const product = await store.createCourse(title);
         form.title = '';
+        notifySuccess('Saved');
+
         closeModal('add-course');
         router.push(`/manage/courses/detail/${product.uuid}`);
     } catch (error) {
         errors.title = error instanceof ApiError
             ? (error.errors?.title?.[0] ?? error.message)
             : 'تعذر إنشاء الدورة.';
+        notifyApiError(error, 'تعذر إنشاء الدورة.');
     } finally {
         submitting.value = false;
     }
