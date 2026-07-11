@@ -1,10 +1,42 @@
 <?php
 
+use App\API\Blog\CreateBlogCategory;
+use App\API\Blog\CreateBlogPost;
+use App\API\Blog\DeleteBlogCategory;
+use App\API\Blog\DeleteBlogFeaturedImage;
+use App\API\Blog\DeleteBlogPosts;
+use App\API\Blog\GetBlogSettings;
+use App\API\Blog\ListBlogCategories;
+use App\API\Blog\ListBlogPosts;
+use App\API\Blog\ReorderBlogCategories;
+use App\API\Blog\ShowBlogPost;
+use App\API\Blog\UpdateBlogCategory;
+use App\API\Blog\UpdateBlogPost;
+use App\API\Blog\UpdateBlogSettings;
+use App\API\Blog\UploadBlogEditorImage;
+use App\API\Blog\UploadBlogFeaturedImage;
 use App\API\Clients\CreateClient;
 use App\API\Clients\ListClientInvoices;
 use App\API\Clients\ListClientOrders;
 use App\API\Clients\ListClients;
 use App\API\Clients\ShowClient;
+use App\API\Courses\CreateCourse;
+use App\API\Courses\CreateCourseCategory;
+use App\API\Courses\DeleteCourseCategory;
+use App\API\Courses\DeleteCourseCoverImage;
+use App\API\Courses\DeleteCourseLessonFile;
+use App\API\Courses\DeleteCourses;
+use App\API\Courses\GetCourseSettings;
+use App\API\Courses\ListCourseCategories;
+use App\API\Courses\ListCourses;
+use App\API\Courses\ReorderCourseCategories;
+use App\API\Courses\ShowCourse;
+use App\API\Courses\UpdateCourse;
+use App\API\Courses\UpdateCourseCategory;
+use App\API\Courses\UpdateCourseSettings;
+use App\API\Courses\UploadCourseCoverImage;
+use App\API\Courses\UploadCourseEditorImage;
+use App\API\Courses\UploadCourseLessonFile;
 use App\API\Dashboard\AddWelcomeSocialLink;
 use App\API\Dashboard\GetDashboardChart;
 use App\API\Dashboard\GetDashboardContext;
@@ -13,6 +45,25 @@ use App\API\Dashboard\GetDashboardStats;
 use App\API\Dashboard\GetWelcomeWidget;
 use App\API\Dashboard\UpdateWelcomeBasicInfo;
 use App\API\Dashboard\UpdateWelcomeContact;
+use App\API\DigitalProducts\CreateDigitalProduct;
+use App\API\DigitalProducts\CreateDigitalProductCategory;
+use App\API\DigitalProducts\DeleteDigitalProductCategory;
+use App\API\DigitalProducts\DeleteDigitalProductDownload;
+use App\API\DigitalProducts\DeleteDigitalProductImage;
+use App\API\DigitalProducts\DeleteDigitalProducts;
+use App\API\DigitalProducts\GetDigitalProductSettings;
+use App\API\DigitalProducts\ListDigitalProductCategories;
+use App\API\DigitalProducts\ListDigitalProducts;
+use App\API\DigitalProducts\ReorderDigitalProductCategories;
+use App\API\DigitalProducts\ReorderDigitalProductDownloads;
+use App\API\DigitalProducts\ReorderDigitalProductImages;
+use App\API\DigitalProducts\ShowDigitalProduct;
+use App\API\DigitalProducts\UpdateDigitalProduct;
+use App\API\DigitalProducts\UpdateDigitalProductCategory;
+use App\API\DigitalProducts\UpdateDigitalProductSettings;
+use App\API\DigitalProducts\UploadDigitalProductDownload;
+use App\API\DigitalProducts\UploadDigitalProductEditorImage;
+use App\API\DigitalProducts\UploadDigitalProductImage;
 use App\API\DigitalServices\CreateDigitalService;
 use App\API\DigitalServices\CreateDigitalServiceCategory;
 use App\API\DigitalServices\DeleteDigitalServiceCategory;
@@ -29,10 +80,42 @@ use App\API\DigitalServices\UpdateDigitalServiceCategory;
 use App\API\DigitalServices\UpdateDigitalServiceSettings;
 use App\API\DigitalServices\UploadDigitalServiceEditorImage;
 use App\API\DigitalServices\UploadDigitalServiceImage;
+use App\API\Forms\CloneForm;
+use App\API\Forms\CreateForm;
+use App\API\Forms\DeleteForms;
+use App\API\Forms\ListForms;
+use App\API\Forms\ShowForm;
+use App\API\Forms\UpdateForm;
 use App\API\FormSubmissions\ListFormSubmissions;
 use App\API\FormSubmissions\ShowFormSubmission;
 use App\API\Invoices\ListInvoices;
 use App\API\Invoices\ShowInvoice;
+use App\API\Menu\CreateMenuCategory;
+use App\API\Menu\CreateMenuItem;
+use App\API\Menu\DeleteMenuCategory;
+use App\API\Menu\DeleteMenuImage;
+use App\API\Menu\DeleteMenuItems;
+use App\API\Menu\GetMenuSettings;
+use App\API\Menu\ListMenuCategories;
+use App\API\Menu\ListMenuItems;
+use App\API\Menu\ReorderMenuCategories;
+use App\API\Menu\ReorderMenuImages;
+use App\API\Menu\ShowMenuItem;
+use App\API\Menu\UpdateMenuCategory;
+use App\API\Menu\UpdateMenuItem;
+use App\API\Menu\UpdateMenuSettings;
+use App\API\Menu\UploadMenuEditorImage;
+use App\API\Menu\UploadMenuImage;
+use App\API\Newsletter\CreateNewsletter;
+use App\API\Newsletter\DeleteNewsletterFeaturedImage;
+use App\API\Newsletter\DeleteNewsletters;
+use App\API\Newsletter\GetNewsletterSettings;
+use App\API\Newsletter\ListNewsletters;
+use App\API\Newsletter\ShowNewsletter;
+use App\API\Newsletter\UpdateNewsletter;
+use App\API\Newsletter\UpdateNewsletterSettings;
+use App\API\Newsletter\UploadNewsletterEditorImage;
+use App\API\Newsletter\UploadNewsletterFeaturedImage;
 use App\API\Orders\CreateOrder;
 use App\API\Orders\CreateOrderContent;
 use App\API\Orders\ListOrders;
@@ -56,6 +139,20 @@ use App\API\Page\ShowPageBlock;
 use App\API\Page\TogglePageBlockActive;
 use App\API\Page\UpdatePageBlock;
 use App\API\Page\UpsertPageBlockLink;
+use App\API\Pages\CreatePage;
+use App\API\Pages\CreatePageBlock as StandaloneCreatePageBlock;
+use App\API\Pages\DeletePageBlock as StandaloneDeletePageBlock;
+use App\API\Pages\DeletePages;
+use App\API\Pages\ListPageBlocks;
+use App\API\Pages\ListPages;
+use App\API\Pages\ReorderPageBlocks as StandaloneReorderPageBlocks;
+use App\API\Pages\ShowPage;
+use App\API\Pages\ShowPageBlock as StandaloneShowPageBlock;
+use App\API\Pages\TogglePageActive;
+use App\API\Pages\TogglePageBlockActive as StandaloneTogglePageBlockActive;
+use App\API\Pages\UpdatePage;
+use App\API\Pages\UpdatePageBlock as StandaloneUpdatePageBlock;
+use App\API\Pages\UploadPageEditorImage;
 use App\API\Payments\ListPayments;
 use App\API\Payments\ShowPayment;
 use App\API\Portfolio\CreatePortfolioCategory;
@@ -138,6 +235,27 @@ use App\API\Store\UpdateStoreProduct;
 use App\API\Store\UpdateStoreSettings;
 use App\API\Store\UploadStoreEditorImage;
 use App\API\Store\UploadStoreImage;
+use App\API\UnitRental\CreateUnitRental;
+use App\API\UnitRental\CreateUnitRentalCalendar;
+use App\API\UnitRental\CreateUnitRentalCategory;
+use App\API\UnitRental\DeleteUnitRentalCalendar;
+use App\API\UnitRental\DeleteUnitRentalCategory;
+use App\API\UnitRental\DeleteUnitRentalImage;
+use App\API\UnitRental\DeleteUnitRentals;
+use App\API\UnitRental\GetUnitRentalSettings;
+use App\API\UnitRental\ListUnitRentalCalendars;
+use App\API\UnitRental\ListUnitRentalCategories;
+use App\API\UnitRental\ListUnitRentals;
+use App\API\UnitRental\ReorderUnitRentalCategories;
+use App\API\UnitRental\ReorderUnitRentalImages;
+use App\API\UnitRental\ShowUnitRental;
+use App\API\UnitRental\ShowUnitRentalCalendar;
+use App\API\UnitRental\UpdateUnitRental;
+use App\API\UnitRental\UpdateUnitRentalCalendar;
+use App\API\UnitRental\UpdateUnitRentalCategory;
+use App\API\UnitRental\UpdateUnitRentalSettings;
+use App\API\UnitRental\UploadUnitRentalEditorImage;
+use App\API\UnitRental\UploadUnitRentalImage;
 use App\API\User\UpdateAccountProfile;
 use Illuminate\Support\Facades\Route;
 
@@ -433,6 +551,58 @@ Route::post('/portfolio/{uuid}/editor-images', UploadPortfolioEditorImage::class
     ->name('api.portfolio.editor-images.store')
     ->whereUuid('uuid');
 
+Route::get('/blog', ListBlogPosts::class)
+    ->name('api.blog.index');
+
+Route::post('/blog', CreateBlogPost::class)
+    ->name('api.blog.store');
+
+Route::delete('/blog', DeleteBlogPosts::class)
+    ->name('api.blog.destroy');
+
+Route::get('/blog/settings', GetBlogSettings::class)
+    ->name('api.blog.settings.show');
+
+Route::put('/blog/settings', UpdateBlogSettings::class)
+    ->name('api.blog.settings.update');
+
+Route::get('/blog/categories', ListBlogCategories::class)
+    ->name('api.blog.categories.index');
+
+Route::post('/blog/categories', CreateBlogCategory::class)
+    ->name('api.blog.categories.store');
+
+Route::put('/blog/categories/reorder', ReorderBlogCategories::class)
+    ->name('api.blog.categories.reorder');
+
+Route::put('/blog/categories/{id}', UpdateBlogCategory::class)
+    ->name('api.blog.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/blog/categories/{id}', DeleteBlogCategory::class)
+    ->name('api.blog.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/blog/{uuid}', ShowBlogPost::class)
+    ->name('api.blog.show')
+    ->whereUuid('uuid');
+
+Route::put('/blog/{uuid}', UpdateBlogPost::class)
+    ->name('api.blog.update')
+    ->whereUuid('uuid');
+
+Route::post('/blog/{uuid}/featured-image', UploadBlogFeaturedImage::class)
+    ->name('api.blog.featured-image.store')
+    ->whereUuid('uuid');
+
+Route::delete('/blog/{uuid}/featured-image', DeleteBlogFeaturedImage::class)
+    ->name('api.blog.featured-image.destroy')
+    ->whereUuid('uuid');
+
+Route::post('/blog/{uuid}/editor-images', UploadBlogEditorImage::class)
+    ->name('api.blog.editor-images.store')
+    ->whereUuid('uuid');
+
 Route::get('/store', ListStoreProducts::class)
     ->name('api.store.index');
 
@@ -488,6 +658,63 @@ Route::delete('/store/{uuid}/images/{mediaId}', DeleteStoreImage::class)
 
 Route::post('/store/{uuid}/editor-images', UploadStoreEditorImage::class)
     ->name('api.store.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/menu', ListMenuItems::class)
+    ->name('api.menu.index');
+
+Route::post('/menu', CreateMenuItem::class)
+    ->name('api.menu.store');
+
+Route::delete('/menu', DeleteMenuItems::class)
+    ->name('api.menu.destroy');
+
+Route::get('/menu/settings', GetMenuSettings::class)
+    ->name('api.menu.settings.show');
+
+Route::put('/menu/settings', UpdateMenuSettings::class)
+    ->name('api.menu.settings.update');
+
+Route::get('/menu/categories', ListMenuCategories::class)
+    ->name('api.menu.categories.index');
+
+Route::post('/menu/categories', CreateMenuCategory::class)
+    ->name('api.menu.categories.store');
+
+Route::put('/menu/categories/reorder', ReorderMenuCategories::class)
+    ->name('api.menu.categories.reorder');
+
+Route::put('/menu/categories/{id}', UpdateMenuCategory::class)
+    ->name('api.menu.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/menu/categories/{id}', DeleteMenuCategory::class)
+    ->name('api.menu.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/menu/{uuid}', ShowMenuItem::class)
+    ->name('api.menu.show')
+    ->whereUuid('uuid');
+
+Route::put('/menu/{uuid}', UpdateMenuItem::class)
+    ->name('api.menu.update')
+    ->whereUuid('uuid');
+
+Route::post('/menu/{uuid}/images', UploadMenuImage::class)
+    ->name('api.menu.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/menu/{uuid}/images/reorder', ReorderMenuImages::class)
+    ->name('api.menu.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/menu/{uuid}/images/{mediaId}', DeleteMenuImage::class)
+    ->name('api.menu.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/menu/{uuid}/editor-images', UploadMenuEditorImage::class)
+    ->name('api.menu.editor-images.store')
     ->whereUuid('uuid');
 
 Route::get('/services', ListServices::class)
@@ -565,6 +792,81 @@ Route::post('/services/{uuid}/editor-images', UploadServiceEditorImage::class)
     ->name('api.services.editor-images.store')
     ->whereUuid('uuid');
 
+Route::get('/unit-rental', ListUnitRentals::class)
+    ->name('api.unit-rental.index');
+
+Route::post('/unit-rental', CreateUnitRental::class)
+    ->name('api.unit-rental.store');
+
+Route::delete('/unit-rental', DeleteUnitRentals::class)
+    ->name('api.unit-rental.destroy');
+
+Route::get('/unit-rental/settings', GetUnitRentalSettings::class)
+    ->name('api.unit-rental.settings.show');
+
+Route::put('/unit-rental/settings', UpdateUnitRentalSettings::class)
+    ->name('api.unit-rental.settings.update');
+
+Route::get('/unit-rental/categories', ListUnitRentalCategories::class)
+    ->name('api.unit-rental.categories.index');
+
+Route::post('/unit-rental/categories', CreateUnitRentalCategory::class)
+    ->name('api.unit-rental.categories.store');
+
+Route::put('/unit-rental/categories/reorder', ReorderUnitRentalCategories::class)
+    ->name('api.unit-rental.categories.reorder');
+
+Route::put('/unit-rental/categories/{id}', UpdateUnitRentalCategory::class)
+    ->name('api.unit-rental.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/unit-rental/categories/{id}', DeleteUnitRentalCategory::class)
+    ->name('api.unit-rental.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/unit-rental/calendars', ListUnitRentalCalendars::class)
+    ->name('api.unit-rental.calendars.index');
+
+Route::post('/unit-rental/calendars', CreateUnitRentalCalendar::class)
+    ->name('api.unit-rental.calendars.store');
+
+Route::get('/unit-rental/calendars/{id}', ShowUnitRentalCalendar::class)
+    ->name('api.unit-rental.calendars.show')
+    ->whereNumber('id');
+
+Route::put('/unit-rental/calendars/{id}', UpdateUnitRentalCalendar::class)
+    ->name('api.unit-rental.calendars.update')
+    ->whereNumber('id');
+
+Route::delete('/unit-rental/calendars/{id}', DeleteUnitRentalCalendar::class)
+    ->name('api.unit-rental.calendars.destroy')
+    ->whereNumber('id');
+
+Route::get('/unit-rental/{uuid}', ShowUnitRental::class)
+    ->name('api.unit-rental.show')
+    ->whereUuid('uuid');
+
+Route::put('/unit-rental/{uuid}', UpdateUnitRental::class)
+    ->name('api.unit-rental.update')
+    ->whereUuid('uuid');
+
+Route::post('/unit-rental/{uuid}/images', UploadUnitRentalImage::class)
+    ->name('api.unit-rental.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/unit-rental/{uuid}/images/reorder', ReorderUnitRentalImages::class)
+    ->name('api.unit-rental.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/unit-rental/{uuid}/images/{mediaId}', DeleteUnitRentalImage::class)
+    ->name('api.unit-rental.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/unit-rental/{uuid}/editor-images', UploadUnitRentalEditorImage::class)
+    ->name('api.unit-rental.editor-images.store')
+    ->whereUuid('uuid');
+
 Route::get('/digital-services', ListDigitalServices::class)
     ->name('api.digital-services.index');
 
@@ -620,4 +922,249 @@ Route::delete('/digital-services/{uuid}/images/{mediaId}', DeleteDigitalServiceI
 
 Route::post('/digital-services/{uuid}/editor-images', UploadDigitalServiceEditorImage::class)
     ->name('api.digital-services.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/digital-products', ListDigitalProducts::class)
+    ->name('api.digital-products.index');
+
+Route::post('/digital-products', CreateDigitalProduct::class)
+    ->name('api.digital-products.store');
+
+Route::delete('/digital-products', DeleteDigitalProducts::class)
+    ->name('api.digital-products.destroy');
+
+Route::get('/digital-products/settings', GetDigitalProductSettings::class)
+    ->name('api.digital-products.settings.show');
+
+Route::put('/digital-products/settings', UpdateDigitalProductSettings::class)
+    ->name('api.digital-products.settings.update');
+
+Route::get('/digital-products/categories', ListDigitalProductCategories::class)
+    ->name('api.digital-products.categories.index');
+
+Route::post('/digital-products/categories', CreateDigitalProductCategory::class)
+    ->name('api.digital-products.categories.store');
+
+Route::put('/digital-products/categories/reorder', ReorderDigitalProductCategories::class)
+    ->name('api.digital-products.categories.reorder');
+
+Route::put('/digital-products/categories/{id}', UpdateDigitalProductCategory::class)
+    ->name('api.digital-products.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/digital-products/categories/{id}', DeleteDigitalProductCategory::class)
+    ->name('api.digital-products.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/digital-products/{uuid}', ShowDigitalProduct::class)
+    ->name('api.digital-products.show')
+    ->whereUuid('uuid');
+
+Route::put('/digital-products/{uuid}', UpdateDigitalProduct::class)
+    ->name('api.digital-products.update')
+    ->whereUuid('uuid');
+
+Route::post('/digital-products/{uuid}/images', UploadDigitalProductImage::class)
+    ->name('api.digital-products.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/digital-products/{uuid}/images/reorder', ReorderDigitalProductImages::class)
+    ->name('api.digital-products.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/digital-products/{uuid}/images/{mediaId}', DeleteDigitalProductImage::class)
+    ->name('api.digital-products.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/digital-products/{uuid}/editor-images', UploadDigitalProductEditorImage::class)
+    ->name('api.digital-products.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::post('/digital-products/{uuid}/downloads', UploadDigitalProductDownload::class)
+    ->name('api.digital-products.downloads.store')
+    ->whereUuid('uuid');
+
+Route::put('/digital-products/{uuid}/downloads/reorder', ReorderDigitalProductDownloads::class)
+    ->name('api.digital-products.downloads.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/digital-products/{uuid}/downloads/{mediaId}', DeleteDigitalProductDownload::class)
+    ->name('api.digital-products.downloads.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::get('/courses', ListCourses::class)
+    ->name('api.courses.index');
+
+Route::post('/courses', CreateCourse::class)
+    ->name('api.courses.store');
+
+Route::delete('/courses', DeleteCourses::class)
+    ->name('api.courses.destroy');
+
+Route::get('/courses/settings', GetCourseSettings::class)
+    ->name('api.courses.settings.show');
+
+Route::put('/courses/settings', UpdateCourseSettings::class)
+    ->name('api.courses.settings.update');
+
+Route::get('/courses/categories', ListCourseCategories::class)
+    ->name('api.courses.categories.index');
+
+Route::post('/courses/categories', CreateCourseCategory::class)
+    ->name('api.courses.categories.store');
+
+Route::put('/courses/categories/reorder', ReorderCourseCategories::class)
+    ->name('api.courses.categories.reorder');
+
+Route::put('/courses/categories/{id}', UpdateCourseCategory::class)
+    ->name('api.courses.categories.update')
+    ->whereNumber('id');
+
+Route::delete('/courses/categories/{id}', DeleteCourseCategory::class)
+    ->name('api.courses.categories.destroy')
+    ->whereNumber('id');
+
+Route::get('/courses/{uuid}', ShowCourse::class)
+    ->name('api.courses.show')
+    ->whereUuid('uuid');
+
+Route::put('/courses/{uuid}', UpdateCourse::class)
+    ->name('api.courses.update')
+    ->whereUuid('uuid');
+
+Route::post('/courses/{uuid}/cover-image', UploadCourseCoverImage::class)
+    ->name('api.courses.cover-image.store')
+    ->whereUuid('uuid');
+
+Route::delete('/courses/{uuid}/cover-image/{mediaId}', DeleteCourseCoverImage::class)
+    ->name('api.courses.cover-image.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/courses/{uuid}/editor-images', UploadCourseEditorImage::class)
+    ->name('api.courses.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::post('/courses/{uuid}/lesson-files', UploadCourseLessonFile::class)
+    ->name('api.courses.lesson-files.store')
+    ->whereUuid('uuid');
+
+Route::delete('/courses/{uuid}/lesson-files/{mediaId}', DeleteCourseLessonFile::class)
+    ->name('api.courses.lesson-files.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::get('/newsletter', ListNewsletters::class)
+    ->name('api.newsletter.index');
+
+Route::post('/newsletter', CreateNewsletter::class)
+    ->name('api.newsletter.store');
+
+Route::delete('/newsletter', DeleteNewsletters::class)
+    ->name('api.newsletter.destroy');
+
+Route::get('/newsletter/settings', GetNewsletterSettings::class)
+    ->name('api.newsletter.settings.show');
+
+Route::put('/newsletter/settings', UpdateNewsletterSettings::class)
+    ->name('api.newsletter.settings.update');
+
+Route::get('/newsletter/{uuid}', ShowNewsletter::class)
+    ->name('api.newsletter.show')
+    ->whereUuid('uuid');
+
+Route::put('/newsletter/{uuid}', UpdateNewsletter::class)
+    ->name('api.newsletter.update')
+    ->whereUuid('uuid');
+
+Route::post('/newsletter/{uuid}/featured-image', UploadNewsletterFeaturedImage::class)
+    ->name('api.newsletter.featured-image.store')
+    ->whereUuid('uuid');
+
+Route::delete('/newsletter/{uuid}/featured-image', DeleteNewsletterFeaturedImage::class)
+    ->name('api.newsletter.featured-image.destroy')
+    ->whereUuid('uuid');
+
+Route::post('/newsletter/{uuid}/editor-images', UploadNewsletterEditorImage::class)
+    ->name('api.newsletter.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/pages', ListPages::class)
+    ->name('api.pages.index');
+
+Route::post('/pages', CreatePage::class)
+    ->name('api.pages.store');
+
+Route::delete('/pages', DeletePages::class)
+    ->name('api.pages.destroy');
+
+Route::get('/pages/{uuid}', ShowPage::class)
+    ->name('api.pages.show')
+    ->whereUuid('uuid');
+
+Route::put('/pages/{uuid}', UpdatePage::class)
+    ->name('api.pages.update')
+    ->whereUuid('uuid');
+
+Route::put('/pages/{uuid}/active', TogglePageActive::class)
+    ->name('api.pages.active')
+    ->whereUuid('uuid');
+
+Route::post('/pages/{uuid}/editor-images', UploadPageEditorImage::class)
+    ->name('api.pages.editor-images.store')
+    ->whereUuid('uuid');
+
+Route::get('/pages/{uuid}/blocks', ListPageBlocks::class)
+    ->name('api.pages.blocks.index')
+    ->whereUuid('uuid');
+
+Route::post('/pages/{uuid}/blocks', StandaloneCreatePageBlock::class)
+    ->name('api.pages.blocks.store')
+    ->whereUuid('uuid');
+
+Route::put('/pages/{uuid}/blocks/reorder', StandaloneReorderPageBlocks::class)
+    ->name('api.pages.blocks.reorder')
+    ->whereUuid('uuid');
+
+Route::get('/pages/{uuid}/blocks/{id}', StandaloneShowPageBlock::class)
+    ->name('api.pages.blocks.show')
+    ->whereUuid('uuid')
+    ->whereNumber('id');
+
+Route::match(['put', 'post'], '/pages/{uuid}/blocks/{id}', StandaloneUpdatePageBlock::class)
+    ->name('api.pages.blocks.update')
+    ->whereUuid('uuid')
+    ->whereNumber('id');
+
+Route::put('/pages/{uuid}/blocks/{id}/active', StandaloneTogglePageBlockActive::class)
+    ->name('api.pages.blocks.active')
+    ->whereUuid('uuid')
+    ->whereNumber('id');
+
+Route::delete('/pages/{uuid}/blocks/{id}', StandaloneDeletePageBlock::class)
+    ->name('api.pages.blocks.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('id');
+
+Route::get('/forms', ListForms::class)
+    ->name('api.forms.index');
+
+Route::post('/forms', CreateForm::class)
+    ->name('api.forms.store');
+
+Route::delete('/forms', DeleteForms::class)
+    ->name('api.forms.destroy');
+
+Route::get('/forms/{uuid}', ShowForm::class)
+    ->name('api.forms.show')
+    ->whereUuid('uuid');
+
+Route::put('/forms/{uuid}', UpdateForm::class)
+    ->name('api.forms.update')
+    ->whereUuid('uuid');
+
+Route::post('/forms/{uuid}/clone', CloneForm::class)
+    ->name('api.forms.clone')
     ->whereUuid('uuid');

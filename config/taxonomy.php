@@ -77,6 +77,8 @@ return [
         'store_tag',
         'digital_store_category',
         'digital_store_tag',
+        'digital_product_category',
+        'digital_product_tag',
         'digital_service_category',
         'digital_service_tag',
         'menu_category',

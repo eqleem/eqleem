@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, inject, reactive, ref, watch } from 'vue';
 import Form from '../../ui/Form.vue';
 import Input from '../../ui/Input.vue';
 import Textarea from '../../ui/Textarea.vue';
@@ -15,6 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits(['saved']);
 const store = usePageStructureStore();
+const blockActions = inject('blockActions', null);
 
 const form = reactive({
     link_type: props.editor.link_type ?? '',
@@ -78,7 +79,9 @@ async function submit() {
     Object.keys(errors).forEach((key) => delete errors[key]);
 
     try {
-        const payload = await store.updateBlock(props.blockId, {
+        const updater = blockActions?.updateBlock
+            ?? ((id, body) => store.updateBlock(id, body));
+        const payload = await updater(props.blockId, {
             link_type: form.link_type,
             title: form.title,
             description: form.description,
