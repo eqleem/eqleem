@@ -23,7 +23,10 @@ class SearchPageLinkContent
      */
     public function rules(): array
     {
-        $typeKeys = array_keys(CtaLink::linkTypeOptions('nav') + CtaLink::linkTypeOptions('block'));
+        $typeKeys = array_values(array_unique([
+            ...array_keys(CtaLink::linkTypeOptions('nav')),
+            ...CtaLink::allowedBlockLinkTypeKeys(),
+        ]));
 
         return [
             'link_type' => ['required', 'string', Rule::in($typeKeys)],
@@ -42,7 +45,7 @@ class SearchPageLinkContent
             return [];
         }
 
-        $results = filled($search) && mb_strlen(trim($search)) >= 2
+        $results = filled($search) && mb_strlen(trim($search)) >= 1
             ? CtaLink::searchContents($linkType, $search)
             : CtaLink::recentContents($linkType);
 

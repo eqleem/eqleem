@@ -211,7 +211,6 @@ export const usePageStructureStore = defineStore('pageStructure', {
 
                 return this.editing;
             } catch (error) {
-                this.editingError = error instanceof ApiError ? error.message : 'تعذر حفظ إعدادات البلوك.';
                 throw error;
             } finally {
                 this.saving = false;

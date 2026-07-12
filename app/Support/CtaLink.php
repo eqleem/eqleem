@@ -27,24 +27,107 @@ class CtaLink
      */
     public static function blockLinkTypeOptions(): array
     {
-        $excludeSections = ['forms', 'pages'];
-        $excludeItems = ['cv', 'forms'];
-
         $options = [];
 
         foreach (config('content-types', []) as $slug => $type) {
-            if (! in_array($slug, $excludeSections, true)) {
-                $options['section:'.$slug] = 'رابط '.$type['name'];
-            }
-
-            if (! in_array($slug, $excludeItems, true) && $slug !== 'pages') {
-                $options['item:'.$slug] = config('cta-link-types.item_labels.'.$slug, 'محتوى محدد من '.$type['name']);
-            }
+            $options['section:'.$slug] = 'رابط '.$type['name'];
         }
 
-        $options['item:pages'] = 'صفحة داخلية';
+        $options['external'] = 'رابط خارجي';
 
         return $options;
+    }
+
+    /**
+     * All link_type keys accepted when saving a block-link (sections, items, external).
+     *
+     * @return list<string>
+     */
+    public static function allowedBlockLinkTypeKeys(): array
+    {
+        $keys = [''];
+
+        foreach (config('content-types', []) as $slug => $type) {
+            $keys[] = 'section:'.$slug;
+            $keys[] = 'item:'.$slug;
+        }
+
+        $keys[] = 'external';
+
+        return $keys;
+    }
+
+    /**
+     * Searchable picker options for the block-link editor (content types + external).
+     *
+     * @return list<array{
+     *     key: string,
+     *     label: string,
+     *     icon_url: string,
+     *     group: string,
+     *     supports_section: bool,
+     *     supports_item: bool,
+     *     section_title: string,
+     *     section_description: string,
+     *     item_description: string
+     * }>
+     */
+    public static function blockLinkPickerOptions(): array
+    {
+        $options = [];
+
+        foreach (config('content-types', []) as $slug => $type) {
+            $icon = (string) ($type['icon'] ?? 'assets/icons/tabler/Link.svg');
+
+            $options[] = [
+                'key' => $slug,
+                'label' => 'رابط '.$type['name'],
+                'icon_url' => asset($icon),
+                'group' => 'content',
+                'supports_section' => self::contentTypeHasSectionRoute($slug),
+                'supports_item' => self::contentTypeHasItemRoute($slug),
+                'section_title' => (string) config(
+                    "cta-link-types.block_link.sections.{$slug}.title",
+                    $type['name'] ?? ''
+                ),
+                'section_description' => (string) config(
+                    "cta-link-types.block_link.sections.{$slug}.description",
+                    ''
+                ),
+                'item_description' => (string) config(
+                    "cta-link-types.block_link.items.{$slug}.description",
+                    ''
+                ),
+            ];
+        }
+
+        $options[] = [
+            'key' => 'external',
+            'label' => 'رابط خارجي',
+            'icon_url' => asset('assets/icons/tabler/ExternalLink.svg'),
+            'group' => 'external',
+            'supports_section' => false,
+            'supports_item' => false,
+            'section_title' => '',
+            'section_description' => '',
+            'item_description' => '',
+        ];
+
+        return $options;
+    }
+
+    public static function contentTypeHasSectionRoute(string $contentType): bool
+    {
+        $routeName = config('cta-link-types.routes.'.$contentType.'.index');
+
+        return is_string($routeName) && filled($routeName);
+    }
+
+    public static function contentTypeHasItemRoute(string $contentType): bool
+    {
+        $routeName = config('cta-link-types.routes.'.$contentType.'.detail');
+
+        return is_string($routeName) && filled($routeName);
     }
 
     /**
@@ -249,6 +332,7 @@ class CtaLink
         return match ($linkType) {
             'section' => self::sectionUrl($data['content_type'] ?? ''),
             'item' => self::itemUrl($data['content_type'] ?? '', (int) ($data['content_id'] ?? 0)),
+            'external' => filled($data['url'] ?? null) ? (string) $data['url'] : null,
             default => null,
         };
     }
@@ -258,6 +342,10 @@ class CtaLink
      */
     public static function iconFromData(array $data): string
     {
+        if (($data['link_type'] ?? '') === 'external') {
+            return (string) ($data['icon'] ?? config('cta-link-types.icons.external'));
+        }
+
         $contentType = $data['content_type'] ?? '';
 
         return config('cta-link-types.icons.'.$contentType, config('cta-link-types.icons.external'));
@@ -472,7 +560,7 @@ class CtaLink
     {
         $search = trim($search);
 
-        if (mb_strlen($search) < 2) {
+        if ($search === '') {
             return collect();
         }
 

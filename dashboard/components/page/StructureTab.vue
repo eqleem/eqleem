@@ -21,7 +21,6 @@ const {
     userBlocks,
     bottomBlocks,
     floatLinksBlock,
-    blockTypes,
     loading,
     error,
     saving,
@@ -39,10 +38,6 @@ const floatLinksPanel = ref(null);
 onMounted(() => {
     store.fetchStructure();
 });
-
-function openAddModal() {
-    openModal('add-block');
-}
 
 function openAddCtaLink() {
     ctaLinksPanel.value?.openAdd?.();
@@ -64,10 +59,9 @@ function onFloatLinksUpdated(payload) {
     }
 }
 
-async function addBlock(type) {
+async function addLinkBlock() {
     try {
-        const block = await store.createBlock(type);
-        closeModal('add-block');
+        const block = await store.createBlock('block-link');
 
         if (block?.id) {
             await openEdit(block.id, block.title);
@@ -245,7 +239,7 @@ function blockHref(block) {
                         <p class="text-sm font-medium text-stone-700">بلوكات الصفحة</p>
                         <p class="text-xs text-stone-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
                     </div>
-                    <Button label="إضافة بلوك" variant="secondary" class="shrink-0" :disabled="saving" @click="openAddModal">
+                    <Button label="إضافة رابط" variant="secondary" class="shrink-0" :disabled="saving" @click="addLinkBlock">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
                     </Button>
                 </div>
@@ -325,7 +319,7 @@ function blockHref(block) {
                         v-if="!userBlocks.length"
                         class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
-                        لا توجد بلوكات بعد. اضغط «إضافة بلوك» لإضافة أول بلوك في هذا القسم.
+                        لا توجد روابط بعد. اضغط «إضافة رابط» لإضافة أول رابط في هذا القسم.
                     </p>
                 </div>
             </div>
@@ -387,25 +381,6 @@ function blockHref(block) {
                 />
             </div>
         </div>
-
-        <Modal title="إضافة بلوك" size="lg" name="add-block">
-            <div class="space-y-2 p-4">
-                <button
-                    v-for="blockType in blockTypes"
-                    :key="blockType.slug"
-                    type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:opacity-50"
-                    :disabled="saving"
-                    @click="addBlock(blockType.slug)"
-                >
-                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-stone-100 p-1.5">
-                    <span class="min-w-0">
-                        <span class="block text-sm font-medium text-stone-800">{{ blockType.name }}</span>
-                        <span class="block text-xs text-stone-400">{{ blockType.description }}</span>
-                    </span>
-                </button>
-            </div>
-        </Modal>
 
         <Modal :title="editTitle" size="lg" name="edit-block">
             <BlockEditorSkeleton v-if="editingLoading" />

@@ -154,10 +154,12 @@ class ShowPageBlock
     protected function blockLinkEditorPayload(array $data): array
     {
         $contentId = filled($data['content_id'] ?? null) ? (int) $data['content_id'] : null;
-        $linkType = CtaLink::typeKeyFromStoredData($data);
-        $options = CtaLink::linkTypeOptions('block');
+        $linkType = filled($data['link_type'] ?? null)
+            ? CtaLink::typeKeyFromStoredData($data)
+            : CtaLink::defaultTypeKey('block');
+        $allowed = CtaLink::allowedBlockLinkTypeKeys();
 
-        if (! array_key_exists($linkType, $options)) {
+        if (! in_array($linkType, $allowed, true)) {
             $linkType = CtaLink::defaultTypeKey('block');
         }
 
@@ -165,12 +167,14 @@ class ShowPageBlock
             'type' => 'block-link',
             'title' => (string) ($data['title'] ?? ''),
             'description' => (string) ($data['description'] ?? ''),
+            'url' => (string) ($data['url'] ?? ''),
             'link_type' => $linkType,
             'content_id' => $contentId,
             'selected_content_title' => $contentId
                 ? (Content::query()->find($contentId)?->title ?? '')
                 : '',
-            'link_type_options' => $options,
+            'link_type_options' => CtaLink::linkTypeOptions('block'),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];
     }
 }

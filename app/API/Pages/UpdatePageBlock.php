@@ -40,9 +40,10 @@ class UpdatePageBlock
 
         return match ($block->type) {
             'block-link' => [
-                'link_type' => ['required', 'string', Rule::in(array_keys(CtaLink::linkTypeOptions('block')))],
+                'link_type' => ['required', 'string', Rule::in(CtaLink::allowedBlockLinkTypeKeys())],
                 'title' => ['nullable', 'string', 'max:255'],
                 'description' => ['nullable', 'string', 'max:500'],
+                'url' => ['nullable', 'url', 'max:500'],
                 'content_id' => ['nullable', 'integer'],
             ],
             default => [
@@ -132,8 +133,13 @@ class UpdatePageBlock
     {
         $linkType = (string) $data['link_type'];
         $parsed = CtaLink::parseTypeKey($linkType);
+        $isExternal = CtaLink::isExternalLink($linkType);
         $needsPicker = CtaLink::needsContentPicker($linkType);
         $contentId = $needsPicker ? (int) ($data['content_id'] ?? 0) : null;
+
+        if ($isExternal && ! filled($data['url'] ?? null)) {
+            throw new UnprocessableEntityHttpException('الرابط الخارجي يتطلب عنوان URL كاملاً.');
+        }
 
         if ($needsPicker) {
             if (! $contentId) {
@@ -154,6 +160,8 @@ class UpdatePageBlock
             'content_id' => $contentId,
             'title' => (string) ($data['title'] ?? ''),
             'description' => (string) ($data['description'] ?? ''),
+            'url' => $isExternal ? (string) ($data['url'] ?? '') : null,
+            'icon' => $isExternal ? (string) ($data['icon'] ?? config('cta-link-types.icons.external')) : null,
         ];
 
         $blockTitle = filled($payload['title'])

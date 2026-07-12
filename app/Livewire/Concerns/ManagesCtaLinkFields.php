@@ -18,6 +18,10 @@ trait ManagesCtaLinkFields
 
     public bool $showContentResults = false;
 
+    public string $url = '';
+
+    public string $icon = 'hugeicons:link-04';
+
     abstract protected function ctaLinkProfile(): string;
 
     protected function ctaLinkDefaultType(): string
@@ -31,6 +35,18 @@ trait ManagesCtaLinkFields
     protected function ctaLinkTypeOptions(): array
     {
         return CtaLink::linkTypeOptions($this->ctaLinkProfile());
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function ctaLinkAllowedTypeKeys(): array
+    {
+        if ($this->ctaLinkProfile() === 'block') {
+            return CtaLink::allowedBlockLinkTypeKeys();
+        }
+
+        return array_keys($this->ctaLinkTypeOptions());
     }
 
     public function isExternalLink(): bool
@@ -112,15 +128,16 @@ trait ManagesCtaLinkFields
         $this->contentSearch = '';
         $this->selectedContentTitle = '';
         $this->showContentResults = false;
+        $this->url = '';
+        $this->icon = 'hugeicons:link-04';
         $this->resetErrorBag('contentId');
     }
 
     protected function loadCtaLinkFieldsFromData(array $data, ?Content $link = null): void
     {
-        $options = $this->ctaLinkTypeOptions();
         $this->linkType = $link ? CtaLink::typeKey($link) : CtaLink::typeKeyFromStoredData($data);
 
-        if (! array_key_exists($this->linkType, $options)) {
+        if (! in_array($this->linkType, $this->ctaLinkAllowedTypeKeys(), true)) {
             $this->linkType = $this->ctaLinkDefaultType();
         }
 
@@ -130,6 +147,8 @@ trait ManagesCtaLinkFields
             : '';
         $this->contentSearch = $this->selectedContentTitle;
         $this->showContentResults = false;
+        $this->url = (string) ($data['url'] ?? '');
+        $this->icon = (string) ($data['icon'] ?? 'hugeicons:link-04');
     }
 
     protected function findPickableContent(int $id): ?Content
@@ -149,7 +168,7 @@ trait ManagesCtaLinkFields
     protected function ctaLinkFieldRules(string $nameField = 'label'): array
     {
         $rules = [
-            'linkType' => 'required|in:'.implode(',', array_keys($this->ctaLinkTypeOptions())),
+            'linkType' => 'required|in:'.implode(',', $this->ctaLinkAllowedTypeKeys()),
         ];
 
         if ($this->ctaLinkProfile() === 'block') {
@@ -160,9 +179,13 @@ trait ManagesCtaLinkFields
         }
 
         if ($this->isExternalLink()) {
-            $rules[$nameField] = 'required|string|max:100';
+            if ($this->ctaLinkProfile() !== 'block') {
+                $rules[$nameField] = 'required|string|max:100';
+            } else {
+                $rules['title'] = 'required|string|max:255';
+            }
             $rules['url'] = 'required|url|max:500';
-            $rules['icon'] = 'required|string|max:100';
+            $rules['icon'] = 'nullable|string|max:100';
         }
 
         if ($this->needsContentPicker()) {
@@ -212,6 +235,10 @@ trait ManagesCtaLinkFields
         if ($this->ctaLinkProfile() === 'block') {
             $data['title'] = $this->title;
             $data['description'] = $this->description;
+            $data['url'] = $this->isExternalLink() ? $this->url : null;
+            $data['icon'] = $this->isExternalLink()
+                ? ($this->icon ?: 'hugeicons:link-04')
+                : null;
         } else {
             $data['label'] = $this->label;
             $data['url'] = $this->isExternalLink() ? $this->url : null;
@@ -247,6 +274,7 @@ trait ManagesCtaLinkFields
         $this->contentSearch = '';
         $this->selectedContentTitle = '';
         $this->showContentResults = false;
+        $this->url = '';
         $this->resetErrorBag('contentId');
 
         if ($this->ctaLinkProfile() === 'block') {

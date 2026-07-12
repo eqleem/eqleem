@@ -167,5 +167,112 @@ test('owner can update block-link settings', function () {
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.editor.title', 'المدونة')
-        ->assertJsonPath('data.block.title', 'المدونة');
+        ->assertJsonPath('data.block.title', 'المدونة')
+        ->assertJsonPath('data.editor.link_type', 'section:blog');
+
+    $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$blockId)
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'section:blog')
+        ->assertJsonStructure([
+            'data' => [
+                'editor' => [
+                    'link_type_picker_options',
+                ],
+            ],
+        ]);
+
+    $picker = $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$blockId)
+        ->json('data.editor.link_type_picker_options');
+
+    expect($picker)->toBeArray()->not->toBeEmpty();
+    expect(collect($picker)->pluck('key'))->toContain('blog', 'store', 'external');
+    expect(collect($picker)->where('group', 'content')->pluck('key'))
+        ->not->toContain('item:blog');
+});
+
+test('owner can update block-link to external url and specific item', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.id');
+
+    $this->actingAs($user)
+        ->putJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'external',
+            'title' => 'موقعنا',
+            'description' => 'رابط خارجي',
+            'url' => 'https://example.com',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'external')
+        ->assertJsonPath('data.editor.url', 'https://example.com');
+
+    setCurrentTenant($tenant);
+
+    $post = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'uuid' => (string) Str::uuid(),
+        'type' => contentTypeModel('blog'),
+        'title' => 'تدوينة تجريبية',
+        'slug' => 'test-post-'.Str::lower(Str::random(6)),
+        'status' => 'published',
+        'published_at' => now(),
+        'active' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->putJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'item:blog',
+            'title' => 'تدوينة تجريبية',
+            'description' => 'اقرأ هذه التدوينة',
+            'content_id' => $post->id,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'item:blog')
+        ->assertJsonPath('data.editor.content_id', $post->id);
+});
+
+test('external block-link requires a full url', function () {
+    [$user] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.id');
+
+    $this->actingAs($user)
+        ->putJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'external',
+            'title' => 'بدون رابط',
+        ])
+        ->assertStatus(422);
+});
+
+test('owner can search specific content items for block-link picker', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+
+    $post = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'uuid' => (string) Str::uuid(),
+        'type' => contentTypeModel('blog'),
+        'title' => 'دليل التشطيب',
+        'slug' => 'finishing-guide-'.Str::lower(Str::random(6)),
+        'status' => 'published',
+        'published_at' => now(),
+        'active' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/page/link-content?link_type=item:blog&search=د')
+        ->assertSuccessful()
+        ->assertJsonFragment(['id' => $post->id, 'title' => 'دليل التشطيب']);
+
+    $this->actingAs($user)
+        ->getJson('/api/page/link-content?link_type=item:blog')
+        ->assertSuccessful()
+        ->assertJsonFragment(['id' => $post->id]);
 });
