@@ -36,11 +36,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $appUrl = config('app.url');
+        // $appUrl = config('app.url');
 
-        if (is_string($appUrl) && str_starts_with($appUrl, 'https://')) {
+        // if (is_string($appUrl) && str_starts_with($appUrl, 'https://')) {
             URL::forceScheme('https');
-        }
+        // }
 
         Livewire::addPersistentMiddleware([
             AdminMiddleware::class,
