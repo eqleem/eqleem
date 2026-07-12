@@ -60,8 +60,8 @@ onBeforeUnmount(() => {
             aria-label="فتح قائمة التبويبات"
             @click="openMobileNav"
         >
-            <Icon name="menu-2" class="size-7 md:size-5 shrink-0" />
-            <span class="hidden truncate text-sm md:block">كل التبويبات</span>
+            <Icon name="menu-2" class="size-7 lg:size-5 shrink-0" />
+            <span class="hidden truncate text-sm lg:block">كل التبويبات</span>
         </button>
 
         <!-- Fixed tabs — bg only in one branch so it never fights Tailwind source order -->
@@ -69,15 +69,15 @@ onBeforeUnmount(() => {
             v-for="tab in fixedTabs"
             :key="tab.id"
             :to="{ path: '/manage', query: { tab: tab.id } }"
-            class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+            class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
             :class="isFixedActive(tab.id) ? 'bg-white text-gray-700' : 'bg-stone-100/50 text-gray-600 hover:bg-white/60 hover:text-gray-800'"
         >
-            <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0 flex items-center justify-center">
-            <span class="hidden truncate md:block">{{ tab.label }}</span>
+            <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5 shrink-0">
+            <span class="hidden truncate lg:block">{{ tab.label }}</span>
         </RouterLink>
 
         <div>
-            <p class="mt-3 hidden px-3 py-1 text-xs text-gray-400 md:block">المحتوى</p>
+            <p class="mt-3 hidden px-3 py-1 text-xs text-gray-400 lg:block">المحتوى</p>
             <div class="mx-1 mb-2 border-t border-dotted border-gray-300 max-lg:mb-6"></div>
         </div>
 
@@ -89,10 +89,10 @@ onBeforeUnmount(() => {
             class="flex w-full items-center gap-2 rounded-lg text-start text-sm transition"
             :class="isTypeActive(tab.contentType.slug) ? `${colorBg[tab.color]} text-gray-900` : `bg-stone-100/50 ${colorHover[tab.color]} text-gray-600 hover:text-gray-800`"
         >
-            <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2 max-md:!bg-transparent" :class="colorBg[tab.color]">
-                <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5">
+            <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2 max-lg:!bg-transparent" :class="colorBg[tab.color]">
+                <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5">
             </span>
-            <span class="hidden truncate md:block">{{ tab.label }}</span>
+            <span class="hidden truncate lg:block">{{ tab.label }}</span>
         </RouterLink>
 
         <!-- Tailwind color safelist -->
@@ -169,9 +169,9 @@ onBeforeUnmount(() => {
                     @click="closeMobileNav"
                 >
                     <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2" >
-                        <img :src="`/${tab.icon}`" :alt="tab.label" class="size-7 md:size-5">
+                        <img :src="`/${tab.icon}`" :alt="tab.label" class="size-7 lg:size-5">
                     </span>
-                    <span class="truncate text-base md:text-sm">{{ tab.label }}</span>
+                    <span class="truncate text-base lg:text-sm">{{ tab.label }}</span>
                 </RouterLink>
             </nav>
         </Transition>

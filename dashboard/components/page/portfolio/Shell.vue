@@ -23,9 +23,9 @@ const section = computed(() => {
 });
 
 const subTabs = [
-    { key: 'projects', label: 'المشاريع', to: '/manage/portfolio' },
-    { key: 'categories', label: 'التصنيفات', to: '/manage/portfolio/categories' },
-    { key: 'settings', label: 'تخصيص الأعمال', to: '/manage/portfolio/settings' },
+    { key: 'projects', label: 'المشاريع', to: '/manage/portfolio', icon: 'hugeicons:folder-library' },
+    { key: 'categories', label: 'التصنيفات', to: '/manage/portfolio/categories', icon: 'hugeicons:folder-02' },
+    { key: 'settings', label: 'تخصيص الأعمال', to: '/manage/portfolio/settings', icon: 'hugeicons:paint-board' },
 ];
 </script>
 
@@ -36,14 +36,15 @@ const subTabs = [
         </template>
 
         <div>
-            <div class="flex border-b border-stone-200 px-px">
+            <div class="flex border-b border-stone-200 px-px flex items-center overflow-x-auto no-scrollbar">
                 <RouterLink
                     v-for="tab in subTabs"
                     :key="tab.key"
                     :to="tab.to"
-                    class="px-4 py-3 text-sm transition"
+                    class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition shrink-0"
                     :class="section === tab.key ? 'border-b-2 border-primary-500 text-stone-900' : 'text-gray-500 hover:text-gray-800'"
                 >
+                    <iconify-icon :icon="tab.icon" class="text-base"></iconify-icon>
                     {{ tab.label }}
                 </RouterLink>
             </div>

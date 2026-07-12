@@ -12,7 +12,7 @@ const categories = computed(() => categoriesFor(props.contentType.slug));
 
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
-        <div class="flex w-full items-center justify-between bg-gray-100 p-3">
+        <div class="flex w-full items-center justify-between bg-white p-3">
             <p class="text-sm font-medium text-gray-600">التصنيفات</p>
             <Button label="تصنيف جديد">
                 <template #icon><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg></template>

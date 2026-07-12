@@ -68,7 +68,7 @@ async function remove(calendarId) {
             </div>
         </div>
 
-        <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
+        <div class="flex w-full items-center gap-x-4 bg-white p-3">
             <div class="flex-grow">
                 <div class="relative text-sm text-gray-800">
                     <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
@@ -78,7 +78,7 @@ async function remove(calendarId) {
                         v-model="search"
                         type="text"
                         placeholder="ابحث .."
-                        class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
+                        class="block w-full bg-gray-100 rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
                     >
                 </div>
             </div>

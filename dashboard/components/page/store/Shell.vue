@@ -31,11 +31,11 @@ const section = computed(() => {
 });
 
 const subTabs = [
-    { key: 'products', label: 'المنتجات', to: '/manage/store' },
-    { key: 'categories', label: 'تصنيفات المتجر', to: '/manage/store/categories' },
-    { key: 'customize', label: 'تخصيص المتجر', to: '/manage/store/settings' },
-    { key: 'payment-options', label: 'وسائل الدفع', to: '/manage/store/payment-options' },
-    { key: 'shipping-options', label: 'وسائل الشحن', to: '/manage/store/shipping-options' },
+    { key: 'products', label: 'المنتجات', to: '/manage/store', icon: 'hugeicons:shopping-bag-01' },
+    { key: 'categories', label: 'تصنيفات المتجر', to: '/manage/store/categories', icon: 'hugeicons:folder-02' },
+    { key: 'customize', label: 'تخصيص المتجر', to: '/manage/store/settings', icon: 'hugeicons:paint-board' },
+    { key: 'payment-options', label: 'وسائل الدفع', to: '/manage/store/payment-options', icon: 'hugeicons:credit-card' },
+    { key: 'shipping-options', label: 'وسائل الشحن', to: '/manage/store/shipping-options', icon: 'hugeicons:delivery-truck-01' },
 ];
 </script>
 
@@ -46,14 +46,15 @@ const subTabs = [
         </template>
 
         <div>
-            <div class="flex border-b border-stone-200 px-px">
+            <div class="flex border-b border-stone-200 px-px flex items-center overflow-x-auto no-scrollbar">
                 <RouterLink
                     v-for="tab in subTabs"
                     :key="tab.key"
                     :to="tab.to"
-                    class="px-4 py-3 text-sm transition"
+                    class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition shrink-0"
                     :class="section === tab.key ? 'border-b-2 border-primary-500 text-stone-900' : 'text-gray-500 hover:text-gray-800'"
                 >
+                    <iconify-icon :icon="tab.icon" class="text-base"></iconify-icon>
                     {{ tab.label }}
                 </RouterLink>
             </div>

@@ -53,15 +53,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="divide-y divide-dotted divide-gray-200">
-        <div class="flex w-full items-center gap-x-7 bg-white p-3">
-            <div class="ps-3">
+    <div class="min-w-0 divide-y divide-dotted divide-gray-200">
+        <div class="flex w-full min-w-0 items-center gap-x-3 bg-white p-3 sm:gap-x-7">
+            <div class="shrink-0 ps-1 sm:ps-3">
                 <div class="flex items-center">
                     <input v-model="allChecked" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
                 </div>
             </div>
 
-            <div class="flex-grow bg-gray-100 rounded-lg">
+            <div class="min-w-0 flex-1 rounded-lg bg-gray-100">
                 <div class="relative col-span-3 text-sm text-gray-800">
                     <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -78,7 +78,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div v-show="selectedIds.length > 0" class="flex items-center gap-x-2">
+            <div v-show="selectedIds.length > 0" class="flex shrink-0 items-center gap-x-2">
                 <div class="flex items-center gap-1 text-sm text-gray-600">
                     <span>{{ selectedIds.length }}</span>
                     <span>محددة</span>
@@ -97,48 +97,42 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="relative overflow-visible p-1">
+        <div class="relative min-w-0 overflow-visible p-1">
             <div
                 v-if="loading"
-                class="animate-pulse"
+                class="min-w-0 overflow-hidden animate-pulse"
                 aria-busy="true"
                 aria-label="جاري تحميل العملاء"
             >
                 <div
                     v-for="n in 6"
                     :key="`skeleton-${n}`"
-                    class="flex w-full items-center justify-between gap-x-7"
+                    class="flex w-full min-w-0 items-center gap-x-3 px-3 py-3 sm:gap-x-7 sm:px-6"
                 >
-                    <div class="ps-6">
-                        <div class="h-4 w-4 rounded-xl bg-gray-200"></div>
-                    </div>
+                    <div class="h-4 w-4 shrink-0 rounded-xl bg-gray-200"></div>
 
-                    <div class="w-full py-3">
-                        <div class="flex items-center gap-x-2">
-                            <div class="h-10 w-10 flex-none rounded-full bg-gray-200"></div>
-                            <div class="min-w-0 flex-1 space-y-2">
+                    <div class="flex min-w-0 flex-1 items-center gap-x-2">
+                        <div class="h-10 w-10 shrink-0 rounded-full bg-gray-200"></div>
+                        <div class="min-w-0 flex-1 space-y-2">
+                            <div
+                                class="h-4 max-w-full rounded-md bg-gray-200 sm:h-5"
+                                :class="n % 3 === 0 ? 'w-2/5 sm:w-28' : n % 2 === 0 ? 'w-1/2 sm:w-40' : 'w-2/5 sm:w-36'"
+                            ></div>
+                            <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                                <div class="h-2 w-2 shrink-0 rounded-full bg-gray-200"></div>
                                 <div
-                                    class="h-5 rounded-md bg-gray-200"
-                                    :class="n % 3 === 0 ? 'w-28' : n % 2 === 0 ? 'w-40' : 'w-36'"
+                                    class="h-4 max-w-[55%] rounded-md bg-gray-100 sm:h-5 sm:max-w-none"
+                                    :class="n % 2 === 0 ? 'w-24 sm:w-32' : 'w-28 sm:w-40'"
                                 ></div>
-                                <div class="flex items-center gap-x-2">
-                                    <div class="h-2 w-2 rounded-full bg-gray-200"></div>
-                                    <div
-                                        class="h-5 rounded-md bg-gray-100"
-                                        :class="n % 2 === 0 ? 'w-32' : 'w-40'"
-                                    ></div>
-                                    <div class="h-4 w-20 rounded-md bg-gray-100"></div>
-                                </div>
+                                <div class="hidden h-4 w-16 rounded-md bg-gray-100 sm:block sm:w-20"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pe-6">
-                        <div class="flex flex-col items-center gap-1 px-1.5 py-1.5">
-                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
-                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
-                            <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
-                        </div>
+                    <div class="flex shrink-0 flex-col items-center gap-1 px-1.5 py-1.5">
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-200"></div>
                     </div>
                 </div>
             </div>

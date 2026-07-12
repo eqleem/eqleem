@@ -82,7 +82,7 @@ async function cloneItem(id, uuid) {
 
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
-        <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
+        <div class="flex w-full items-center gap-x-4 bg-white p-3">
             <div class="hidden ps-3 sm:block">
                 <input v-model="allSelected" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
             </div>
@@ -96,7 +96,7 @@ async function cloneItem(id, uuid) {
                         v-model="search"
                         type="text"
                         placeholder="ابحث .."
-                        class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
+                        class="block w-full bg-gray-100 rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
                     >
                 </div>
             </div>

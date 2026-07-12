@@ -18,13 +18,13 @@ const results = computed(() => {
 
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
-        <div class="flex w-full items-center gap-x-4 bg-gray-100 p-3">
+        <div class="flex w-full items-center gap-x-4 bg-white p-3">
             <div class="flex-grow">
                 <div class="relative text-sm text-gray-800">
                     <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7" /><path stroke-linecap="round" d="m20 20-3-3" /></svg>
                     </div>
-                    <input v-model="search" type="text" placeholder="ابحث .." class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6">
+                    <input v-model="search" type="text" placeholder="ابحث .." class="block w-full bg-gray-100 rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6">
                 </div>
             </div>
             <Button label="عنصر جديد">
