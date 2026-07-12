@@ -20,7 +20,7 @@
                     </a>
                     <a href="{{ route('auth.login') }}" wire:navigate class="inline-flex items-center justify-center p-2 px-4 rounded-full border border-black/10 text-[#111111] text-sm font-normal hover:bg-black/5 transition-colors w-full sm:w-auto gap-2 group">
                         دخول 
-                        <iconify-icon icon="solar:arrow-left-linear" stroke-width="1.5" class=" transition-transform hidden md:block"></iconify-icon>
+                        <iconify-icon noobserver icon="solar:arrow-left-linear" stroke-width="1.5" class=" transition-transform hidden md:block"></iconify-icon>
                     </a>
                 @endauth
   
@@ -69,15 +69,15 @@
 
                     <p class="mt-5 text-xs lg:text-sm text-stone-400 font-normal flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
                         <span class="inline-flex items-center gap-0.5">
-                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                             مجانًا
                         </span>
                         <span class="inline-flex items-center gap-0.5">
-                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                             بدون خبرة تقنية
                         </span>
                         <span class="inline-flex items-center gap-0.5">
-                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                             جاهزة خلال دقائق
                         </span>
                     </p>
@@ -140,13 +140,13 @@
                                             />
                                         </div>
                                         <span class="absolute -bottom-0.5 -end-0.5 size-[1.15rem] rounded-full bg-primary-500 text-white flex items-center justify-center ring-[1.5px] ring-white">
-                                            <iconify-icon icon="solar:verified-check-bold" class="text-[10px]"></iconify-icon>
+                                            <iconify-icon noobserver icon="solar:verified-check-bold" class="text-[10px]"></iconify-icon>
                                         </span>
                                     </div>
 
                                     <h3 class="text-[0.9rem] font-bold text-zinc-900 leading-none tracking-tight">استوديو أُفق</h3>
                                     <p class="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-400 leading-none">
-                                        <iconify-icon icon="solar:map-point-bold" class="text-[11px] text-primary-500"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:map-point-bold" class="text-[11px] text-primary-500"></iconify-icon>
                                         الرياض
                                     </p>
                                     <p class="mt-2 text-[10px] leading-snug text-zinc-500">
@@ -162,7 +162,7 @@
                                             'ri:twitter-x-fill',
                                         ] as $social)
                                             <a href="{{ route('auth.register') }}" wire:navigate class="size-7 rounded-lg bg-stone-100 text-zinc-500 hover:bg-stone-200 hover:text-zinc-800 flex items-center justify-center transition-colors" aria-label="سوشال">
-                                                <iconify-icon icon="{{ $social }}" class="text-[13px]"></iconify-icon>
+                                                <iconify-icon noobserver icon="{{ $social }}" class="text-[13px]"></iconify-icon>
                                             </a>
                                         @endforeach
                                     </div>
@@ -171,11 +171,11 @@
                                 {{-- CTAs --}}
                                 <div class="mt-3 grid grid-cols-2 gap-1.5 shrink-0">
                                     <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] font-semibold py-2.5 px-1.5 shadow-sm shadow-primary-500/20 transition-colors">
-                                        <iconify-icon icon="hugeicons:calendar-03" class="text-xs"></iconify-icon>
+                                        <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-xs"></iconify-icon>
                                         حجز موعد
                                     </a>
                                     <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold py-2.5 px-1.5 transition-colors">
-                                        <iconify-icon icon="mdi:whatsapp" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="mdi:whatsapp" class="text-sm"></iconify-icon>
                                         تواصل الآن
                                     </a>
                                 </div>
@@ -190,13 +190,13 @@
                                     ] as $link)
                                         <a href="{{ route('auth.register') }}" wire:navigate class="group flex items-center gap-2 rounded-xl bg-stone-50 hover:bg-stone-100 px-2 py-1.5 transition-colors">
                                             <span class="size-7 rounded-lg bg-primary-500 text-white flex items-center justify-center shrink-0">
-                                                <iconify-icon icon="{{ $link['icon'] }}" class="text-xs"></iconify-icon>
+                                                <iconify-icon noobserver icon="{{ $link['icon'] }}" class="text-xs"></iconify-icon>
                                             </span>
                                             <span class="min-w-0 flex-1 text-start">
                                                 <span class="block text-[11px] font-semibold text-zinc-900 leading-tight">{{ $link['title'] }}</span>
                                                 <span class="block text-[9px] text-zinc-400 truncate leading-tight mt-0.5">{{ $link['desc'] }}</span>
                                             </span>
-                                            <iconify-icon icon="solar:alt-arrow-left-linear" class="text-zinc-300 text-sm shrink-0 group-hover:text-zinc-500 transition-colors"></iconify-icon>
+                                            <iconify-icon noobserver icon="solar:alt-arrow-left-linear" class="text-zinc-300 text-sm shrink-0 group-hover:text-zinc-500 transition-colors"></iconify-icon>
                                         </a>
                                     @endforeach
                                 </div>
@@ -204,7 +204,7 @@
                                 {{-- Soft conversion cue --}}
                                 <a href="{{ route('auth.register') }}" wire:navigate class="mt-1.5 shrink-0 inline-flex items-center justify-center gap-1 text-[9px] font-medium text-primary-600 hover:text-primary-700">
                                     أنشئ صفحتك مثل هذه مجاناً
-                                    <iconify-icon icon="solar:arrow-left-linear" class="text-[10px]"></iconify-icon>
+                                    <iconify-icon noobserver icon="solar:arrow-left-linear" class="text-[10px]"></iconify-icon>
                                 </a>
                             </div>
                         </div>
@@ -230,7 +230,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="size-11 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
-                            <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
                         </div>
                         <div class="min-w-0 text-start">
                             <p class="text-sm font-semibold text-sky-950/80 truncate">باقة التصميم</p>
@@ -243,7 +243,7 @@
             {{-- Keep: shipping status pill (mid-start) --}}
             <div class="absolute top-[28%] start-0 sm:start-[2%] lg:start-0 z-20 hidden md:block animate-[showcase-float_6.4s_ease-in-out_infinite]" style="animation-delay: -2.4s;">
                 <div class="inline-flex items-center gap-2 rounded-full bg-sky-50 text-sky-800 px-3.5 py-2 shadow-[0_10px_28px_-10px_rgba(14,165,233,0.35)] border border-sky-100/80">
-                    <iconify-icon icon="solar:delivery-bold" class="text-base text-sky-600"></iconify-icon>
+                    <iconify-icon noobserver icon="solar:delivery-bold" class="text-base text-sky-600"></iconify-icon>
                     <span class="text-xs font-medium">الشحنة في الطريق</span>
                 </div>
             </div>
@@ -256,7 +256,7 @@
                 >
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
-                            <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
                         </div>
                         <div class="text-start">
                             <p class="text-[11px] text-teal-700/50 leading-none">زوار الآن</p>
@@ -274,7 +274,7 @@
                 >
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-                            <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
+                            <iconify-icon noobserver icon="solar:star-bold" class="text-xl"></iconify-icon>
                         </div>
                         <div class="text-start">
                             <p class="text-base font-semibold leading-none text-amber-950/80">٤.٩</p>
@@ -288,7 +288,7 @@
             <div class="absolute top-[32%] end-0 sm:end-[1%] lg:end-0 z-20 hidden md:block animate-[showcase-float_5.2s_ease-in-out_infinite]" style="animation-delay: -1.8s;">
                 <div class="flex items-center gap-2.5 rounded-[1.15rem] bg-white px-3.5 py-2.5 shadow-[0_12px_36px_-12px_rgba(0,0,0,0.18)] border border-black/[0.03]">
                     <span class="size-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                        <iconify-icon icon="solar:check-circle-bold" class="text-lg"></iconify-icon>
+                        <iconify-icon noobserver icon="solar:check-circle-bold" class="text-lg"></iconify-icon>
                     </span>
                     <div class="text-start pe-1">
                         <p class="text-xs font-semibold text-zinc-900">تم الدفع بنجاح</p>
@@ -305,7 +305,7 @@
                 >
                     <div class="flex items-start gap-3">
                         <div class="size-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
-                            <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
                         </div>
                         <div class="min-w-0 text-start">
                             <p class="text-sm font-semibold text-orange-950/80">حجز موعد</p>
@@ -324,7 +324,7 @@
                 >
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                            <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                            <iconify-icon noobserver icon="mdi:whatsapp" class="text-xl"></iconify-icon>
                         </div>
                         <div class="text-start">
                             <p class="text-sm font-semibold text-emerald-950/80">تواصل مباشر</p>
@@ -387,15 +387,15 @@
 
                         <p class="mt-5 text-xs lg:text-sm text-stone-400 font-normal flex flex-wrap items-center gap-x-3 gap-y-2">
                             <span class="inline-flex items-center gap-0.5">
-                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                                 مجانًا
                             </span>
                             <span class="inline-flex items-center gap-0.5">
-                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                                 بدون خبرة تقنية
                             </span>
                             <span class="inline-flex items-center gap-0.5">
-                                <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                                <iconify-icon noobserver icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
                                 جاهزة خلال دقائق
                             </span>
                         </p>
@@ -444,7 +444,7 @@
     <div class="hidden gridx grid-cols-2x md:grid-cols-7x overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex itmes-center justify-center bg-[#0B161B] text-white border-t border-[#262626]">
         <div class="w-full border-r border-[#262626] p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:bed-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:bed-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               01
             </span>
@@ -460,7 +460,7 @@
         </div>
         <div class="w-full border-r border-[#262626] p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:cup-hot-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:cup-hot-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               02
             </span>
@@ -476,7 +476,7 @@
         </div>
         <div class="w-full border-r border-[#262626] p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer hidden md:flex">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:dumbbell-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:dumbbell-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               03
             </span>
@@ -492,7 +492,7 @@
         </div>
         <div class="w-full border-r border-[#262626] p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer hidden md:flex">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:camera-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:camera-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               04
             </span>
@@ -508,7 +508,7 @@
         </div>
         <div class="w-full border-e border-[#262626] p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer hidden md:flex">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:wineglass-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:wineglass-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               05
             </span>
@@ -524,7 +524,7 @@
         </div>
         <div class="w-full  p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer hidden md:flex">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:medal-star-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:medal-star-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               06
             </span>
@@ -540,7 +540,7 @@
         </div>        
         <div class="w-full    p-6 flex flex-col gap-8 group hover:bg-[#141414] hover:text-[#F97316] transition-colors cursor-pointer hidden md:flex">
           <div class="flex justify-between items-start">
-            <iconify-icon icon="solar:medal-star-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
+            <iconify-icon noobserver icon="solar:medal-star-linear" width="24" class="text-[#979797] group-hover:text-[#F97316]"></iconify-icon>
             <span class="text-3xl font-extralight opacity-20 group-hover:opacity-100 transition-opacity font-mono">
               07
             </span>
@@ -611,35 +611,35 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80  transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:shopping-cart-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:shopping-cart-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm ">متجر إلكتروني</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm">حجز المواعيد</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2   rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white  hover:bg-primary-600 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:note-edit" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:note-edit" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm">طلب خدمة</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:credit-card" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:credit-card" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm">الدفع الإلكتروني</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-xs lg:text-sm">المنتجات الرقمية</span>
                         </div>
                         <div class="flex px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:gift" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:gift" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm">تأجير الوحدات</span>
                         </div>
                         <div class="flex px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:call" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:call" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm">تواصل مباشر</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 xborder border-black/10 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 hover:border-black/20 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:target-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:target-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm lg:text-sm font-bold">زر "احجز الآن"</span>
                         </div>
                         
@@ -680,7 +680,7 @@
 
                         <div class="flex items-center gap-3 rounded-2xl bg-stone-50 p-3 ring-1 ring-black/5">
                             <div class="size-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-primary-500/25">
-                                <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                                <iconify-icon noobserver icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="text-sm font-medium text-zinc-900 truncate">باقة التصميم الاحترافي</p>
@@ -703,19 +703,19 @@
                                 <div class="relative flex items-start justify-between">
                                     <div class="flex flex-col items-center gap-1.5">
                                         <span class="size-7 rounded-full bg-sky-100 text-sky-700 ring-2 ring-white shadow-sm flex items-center justify-center">
-                                            <iconify-icon icon="hugeicons:credit-card" class="text-sm"></iconify-icon>
+                                            <iconify-icon noobserver icon="hugeicons:credit-card" class="text-sm"></iconify-icon>
                                         </span>
                                         <span class="text-[10px] text-zinc-500">مدفوع</span>
                                     </div>
                                     <div class="flex flex-col items-center gap-1.5">
                                         <span class="size-7 rounded-full bg-primary-500 text-white ring-2 ring-white shadow-sm shadow-primary-500/30 flex items-center justify-center">
-                                            <iconify-icon icon="hugeicons:package-01" class="text-sm"></iconify-icon>
+                                            <iconify-icon noobserver icon="hugeicons:package-01" class="text-sm"></iconify-icon>
                                         </span>
                                         <span class="text-[10px] font-medium text-primary-600">تجهيز</span>
                                     </div>
                                     <div class="flex flex-col items-center gap-1.5">
                                         <span class="size-7 rounded-full bg-stone-100 text-stone-400 ring-2 ring-white flex items-center justify-center">
-                                            <iconify-icon icon="hugeicons:tick-02" class="text-sm"></iconify-icon>
+                                            <iconify-icon noobserver icon="hugeicons:tick-02" class="text-sm"></iconify-icon>
                                         </span>
                                         <span class="text-[10px] text-zinc-400">مكتمل</span>
                                     </div>
@@ -734,7 +734,7 @@
                         style="animation-delay: -3s;"
                     >
                         <span class="size-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:notification-01" class="text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:notification-01" class="text-base"></iconify-icon>
                         </span>
                         <div class="leading-tight">
                             <p class="text-xs font-medium text-zinc-900">تم استلام الدفع</p>
@@ -785,35 +785,35 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:globe" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:globe" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">دومين مخصص</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">بريد إلكتروني رسمي</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:paint-board" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:paint-board" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">ألوان هويتك</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:text-font" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:text-font" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الخطوط والشعار</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:smart-phone-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:smart-phone-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">تصميم متوافق مع الجوال</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:translate" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:translate" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">دعم لغات متعددة</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:unavailable" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:unavailable" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">بدون شعار المنصة</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">صور أغلفة مخصصة</span>
                         </div>
                     </div>
@@ -831,7 +831,7 @@
                         style="animation-delay: -1.2s;"
                     >
                         <span class="size-6 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:paint-board" class="text-sm"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:paint-board" class="text-sm"></iconify-icon>
                         </span>
                         تم تطبيق هوية علامتك
                     </div>
@@ -846,7 +846,7 @@
                                 <span class="size-2 rounded-full bg-emerald-400/80"></span>
                             </div>
                             <div class="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-lg bg-white border border-black/5 px-2.5 py-1">
-                                <iconify-icon icon="hugeicons:security-check" class="text-emerald-500 text-sm shrink-0"></iconify-icon>
+                                <iconify-icon noobserver icon="hugeicons:security-check" class="text-emerald-500 text-sm shrink-0"></iconify-icon>
                                 <span class="text-[11px] text-zinc-600 truncate font-medium" dir="ltr">yourbrand.sa</span>
                             </div>
                         </div>
@@ -874,7 +874,7 @@
 
                             <div class="flex items-center gap-2 rounded-xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5 mb-4">
                                 <span class="size-7 rounded-lg bg-white text-primary-600 flex items-center justify-center ring-1 ring-black/5 shrink-0">
-                                    <iconify-icon icon="hugeicons:mail-01" class="text-sm"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:mail-01" class="text-sm"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 leading-tight">
                                     <p class="text-[10px] text-zinc-400">بريد رسمي</p>
@@ -902,7 +902,7 @@
                         style="animation-delay: -2.8s;"
                     >
                         <span class="size-7 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:security-check" class="text-sm"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:security-check" class="text-sm"></iconify-icon>
                         </span>
                         <div class="leading-tight">
                             <p class="text-xs font-medium">SSL · Secure</p>
@@ -946,35 +946,35 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:star" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:star" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">تقييمات العملاء</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:award-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:award-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الاعتمادات</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:image-02" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">معرض الأعمال</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:shield-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:shield-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الضمانات</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:help-circle" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:help-circle" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الأسئلة الشائعة</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:location-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:location-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">معلومات التواصل</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:package-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">متابعة الطلب</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:invoice-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:invoice-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الفواتير</span>
                         </div>
                        
@@ -992,7 +992,7 @@
                         class="absolute -top-3 start-2 z-20 inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium shadow-lg shadow-emerald-600/25 animate-[home-float_5s_ease-in-out_infinite]"
                         style="animation-delay: -1.4s;"
                     >
-                        <iconify-icon icon="solar:shield-check-bold" class="text-base"></iconify-icon>
+                        <iconify-icon noobserver icon="solar:shield-check-bold" class="text-base"></iconify-icon>
                         نشاط موثق
                     </div>
 
@@ -1004,11 +1004,11 @@
                             <div class="flex items-end justify-between gap-3">
                                 <div>
                                     <div class="flex items-center gap-1 text-amber-400 mb-1.5">
-                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
-                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
-                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
-                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
-                                        <iconify-icon icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:star-bold" class="text-sm"></iconify-icon>
+                                        <iconify-icon noobserver icon="solar:star-bold" class="text-sm"></iconify-icon>
                                     </div>
                                     <p class="text-4xl font-bold tracking-tight tabular-nums leading-none text-zinc-900">
                                         4.9<span class="text-lg font-medium text-zinc-400">/5</span>
@@ -1051,13 +1051,13 @@
                     >
                         <div class="inline-flex items-center gap-2 rounded-xl bg-white border border-black/5 px-2 py-1 shadow-sm shadow-black/10">
                             <span class="size-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                <iconify-icon icon="hugeicons:checkmark-badge-02" class="text-sm"></iconify-icon>
+                                <iconify-icon noobserver icon="hugeicons:checkmark-badge-02" class="text-sm"></iconify-icon>
                             </span>
                             <span class="text-xs font-medium text-zinc-800">سجل تجاري</span>
                         </div>
                         <div class="inline-flex items-center gap-2 rounded-xl bg-white border border-black/5 px-2 py-1 shadow-sm shadow-black/10 ms-4">
                             <span class="size-7 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                                <iconify-icon icon="hugeicons:file-validation" class="text-sm"></iconify-icon>
+                                <iconify-icon noobserver icon="hugeicons:file-validation" class="text-sm"></iconify-icon>
                             </span>
                             <span class="text-xs font-medium text-zinc-800">وثيقة عمل حر</span>
                         </div>
@@ -1096,31 +1096,31 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:quill-write-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:quill-write-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">المدونة</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:mail-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">النشرة البريدية</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:video-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:video-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">الفيديوهات</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:mic-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:mic-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">البودكاست</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:news" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:news" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">آخر الأخبار</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:book-open-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:book-open-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">المقالات والدلائل</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:notification-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:notification-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">تحديثات النشاط</span>
                         </div>
                     </div>
@@ -1155,7 +1155,7 @@
                             {{-- Article --}}
                             <div class="flex items-start gap-3 py-3.5 first:pt-0">
                                 <span class="size-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 ring-1 ring-amber-500/10">
-                                    <iconify-icon icon="hugeicons:quill-write-01" class="text-lg"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:quill-write-01" class="text-lg"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-[10px] font-medium text-amber-700 mb-0.5">أحدث المقالات</p>
@@ -1167,7 +1167,7 @@
                             {{-- Video --}}
                             <div class="flex items-start gap-3 py-3.5">
                                 <span class="size-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 ring-1 ring-rose-500/10">
-                                    <iconify-icon icon="hugeicons:video-01" class="text-lg"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:video-01" class="text-lg"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-[10px] font-medium text-rose-600 mb-0.5">فيديو جديد</p>
@@ -1179,7 +1179,7 @@
                             {{-- Newsletter --}}
                             <div class="flex items-start gap-3 py-3.5 last:pb-0">
                                 <span class="size-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 ring-1 ring-sky-500/10">
-                                    <iconify-icon icon="hugeicons:mail-01" class="text-lg"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:mail-01" class="text-lg"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-[10px] font-medium text-sky-600 mb-0.5">Newsletter</p>
@@ -1196,7 +1196,7 @@
                         style="animation-delay: -2.7s;"
                     >
                         <span class="size-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:notification-01" class="text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:notification-01" class="text-base"></iconify-icon>
                         </span>
                         <div class="leading-tight">
                             <p class="text-xs font-medium text-zinc-900">تحديثات النشاط</p>
@@ -1236,31 +1236,31 @@
 
                     <div class="flex flex-wrap gap-1.5 lg:gap-2 mt-10 mb-10 lg:mb-2 max-w-lg lg:max-w-2xl">
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-primary-500 text-white hover:bg-primary-600 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:dashboard-square-add" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:dashboard-square-add" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">أضف أقسامًا جديدة</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">توسّع بخدمات جديدة</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:user-group" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:user-group" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">إدارة الفريق</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:analytics-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:analytics-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">إحصاءات الأداء</span>
                         </div>
                         <div class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full flex items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:flash" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:flash" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">تكاملات خارجية</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:plug-socket" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:plug-socket" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">ربط التطبيقات</span>
                         </div>
                         <div class="hidden lg:flex px-3 py-1.5 lg:px-4 lg:py-2 rounded-full items-center gap-1.5 lg:gap-2 bg-stone-200 hover:bg-stone-300/80 transition-colors interactive cursor-hover">
-                            <iconify-icon icon="hugeicons:rocket-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:rocket-01" class="text-sm lg:text-xl" stroke-width="1.5"></iconify-icon>
                             <span class="text-sm">تحديثات مستمرة</span>
                         </div>
                     </div>
@@ -1278,7 +1278,7 @@
                         style="animation-delay: -1.2s;"
                     >
                         <span class="size-6 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:dashboard-square-add" class="text-sm"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:dashboard-square-add" class="text-sm"></iconify-icon>
                         </span>
                         قسم جديد مفعّل
                     </div>
@@ -1291,7 +1291,7 @@
                                 <h3 class="text-lg font-semibold text-zinc-900 mt-0.5">صفحتك تنمو معك</h3>
                             </div>
                             <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-medium ring-1 ring-emerald-600/10">
-                                <iconify-icon icon="hugeicons:arrow-up-02" class="text-sm"></iconify-icon>
+                                <iconify-icon noobserver icon="hugeicons:arrow-up-02" class="text-sm"></iconify-icon>
                                 +3 هذا الشهر
                             </span>
                         </div>
@@ -1311,7 +1311,7 @@
                         <div class="space-y-2.5">
                             <div class="flex items-center gap-3 rounded-2xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5">
                                 <span class="size-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:shopping-cart-01" class="text-base"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:shopping-cart-01" class="text-base"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-medium text-zinc-900">متجر إلكتروني</p>
@@ -1321,7 +1321,7 @@
                             </div>
                             <div class="flex items-center gap-3 rounded-2xl bg-stone-50 ring-1 ring-black/5 px-3 py-2.5">
                                 <span class="size-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:calendar-03" class="text-base"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-base"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-medium text-zinc-900">حجز المواعيد</p>
@@ -1331,7 +1331,7 @@
                             </div>
                             <div class="flex items-center gap-3 rounded-2xl border border-dashed border-black/10 px-3 py-2.5">
                                 <span class="size-9 rounded-xl bg-stone-100 text-zinc-400 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:add-01" class="text-base"></iconify-icon>
+                                    <iconify-icon noobserver icon="hugeicons:add-01" class="text-base"></iconify-icon>
                                 </span>
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-medium text-zinc-600">أضف قسمًا جديدًا</p>
@@ -1360,7 +1360,7 @@
                         style="animation-delay: -2.8s;"
                     >
                         <span class="size-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <iconify-icon icon="hugeicons:analytics-01" class="text-base"></iconify-icon>
+                            <iconify-icon noobserver icon="hugeicons:analytics-01" class="text-base"></iconify-icon>
                         </span>
                         <div class="leading-tight">
                             <p class="text-xs font-medium text-zinc-900">+42% نمو</p>
@@ -1415,41 +1415,41 @@
               </p>
               <ul class="space-y-3 mt-8 mb-8 text-sm text-zinc-600 flex-1">
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>صفحة احترافية</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>رابط ثابت مجاني</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>كيو آر كود QR Code</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>استقبل الطلبات والمشتريات لمنتجاتك وخدماتك</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>خيارات شحن مخصصة</span>
                 </li>
                 <li class="flex items-start gap-2 text-zinc-400/70">
-                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
                   <span>دومين مخصص</span>
                 </li>
                 <li class="flex items-start gap-2 text-zinc-400/70">
-                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
                   <span>ايميل رسمي</span>
                 </li>
                 <li class="flex items-start gap-2 text-zinc-400/70">
-                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:cancel-01" class="text-base text-zinc-300 shrink-0 mt-0.5"></iconify-icon>
                   <span>تفعيل بوابات الدفع الرقمية</span>
                 </li>
               </ul>
               <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
                 ابدأ الآن
-                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
+                <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
             <div data-reveal="" class="liquid-border liquid-border-dark relative rounded-3xl bg-zinc-900 text-white p-8 flex flex-col   transition-transform duration-300 overflow-hidden ">
@@ -1475,45 +1475,45 @@
               </p>
               <ul class="relative space-y-3 mt-8 mb-8 text-sm text-zinc-300 flex-1">
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>كل مزايا باقة بداية، بالإضافة إلى</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>دومين مخصص</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>ايميل رسمي عدد 2 ايميلات رسمية</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>استقبال جميع بوابات الدفع + تابي + تمارا</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>ربط 240+ بوابة شحن لمنتجاتك الملموسة</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>إحصاءات متقدمة</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-400 shrink-0 mt-0.5"></iconify-icon>
                   <span>تكاملات أساسية Integrations</span>
                 </li>
                 <li class="flex items-start gap-2 text-zinc-500">
-                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>إدارة الفريق والصلاحيات</span>
                 </li>
                 <li class="flex items-start gap-2 text-zinc-500">
-                  <iconify-icon icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:cancel-01" class="text-base text-zinc-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>إزالة شعار إقليم</span>
                 </li>
               </ul>
               <a href="{{ route('auth.register') }}" wire:navigate class="group relative mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all duration-300 hover:bg-primary-500">
                 اختر انطلاق
-                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
+                <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
 
@@ -1533,33 +1533,33 @@
               </p>
               <ul class="space-y-3 mt-8 mb-8 text-sm text-zinc-600 flex-1">
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>كل مزايا باقة انطلاق، بالإضافة إلى</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>إدارة فريق العمل حتى 5 أعضاء</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>ايميل رسمي عدد 25</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>قوالب مخصصة</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>إزالة شعار إقليم</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <iconify-icon icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
+                  <iconify-icon noobserver icon="hugeicons:tick-02" class="text-base text-primary-600 shrink-0 mt-0.5"></iconify-icon>
                   <span>جميع التكاملات Integrations</span>
                 </li>
               </ul>
               <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
                 اختر نمو
-                <iconify-icon icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
+                <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
             </div>
           </div>
@@ -1571,7 +1571,7 @@
       <section class="py-24  hidden">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="inline-flex items-center gap-2 text-xs font-medium bg-black/5 text-[#0E0E0E] px-3 py-1.5 rounded-full mb-6">
-                <iconify-icon icon="solar:eye-closed-linear" class="text-[#6B7280]"></iconify-icon>
+                <iconify-icon noobserver icon="solar:eye-closed-linear" class="text-[#6B7280]"></iconify-icon>
                   أسئلة قد تدور في ذهنك.
             </div>
             
@@ -1732,7 +1732,7 @@
           <div class="lg:col-span-5 scroll-fade" style="translate: none; rotate: none; scale: none; transform: translate(0px, 0px); opacity: 1;">
             
             {{-- <div class="inline-flex items-center gap-2 text-xs font-medium bg-black/5 text-[#0E0E0E] px-3 py-1.5 rounded-full mb-6">
-                <iconify-icon icon="solar:eye-closed-linear" class="text-[#6B7280]"></iconify-icon>
+                <iconify-icon noobserver icon="solar:eye-closed-linear" class="text-[#6B7280]"></iconify-icon>
                   أسئلة قد تدور في ذهنك.
             </div> --}}
             <h2 class="text-4xl md:text-5xl tracking-tight max-w-md font-normal lg:!leading-[4rem] mb-4 text-balance">
@@ -1760,7 +1760,7 @@
                     <span class="text-[#2C2825]/40 text-xs">01.</span>
                     هل المنصة مناسبة لنشاطي؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 1 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 1 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 1" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1781,7 +1781,7 @@
                     <span class="text-[#2C2825]/40 text-xs">02.</span>
                     هل أحتاج إلى خبرة تقنية؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 2 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 2 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 2" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1802,7 +1802,7 @@
                     <span class="text-[#2C2825]/40 text-xs">03.</span>
                     هل أستطيع استخدام دومين خاص وهوية نشاطي؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 3 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 3 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 3" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1823,7 +1823,7 @@
                     <span class="text-[#2C2825]/40 text-xs">04.</span>
                     هل أستطيع استقبال الطلبات والمدفوعات من الصفحة مباشرة؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 4 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 4 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 4" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1844,7 +1844,7 @@
                     <span class="text-[#2C2825]/40 text-xs">05.</span>
                     هل سأحتاج إلى إعادة بناء صفحتي عندما يكبر نشاطي؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 5 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 5 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 5" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1865,7 +1865,7 @@
                     <span class="text-[#2C2825]/40 text-xs">06.</span>
                     هل بيانات العملاء والطلبات ملك لي؟
                   </span>
-                  <iconify-icon icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 6 ? 'rotate-180' : ''"></iconify-icon>
+                  <iconify-icon noobserver icon="solar:alt-arrow-down-linear" stroke-width="1.5" class="transform transition-transform duration-300" :class="active === 6 ? 'rotate-180' : ''"></iconify-icon>
                 </button>
                 <div x-show="active === 6" x-collapse>
                   <p class="text-sm text-[#2C2825]/70 pt-4 pl-8 pb-2 leading-relaxed">
@@ -1933,10 +1933,10 @@
                 </ul>
             </div>
             <div class="flex items-center gap-4 shrink-0 text-[#0D0C22]">
-                <a href="https://x.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="X"><iconify-icon icon="solar:hashtag-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="{{ route('home') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="{{ config('app.name') }}"><iconify-icon icon="solar:global-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="https://www.instagram.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام"><iconify-icon icon="solar:camera-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="{{ route('auth.register') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="ابدأ الآن"><iconify-icon icon="solar:play-circle-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="https://x.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="X"><iconify-icon noobserver icon="solar:hashtag-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="{{ route('home') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="{{ config('app.name') }}"><iconify-icon noobserver icon="solar:global-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="https://www.instagram.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام"><iconify-icon noobserver icon="solar:camera-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="{{ route('auth.register') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="ابدأ الآن"><iconify-icon noobserver icon="solar:play-circle-linear" class="w-5 h-5"></iconify-icon></a>
             </div>
         </div>
         
