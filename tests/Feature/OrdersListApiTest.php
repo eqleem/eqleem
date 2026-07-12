@@ -162,6 +162,47 @@ test('search filters by order number and client name', function () {
         ->assertJsonPath('data.0.number', '000222');
 });
 
+test('status filter returns only matching orders', function () {
+    [$user, $tenant] = createOrdersListUserWithTenant();
+
+    createOrderForOrdersList($tenant, [
+        'number' => '000111',
+        'status' => 'new',
+    ]);
+
+    createOrderForOrdersList($tenant, [
+        'number' => '000222',
+        'status' => 'completed',
+    ]);
+
+    createOrderForOrdersList($tenant, [
+        'number' => '000333',
+        'status' => 'refunded',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/orders?status=completed')
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.number', '000222')
+        ->assertJsonPath('data.0.status', 'completed')
+        ->assertJsonPath('data.0.status_label', 'مكتمل');
+
+    $this->actingAs($user)
+        ->getJson('/api/orders?status=refunded')
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.number', '000333')
+        ->assertJsonPath('data.0.status', 'refunded')
+        ->assertJsonPath('data.0.status_label', 'مسترد')
+        ->assertJsonPath('data.0.status_color', 'pink');
+
+    $this->actingAs($user)
+        ->getJson('/api/orders?status=not-valid')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['status']);
+});
+
 test('walking client orders return null client name', function () {
     [$user, $tenant] = createOrdersListUserWithTenant();
 

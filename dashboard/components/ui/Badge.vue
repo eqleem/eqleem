@@ -10,6 +10,7 @@ const colors = {
     green: 'bg-green-50 text-green-500',
     yellow: 'bg-yellow-50 text-yellow-500',
     blue: 'bg-blue-50 text-blue-500',
+    teal: 'bg-teal-50 text-teal-600',
     red: 'bg-red-50 text-red-500',
     purple: 'bg-purple-50 text-purple-500',
     pink: 'bg-pink-50 text-pink-500',

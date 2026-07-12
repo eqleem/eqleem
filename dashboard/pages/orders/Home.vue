@@ -5,6 +5,7 @@ import Container from '../../components/ui/Container.vue';
 import Icon from '../../components/ui/Icon.vue';
 import MainBox from '../../components/ui/MainBox.vue';
 import Table from '../../components/orders/Table.vue';
+import BookingsTable from '../../components/bookings/Table.vue';
 import PaymentsTable from '../../components/payments/Table.vue';
 import InvoicesTable from '../../components/invoices/Table.vue';
 import FormSubmissionsTable from '../../components/form-submissions/Table.vue';
@@ -13,6 +14,7 @@ import FormSubmissionsTable from '../../components/form-submissions/Table.vue';
 // Tabs are driven by the `tab` query param (like the blade's url-key="tab").
 const tabs = [
     { name: 'orders', label: 'الطلبات', icon: 'message-2' },
+    { name: 'bookings', label: 'الحجوزات', icon: 'calendar' },
     { name: 'payments', label: 'المبيعات', icon: 'receipt' },
     { name: 'invoices', label: 'الفواتير', icon: 'file-invoice' },
     { name: 'form-submissions', label: 'ردود النماذج', icon: 'clipboard-list' },
@@ -20,12 +22,11 @@ const tabs = [
 
 const route = useRoute();
 const active = computed(() => (tabs.some((tab) => tab.name === route.query.tab) ? route.query.tab : 'orders'));
-const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)?.label);
 </script>
 
 <template>
     <Container>
-        <MainBox title="الطلبات" subtitle="الطلبات والمشتريات، تجدها هنا.">
+        <MainBox title="الطلبات والحجوزات" subtitle="الطلبات والحجوزات والمبيعات وكل تعاملات العملاء تجدها هنا.">
             <template #icon>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-500" viewBox="0 0 24 24" fill="none">
                     <path
@@ -48,12 +49,12 @@ const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)
             </template>
 
             <div>
-                <div class="flex border-b border-stone-200 px-px">
+                <div class="flex border-b border-stone-200 border-dotted px-px flex overflow-x-auto no-scrollbar">
                     <RouterLink
                         v-for="tab in tabs"
                         :key="tab.name"
                         :to="{ query: { tab: tab.name } }"
-                        class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition"
+                        class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition shrink-0"
                         :class="active === tab.name
                             ? 'border-b-2 border-primary-500 text-stone-900'
                             : 'text-gray-500 hover:text-gray-800'"
@@ -64,6 +65,7 @@ const activeLabel = computed(() => tabs.find((tab) => tab.name === active.value)
                 </div>
 
                 <Table v-if="active === 'orders'" />
+                <BookingsTable v-else-if="active === 'bookings'" />
                 <PaymentsTable v-else-if="active === 'payments'" />
                 <InvoicesTable v-else-if="active === 'invoices'" />
                 <FormSubmissionsTable v-else-if="active === 'form-submissions'" />

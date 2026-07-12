@@ -54,14 +54,14 @@ onMounted(() => {
 
 <template>
     <div class="divide-y divide-dotted divide-gray-200">
-        <div class="flex w-full items-center gap-x-7 bg-gray-100 p-3">
+        <div class="flex w-full items-center gap-x-7 bg-white p-3">
             <div class="ps-3">
                 <div class="flex items-center">
                     <input v-model="allChecked" type="checkbox" class="h-4 w-4 rounded-xl border-gray-300 shadow-sm">
                 </div>
             </div>
 
-            <div class="flex-grow">
+            <div class="flex-grow bg-gray-100 rounded-lg">
                 <div class="relative col-span-3 text-sm text-gray-800">
                     <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

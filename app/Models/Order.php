@@ -135,15 +135,41 @@ class Order extends Model
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function statusOptions(): array
     {
         return [
-            'draft' => 'مسودة',
-            'open' => 'مفتوح',
+            'new' => 'جديد',
+            'awaiting_payment' => 'بانتظار الدفع',
             'confirmed' => 'مؤكد',
+            'processing' => 'قيد التنفيذ',
             'completed' => 'مكتمل',
-            'cancelled' => 'ملغى',
+            'cancelled' => 'ملغي',
+            'refunded' => 'مسترد',
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function statusIcons(): array
+    {
+        return [
+            'new' => 'sparkles',
+            'awaiting_payment' => 'coin',
+            'confirmed' => 'check',
+            'processing' => 'refresh',
+            'completed' => 'package',
+            'cancelled' => 'x',
+            'refunded' => 'history',
+        ];
+    }
+
+    public static function statusIconFor(string $status): string
+    {
+        return self::statusIcons()[$status] ?? 'info';
     }
 
     public static function paymentStatusOptions(): array
@@ -245,15 +271,16 @@ class Order extends Model
     public static function statusLabelFor(string $status): string
     {
         return match ($status) {
-            'draft' => 'مسودة',
-            'open' => 'مفتوح',
+            'new', 'draft' => 'جديد',
+            'awaiting_payment', 'open' => 'بانتظار الدفع',
             'confirmed' => 'مؤكد',
+            'processing' => 'قيد التنفيذ',
+            'completed' => 'مكتمل',
+            'cancelled', 'void' => 'ملغي',
+            'refunded' => 'مسترد',
             'partially_paid' => 'مدفوع جزئياً',
             'paid' => 'مدفوع',
-            'void' => 'ملغي',
-            'cancelled' => 'ملغى',
-            'completed' => 'مكتمل',
-            default => $status,
+            default => self::statusOptions()[$status] ?? $status,
         };
     }
 
@@ -382,10 +409,14 @@ class Order extends Model
     public static function statusBadgeColorFor(string $status): string
     {
         return match ($status) {
-            'completed', 'paid', 'confirmed' => 'green',
+            'new', 'draft' => 'blue',
+            'awaiting_payment', 'open' => 'yellow',
+            'confirmed' => 'teal',
+            'processing' => 'purple',
+            'completed', 'paid' => 'green',
             'cancelled', 'void' => 'red',
-            'draft', 'open' => 'gray',
-            default => 'blue',
+            'refunded' => 'pink',
+            default => 'gray',
         };
     }
 

@@ -78,7 +78,7 @@ it('renders order detail page with activity history section', function () {
     [$user, $tenant] = createTenantWithUser();
 
     $order = createOrderForTenant($tenant);
-    $order->changeStatus('open', 'فتح الطلب للمراجعة');
+    $order->changeStatus('awaiting_payment', 'فتح الطلب للمراجعة');
 
     $this->actingAs($user)
         ->get(route('admin.orders.detail', ['id' => $order->uuid]))

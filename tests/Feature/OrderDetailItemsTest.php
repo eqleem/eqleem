@@ -152,7 +152,7 @@ it('shows booking details for service and unit rental items', function () {
         ->assertSee('خدمة')
         ->assertSee('تاريخ الموعد')
         ->assertSee('وقت الموعد')
-        ->assertSee('قيد الانتظار')
+        ->assertSee('جديد')
         ->assertSee('تقويم الخدمات')
         ->assertSee('سعر الحجز')
         ->assertSee('شقة فاخرة')

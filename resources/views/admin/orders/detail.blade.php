@@ -709,7 +709,9 @@ new class extends \Livewire\Component {
             $calendarName = $booking?->calendar?->name
                 ?? ($calendarId ? $calendars->get($calendarId)?->name : null);
 
-            $bookingStatus = $booking?->status;
+            $bookingStatus = $booking?->status
+                ? Booking::normalizeStatus((string) $booking->status)
+                : null;
 
             $item->type = $type;
             $item->type_label = Order::itemTypeOptions()[$type] ?? $type;
@@ -724,7 +726,7 @@ new class extends \Livewire\Component {
             $item->calendar_name = $calendarName;
             $item->booking_status = $bookingStatus;
             $item->booking_status_label = $bookingStatus
-                ? (Booking::statuses()[$bookingStatus] ?? $bookingStatus)
+                ? Booking::statusLabelFor($bookingStatus)
                 : null;
             $item->booking_status_color = $this->bookingStatusBadgeColor($bookingStatus);
 
@@ -748,13 +750,7 @@ new class extends \Livewire\Component {
 
     protected function bookingStatusBadgeColor(?string $status): string
     {
-        return match ($status) {
-            'pending' => 'yellow',
-            'confirmed' => 'green',
-            'cancelled' => 'red',
-            'completed' => 'blue',
-            default => 'gray',
-        };
+        return Booking::statusBadgeColorFor((string) $status);
     }
 
     protected function bookingTimeLabel(?Carbon $startAt, ?Carbon $endAt): ?string

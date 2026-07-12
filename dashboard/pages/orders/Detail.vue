@@ -172,7 +172,47 @@ onUnmounted(() => ordersStore.clearDetail());
                                             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400"><Icon name="package" class="h-5 w-5" /></div>
                                             <div class="min-w-0 space-y-1">
                                                 <p class="font-medium text-gray-900">{{ item.name }}</p>
-                                                <Badge :color="item.type_color">{{ item.type_label }}</Badge>
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    <Badge :color="item.type_color">{{ item.type_label }}</Badge>
+                                                    <Badge v-if="item.booking?.status_label" :color="item.booking.status_color" size="sm">{{ item.booking.status_label }}</Badge>
+                                                </div>
+
+                                                <template v-if="item.is_booking && item.booking">
+                                                    <div class="mt-1.5 space-y-1 text-xs text-gray-500">
+                                                        <p v-if="item.booking.calendar_name">
+                                                            <span class="text-gray-400">{{ item.booking.calendar_label }}:</span>
+                                                            {{ item.booking.calendar_name }}
+                                                        </p>
+
+                                                        <template v-if="item.type === 'service'">
+                                                            <p v-if="item.booking.date_label">
+                                                                <span class="text-gray-400">التاريخ:</span>
+                                                                {{ item.booking.date_label }}
+                                                            </p>
+                                                            <p v-if="item.booking.time_label">
+                                                                <span class="text-gray-400">الوقت:</span>
+                                                                <span dir="ltr">{{ item.booking.time_label }}</span>
+                                                            </p>
+                                                        </template>
+
+                                                        <template v-else-if="item.type === 'unit_rental'">
+                                                            <p v-if="item.booking.dates_label">
+                                                                <span class="text-gray-400">التواريخ:</span>
+                                                                {{ item.booking.dates_label }}
+                                                            </p>
+                                                            <p v-if="item.booking.duration_label" class="text-gray-400">
+                                                                {{ item.booking.duration_label }}
+                                                            </p>
+                                                        </template>
+                                                    </div>
+                                                </template>
+
+                                                <div v-else class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
+                                                    <span v-if="item.sku && ['product', 'digital_product', 'menu'].includes(item.type)" dir="ltr">SKU: {{ item.sku }}</span>
+                                                    <span v-if="item.type === 'course'">المقاعد: {{ item.qty }}</span>
+                                                    <span v-if="item.description">{{ item.description }}</span>
+                                                </div>
+
                                                 <p v-if="item.discount > 0" class="text-xs text-red-500 inline-flex items-baseline gap-1">خصم <Money :formatted="item.discount_formatted" class="inline-flex" /></p>
                                             </div>
                                         </div>

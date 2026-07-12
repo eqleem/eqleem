@@ -287,8 +287,8 @@ function saveAndClose() {
                     <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
                         <img v-if="menu.type?.icon" :src="`/${menu.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ menu.type?.name }}</span>
-                        <span class="text-gray-400">/</span>
-                        <span class="truncate text-gray-600">تحرير الطبق</span>
+                        <span class="text-gray-400 hidden md:inline">/</span>
+                        <span class="truncate text-gray-600 hidden md:inline">تحرير الطبق</span>
                     </div>
                 </div>
 

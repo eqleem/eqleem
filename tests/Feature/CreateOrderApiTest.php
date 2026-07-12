@@ -98,7 +98,7 @@ test('owner can create a draft order with product item and client', function () 
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.client.name', $client->name)
-        ->assertJsonPath('data.status', 'draft')
+        ->assertJsonPath('data.status', 'new')
         ->assertJsonPath('data.payment_status', 'unpaid')
         ->assertJsonPath('data.items.0.name', 'منتج تجريبي')
         ->assertJsonPath('data.items.0.qty', 2);
@@ -172,6 +172,38 @@ test('content search returns matching products for order type', function () {
         ->assertJsonPath('data.0.name', 'Arabic Coffee')
         ->assertJsonPath('data.0.unit_price', 15);
 });
+
+test('content search returns data price for services and unit rentals', function (string $orderType, string $contentTypeKey) {
+    [$user, $tenant] = createOrderApiUser();
+    setCurrentTenant($tenant);
+
+    Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel($contentTypeKey),
+        'title' => 'Priced Booking Item',
+        'slug' => 'priced-booking-'.Str::lower(Str::random(4)),
+        'status' => 'published',
+        'active' => true,
+        'price' => 0,
+        'data' => [
+            'price' => 12500,
+            'duration_minutes' => 45,
+        ],
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/orders/content-search?'.http_build_query([
+            'type' => $orderType,
+            'search' => 'Priced',
+        ]))
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.name', 'Priced Booking Item')
+        ->assertJsonPath('data.0.unit_price', 125)
+        ->assertJsonPath('data.0.duration_minutes', 45);
+})->with([
+    'service' => ['service', 'services'],
+    'unit_rental' => ['unit_rental', 'unit-rental'],
+]);
 
 test('foreign client id is rejected when creating order', function () {
     [$user] = createOrderApiUser();

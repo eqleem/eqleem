@@ -62,15 +62,16 @@ test('owner can update general info basic and contact', function () {
     Storage::fake('spaces');
 
     $this->actingAs($user)
-        ->put('/api/settings/general-info/basic', [
+        ->post('/api/settings/general-info/basic', [
             'name' => 'صفحة جديدة',
             'logo' => UploadedFile::fake()->image('logo.png', 100, 100),
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonPath('data.name', 'صفحة جديدة')
-        ->assertJsonStructure(['message']);
+        ->assertJsonStructure(['message', 'data' => ['logo']]);
 
-    expect($tenant->fresh()->name)->toBe('صفحة جديدة');
+    expect($tenant->fresh()->name)->toBe('صفحة جديدة')
+        ->and((bool) data_get($tenant->fresh()->meta, 'logo_saved'))->toBeTrue();
 
     $this->actingAs($user)
         ->putJson('/api/settings/general-info/contact', [

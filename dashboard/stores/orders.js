@@ -111,6 +111,7 @@ export const useOrdersStore = defineStore('orders', {
         items: [],
         meta: emptyMeta(),
         search: '',
+        status: '',
         loading: false,
         loaded: false,
         error: null,
@@ -126,9 +127,13 @@ export const useOrdersStore = defineStore('orders', {
     },
 
     actions: {
-        async fetchOrders({ page = 1, search } = {}) {
+        async fetchOrders({ page = 1, search, status } = {}) {
             if (search !== undefined) {
                 this.search = search;
+            }
+
+            if (status !== undefined) {
+                this.status = status ?? '';
             }
 
             this.loading = true;
@@ -142,6 +147,11 @@ export const useOrdersStore = defineStore('orders', {
                 const query = this.search.trim();
                 if (query) {
                     params.set('search', query);
+                }
+
+                const statusFilter = String(this.status ?? '').trim();
+                if (statusFilter) {
+                    params.set('status', statusFilter);
                 }
 
                 const payload = await api(`/orders?${params.toString()}`);
@@ -169,6 +179,11 @@ export const useOrdersStore = defineStore('orders', {
 
         async setSearch(search) {
             this.search = search;
+            await this.fetchOrders({ page: 1 });
+        },
+
+        async setStatus(status) {
+            this.status = status ?? '';
             await this.fetchOrders({ page: 1 });
         },
 

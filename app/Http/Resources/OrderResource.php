@@ -2,10 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Booking;
+use App\Models\Calendar;
 use App\Models\Order;
 use App\Support\Money;
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -99,11 +104,35 @@ class OrderResource extends JsonResource
             ->orderBy('id')
             ->get(['id', 'name', 'qty', 'unit_price', 'discount_total', 'line_total', 'sku', 'meta']);
 
-        return $rows->map(function (object $item): array {
+        $metas = $rows->mapWithKeys(function (object $item): array {
             $meta = is_string($item->meta ?? null)
                 ? (json_decode($item->meta, true) ?: [])
                 : (array) ($item->meta ?? []);
+
+            return [$item->id => $meta];
+        });
+
+        [$bookings, $calendars] = $this->loadBookingLookups($metas);
+
+        return $rows->map(function (object $item) use ($metas, $bookings, $calendars): array {
+            $meta = $metas->get($item->id, []);
             $type = (string) ($meta['type'] ?? 'other');
+            $isBooking = Order::isBookingItemType($type);
+            $booking = filled($meta['booking_id'] ?? null)
+                ? $bookings->get((int) $meta['booking_id'])
+                : null;
+
+            $startAt = $booking?->start_at
+                ?? (filled($meta['booking_start_at'] ?? null) ? Carbon::parse($meta['booking_start_at']) : null);
+            $endAt = $booking?->end_at
+                ?? (filled($meta['booking_end_at'] ?? null) ? Carbon::parse($meta['booking_end_at']) : null);
+
+            $calendarId = $booking?->calendar_id ?? ($meta['calendar_id'] ?? null);
+            $calendar = $booking?->calendar
+                ?? ($calendarId ? $calendars->get((int) $calendarId) : null);
+            $bookingStatus = $booking?->status
+                ? Booking::normalizeStatus((string) $booking->status)
+                : null;
 
             return [
                 'id' => $item->id,
@@ -112,7 +141,7 @@ class OrderResource extends JsonResource
                 'type' => $type,
                 'type_label' => Order::itemTypeOptions()[$type] ?? $type,
                 'type_color' => match ($type) {
-                    'product', 'digital_service' => 'blue',
+                    'product', 'digital_service', 'unit_rental' => 'blue',
                     'digital_product', 'course' => 'purple',
                     'menu' => 'yellow',
                     'service' => 'green',
@@ -127,8 +156,110 @@ class OrderResource extends JsonResource
                 'line_total_formatted' => Money::formatWithCurrency($item->line_total),
                 'description' => filled($meta['description'] ?? null) ? (string) $meta['description'] : null,
                 'image_url' => $meta['image_url'] ?? null,
+                'is_booking' => $isBooking,
+                'booking' => $isBooking ? [
+                    'calendar_id' => $calendar?->id ?? ($calendarId ? (int) $calendarId : null),
+                    'calendar_name' => $calendar?->name,
+                    'calendar_label' => $type === 'unit_rental' ? 'مخزون الوحدات' : 'مقدم الخدمة',
+                    'date_label' => $startAt?->copy()->locale(app()->getLocale())->translatedFormat('l j F Y'),
+                    'time_label' => $type === 'service' ? $this->bookingTimeLabel($startAt, $endAt) : null,
+                    'dates_label' => $type === 'unit_rental' ? $this->bookingDatesLabel($startAt, $endAt) : null,
+                    'duration_label' => $type === 'unit_rental' ? $this->bookingDurationLabel($startAt, $endAt) : null,
+                    'status' => $bookingStatus,
+                    'status_label' => $bookingStatus
+                        ? Booking::statusLabelFor($bookingStatus)
+                        : null,
+                    'status_color' => $bookingStatus
+                        ? Booking::statusBadgeColorFor($bookingStatus)
+                        : null,
+                ] : null,
             ];
         })->all();
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $metas
+     * @return array{0: Collection<int, Booking>, 1: Collection<int, Calendar>}
+     */
+    private function loadBookingLookups(Collection $metas): array
+    {
+        $bookingIds = $metas->pluck('booking_id')->filter()->unique()->values();
+
+        $bookings = $bookingIds->isEmpty()
+            ? collect()
+            : Booking::query()
+                ->with('calendar:id,name,type')
+                ->whereIn('id', $bookingIds)
+                ->get()
+                ->keyBy('id');
+
+        $calendarIds = $metas->pluck('calendar_id')
+            ->filter()
+            ->unique()
+            ->diff($bookings->pluck('calendar_id')->filter())
+            ->values();
+
+        $calendars = $calendarIds->isEmpty()
+            ? collect()
+            : Calendar::query()
+                ->whereIn('id', $calendarIds)
+                ->get(['id', 'name', 'type'])
+                ->keyBy('id');
+
+        return [$bookings, $calendars];
+    }
+
+    private function bookingTimeLabel(?CarbonInterface $startAt, ?CarbonInterface $endAt): ?string
+    {
+        if ($startAt === null) {
+            return null;
+        }
+
+        $start = $startAt->copy()->locale(app()->getLocale());
+
+        if ($endAt !== null) {
+            $end = $endAt->copy()->locale(app()->getLocale());
+
+            return $start->format('H:i').' – '.$end->format('H:i');
+        }
+
+        return $start->format('H:i');
+    }
+
+    private function bookingDatesLabel(?CarbonInterface $startAt, ?CarbonInterface $endAt): ?string
+    {
+        if ($startAt === null || $endAt === null) {
+            return null;
+        }
+
+        $locale = app()->getLocale();
+        $start = $startAt->copy()->locale($locale);
+        $end = $endAt->copy()->locale($locale);
+
+        return sprintf(
+            'من %s إلى %s',
+            $start->translatedFormat('j F Y'),
+            $end->translatedFormat('j F Y'),
+        );
+    }
+
+    private function bookingDurationLabel(?CarbonInterface $startAt, ?CarbonInterface $endAt): ?string
+    {
+        if ($startAt === null || $endAt === null || $endAt->lte($startAt)) {
+            return null;
+        }
+
+        $nights = (int) $startAt->diffInDays($endAt);
+
+        if ($nights <= 0) {
+            return null;
+        }
+
+        return match ($nights) {
+            1 => 'ليلة واحدة',
+            2 => 'ليلتان',
+            default => $nights.' ليالٍ',
+        };
     }
 
     /**

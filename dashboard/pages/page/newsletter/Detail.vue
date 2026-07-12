@@ -233,8 +233,8 @@ function saveAndClose() {
                     <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
                         <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ store.type?.name }}</span>
-                        <span class="text-gray-400">/</span>
-                        <span class="truncate text-gray-600">تحرير النشرة</span>
+                        <span class="text-gray-400 hidden md:inline">/</span>
+                        <span class="truncate text-gray-600 hidden md:inline">تحرير النشرة</span>
                     </div>
                 </div>
 

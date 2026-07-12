@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('calendar_id')->nullable();
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('new');
             $table->json('data')->nullable();
             $table->decimal('price_snapshot', 10, 2)->nullable();
             $table->string('currency', 3)->default('SAR');
@@ -32,5 +32,4 @@ return new class extends Migration
             $table->index(['tenant_id', 'start_at']);
         });
     }
- 
 };

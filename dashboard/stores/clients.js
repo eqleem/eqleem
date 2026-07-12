@@ -22,6 +22,7 @@ export const useClientsStore = defineStore('clients', {
             items: [],
             meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
             search: '',
+            status: '',
             loading: false,
             loaded: false,
             error: null,
@@ -173,9 +174,13 @@ export const useClientsStore = defineStore('clients', {
             }
         },
 
-        async fetchClientOrders(uuid, { page = 1, search } = {}) {
+        async fetchClientOrders(uuid, { page = 1, search, status } = {}) {
             if (search !== undefined) {
                 this.orders.search = search;
+            }
+
+            if (status !== undefined) {
+                this.orders.status = status ?? '';
             }
 
             this.orders.loading = true;
@@ -190,6 +195,11 @@ export const useClientsStore = defineStore('clients', {
                 const query = this.orders.search.trim();
                 if (query) {
                     params.set('search', query);
+                }
+
+                const statusFilter = String(this.orders.status ?? '').trim();
+                if (statusFilter) {
+                    params.set('status', statusFilter);
                 }
 
                 const payload = await api(`/clients/${uuid}/orders?${params.toString()}`);
@@ -217,6 +227,11 @@ export const useClientsStore = defineStore('clients', {
 
         async setClientOrdersSearch(uuid, search) {
             this.orders.search = search;
+            await this.fetchClientOrders(uuid, { page: 1 });
+        },
+
+        async setClientOrdersStatus(uuid, status) {
+            this.orders.status = status ?? '';
             await this.fetchClientOrders(uuid, { page: 1 });
         },
 
@@ -288,6 +303,7 @@ export const useClientsStore = defineStore('clients', {
                 items: [],
                 meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
                 search: '',
+                status: '',
                 loading: false,
                 loaded: false,
                 error: null,

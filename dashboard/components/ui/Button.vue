@@ -14,6 +14,7 @@ const variants = {
     secondary: 'bg-black/10 text-black/70 hover:bg-black/20 shadow-none',
     outline: 'bg-white text-black/70 hover:bg-black/5 border border-black/10 shadow-none',
     ghost: 'bg-transparent text-black/70 hover:bg-black/10 shadow-none',
+    light: 'bg-white text-primary-700 hover:bg-primary-50 shadow-none',
     green: 'bg-green-600 text-white hover:bg-green-700',
     danger: 'bg-red-700 text-white hover:bg-red-800',
     warning: 'bg-yellow-500 text-white hover:bg-yellow-600',

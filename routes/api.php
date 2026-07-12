@@ -15,6 +15,9 @@ use App\API\Blog\UpdateBlogPost;
 use App\API\Blog\UpdateBlogSettings;
 use App\API\Blog\UploadBlogEditorImage;
 use App\API\Blog\UploadBlogFeaturedImage;
+use App\API\Bookings\CreateBooking;
+use App\API\Bookings\GetBookingAvailability;
+use App\API\Bookings\ListBookings;
 use App\API\Clients\CreateClient;
 use App\API\Clients\ListClientInvoices;
 use App\API\Clients\ListClientOrders;
@@ -307,6 +310,15 @@ Route::get('/orders', ListOrders::class)
 Route::post('/orders', CreateOrder::class)
     ->name('api.orders.store');
 
+Route::get('/bookings', ListBookings::class)
+    ->name('api.bookings.index');
+
+Route::post('/bookings', CreateBooking::class)
+    ->name('api.bookings.store');
+
+Route::get('/bookings/availability', GetBookingAvailability::class)
+    ->name('api.bookings.availability');
+
 Route::get('/orders/content-search', SearchOrderContent::class)
     ->name('api.orders.content-search');
 
@@ -394,7 +406,7 @@ Route::put('/settings/analytics', UpdateAnalyticsSettings::class)
 Route::get('/settings/general-info', GetGeneralInfoSettings::class)
     ->name('api.settings.general-info.show');
 
-Route::put('/settings/general-info/basic', UpdateGeneralInfoBasic::class)
+Route::match(['put', 'post'], '/settings/general-info/basic', UpdateGeneralInfoBasic::class)
     ->name('api.settings.general-info.basic');
 
 Route::put('/settings/general-info/contact', UpdateGeneralInfoContact::class)

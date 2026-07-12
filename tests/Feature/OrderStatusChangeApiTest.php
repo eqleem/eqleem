@@ -33,7 +33,7 @@ function createOrderForStatusApi(array $orderOverrides = []): array
     $order = Order::query()->create([
         'tenant_id' => $tenant->id,
         'type' => 'order',
-        'status' => 'draft',
+        'status' => 'new',
         'channel' => 'manual',
         'number' => '000'.random_int(100, 999),
         'currency_code' => 'SAR',
@@ -87,17 +87,17 @@ test('owner can update order status without a reason', function () {
 
     $this->actingAs($user)
         ->patchJson('/api/orders/'.$order->uuid.'/status', [
-            'status' => 'open',
+            'status' => 'awaiting_payment',
         ])
         ->assertSuccessful()
-        ->assertJsonPath('data.status', 'open');
+        ->assertJsonPath('data.status', 'awaiting_payment');
 
     $order->refresh();
     $status = $order->statuses()->first();
 
-    expect($order->statusValue())->toBe('open')
+    expect($order->statusValue())->toBe('awaiting_payment')
         ->and($status)->not->toBeNull()
-        ->and($status->name)->toBe('open')
+        ->and($status->name)->toBe('awaiting_payment')
         ->and($status->reason)->toBeNull();
 });
 

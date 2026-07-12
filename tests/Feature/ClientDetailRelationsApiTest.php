@@ -156,6 +156,26 @@ test('client orders search filters by number', function () {
         ->assertJsonPath('data.0.number', '000222');
 });
 
+test('client orders can be filtered by status', function () {
+    [$user, $tenant] = createClientDetailApiUserWithTenant();
+    $client = createClientForDetailApi($tenant);
+    createOrderForDetailApi($tenant, $client, ['number' => '000111', 'status' => 'new']);
+    createOrderForDetailApi($tenant, $client, ['number' => '000222', 'status' => 'completed']);
+
+    $this->actingAs($user)
+        ->getJson('/api/clients/'.$client->uuid.'/orders?'.http_build_query(['status' => 'completed']))
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.number', '000222')
+        ->assertJsonPath('data.0.status', 'completed')
+        ->assertJsonPath('data.0.status_label', 'مكتمل');
+
+    $this->actingAs($user)
+        ->getJson('/api/clients/'.$client->uuid.'/orders?'.http_build_query(['status' => 'not-a-status']))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['status']);
+});
+
 test('lists only invoices for the clients orders', function () {
     [$user, $tenant] = createClientDetailApiUserWithTenant();
     $client = createClientForDetailApi($tenant);

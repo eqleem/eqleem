@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -50,6 +51,7 @@ class ListOrders
     {
         return [
             'search' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'status' => ['sometimes', 'nullable', 'string', Rule::in(array_keys(Order::statusOptions()))],
             'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
         ];
@@ -58,7 +60,7 @@ class ListOrders
     /**
      * @return LengthAwarePaginator<int, Order>
      */
-    public function handle(Tenant $tenant, ?string $search = null, int $perPage = 20): LengthAwarePaginator
+    public function handle(Tenant $tenant, ?string $search = null, ?string $status = null, int $perPage = 20): LengthAwarePaginator
     {
         setCurrentTenant($tenant);
 
@@ -80,6 +82,7 @@ class ListOrders
             ])
             ->orderByDesc('orders.id');
 
+        $this->applyStatusFilter($query, $status);
         $this->applySearch($query, $search);
 
         return $query->paginate($perPage);
@@ -93,12 +96,15 @@ class ListOrders
         /** @var Tenant $tenant */
         $tenant = $user->currentTenant;
 
-        /** @var array{search?: string|null, per_page?: int} $validated */
+        /** @var array{search?: string|null, status?: string|null, per_page?: int} $validated */
         $validated = $request->validated();
+
+        $status = isset($validated['status']) ? trim((string) $validated['status']) : null;
 
         return $this->handle(
             $tenant,
             isset($validated['search']) ? trim((string) $validated['search']) : null,
+            $status !== '' ? $status : null,
             (int) ($validated['per_page'] ?? 20),
         );
     }
@@ -106,6 +112,15 @@ class ListOrders
     public function jsonResponse(LengthAwarePaginator $orders): AnonymousResourceCollection
     {
         return OrderListResource::collection($orders);
+    }
+
+    private function applyStatusFilter(Builder $query, ?string $status): void
+    {
+        if ($status === null || $status === '') {
+            return;
+        }
+
+        $query->where('orders.status', $status);
     }
 
     private function applySearch(Builder $query, ?string $search): void

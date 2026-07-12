@@ -1120,7 +1120,7 @@ new class extends Livewire\Component {
                         'calendar_id' => $item['calendar_id'],
                         'start_at' => $item['booking_start_at'],
                         'end_at' => $item['booking_end_at'],
-                        'status' => 'pending',
+                        'status' => 'new',
                         'price_snapshot' => Order::fromMinor($unitPrice),
                         'currency' => $this->currency_code,
                         'meta' => [

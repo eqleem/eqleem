@@ -648,7 +648,7 @@ class CartService
                         'calendar_id' => $item->calendarId(),
                         'start_at' => $item->bookingStartAt(),
                         'end_at' => $item->bookingEndAt(),
-                        'status' => 'pending',
+                        'status' => 'new',
                         'price_snapshot' => Order::fromMinor($item->unit_price),
                         'currency' => Money::defaultCurrencyCode(),
                         'meta' => [

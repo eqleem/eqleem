@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import Modal from '../ui/Modal.vue';
+import Button from '../ui/Button.vue';
 import CompletionBasicInfo from './CompletionBasicInfo.vue';
 import CompletionContact from './CompletionContact.vue';
 import CompletionSocial from './CompletionSocial.vue';
@@ -97,15 +98,17 @@ function openStep(modal) {
                 :class="percentage >= 100 ? 'border-b border-white/10 pb-4' : ''"
             >
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-xl font-bold  ">مرحباً، {{ userName || '…' }} 👋</h2>
-                    <button 
-                        type="button"
-                        class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                    <h2 class="text-xl font-bold">مرحباً، {{ userName || '…' }} 👋</h2>
+                    <Button
+                        variant="light"
+                        class="h-auto shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold sm:px-4 sm:py-2 sm:text-sm"
                         @click="openModal('home-step-content')"
                     >
-                        <iconify-icon icon="solar:add-circle-bold" class="text-base"></iconify-icon>
+                        <template #icon>
+                            <iconify-icon icon="solar:add-circle-bold" class="text-base"></iconify-icon>
+                        </template>
                         إضافة محتوى
-                    </button>
+                    </Button>
                 </div>
 
                 <template v-if="percentage < 100">
@@ -122,15 +125,17 @@ function openStep(modal) {
                         </div>
                     </div>
 
-                    <button
+                    <Button
                         v-if="nextStep"
-                        type="button"
-                        class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 sm:w-auto"
+                        variant="light"
+                        class="mt-4 h-auto w-full rounded-xl px-4 py-2.5 font-semibold sm:w-auto"
                         @click="openStep(nextStep.modal)"
                     >
-                        <iconify-icon icon="solar:arrow-left-bold" class="text-base"></iconify-icon>
+                        <template #icon>
+                            <iconify-icon icon="solar:arrow-left-bold" class="text-base"></iconify-icon>
+                        </template>
                         {{ nextStep.label }}
-                    </button>
+                    </Button>
                 </template>
                 <p v-else class="mt-2 text-sm text-primary-100/90">صفحتك جاهزة — شاركها مع عملائك.</p>
             </div>
@@ -157,7 +162,7 @@ function openStep(modal) {
                         :href="pageUrl || '#'"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="flex flex-col items-center justify-center gap-1 rounded-xl bg-green-500 p-2.5 text-center text-[11px] font-medium text-white transition hover:bg-green-600"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-green-500 p-2.5 text-center text-[11px] font-medium text-white transition hover:bg-green-600"
                         title="معاينة الصفحة"
                     >
                         <iconify-icon icon="solar:eye-bold" class="text-lg"></iconify-icon>
@@ -166,7 +171,7 @@ function openStep(modal) {
 
                     <button
                         type="button"
-                        class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="نسخ الرابط"
                         @click="copyLink"
                     >
@@ -176,7 +181,7 @@ function openStep(modal) {
 
                     <button
                         type="button"
-                        class="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="مشاركة الصفحة"
                         @click="openModal('home-share-page')"
                     >
@@ -186,7 +191,7 @@ function openStep(modal) {
 
                     <button
                         type="button"
-                        class="flex items-center justify-center rounded-xl bg-white p-1 ring-1 ring-white/20 transition hover:bg-white/90"
+                        class="flex cursor-pointer items-center justify-center rounded-xl bg-white p-1 ring-1 ring-white/20 transition hover:bg-white/90"
                         title="رمز QR — اضغط للتكبير"
                         @click="openModal('home-page-qr')"
                     >
@@ -208,14 +213,16 @@ function openStep(modal) {
                         :value="pageUrl"
                         class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700"
                     >
-                    <button
-                        type="button"
-                        class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+                    <Button
+                        variant="primary"
+                        class="h-auto shrink-0 rounded-xl px-4 py-2.5 font-semibold"
                         @click="copyLink"
                     >
-                        <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                        <template #icon>
+                            <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                        </template>
                         {{ copied ? 'تم النسخ' : 'نسخ' }}
-                    </button>
+                    </Button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -225,7 +232,7 @@ function openStep(modal) {
                         :href="shareLink(social.platform)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                     >
                         <iconify-icon :icon="social.icon" class="text-lg" :class="social.class"></iconify-icon>
                         {{ social.label }}
@@ -241,14 +248,16 @@ function openStep(modal) {
                     <img :src="qrImageUrl(220)" alt="رمز QR للصفحة" class="mx-auto size-[220px]" loading="lazy">
                 </div>
                 <p class="truncate text-xs text-gray-500" dir="ltr">{{ pageUrl }}</p>
-                <button
-                    type="button"
-                    class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+                <Button
+                    variant="primary"
+                    class="h-auto rounded-xl px-4 py-2.5 font-semibold"
                     @click="copyLink"
                 >
-                    <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                    <template #icon>
+                        <iconify-icon icon="solar:copy-bold" class="text-lg"></iconify-icon>
+                    </template>
                     {{ copied ? 'تم النسخ' : 'نسخ الرابط' }}
-                </button>
+                </Button>
             </div>
         </Modal>
 

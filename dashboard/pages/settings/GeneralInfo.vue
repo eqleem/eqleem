@@ -7,6 +7,7 @@ import Input from '../../components/ui/Input.vue';
 import Select from '../../components/ui/Select.vue';
 import Button from '../../components/ui/Button.vue';
 import Modal from '../../components/ui/Modal.vue';
+import FileCrop from '../../components/ui/FileCrop.vue';
 import { socialNetworks as fallbackNetworks } from '../../data/settings.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
@@ -17,8 +18,10 @@ const { tenant } = useSession();
 
 const profile = reactive({
     name: '',
-    logoPreview: null,
 });
+
+const logoFile = ref(null);
+const logoPreview = ref(null);
 
 const contact = reactive({
     phone: '',
@@ -37,6 +40,7 @@ const saving = reactive({ profile: false, contact: false, social: false });
 const message = ref(null);
 const errors = reactive({
     name: null,
+    logo: null,
     phone: null,
     email: null,
     whatsapp: null,
@@ -50,7 +54,10 @@ function applyPayload(payload) {
     const data = payload?.data ?? payload;
 
     profile.name = data.name ?? '';
-    profile.logoPreview = data.logo ?? null;
+
+    if (!logoFile.value) {
+        logoPreview.value = data.logo ?? null;
+    }
 
     Object.assign(contact, {
         phone: data.contact?.phone ?? '',
@@ -79,9 +86,13 @@ function applyPayload(payload) {
         updateTenant({
             ...tenant.value,
             name: profile.name,
-            logo: profile.logoPreview,
+            logo: data.logo ?? logoPreview.value,
         });
     }
+}
+
+function onLogoChange() {
+    errors.logo = null;
 }
 
 async function load() {
@@ -101,16 +112,27 @@ async function submitProfile() {
     saving.profile = true;
     message.value = null;
     errors.name = null;
+    errors.logo = null;
 
     try {
-        applyPayload(await api('/settings/general-info/basic', {
-            method: 'PUT',
-            body: { name: profile.name.trim() },
-        }));
+        const body = new FormData();
+        body.append('name', profile.name.trim());
+
+        if (logoFile.value) {
+            body.append('logo', logoFile.value);
+        }
+
+        const payload = await api('/settings/general-info/basic', {
+            method: 'POST',
+            body,
+        });
+        logoFile.value = null;
+        applyPayload(payload);
         notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             errors.name = error.errors?.name?.[0] ?? null;
+            errors.logo = error.errors?.logo?.[0] ?? null;
         }
 
         notifyApiError(error, 'تعذر حفظ معلومات الصفحة.');
@@ -216,21 +238,17 @@ onMounted(load);
                     :error="errors.name"
                 />
 
-                <div class="relative items-center gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-                    <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">الشعار</span>
-                    <div class="flex items-center gap-3 p-2">
-                        <div class="flex size-20 items-center justify-center overflow-hidden rounded-lg bg-white">
-                            <img
-                                v-if="profile.logoPreview"
-                                :src="profile.logoPreview"
-                                alt=""
-                                class="size-20 object-cover"
-                            >
-                            <img v-else :src="`/assets/images/user.png`" alt="" class="size-12 opacity-60">
-                        </div>
-                        <p class="text-xs text-gray-400">رفع الشعار (قريباً)</p>
-                    </div>
-                </div>
+                <FileCrop
+                    v-model="logoFile"
+                    v-model:preview="logoPreview"
+                    name="logo"
+                    label="الشعار"
+                    upload-label="رفع شعار"
+                    crop-title="قص الشعار"
+                    shape="square"
+                    :error="errors.logo"
+                    @change="onLogoChange"
+                />
 
                 <template #footer>
                     <Button type="submit" label="حفظ" :disabled="loading || saving.profile" />

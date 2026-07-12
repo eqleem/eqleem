@@ -56,10 +56,60 @@ class Booking extends Model
     public static function statuses(): array
     {
         return [
-            'pending' => 'قيد الانتظار',
+            'new' => 'جديد',
+            'awaiting_payment' => 'بانتظار الدفع',
             'confirmed' => 'مؤكد',
-            'cancelled' => 'ملغي',
             'completed' => 'مكتمل',
+            'cancelled' => 'ملغي',
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function statusIcons(): array
+    {
+        return [
+            'new' => 'sparkles',
+            'awaiting_payment' => 'coin',
+            'confirmed' => 'check',
+            'completed' => 'package',
+            'cancelled' => 'x',
+        ];
+    }
+
+    public static function statusIconFor(string $status): string
+    {
+        return self::statusIcons()[self::normalizeStatus($status)] ?? 'info';
+    }
+
+    /**
+     * Legacy `pending` is treated as `new`.
+     */
+    public static function normalizeStatus(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'new',
+            default => $status,
+        };
+    }
+
+    public static function statusLabelFor(string $status): string
+    {
+        $normalized = self::normalizeStatus($status);
+
+        return self::statuses()[$normalized] ?? $status;
+    }
+
+    public static function statusBadgeColorFor(string $status): string
+    {
+        return match (self::normalizeStatus($status)) {
+            'new' => 'blue',
+            'awaiting_payment' => 'yellow',
+            'confirmed' => 'teal',
+            'completed' => 'green',
+            'cancelled' => 'red',
+            default => 'gray',
+        };
     }
 }
