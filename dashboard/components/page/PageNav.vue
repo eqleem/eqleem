@@ -56,11 +56,11 @@ onBeforeUnmount(() => {
     <nav class="sticky top-[var(--dashboard-chrome-h)] z-20 max-h-[calc(100vh-var(--dashboard-chrome-h))] w-auto shrink-0 self-start space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-y-contain rounded-xl bg-gray-300/30 p-0.5 lg:w-48">
         <button
             type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-gray-600 transition hover:bg-white/60 hover:text-gray-800 lg:hidden"
+            class="flex w-full items-center justify-center mb-2 gap-2 rounded-lg px-1 py-1.5 text-white transition bg-primary-500 hover:bg-primary-600 lg:hidden"
             aria-label="فتح قائمة التبويبات"
             @click="openMobileNav"
         >
-            <Icon name="menu-2" class="h-5 w-5 shrink-0" />
+            <Icon name="menu-2" class="size-7 md:size-5 shrink-0" />
             <span class="hidden truncate text-sm md:block">كل التبويبات</span>
         </button>
 
@@ -69,10 +69,10 @@ onBeforeUnmount(() => {
             v-for="tab in fixedTabs"
             :key="tab.id"
             :to="{ path: '/manage', query: { tab: tab.id } }"
-            class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+            class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
             :class="isFixedActive(tab.id) ? 'bg-white text-gray-700' : 'bg-stone-100/50 text-gray-600 hover:bg-white/60 hover:text-gray-800'"
         >
-            <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
+            <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0 flex items-center justify-center">
             <span class="hidden truncate md:block">{{ tab.label }}</span>
         </RouterLink>
 
@@ -168,10 +168,10 @@ onBeforeUnmount(() => {
                     :class="isTypeActive(tab.contentType.slug) ? `${colorBg[tab.color]} text-gray-900` : `bg-stone-100/50 ${colorHover[tab.color]} text-gray-600 hover:text-gray-800`"
                     @click="closeMobileNav"
                 >
-                    <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2" :class="colorBg[tab.color]">
-                        <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5">
+                    <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2" >
+                        <img :src="`/${tab.icon}`" :alt="tab.label" class="size-7 md:size-5">
                     </span>
-                    <span class="truncate">{{ tab.label }}</span>
+                    <span class="truncate text-base md:text-sm">{{ tab.label }}</span>
                 </RouterLink>
             </nav>
         </Transition>
