@@ -19,17 +19,20 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:file']);
 
+const localFile = ref(props.file);
 const localPreview = ref(props.preview);
 
-watch(() => props.preview, (value) => {
-    if (!props.file) {
-        localPreview.value = value;
+watch(() => props.file, (value) => {
+    localFile.value = value;
+
+    if (!value) {
+        localPreview.value = props.preview;
     }
 });
 
-watch(() => props.file, (file) => {
-    if (!file) {
-        localPreview.value = props.preview;
+watch(() => props.preview, (value) => {
+    if (!localFile.value) {
+        localPreview.value = value;
     }
 });
 
@@ -41,12 +44,8 @@ const cropEnabled = computed(() => Boolean(props.field?.crop));
 const cropShape = computed(() => {
     const shape = props.field?.cropShape ?? 'both';
 
-    if (shape === 'free') {
-        return 'free';
-    }
-
-    if (shape === 'square') {
-        return 'square';
+    if (shape === 'free' || shape === 'square') {
+        return shape;
     }
 
     return 'square';
@@ -54,6 +53,7 @@ const cropShape = computed(() => {
 const allowShapeSwitch = computed(() => (props.field?.cropShape ?? 'both') === 'both');
 
 function onFileChange(file) {
+    localFile.value = file;
     emit('update:file', file);
 }
 </script>
@@ -78,8 +78,8 @@ function onFileChange(file) {
     />
 
     <FileCrop
-        v-else-if="type === 'upload-single-image' && cropEnabled"
-        :model-value="file"
+        v-else-if="type === 'upload-single-image'"
+        v-model="localFile"
         v-model:preview="localPreview"
         :name="fieldKey"
         :label="label"
@@ -88,25 +88,10 @@ function onFileChange(file) {
         crop-title="قص الصورة"
         :shape="cropShape"
         :allow-shape-switch="allowShapeSwitch"
+        :enable-crop="cropEnabled"
         :output-size="1920"
         preview-class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover"
         :error="error"
-        @update:model-value="onFileChange"
-        @change="onFileChange"
-    />
-
-    <FileCrop
-        v-else-if="type === 'upload-single-image'"
-        :model-value="file"
-        v-model:preview="localPreview"
-        :name="fieldKey"
-        :label="label"
-        :info="info"
-        upload-label="رفع صورة"
-        :enable-crop="false"
-        preview-class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover"
-        :error="error"
-        @update:model-value="onFileChange"
         @change="onFileChange"
     />
 

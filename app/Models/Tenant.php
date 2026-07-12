@@ -12,10 +12,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Http\UploadedFile;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Facades\Storage;
 use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
 
 #[Fillable(['name', 'handle', 'user_id', 'theme_id', 'active', 'data', 'meta', 'config', 'phone', 'email', 'status', 'role', 'custom_domain', 'custom_domain_status'])]
@@ -82,34 +83,24 @@ class Tenant extends Model implements HasMedia
 
     public function uploadThemeOptionMedia(int $themeId, string $optionKey, UploadedFile $file): string
     {
+        $mediaDisk = config('media-library.disk_name', 'spaces');
+
+        $previous = data_get($this->themeSettingsFor($themeId), $optionKey);
+
+        if (is_string($previous) && filled($previous) && ! str_starts_with($previous, 'http')) {
+            Storage::disk($mediaDisk)->delete($previous);
+        }
+
         $this->getMedia('theme-options')
             ->filter(fn (Media $media): bool => (int) $media->getCustomProperty('theme_id') === $themeId
                 && (string) $media->getCustomProperty('option_key') === $optionKey)
             ->each->delete();
 
-        $mediaDisk = config('media-library.disk_name');
-        $fileName = md5($file->getClientOriginalName()).'.'.$file->getClientOriginalExtension();
-        $customProperties = [
-            'theme_id' => $themeId,
-            'option_key' => $optionKey,
-        ];
-
-        if ($file instanceof TemporaryUploadedFile) {
-            $path = $file->storePublicly('tenant-media/'.$this->uuid.'/theme-options', $mediaDisk);
-
-            $media = $this->addMediaFromDisk($path, $mediaDisk)
-                ->usingFileName($fileName)
-                ->withCustomProperties($customProperties)
-                ->preservingOriginal()
-                ->toMediaCollection('theme-options');
-        } else {
-            $media = $this->addMedia($file)
-                ->usingFileName($fileName)
-                ->withCustomProperties($customProperties)
-                ->toMediaCollection('theme-options');
-        }
-
-        return $media->getPathRelativeToRoot();
+        // Same path as logo / other dashboard uploads: storePublicly on spaces.
+        return $file->storePublicly(
+            'tenant-media/'.$this->uuid.'/theme-options',
+            $mediaDisk,
+        );
     }
 
     public function registerMediaCollections(): void

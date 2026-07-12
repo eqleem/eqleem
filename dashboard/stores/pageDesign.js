@@ -142,11 +142,21 @@ export const usePageDesignStore = defineStore('pageDesign', {
 
                 Object.entries(uploads).forEach(([key, file]) => {
                     if (file instanceof File) {
-                        body.append(`uploads[${key}]`, file);
+                        body.append(`uploads[${key}]`, file, file.name || `${key}.jpg`);
                     } else if (file instanceof Blob) {
                         body.append(`uploads[${key}]`, file, `${key}.jpg`);
                     }
                 });
+
+                if (uploadKeys.size === 0 && Object.keys(uploads).length > 0) {
+                    this.error = 'تعذر قراءة ملف الصورة. أعد اختيار الصورة ثم احفظ.';
+
+                    return {
+                        ok: false,
+                        errors: {},
+                        message: this.error,
+                    };
+                }
 
                 const payload = await api('/page/design/options', {
                     method: 'POST',

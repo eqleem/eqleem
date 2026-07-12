@@ -222,6 +222,8 @@ test('owner can save theme options including image upload', function () {
     expect($saved['primaryColor'])->toBe('teal')
         ->and($saved['logoRadius'])->toBe('rounded-lg')
         ->and($saved['headerImage'])->not->toBeEmpty();
+
+    Storage::disk(config('media-library.disk_name'))->assertExists($saved['headerImage']);
 });
 
 test('saving theme options without a new upload preserves existing header image', function () {

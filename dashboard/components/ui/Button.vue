@@ -4,6 +4,7 @@ defineProps({
     label: { type: String, default: null },
     href: { type: String, default: null },
     target: { type: String, default: null },
+    type: { type: String, default: 'button' },
     variant: { type: String, default: 'primary' },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -28,6 +29,7 @@ const variants = {
         :is="href ? 'a' : 'button'"
         :href="href"
         :target="target"
+        :type="href ? null : type"
         :role="href ? null : 'button'"
         :disabled="!href && (disabled || loading) ? true : null"
         class="inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"

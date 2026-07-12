@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, shallowReactive, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import Icon from '../ui/Icon.vue';
 import Badge from '../ui/Badge.vue';
@@ -19,7 +19,6 @@ const {
     error,
     saving,
     activating,
-    message,
     hasOptions,
     themesEmpty,
     schemaEntries,
@@ -27,11 +26,18 @@ const {
 
 const activeTab = ref('customize');
 const galleryIndex = ref(0);
-const uploads = shallowReactive({});
+/** @type {import('vue').Ref<Record<string, File>>} */
+const uploads = ref({});
 const fieldErrors = reactive({});
+
 onMounted(() => {
     store.fetchDesign();
 });
+
+function clearUploads() {
+    uploads.value = {};
+    Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
+}
 
 watch(() => selectedTheme.value?.id, (themeId, previousThemeId) => {
     if (themeId === previousThemeId) {
@@ -40,8 +46,7 @@ watch(() => selectedTheme.value?.id, (themeId, previousThemeId) => {
 
     activeTab.value = selectedTheme.value?.is_active ? 'customize' : 'info';
     galleryIndex.value = 0;
-    Object.keys(uploads).forEach((key) => delete uploads[key]);
-    Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
+    clearUploads();
 }, { immediate: true });
 
 watch(() => selectedTheme.value?.is_active, (isActive) => {
@@ -110,19 +115,24 @@ async function setDefaultTheme() {
 }
 
 function onFileUpdate(key, file) {
-    if (file) {
-        uploads[key] = file;
+    const next = { ...uploads.value };
+
+    if (file instanceof File || file instanceof Blob) {
+        next[key] = file instanceof File
+            ? file
+            : new File([file], `${key}.jpg`, { type: file.type || 'image/jpeg' });
     } else {
-        delete uploads[key];
+        delete next[key];
     }
 
+    uploads.value = next;
     fieldErrors[key] = null;
 }
 
 async function saveOptions() {
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
 
-    const pendingUploads = { ...uploads };
+    const pendingUploads = { ...uploads.value };
     const result = await store.saveOptions(pendingUploads);
 
     if (!result.ok) {
@@ -137,7 +147,7 @@ async function saveOptions() {
     }
 
     notifySuccess('Settings updated successfully.');
-    Object.keys(uploads).forEach((key) => delete uploads[key]);
+    clearUploads();
 }
 </script>
 

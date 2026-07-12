@@ -177,11 +177,21 @@ async function confirmCrop() {
             ? await cropInstance.value.toBlob('image/jpeg', 0.92)
             : await cropInstance.value.toBlob(props.outputSize, 'image/jpeg', 0.92);
 
+        if (!blob) {
+            throw new Error('Export failed');
+        }
+
         const file = new File([blob], 'cropped.jpg', { type: 'image/jpeg' });
         commitFile(file);
         closeCropper();
-    } catch {
-        // keep modal open on failure
+    } catch (error) {
+        console.error('FileCrop confirmCrop failed', error);
+
+        // Fall back to the original file so upload still works if canvas export fails.
+        if (pendingFile.value) {
+            commitFile(pendingFile.value);
+            closeCropper();
+        }
     } finally {
         cropping.value = false;
     }

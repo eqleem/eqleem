@@ -86,14 +86,21 @@ class SavePageThemeOptions
      */
     public function asController(ActionRequest $request): array
     {
-        /** @var array{theme_id: int, options?: array<string, mixed>, uploads?: array<string, UploadedFile|null>} $validated */
+        /** @var array{theme_id: int, options?: array<string, mixed>} $validated */
         $validated = $request->validated();
+
+        /** @var array<string, UploadedFile|null> $uploads */
+        $uploads = $request->file('uploads', []);
+
+        if (! is_array($uploads)) {
+            $uploads = [];
+        }
 
         return $this->handle(
             $this->currentDashboardTenant($request),
             (int) $validated['theme_id'],
             $validated['options'] ?? [],
-            $validated['uploads'] ?? [],
+            $uploads,
         );
     }
 
