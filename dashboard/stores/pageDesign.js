@@ -116,8 +116,24 @@ export const usePageDesignStore = defineStore('pageDesign', {
                 const body = new FormData();
                 body.append('theme_id', String(this.selectedThemeId));
 
+                const uploadKeys = new Set(
+                    Object.entries(uploads)
+                        .filter(([, file]) => file instanceof Blob)
+                        .map(([key]) => key),
+                );
+
                 Object.entries(this.options).forEach(([key, value]) => {
                     if (value === undefined || value === null) {
+                        return;
+                    }
+
+                    // Don't send the old path for fields that have a fresh file upload.
+                    if (uploadKeys.has(key)) {
+                        return;
+                    }
+
+                    // Don't wipe existing images with an empty string.
+                    if (value === '' && (this.optionsSchema?.[key]?.type === 'upload-single-image')) {
                         return;
                     }
 
@@ -127,6 +143,8 @@ export const usePageDesignStore = defineStore('pageDesign', {
                 Object.entries(uploads).forEach(([key, file]) => {
                     if (file instanceof File) {
                         body.append(`uploads[${key}]`, file);
+                    } else if (file instanceof Blob) {
+                        body.append(`uploads[${key}]`, file, `${key}.jpg`);
                     }
                 });
 

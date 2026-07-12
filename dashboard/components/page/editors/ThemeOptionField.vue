@@ -12,18 +12,24 @@ const props = defineProps({
     fieldKey: { type: String, required: true },
     field: { type: Object, required: true },
     modelValue: { default: '' },
+    file: { default: null },
     preview: { type: String, default: null },
     error: { type: String, default: null },
 });
 
-const emit = defineEmits(['update:modelValue', 'upload']);
+const emit = defineEmits(['update:modelValue', 'update:file']);
 
-const uploadFile = ref(null);
 const localPreview = ref(props.preview);
 
 watch(() => props.preview, (value) => {
-    if (!uploadFile.value) {
+    if (!props.file) {
         localPreview.value = value;
+    }
+});
+
+watch(() => props.file, (file) => {
+    if (!file) {
+        localPreview.value = props.preview;
     }
 });
 
@@ -47,9 +53,8 @@ const cropShape = computed(() => {
 });
 const allowShapeSwitch = computed(() => (props.field?.cropShape ?? 'both') === 'both');
 
-function onUploadChange(file) {
-    uploadFile.value = file;
-    emit('upload', { key: props.fieldKey, file });
+function onFileChange(file) {
+    emit('update:file', file);
 }
 </script>
 
@@ -74,7 +79,7 @@ function onUploadChange(file) {
 
     <FileCrop
         v-else-if="type === 'upload-single-image' && cropEnabled"
-        v-model="uploadFile"
+        :model-value="file"
         v-model:preview="localPreview"
         :name="fieldKey"
         :label="label"
@@ -86,12 +91,13 @@ function onUploadChange(file) {
         :output-size="1920"
         preview-class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover"
         :error="error"
-        @change="onUploadChange"
+        @update:model-value="onFileChange"
+        @change="onFileChange"
     />
 
     <FileCrop
         v-else-if="type === 'upload-single-image'"
-        v-model="uploadFile"
+        :model-value="file"
         v-model:preview="localPreview"
         :name="fieldKey"
         :label="label"
@@ -100,7 +106,8 @@ function onUploadChange(file) {
         :enable-crop="false"
         preview-class="mb-2 h-32 w-full max-w-xs rounded-lg object-cover"
         :error="error"
-        @change="onUploadChange"
+        @update:model-value="onFileChange"
+        @change="onFileChange"
     />
 
     <Radio

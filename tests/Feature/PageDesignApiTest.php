@@ -223,3 +223,41 @@ test('owner can save theme options including image upload', function () {
         ->and($saved['logoRadius'])->toBe('rounded-lg')
         ->and($saved['headerImage'])->not->toBeEmpty();
 });
+
+test('saving theme options without a new upload preserves existing header image', function () {
+    Storage::fake(config('media-library.disk_name'));
+
+    [$user, $tenant, $default] = createUserWithThemesForPageDesign();
+
+    $file = UploadedFile::fake()->image('header.jpg', 800, 400);
+
+    $this->actingAs($user)
+        ->post('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'primaryColor' => 'blue',
+            ],
+            'uploads' => [
+                'headerImage' => $file,
+            ],
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful();
+
+    $existing = $tenant->fresh()->themeSettingsFor($default->id)['headerImage'];
+
+    expect($existing)->not->toBeEmpty();
+
+    $this->actingAs($user)
+        ->post('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'primaryColor' => 'teal',
+                'headerImage' => '',
+            ],
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.primaryColor', 'teal')
+        ->assertJsonPath('data.options.headerImage', $existing);
+
+    expect($tenant->fresh()->themeSettingsFor($default->id)['headerImage'])->toBe($existing);
+});

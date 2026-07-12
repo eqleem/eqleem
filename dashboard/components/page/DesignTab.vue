@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, shallowReactive, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import Icon from '../ui/Icon.vue';
 import Badge from '../ui/Badge.vue';
@@ -27,18 +27,28 @@ const {
 
 const activeTab = ref('customize');
 const galleryIndex = ref(0);
-const uploads = reactive({});
+const uploads = shallowReactive({});
 const fieldErrors = reactive({});
 onMounted(() => {
     store.fetchDesign();
 });
 
-watch(selectedTheme, (theme) => {
-    activeTab.value = theme?.is_active ? 'customize' : 'info';
+watch(() => selectedTheme.value?.id, (themeId, previousThemeId) => {
+    if (themeId === previousThemeId) {
+        return;
+    }
+
+    activeTab.value = selectedTheme.value?.is_active ? 'customize' : 'info';
     galleryIndex.value = 0;
     Object.keys(uploads).forEach((key) => delete uploads[key]);
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
 }, { immediate: true });
+
+watch(() => selectedTheme.value?.is_active, (isActive) => {
+    if (selectedTheme.value) {
+        activeTab.value = isActive ? 'customize' : 'info';
+    }
+});
 
 const selectedBorderClass = computed(() => 'border-primary-500   ');
 
@@ -99,15 +109,21 @@ async function setDefaultTheme() {
     }
 }
 
-function onUpload({ key, file }) {
-    uploads[key] = file;
+function onFileUpdate(key, file) {
+    if (file) {
+        uploads[key] = file;
+    } else {
+        delete uploads[key];
+    }
+
     fieldErrors[key] = null;
 }
 
 async function saveOptions() {
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
 
-    const result = await store.saveOptions(uploads);
+    const pendingUploads = { ...uploads };
+    const result = await store.saveOptions(pendingUploads);
 
     if (!result.ok) {
         Object.entries(result.errors ?? {}).forEach(([key, messages]) => {
@@ -416,9 +432,10 @@ async function saveOptions() {
                                     :field-key="key"
                                     :field="field"
                                     v-model="options[key]"
+                                    :file="uploads[key] ?? null"
                                     :preview="optionPreviews[key] ?? null"
                                     :error="fieldErrors[key] ?? null"
-                                    @upload="onUpload"
+                                    @update:file="onFileUpdate(key, $event)"
                                 />
 
                                 <template #footer>

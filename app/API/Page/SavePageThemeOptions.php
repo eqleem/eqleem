@@ -62,7 +62,12 @@ class SavePageThemeOptions
                 if ($upload instanceof UploadedFile) {
                     $merged[$key] = $tenant->uploadThemeOptionMedia($themeId, $key, $upload);
                 } else {
-                    $merged[$key] = data_get($options, $key, data_get($saved, $key, $field['default'] ?? ''));
+                    $incoming = data_get($options, $key);
+                    $fallback = data_get($saved, $key, $field['default'] ?? '');
+
+                    // Preserve the saved media path when the client omits/clears the option
+                    // without sending a replacement upload.
+                    $merged[$key] = filled($incoming) ? $incoming : $fallback;
                 }
 
                 continue;
