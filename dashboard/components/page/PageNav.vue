@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Icon from '../ui/Icon.vue';
-import { fixedTabs, contentTabs, colorBg, colorHover } from '../../data/page.js';
+import { fixedTabs, contentTabs } from '../../data/page.js';
 
 // Mirror Nav.vue: a content type stays lit across its whole section
 // (/manage/:type, /categories, /settings, /detail/:id). Fixed tabs only
@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
             :key="tab.id"
             :to="{ path: '/manage', query: { tab: tab.id } }"
             class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
-            :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : 'bg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
+            :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : 'xbg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
         >
             <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5 shrink-0">
             <span class="hidden truncate lg:block">{{ tab.label }}</span>
@@ -81,22 +81,16 @@ onBeforeUnmount(() => {
             <div class="mx-1 mb-2 border-t border-dotted border-stone-300 max-lg:mb-6"></div>
         </div>
 
-        <!-- Content tabs — same: never stack bg-stone with the active color class -->
         <RouterLink
             v-for="tab in contentTabs"
             :key="tab.id"
             :to="`/manage/${tab.contentType.slug}`"
-            class="flex w-full items-center gap-2 rounded-lg text-start text-sm transition"
-            :class="isTypeActive(tab.contentType.slug) ? `${colorBg[tab.color]} text-stone-900` : `bg-stone-100/50 ${colorHover[tab.color]} text-stone-600 hover:text-stone-800`"
+            class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+            :class="isTypeActive(tab.contentType.slug) ? 'bg-white text-stone-700' : 'xbg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
         >
-            <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2 max-lg:!bg-transparent" :class="colorBg[tab.color]">
-                <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5">
-            </span>
+            <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5 shrink-0">
             <span class="hidden truncate lg:block">{{ tab.label }}</span>
         </RouterLink>
-
-        <!-- Tailwind color safelist -->
-        <div class="hidden bg-blue-50 hover:bg-blue-50 bg-orange-50 hover:bg-orange-50 bg-violet-50 hover:bg-violet-50 bg-yellow-50 hover:bg-yellow-50 bg-green-50 hover:bg-green-50 bg-red-50 hover:bg-red-50 bg-teal-50 hover:bg-teal-50 bg-rose-50 hover:bg-rose-50 bg-amber-50 hover:bg-amber-50 bg-lime-50 hover:bg-lime-50 bg-pink-50 hover:bg-pink-50 bg-stone-50 hover:bg-stone-50" aria-hidden="true"></div>
     </nav>
 
     <Teleport to="body">
@@ -148,7 +142,7 @@ onBeforeUnmount(() => {
                     :key="`slideout-${tab.id}`"
                     :to="{ path: '/manage', query: { tab: tab.id } }"
                     class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
-                    :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : 'bg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
+                    :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : '  text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                     @click="closeMobileNav"
                 >
                     <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
@@ -164,14 +158,12 @@ onBeforeUnmount(() => {
                     v-for="tab in contentTabs"
                     :key="`slideout-${tab.id}`"
                     :to="`/manage/${tab.contentType.slug}`"
-                    class="flex w-full items-center gap-2 rounded-lg text-start text-sm transition"
-                    :class="isTypeActive(tab.contentType.slug) ? `${colorBg[tab.color]} text-stone-900` : `bg-stone-100/50 ${colorHover[tab.color]} text-stone-600 hover:text-stone-800`"
+                    class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+                    :class="isTypeActive(tab.contentType.slug) ? 'bg-white text-stone-700' : 'bg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                     @click="closeMobileNav"
                 >
-                    <span class="flex shrink-0 items-center justify-center rounded-s-lg p-2" >
-                        <img :src="`/${tab.icon}`" :alt="tab.label" class="size-7 lg:size-5">
-                    </span>
-                    <span class="truncate text-base lg:text-sm">{{ tab.label }}</span>
+                    <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
+                    <span class="truncate">{{ tab.label }}</span>
                 </RouterLink>
             </nav>
         </Transition>

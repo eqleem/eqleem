@@ -30,6 +30,7 @@ class PageBlockResource extends JsonResource
             'icon' => $block['icon'] ?? null,
             'icon_url' => $block['icon_url'] ?? null,
             'content_manage_url' => $block['content_manage_url'] ?? null,
+            'content_manage_label' => $block['content_manage_label'] ?? null,
         ];
 
         if (array_key_exists('editor', $block)) {

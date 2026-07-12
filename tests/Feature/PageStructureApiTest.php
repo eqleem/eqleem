@@ -198,6 +198,37 @@ test('cannot delete system blocks', function () {
         ->assertNotFound();
 });
 
+test('block-link section blocks expose content manage url and label', function () {
+    [$user, $tenant] = createUserWithTenantForPageStructure();
+
+    setCurrentTenant($tenant);
+
+    $block = Block::query()->create([
+        'tenant_id' => $tenant->id,
+        'component' => 'tenant::components.block-link',
+        'type' => 'block-link',
+        'title' => 'قسم المدونة',
+        'sort_order' => 99,
+        'is_default' => false,
+        'status' => 'draft',
+        'active' => true,
+        'position' => 'home',
+        'data' => [
+            'link_type' => 'section',
+            'content_type' => 'blog',
+        ],
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful()
+        ->assertJsonFragment([
+            'id' => $block->id,
+            'content_manage_url' => '/dashboard/manage/blog',
+            'content_manage_label' => 'إدارة المدونة',
+        ]);
+});
+
 test('users without a tenant cannot access page structure', function () {
     $user = User::factory()->create(['uuid' => (string) Str::uuid()]);
 

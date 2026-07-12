@@ -17,7 +17,7 @@ onMounted(() => {
             to="/clients"
             class="flex w-16 flex-shrink-0 items-center justify-center group rounded-s-xl bg-pgray-100 text-sm font-medium text-white group-hover:bg-opacity-75"
         >
-        <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-4xl text-primary-400 group-hover:text-primary-500"></iconify-icon>
+            <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-4xl text-primary-500 group-hover:text-primary-600"></iconify-icon>
             <!-- <img class="h-10" :src="'/assets/icons/business/025-team work.svg'" alt=""> -->
         </RouterLink>
 
@@ -27,8 +27,12 @@ onMounted(() => {
                 <p class="mt-1 text-stone-400">
                     <b class="me-1 text-2xl font-bold text-pgray-800">{{ clients.value }}</b>
                     <span class="ms-1 text-xs font-normal" :title="`${clients.growth}% مقارنة بنفس الفترة السابقة`">
-                        <span v-if="clients.growth < 0" dir="ltr" class="text-red-500"> ⬇ {{ clients.growth }}%</span>
-                        <span v-else dir="ltr" class="text-green-500"> ⬆ {{ clients.growth }}%</span>
+                        <span v-if="clients.growth < 0" dir="ltr" class="text-red-500"> 
+                            <iconify-icon icon="solar:arrow-down-bold-duotone" class="text-red-500 text-lg"></iconify-icon>
+                            {{ clients.growth }}%</span>
+                        <span v-else dir="ltr" class="text-green-500"> 
+                            <iconify-icon icon="solar:arrow-up-bold-duotone" class="text-green-500 text-lg"></iconify-icon>
+                            {{ clients.growth }}%</span>
                     </span>
                 </p>
             </RouterLink>

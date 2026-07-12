@@ -58,7 +58,9 @@
                 </h1>
 
                 <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[34rem] font-normal mx-auto">
-                    أنشئ صفحة لأعمالك، تستقبل الزوار، تعرض المنتجات والخدمات،  وتستقبل الطلبات والحجوزات على مدار الساعة.
+                    أنشئ صفحة لأعمالك، تحوّل زوارك إلى عملاء،
+                     تعرض منتجاتك وخدماتك،
+                      وتستقبل الطلبات والحجوزات على مدار الساعة.
                 </p>
 
                 <div class="flex flex-col items-center">

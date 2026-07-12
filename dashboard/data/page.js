@@ -34,18 +34,6 @@ export const allTabs = [
     ...contentTabs,
 ];
 
-// Literal color classes (kept together so Tailwind's JIT keeps them).
-export const colorBg = {
-    blue: 'bg-blue-50', orange: 'bg-orange-50', violet: 'bg-violet-50', yellow: 'bg-yellow-50',
-    green: 'bg-green-50', red: 'bg-red-50', teal: 'bg-teal-50', rose: 'bg-rose-50',
-    amber: 'bg-amber-50', lime: 'bg-lime-50', pink: 'bg-pink-50', gray: 'bg-stone-50',
-};
-export const colorHover = {
-    blue: 'hover:bg-blue-50', orange: 'hover:bg-orange-50', violet: 'hover:bg-violet-50', yellow: 'hover:bg-yellow-50',
-    green: 'hover:bg-green-50', red: 'hover:bg-red-50', teal: 'hover:bg-teal-50', rose: 'hover:bg-rose-50',
-    amber: 'hover:bg-amber-50', lime: 'hover:bg-lime-50', pink: 'hover:bg-pink-50', gray: 'hover:bg-stone-50',
-};
-
 // Structure tab — live data comes from /api/page/structure (see stores/pageStructure.js).
 // Design tab — live data comes from /api/page/design (see stores/pageDesign.js).
 

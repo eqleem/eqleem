@@ -160,8 +160,19 @@ async function onDrop(event, targetId) {
     }
 }
 
-function blockHref(block) {
-    return block.content_manage_url || null;
+function contentManageTo(block) {
+    const url = block.content_manage_url;
+
+    if (!url) {
+        return null;
+    }
+
+    // API returns /dashboard/manage/...; Vue router base is already /dashboard.
+    return url.replace(/^\/dashboard/, '') || null;
+}
+
+function contentManageLabel(block) {
+    return block.content_manage_label || 'إدارة المحتوى';
 }
 </script>
 
@@ -264,24 +275,7 @@ function blockHref(block) {
                                 <Icon name="grip-vertical" class="h-4 w-4" />
                             </button>
 
-                            <a
-                                v-if="block.editable && blockHref(block)"
-                                :href="blockHref(block)"
-                                class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
-                            >
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
-                            </a>
-                            <button
-                                v-else-if="block.editable"
-                                type="button"
-                                class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
-                                @click="openEdit(block.id, block.title)"
-                            >
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
-                            </button>
-                            <div v-else class="flex min-w-0 flex-1 items-center gap-2">
+                            <div class="flex min-w-0 flex-1 items-center gap-2">
                                 <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
                                 <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                             </div>
@@ -295,6 +289,14 @@ function blockHref(block) {
                             >
                                 <Icon name="trash" class="h-4 w-4" />
                             </button>
+
+                            <RouterLink
+                                v-if="contentManageTo(block)"
+                                :to="contentManageTo(block)"
+                                class="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50"
+                            >
+                                {{ contentManageLabel(block) }}
+                            </RouterLink>
 
                             <button
                                 v-if="block.editable"

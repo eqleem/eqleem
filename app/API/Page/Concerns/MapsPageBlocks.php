@@ -20,8 +20,8 @@ trait MapsPageBlocks
 
         return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
             $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
-            $contentManageUrl = $block->type === 'block-link' && is_array($block->data)
-                ? $this->dashboardManageUrlFromData($block->data)
+            $contentManage = $block->type === 'block-link' && is_array($block->data)
+                ? $this->dashboardManageMetaFromData($block->data)
                 : null;
 
             return [
@@ -35,7 +35,8 @@ trait MapsPageBlocks
                 'active' => (bool) $block->active,
                 'icon' => $icon,
                 'icon_url' => asset($icon),
-                'content_manage_url' => $contentManageUrl,
+                'content_manage_url' => $contentManage['url'] ?? null,
+                'content_manage_label' => $contentManage['label'] ?? null,
             ];
         });
     }
@@ -161,8 +162,9 @@ trait MapsPageBlocks
 
     /**
      * @param  array<string, mixed>  $data
+     * @return array{url: string, label: string}|null
      */
-    protected function dashboardManageUrlFromData(array $data): ?string
+    protected function dashboardManageMetaFromData(array $data): ?array
     {
         $params = CtaLink::adminManageParamsFromData($data);
 
@@ -176,11 +178,15 @@ trait MapsPageBlocks
             return null;
         }
 
-        if (filled($params['item'] ?? null)) {
-            return '/dashboard/manage/'.$contentType.'/detail/'.$params['item'];
-        }
+        $name = config("content-types.{$contentType}.name");
+        $url = filled($params['item'] ?? null)
+            ? '/dashboard/manage/'.$contentType.'/detail/'.$params['item']
+            : '/dashboard/manage/'.$contentType;
 
-        return '/dashboard/manage/'.$contentType;
+        return [
+            'url' => $url,
+            'label' => filled($name) ? 'إدارة '.$name : 'إدارة المحتوى',
+        ];
     }
 
     protected function findTenantRootBlock(int $id): ?Block
