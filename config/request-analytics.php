@@ -2,7 +2,7 @@
 
 return [
     'database' => [
-        'connection' => env('REQUEST_ANALYTICS_DB_CONNECTION', null), // Use default connection if null
+        'connection' => env('REQUEST_ANALYTICS_DB_CONNECTION', 'request_analytics'),
         'table' => env('REQUEST_ANALYTICS_TABLE_NAME', 'request_analytics'),
     ],
 
