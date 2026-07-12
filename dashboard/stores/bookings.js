@@ -15,6 +15,9 @@ export const useBookingsStore = defineStore('bookings', {
         loaded: false,
         error: null,
         creating: false,
+        detail: null,
+        detailLoading: false,
+        detailError: null,
     }),
 
     getters: {
@@ -23,6 +26,35 @@ export const useBookingsStore = defineStore('bookings', {
     },
 
     actions: {
+        async fetchBooking(id) {
+            this.detailLoading = true;
+            this.detailError = null;
+
+            try {
+                const payload = await api(`/bookings/${id}`);
+                this.detail = payload?.data ?? payload;
+
+                return this.detail;
+            } catch (error) {
+                this.detail = null;
+                this.detailError = error instanceof ApiError ? error.message : 'Failed to load booking';
+
+                if (error instanceof ApiError && error.status === 401) {
+                    window.location.href = '/login';
+                }
+
+                throw error;
+            } finally {
+                this.detailLoading = false;
+            }
+        },
+
+        clearDetail() {
+            this.detail = null;
+            this.detailError = null;
+            this.detailLoading = false;
+        },
+
         async fetchBookings({ page = 1, search, status } = {}) {
             if (search !== undefined) {
                 this.search = search;
@@ -73,18 +105,65 @@ export const useBookingsStore = defineStore('bookings', {
             }
         },
 
-        async setSearch(search) {
+        async setSearch(search, { fetch = true } = {}) {
             this.search = search;
-            await this.fetchBookings({ page: 1 });
+
+            if (fetch) {
+                await this.fetchBookings({ page: 1 });
+            }
         },
 
-        async setStatus(status) {
+        async setStatus(status, { fetch = true } = {}) {
             this.status = status ?? '';
-            await this.fetchBookings({ page: 1 });
+
+            if (fetch) {
+                await this.fetchBookings({ page: 1 });
+            }
         },
 
         async goToPage(page) {
             await this.fetchBookings({ page });
+        },
+
+        /**
+         * Fetch bookings overlapping a visible calendar range (no store mutation of list items).
+         *
+         * @returns {Promise<object[]>}
+         */
+        async fetchCalendarBookings({ from, to, search, status } = {}) {
+            try {
+                const params = new URLSearchParams();
+                params.set('page', '1');
+                params.set('per_page', '200');
+
+                if (from) {
+                    params.set('from', String(from));
+                }
+
+                if (to) {
+                    params.set('to', String(to));
+                }
+
+                const query = String(search ?? this.search ?? '').trim();
+                if (query) {
+                    params.set('search', query);
+                }
+
+                const statusFilter = String(status ?? this.status ?? '').trim();
+                if (statusFilter) {
+                    params.set('status', statusFilter);
+                }
+
+                const payload = await api(`/bookings?${params.toString()}`);
+
+                return Array.isArray(payload?.data) ? payload.data : [];
+            } catch (error) {
+                if (error instanceof ApiError && error.status === 401) {
+                    window.location.href = '/login';
+                }
+
+                throw error;
+            }
         },
 
         async searchContent(type, search) {

@@ -1,5 +1,6 @@
 <?php
 
+use App\API\Analytics\GetAnalyticsOverview;
 use App\API\Blog\CreateBlogCategory;
 use App\API\Blog\CreateBlogPost;
 use App\API\Blog\DeleteBlogCategory;
@@ -18,6 +19,7 @@ use App\API\Blog\UploadBlogFeaturedImage;
 use App\API\Bookings\CreateBooking;
 use App\API\Bookings\GetBookingAvailability;
 use App\API\Bookings\ListBookings;
+use App\API\Bookings\ShowBooking;
 use App\API\Clients\CreateClient;
 use App\API\Clients\ListClientInvoices;
 use App\API\Clients\ListClientOrders;
@@ -282,6 +284,9 @@ Route::get('/dashboard/charts/{chart}', GetDashboardChart::class)
     ->name('api.dashboard.charts.show')
     ->whereIn('chart', ['orders', 'sales', 'visits', 'clients']);
 
+Route::get('/analytics/overview', GetAnalyticsOverview::class)
+    ->name('api.analytics.overview');
+
 Route::get('/dashboard/welcome', GetWelcomeWidget::class)
     ->name('api.dashboard.welcome');
 
@@ -318,6 +323,10 @@ Route::post('/bookings', CreateBooking::class)
 
 Route::get('/bookings/availability', GetBookingAvailability::class)
     ->name('api.bookings.availability');
+
+Route::get('/bookings/{booking}', ShowBooking::class)
+    ->name('api.bookings.show')
+    ->whereNumber('booking');
 
 Route::get('/orders/content-search', SearchOrderContent::class)
     ->name('api.orders.content-search');

@@ -141,6 +141,8 @@ test('owner can create an order with a service booking item', function () {
     expect($booking->content_id)->toBe($service->id)
         ->and($booking->calendar_id)->toBe($calendar->id)
         ->and($booking->start_at->format('Y-m-d H:i:s'))->toBe('2026-07-06 09:00:00')
+        ->and($booking->order_id)->toBe(Order::query()->value('id'))
+        ->and($orderItem->booking_id)->toBe($booking->id)
         ->and($meta['booking_id'])->toBe($booking->id)
         ->and($meta['type'])->toBe('service');
 });

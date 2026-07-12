@@ -168,15 +168,19 @@ it('creates a mixed ecommerce order with product service and course items', func
 
     expect($booking->content_id)->toBe($service->id)
         ->and($booking->calendar_id)->toBe($calendar->id)
-        ->and($booking->start_at->format('Y-m-d H:i:s'))->toBe('2026-07-06 09:00:00');
+        ->and($booking->start_at->format('Y-m-d H:i:s'))->toBe('2026-07-06 09:00:00')
+        ->and($booking->order_id)->toBe($order->id);
 
-    $serviceOrderItemMeta = json_decode((string) DB::table('order_items')
+    $serviceOrderItem = DB::table('order_items')
         ->where('order_id', $order->id)
         ->where('name', $service->title)
-        ->value('meta'), true);
+        ->first();
+
+    $serviceOrderItemMeta = json_decode((string) $serviceOrderItem->meta, true);
 
     expect($serviceOrderItemMeta['type'])->toBe('service')
-        ->and($serviceOrderItemMeta['booking_id'])->toBe($booking->id);
+        ->and($serviceOrderItemMeta['booking_id'])->toBe($booking->id)
+        ->and($serviceOrderItem->booking_id)->toBe($booking->id);
 
     session(['recent_order_id' => $order->id]);
 

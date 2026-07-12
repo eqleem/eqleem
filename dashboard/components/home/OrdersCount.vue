@@ -12,12 +12,13 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="group relative col-span-1 flex rounded-xl shadow-sm" :class="{ 'animate-pulse opacity-70': loading && !loaded }">
+    <div class="group relative col-span-1 flex rounded-xl shadow-smx" :class="{ 'animate-pulse opacity-70': loading && !loaded }">
         <RouterLink
             to="/orders"
-            class="flex w-16 flex-shrink-0 items-center justify-center rounded-s-xl bg-pgray-100 text-sm font-medium text-white group-hover:bg-opacity-75"
+            class="flex w-16 flex-shrink-0 items-center justify-center group rounded-s-xl bg-pgray-100 text-sm font-medium text-white group-hover:bg-opacity-75"
         >
-            <img class="h-10" :src="'/assets/icons/business/023-email.svg'" alt="">
+        <iconify-icon icon="solar:cart-large-2-bold-duotone" class="text-4xl text-primary-400 group-hover:text-primary-500"></iconify-icon>
+            <!-- <img class="h-10" :src="'/assets/icons/business/023-email.svg'" alt=""> -->
         </RouterLink>
 
         <div class="flex flex-1 items-center justify-between truncate rounded-e-xl border-stone-200 bg-white">

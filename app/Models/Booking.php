@@ -13,6 +13,7 @@ class Booking extends Model
     protected $fillable = [
         'tenant_id',
         'client_id',
+        'order_id',
         'content_id',
         'calendar_id',
         'start_at',
@@ -48,6 +49,11 @@ class Booking extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     /**

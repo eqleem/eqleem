@@ -28,8 +28,328 @@
         </div>
     </nav>
 
+    {{-- Showcase hero: centered headline + phone + floating capabilities --}}
+    <section class="relative w-full overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-20 lg:pt-36 lg:pb-24"  >
+        <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+            <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-[min(90vw,42rem)] h-[min(90vw,42rem)] rounded-full bg-[radial-gradient(circle_at_center,rgba(227,95,38,0.08)_0%,transparent_68%)]"></div>
+            <div class="absolute bottom-[8%] right-[12%] size-56 rounded-full bg-orange-200/20 blur-3xl"></div>
+            <div class="absolute top-[30%] left-[8%] size-48 rounded-full bg-stone-300/40 blur-3xl"></div>
+        </div>
 
-    <section class="relative w-full px-4 sm:px-6 flex items-center min-h-[calc(100vh-9rem)] pb-12 pt-32 lg:py-16 overflow-x-hidden">
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center mb-24">
+            <div class="text-xs w-auto flex-shrink bg-stone-300/80 text-stone-600 px-4 py-1.5 rounded-full tracking-widest inline-flex items-center gap-2 backdrop-blur-sm">
+                <span class="size-3 rounded-full bg-[#E35F26] animate-pulse -mx-1 me-1"></span>
+                جاهزة للنشر خلال دقائق
+            </div>
+
+            <div class="flex flex-col items-center gap-7 mt-6">
+                <h1 class="-mt-2 text-[3.25rem] md:text-[4rem] 2xl:text-[4.5rem] lg:leading-[1.4] leading-[1.5] tracking-tighter text-[#111111]">
+                    <span class="hero-line block">
+                        ابنِ
+                        <span class="relative inline-block text-[#C94309]">
+                            صفحة أعمال
+                            <svg class="absolute -bottom-1 lg:-bottom-4 left-0 w-full" viewBox="0 0 120 12" fill="none" aria-hidden="true">
+                                <path id="underline-showcase" d="M2 10 C 60 3, 80 3, 117 5" stroke="#C94309" stroke-width="2.5" stroke-linecap="round" style="stroke-dashoffset: 0px; stroke-dasharray: 114.391;"></path>
+                            </svg>
+                        </span>
+                    </span>
+                    <b class="font-bold"> تبيع عنّك،</b>
+                    بدقائق.
+                </h1>
+
+                <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[34rem] font-normal mx-auto">
+                    أنشئ صفحة لأعمالك، تستقبل الزوار، تجيب عن أسئلتهم، تعرض المنتجات والخدمات، وتستقبل الطلبات والحجوزات على مدار الساعة.
+                </p>
+
+                <div class="flex flex-col items-center">
+                    <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
+                        أنشئ صفحتي الآن -  مجاناً
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+
+                    <p class="mt-5 text-xs lg:text-sm text-stone-400 font-normal flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                        <span class="inline-flex items-center gap-0.5">
+                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            مجانًا
+                        </span>
+                        <span class="inline-flex items-center gap-0.5">
+                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            بدون خبرة تقنية
+                        </span>
+                        <span class="inline-flex items-center gap-0.5">
+                            <iconify-icon icon="solar:check-circle-bold" stroke-width="1.5" class="text-green-500 text-base"></iconify-icon>
+                            جاهزة خلال دقائق
+                        </span>
+                    </p>
+                    <div class="mt-6 flex items-center justify-center gap-4">
+                        <div class="flex x-space-x-3">
+                            <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/frst.webp') }}" alt="User avatar">
+                            <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/baderatg.jpg') }}" alt="User avatar">
+                            <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/crisp-burger.webp') }}" alt="User avatar">
+                            <img class="size-12 -mx-2 rounded-full border-2 border-stone-200 object-cover bg-stone-500/20 rounded-fulll p-1" src="{{ asset('assets/images/clients/aswar.avif') }}" alt="User avatar">
+                        </div>
+                        <div class="flex flex-col items-start">
+                            <div class="flex items-center gap-1 text-yellow-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" aria-hidden="true" class="lucide lucide-star w-4 h-4 fill-current"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                            </div>
+                            <span class="text-xs font-medium text-stone-500 mt-1">
+                                <span class="text-gray-900">4.9/5</span> تقييمات أصحاب الأعمال
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Stage: phone + orbiting capability cards --}}
+        <div class="relative mx-auto mt-12 sm:mt-14 lg:mt-16 w-full max-w-5xl px-2 sm:px-6 min-h-[34rem] sm:min-h-[38rem] lg:min-h-[42rem]">
+            {{-- Soft ground glow under phone --}}
+            <div class="absolute left-1/2 bottom-[6%] -translate-x-1/2 w-[70%] max-w-md h-24 rounded-full bg-stone-400/15 blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+            {{-- Center phone --}}
+            <div class="absolute top-1/2 left-1/2 z-10 w-[17.5rem] sm:w-[18.5rem] md:w-[19.5rem] -translate-x-1/2 -translate-y-[52%]">
+                <div class="relative transition-transform duration-700 ease-out hover:-translate-y-2">
+                    <div class="absolute -inset-8 rounded-[3rem] bg-stone-400/10 blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+                    <div class="relative rounded-[2.75rem] bg-gradient-to-b from-zinc-100 via-zinc-700 to-zinc-950 p-[0.48rem] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.28)] animate-[showcase-float_7s_ease-in-out_infinite]">
+                        <div class="absolute inset-[1px] rounded-[2.65rem] bg-zinc-900 pointer-events-none" aria-hidden="true"></div>
+
+                        <span class="absolute -start-[3px] top-[22%] h-7 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
+                        <span class="absolute -start-[3px] top-[32%] h-12 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
+                        <span class="absolute -end-[3px] top-[28%] h-14 w-[3px] rounded-e-md bg-zinc-500" aria-hidden="true"></span>
+
+                        <div class="relative overflow-hidden rounded-[2.3rem] bg-white aspect-[9/17.2] ring-1 ring-white/15">
+                            <div class="absolute top-3 left-1/2 -translate-x-1/2 z-30 h-5 w-[30%] max-w-[6.25rem] rounded-full bg-zinc-950 shadow-inner" aria-hidden="true"></div>
+
+                            {{-- Mini business page — full bleed (same as lower hero) --}}
+                            <div class="absolute inset-0 overflow-hidden pt-9 px-3.5 pb-3 flex flex-col bg-white" dir="rtl">
+                                {{-- Profile --}}
+                                <div class="flex flex-col items-center text-center shrink-0">
+                                    <div class="relative mb-2">
+                                        <div class="size-[3.75rem] rounded-full overflow-hidden bg-stone-100 ring-[2.5px] ring-primary-500/15 shadow-sm">
+                                            <img
+                                                src="{{ asset('assets/images/clients/aswar.avif') }}"
+                                                alt=""
+                                                class="size-full object-cover"
+                                                loading="eager"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                        <span class="absolute -bottom-0.5 -end-0.5 size-[1.15rem] rounded-full bg-primary-500 text-white flex items-center justify-center ring-[1.5px] ring-white">
+                                            <iconify-icon icon="solar:verified-check-bold" class="text-[10px]"></iconify-icon>
+                                        </span>
+                                    </div>
+
+                                    <h3 class="text-[0.9rem] font-bold text-zinc-900 leading-none tracking-tight">استوديو أُفق</h3>
+                                    <p class="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-400 leading-none">
+                                        <iconify-icon icon="solar:map-point-bold" class="text-[11px] text-primary-500"></iconify-icon>
+                                        الرياض
+                                    </p>
+                                    <p class="mt-2 text-[10px] leading-snug text-zinc-500">
+                                        نصمّم وننفّذ مساحات أنيقة وعملية — ديكور، تشطيب، وتركيب باحتراف.
+                                    </p>
+
+                                    {{-- Socials --}}
+                                    <div class="mt-2.5 flex items-center justify-center gap-1.5">
+                                        @foreach ([
+                                            'mdi:instagram',
+                                            'mdi:snapchat',
+                                            'mdi:youtube',
+                                            'ri:twitter-x-fill',
+                                        ] as $social)
+                                            <a href="{{ route('auth.register') }}" wire:navigate class="size-7 rounded-lg bg-stone-100 text-zinc-500 hover:bg-stone-200 hover:text-zinc-800 flex items-center justify-center transition-colors" aria-label="سوشال">
+                                                <iconify-icon icon="{{ $social }}" class="text-[13px]"></iconify-icon>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- CTAs --}}
+                                <div class="mt-3 grid grid-cols-2 gap-1.5 shrink-0">
+                                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] font-semibold py-2.5 px-1.5 shadow-sm shadow-primary-500/20 transition-colors">
+                                        <iconify-icon icon="hugeicons:calendar-03" class="text-xs"></iconify-icon>
+                                        حجز موعد
+                                    </a>
+                                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold py-2.5 px-1.5 transition-colors">
+                                        <iconify-icon icon="mdi:whatsapp" class="text-sm"></iconify-icon>
+                                        تواصل الآن
+                                    </a>
+                                </div>
+
+                                {{-- Section links --}}
+                                <div class="mt-2.5 space-y-1 flex-1 min-h-0">
+                                    @foreach ([
+                                        ['icon' => 'hugeicons:shopping-bag-01', 'title' => 'المتجر', 'desc' => 'منتجات وتشطيبات جاهزة'],
+                                        ['icon' => 'hugeicons:note-edit', 'title' => 'الخدمات', 'desc' => 'تصميم · تنفيذ · استشارة'],
+                                        ['icon' => 'hugeicons:image-01', 'title' => 'أعمالنا', 'desc' => 'معرض مشاريع منفّذة'],
+                                        ['icon' => 'hugeicons:package-01', 'title' => 'الباقات', 'desc' => 'باقات تناسب ميزانيتك'],
+                                    ] as $link)
+                                        <a href="{{ route('auth.register') }}" wire:navigate class="group flex items-center gap-2 rounded-xl bg-stone-50 hover:bg-stone-100 px-2 py-1.5 transition-colors">
+                                            <span class="size-7 rounded-lg bg-primary-500 text-white flex items-center justify-center shrink-0">
+                                                <iconify-icon icon="{{ $link['icon'] }}" class="text-xs"></iconify-icon>
+                                            </span>
+                                            <span class="min-w-0 flex-1 text-start">
+                                                <span class="block text-[11px] font-semibold text-zinc-900 leading-tight">{{ $link['title'] }}</span>
+                                                <span class="block text-[9px] text-zinc-400 truncate leading-tight mt-0.5">{{ $link['desc'] }}</span>
+                                            </span>
+                                            <iconify-icon icon="solar:alt-arrow-left-linear" class="text-zinc-300 text-sm shrink-0 group-hover:text-zinc-500 transition-colors"></iconify-icon>
+                                        </a>
+                                    @endforeach
+                                </div>
+
+                                {{-- Soft conversion cue --}}
+                                <a href="{{ route('auth.register') }}" wire:navigate class="mt-1.5 shrink-0 inline-flex items-center justify-center gap-1 text-[9px] font-medium text-primary-600 hover:text-primary-700">
+                                    أنشئ صفحتك مثل هذه مجاناً
+                                    <iconify-icon icon="solar:arrow-left-linear" class="text-[10px]"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Orbit: top-start — new order (from old hero) --}}
+            <div class="absolute top-[2%] start-[2%] sm:start-[6%] lg:start-[4%] z-20 scale-75 origin-top-start sm:scale-100 transition-transform">
+                <div
+                    class="w-[12rem] sm:w-[14rem] rounded-2xl bg-sky-50/95 backdrop-blur-xl border border-sky-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(14,165,233,0.22)] animate-[showcase-float_5.5s_ease-in-out_infinite]"
+                    style="animation-delay: -1.1s;"
+                >
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-sky-700/80">
+                            <span class="relative flex size-2">
+                                <span class="absolute inline-flex size-full animate-ping rounded-full bg-sky-400/70 opacity-75"></span>
+                                <span class="relative inline-flex size-2 rounded-full bg-sky-400"></span>
+                            </span>
+                            طلب جديد
+                        </span>
+                        <span class="text-[10px] text-sky-600/50">الآن</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="size-11 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                            <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
+                        </div>
+                        <div class="min-w-0 text-start">
+                            <p class="text-sm font-semibold text-sky-950/80 truncate">باقة التصميم</p>
+                            <p class="text-xs text-sky-700/55 mt-0.5 tabular-nums">٤٩٠ ر.س · مدفوع</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Keep: shipping status pill (mid-start) --}}
+            <div class="absolute top-[28%] start-0 sm:start-[2%] lg:start-0 z-20 hidden md:block animate-[showcase-float_6.4s_ease-in-out_infinite]" style="animation-delay: -2.4s;">
+                <div class="inline-flex items-center gap-2 rounded-full bg-sky-50 text-sky-800 px-3.5 py-2 shadow-[0_10px_28px_-10px_rgba(14,165,233,0.35)] border border-sky-100/80">
+                    <iconify-icon icon="solar:delivery-bold" class="text-base text-sky-600"></iconify-icon>
+                    <span class="text-xs font-medium">الشحنة في الطريق</span>
+                </div>
+            </div>
+
+            {{-- Orbit: bottom-start — visitors (from old hero) --}}
+            <div class="absolute bottom-[8%] start-[1%] sm:start-[5%] lg:start-[2%] z-20 scale-75 origin-bottom-start sm:scale-100 transition-transform">
+                <div
+                    class="rounded-2xl bg-teal-50/95 backdrop-blur-xl border border-teal-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(20,184,166,0.2)] animate-[showcase-float_6.5s_ease-in-out_infinite]"
+                    style="animation-delay: -3.2s;"
+                >
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                            <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
+                        </div>
+                        <div class="text-start">
+                            <p class="text-[11px] text-teal-700/50 leading-none">زوار الآن</p>
+                            <p class="text-sm font-semibold text-teal-950/80 mt-1 tabular-nums">١٢+</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Orbit: top-end — rating (from old hero) --}}
+            <div class="absolute top-[4%] end-[1%] sm:end-[5%] lg:end-[3%] z-20 scale-75 origin-top-end sm:scale-100 transition-transform">
+                <div
+                    class="rounded-2xl bg-amber-50/95 backdrop-blur-xl border border-amber-100/80 px-4 py-3.5 shadow-[0_16px_40px_-18px_rgba(245,158,11,0.2)] animate-[showcase-float_6.2s_ease-in-out_infinite]"
+                    style="animation-delay: -2.6s;"
+                >
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                            <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
+                        </div>
+                        <div class="text-start">
+                            <p class="text-base font-semibold leading-none text-amber-950/80">٤.٩</p>
+                            <p class="text-[11px] text-amber-700/55 mt-1.5">تقييم العملاء</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Keep: payment success (mid-end) --}}
+            <div class="absolute top-[32%] end-0 sm:end-[1%] lg:end-0 z-20 hidden md:block animate-[showcase-float_5.2s_ease-in-out_infinite]" style="animation-delay: -1.8s;">
+                <div class="flex items-center gap-2.5 rounded-[1.15rem] bg-white px-3.5 py-2.5 shadow-[0_12px_36px_-12px_rgba(0,0,0,0.18)] border border-black/[0.03]">
+                    <span class="size-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-lg"></iconify-icon>
+                    </span>
+                    <div class="text-start pe-1">
+                        <p class="text-xs font-semibold text-zinc-900">تم الدفع بنجاح</p>
+                        <p class="text-[10px] text-zinc-400 mt-0.5 tabular-nums">عبر مدى · ٣٢٠ ر.س</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Orbit: mid-end — booking (from old hero) --}}
+            <div class="absolute top-[48%] end-[1%] sm:end-[4%] lg:end-[6%] z-20 scale-75 origin-right sm:scale-100 transition-transform">
+                <div
+                    class="w-[12rem] sm:w-[13.5rem] rounded-2xl bg-orange-50/95 backdrop-blur-xl border border-orange-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(249,115,22,0.18)] animate-[showcase-float_5.8s_ease-in-out_infinite]"
+                    style="animation-delay: -0.4s;"
+                >
+                    <div class="flex items-start gap-3">
+                        <div class="size-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                            <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
+                        </div>
+                        <div class="min-w-0 text-start">
+                            <p class="text-sm font-semibold text-orange-950/80">حجز موعد</p>
+                            <p class="text-xs text-orange-700/55 mt-0.5">غداً · ٤:٣٠ م</p>
+                            <span class="mt-2 inline-flex items-center rounded-full bg-orange-100/80 text-orange-700/80 px-2 py-0.5 text-[10px] font-medium">مؤكد</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Orbit: bottom-end — contact (from old hero) --}}
+            <div class="absolute bottom-[6%] end-[4%] sm:end-[10%] lg:end-[14%] z-20 scale-75 origin-bottom-end sm:scale-100 transition-transform">
+                <div
+                    class="rounded-2xl bg-emerald-50/95 backdrop-blur-xl border border-emerald-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(16,185,129,0.2)] animate-[showcase-float_5.2s_ease-in-out_infinite]"
+                    style="animation-delay: -1.8s;"
+                >
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                            <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                        </div>
+                        <div class="text-start">
+                            <p class="text-sm font-semibold text-emerald-950/80">تواصل مباشر</p>
+                            <p class="text-[11px] text-emerald-700/50 mt-0.5">واتساب · رد فوري</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes showcase-float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            @media (max-width: 639px) {
+                @keyframes showcase-float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-6px); }
+                }
+            }
+        </style>
+    </section>
+
+    <section class="hidden relative w-full px-4 sm:px-6 flex items-center min-h-[calc(100vh-9rem)] pb-12 pt-16 lg:py-16 overflow-x-hidden">
         <div class="glow-bg top-[8%] left-[50%] -translate-x-[50%]"></div>
 
         <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 lg:gap-6 xl:gap-10 items-center">
@@ -102,223 +422,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Visual stage --}}
-            <div class="lg:col-span-6 order-2 flex justify-center lg:justify-end mt-10 lg:mt-0">
-                <div class="relative w-full max-w-[30rem] sm:max-w-[34rem] mx-auto lg:ms-auto lg:me-0 min-h-[38rem] sm:min-h-[40rem] lg:min-h-[42rem]">
-                    {{-- Atmosphere --}}
-                    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle_at_center,rgba(201,67,9,0.12)_0%,rgba(255,255,255,0.35)_42%,transparent_72%)]"></div>
-                        <div class="absolute top-[12%] left-[18%] size-40 rounded-full bg-white/50 blur-3xl"></div>
-                        <div class="absolute bottom-[10%] right-[12%] size-48 rounded-full bg-orange-200/25 blur-3xl"></div>
-                        <div class="hidden sm:block absolute inset-[6%] rounded-full border border-black/[0.04]"></div>
-                        <div class="hidden sm:block absolute inset-[14%] rounded-full border border-dashed border-black/[0.055]"></div>
-                    </div>
-
-                    {{-- Phone --}}
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[54%] z-10 w-[17.5rem] sm:w-[18.5rem] md:w-[19.5rem] lg:w-[19rem] xl:w-[20.5rem]">
-                        <div class="relative transition-transform duration-700 ease-out hover:-translate-y-2">
-                            <div class="absolute -inset-8 rounded-[3rem] bg-stone-400/10 blur-2xl pointer-events-none" aria-hidden="true"></div>
-
-                            <div class="relative rounded-[2.75rem] bg-gradient-to-b from-zinc-100 via-zinc-700 to-zinc-950 p-[0.48rem] shadow-[0_28px_60px_-24px_rgba(0,0,0,0.28)] animate-[home-float_7s_ease-in-out_infinite]">
-                                <div class="absolute inset-[1px] rounded-[2.65rem] bg-zinc-900 pointer-events-none" aria-hidden="true"></div>
-
-                                <span class="absolute -start-[3px] top-[22%] h-7 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
-                                <span class="absolute -start-[3px] top-[32%] h-12 w-[3px] rounded-s-md bg-zinc-500" aria-hidden="true"></span>
-                                <span class="absolute -end-[3px] top-[28%] h-14 w-[3px] rounded-e-md bg-zinc-500" aria-hidden="true"></span>
-
-                                <div class="relative overflow-hidden rounded-[2.3rem] bg-white aspect-[9/17.2] ring-1 ring-white/15">
-                                    <div class="absolute top-3 left-1/2 -translate-x-1/2 z-30 h-5 w-[30%] max-w-[6.25rem] rounded-full bg-zinc-950 shadow-inner" aria-hidden="true"></div>
-
-                                    {{-- Mini business page — full bleed --}}
-                                    <div class="absolute inset-0 overflow-hidden pt-9 px-3.5 pb-3 flex flex-col bg-white" dir="rtl">
-                                        {{-- Profile --}}
-                                        <div class="flex flex-col items-center text-center shrink-0">
-                                            <div class="relative mb-2">
-                                                <div class="size-[3.75rem] rounded-full overflow-hidden bg-stone-100 ring-[2.5px] ring-primary-500/15 shadow-sm">
-                                                    <img
-                                                        src="{{ asset('assets/images/clients/aswar.avif') }}"
-                                                        alt=""
-                                                        class="size-full object-cover"
-                                                        loading="eager"
-                                                        decoding="async"
-                                                    />
-                                                </div>
-                                                <span class="absolute -bottom-0.5 -end-0.5 size-[1.15rem] rounded-full bg-primary-500 text-white flex items-center justify-center ring-[1.5px] ring-white">
-                                                    <iconify-icon icon="solar:verified-check-bold" class="text-[10px]"></iconify-icon>
-                                                </span>
-                                            </div>
-
-                                            <h3 class="text-[0.9rem] font-bold text-zinc-900 leading-none tracking-tight">استوديو أُفق</h3>
-                                            <p class="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-400 leading-none">
-                                                <iconify-icon icon="solar:map-point-bold" class="text-[11px] text-primary-500"></iconify-icon>
-                                                الرياض
-                                            </p>
-                                            <p class="mt-2 text-[10px] leading-snug text-zinc-500">
-                                                نصمّم وننفّذ مساحات أنيقة وعملية — ديكور، تشطيب، وتركيب باحتراف.
-                                            </p>
-
-                                            {{-- Socials --}}
-                                            <div class="mt-2.5 flex items-center justify-center gap-1.5">
-                                                @foreach ([
-                                                    'mdi:instagram',
-                                                    'mdi:snapchat',
-                                                    'mdi:youtube',
-                                                    'ri:twitter-x-fill',
-                                                ] as $social)
-                                                    <a href="{{ route('auth.register') }}" wire:navigate class="size-7 rounded-lg bg-stone-100 text-zinc-500 hover:bg-stone-200 hover:text-zinc-800 flex items-center justify-center transition-colors" aria-label="سوشال">
-                                                        <iconify-icon icon="{{ $social }}" class="text-[13px]"></iconify-icon>
-                                                    </a>
-                                                @endforeach
-                                            </div>
-                                        </div>
-
-                                        {{-- CTAs --}}
-                                        <div class="mt-3 grid grid-cols-2 gap-1.5 shrink-0">
-                                            <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] font-semibold py-2.5 px-1.5 shadow-sm shadow-primary-500/20 transition-colors">
-                                                <iconify-icon icon="hugeicons:calendar-03" class="text-xs"></iconify-icon>
-                                                حجز موعد
-                                            </a>
-                                            <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold py-2.5 px-1.5 transition-colors">
-                                                <iconify-icon icon="mdi:whatsapp" class="text-sm"></iconify-icon>
-                                                تواصل الآن
-                                            </a>
-                                        </div>
-
-                                        {{-- Section links --}}
-                                        <div class="mt-2.5 space-y-1 flex-1 min-h-0">
-                                            @foreach ([
-                                                ['icon' => 'hugeicons:shopping-bag-01', 'title' => 'المتجر', 'desc' => 'منتجات وتشطيبات جاهزة'],
-                                                ['icon' => 'hugeicons:note-edit', 'title' => 'الخدمات', 'desc' => 'تصميم · تنفيذ · استشارة'],
-                                                ['icon' => 'hugeicons:image-01', 'title' => 'أعمالنا', 'desc' => 'معرض مشاريع منفّذة'],
-                                                ['icon' => 'hugeicons:package-01', 'title' => 'الباقات', 'desc' => 'باقات تناسب ميزانيتك'],
-                                            ] as $link)
-                                                <a href="{{ route('auth.register') }}" wire:navigate class="group flex items-center gap-2 rounded-xl bg-stone-50 hover:bg-stone-100 px-2 py-1.5 transition-colors">
-                                                    <span class="size-7 rounded-lg bg-primary-500 text-white flex items-center justify-center shrink-0">
-                                                        <iconify-icon icon="{{ $link['icon'] }}" class="text-xs"></iconify-icon>
-                                                    </span>
-                                                    <span class="min-w-0 flex-1 text-start">
-                                                        <span class="block text-[11px] font-semibold text-zinc-900 leading-tight">{{ $link['title'] }}</span>
-                                                        <span class="block text-[9px] text-zinc-400 truncate leading-tight mt-0.5">{{ $link['desc'] }}</span>
-                                                    </span>
-                                                    <iconify-icon icon="solar:alt-arrow-left-linear" class="text-zinc-300 text-sm shrink-0 group-hover:text-zinc-500 transition-colors"></iconify-icon>
-                                                </a>
-                                            @endforeach
-                                        </div>
-
-                                        {{-- Soft conversion cue --}}
-                                        <a href="{{ route('auth.register') }}" wire:navigate class="mt-1.5 shrink-0 inline-flex items-center justify-center gap-1 text-[9px] font-medium text-primary-600 hover:text-primary-700">
-                                            أنشئ صفحتك مثل هذه مجاناً
-                                            <iconify-icon icon="solar:arrow-left-linear" class="text-[10px]"></iconify-icon>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: top-start — new order (soft sky) --}}
-                    <div class="absolute top-2 start-0 z-20 scale-50 origin-top-start sm:scale-100 transition-transform">
-                        <div
-                            class="w-[12rem] sm:w-[14rem] rounded-2xl bg-sky-50/95 backdrop-blur-xl border border-sky-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(14,165,233,0.22)] animate-[home-float_5.5s_ease-in-out_infinite]"
-                            style="animation-delay: -1.1s;"
-                        >
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-sky-700/80">
-                                    <span class="relative flex size-2">
-                                        <span class="absolute inline-flex size-full animate-ping rounded-full bg-sky-400/70 opacity-75"></span>
-                                        <span class="relative inline-flex size-2 rounded-full bg-sky-400"></span>
-                                    </span>
-                                    طلب جديد
-                                </span>
-                                <span class="text-[10px] text-sky-600/50">الآن</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="size-11 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:shopping-bag-01" class="text-xl"></iconify-icon>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-sky-950/80 truncate">باقة التصميم</p>
-                                    <p class="text-xs text-sky-700/55 mt-0.5 tabular-nums">٤٩٠ ر.س · مدفوع</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: top-end — rating (soft amber) --}}
-                    <div class="absolute top-6 end-0 z-20 scale-50 origin-top-end sm:scale-100 transition-transform">
-                        <div
-                            class="rounded-2xl bg-amber-50/95 backdrop-blur-xl border border-amber-100/80 px-4 py-3.5 shadow-[0_16px_40px_-18px_rgba(245,158,11,0.2)] animate-[home-float_6.2s_ease-in-out_infinite]"
-                            style="animation-delay: -2.6s;"
-                        >
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-                                    <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
-                                </div>
-                                <div>
-                                    <p class="text-base font-semibold leading-none text-amber-950/80">٤.٩</p>
-                                    <p class="text-[11px] text-amber-700/55 mt-1.5">تقييم العملاء</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: mid-end — booking (soft peach) --}}
-                    <div class="absolute top-[48%] end-0 z-20 scale-50 origin-right sm:scale-100 transition-transform">
-                        <div
-                            class="w-[12rem] sm:w-[13.5rem] rounded-2xl bg-orange-50/95 backdrop-blur-xl border border-orange-100/80 p-3.5 sm:p-4 shadow-[0_16px_40px_-18px_rgba(249,115,22,0.18)] animate-[home-float_5.8s_ease-in-out_infinite]"
-                            style="animation-delay: -0.4s;"
-                        >
-                            <div class="flex items-start gap-3">
-                                <div class="size-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:calendar-03" class="text-xl"></iconify-icon>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-orange-950/80">حجز موعد</p>
-                                    <p class="text-xs text-orange-700/55 mt-0.5">غداً · ٤:٣٠ م</p>
-                                    <span class="mt-2 inline-flex items-center rounded-full bg-orange-100/80 text-orange-700/80 px-2 py-0.5 text-[10px] font-medium">مؤكد</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: bottom-start — visitors (soft teal) --}}
-                    <div class="absolute bottom-4 start-0 z-20 scale-50 origin-bottom-start sm:scale-100 transition-transform">
-                        <div
-                            class="rounded-2xl bg-teal-50/95 backdrop-blur-xl border border-teal-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(20,184,166,0.2)] animate-[home-float_6.5s_ease-in-out_infinite]"
-                            style="animation-delay: -3.2s;"
-                        >
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="hugeicons:analytics-up" class="text-lg"></iconify-icon>
-                                </div>
-                                <div>
-                                    <p class="text-[11px] text-teal-700/50 leading-none">زوار الآن</p>
-                                    <p class="text-sm font-semibold text-teal-950/80 mt-1 tabular-nums">١٢+</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Orbit: bottom-end — contact (soft sage) --}}
-                    <div class="absolute bottom-8 end-0 z-20 scale-50 origin-bottom-end sm:scale-100 transition-transform">
-                        <div
-                            class="rounded-2xl bg-emerald-50/95 backdrop-blur-xl border border-emerald-100/80 px-4 py-3 shadow-[0_16px_40px_-18px_rgba(16,185,129,0.2)] animate-[home-float_5.2s_ease-in-out_infinite]"
-                            style="animation-delay: -1.8s;"
-                        >
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                                    <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-emerald-950/80">تواصل مباشر</p>
-                                    <p class="text-[11px] text-emerald-700/50 mt-0.5">واتساب · رد فوري</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ 
         </div>
 
         <style>

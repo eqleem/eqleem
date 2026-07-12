@@ -1116,6 +1116,7 @@ new class extends Livewire\Component {
                     $booking = Booking::query()->create([
                         'tenant_id' => $tenantId,
                         'client_id' => $this->client_id,
+                        'order_id' => $order->id,
                         'content_id' => $item['product_id'],
                         'calendar_id' => $item['calendar_id'],
                         'start_at' => $item['booking_start_at'],
@@ -1134,6 +1135,7 @@ new class extends Livewire\Component {
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
                     'product_id' => $item['type'] === 'other' ? null : $item['product_id'],
+                    'booking_id' => $bookingId,
                     'name' => $item['name'],
                     'qty' => $qty,
                     'unit_price' => $unitPrice,

@@ -102,7 +102,7 @@ class OrderResource extends JsonResource
         $rows = DB::table('order_items')
             ->where('order_id', $order->id)
             ->orderBy('id')
-            ->get(['id', 'name', 'qty', 'unit_price', 'discount_total', 'line_total', 'sku', 'meta']);
+            ->get(['id', 'name', 'qty', 'unit_price', 'discount_total', 'line_total', 'sku', 'booking_id', 'meta']);
 
         $metas = $rows->mapWithKeys(function (object $item): array {
             $meta = is_string($item->meta ?? null)
@@ -112,15 +112,16 @@ class OrderResource extends JsonResource
             return [$item->id => $meta];
         });
 
-        [$bookings, $calendars] = $this->loadBookingLookups($metas);
+        $bookingIds = $rows->pluck('booking_id')->filter()->unique()->values();
+
+        [$bookings, $calendars] = $this->loadBookingLookups($metas, $bookingIds);
 
         return $rows->map(function (object $item) use ($metas, $bookings, $calendars): array {
             $meta = $metas->get($item->id, []);
             $type = (string) ($meta['type'] ?? 'other');
             $isBooking = Order::isBookingItemType($type);
-            $booking = filled($meta['booking_id'] ?? null)
-                ? $bookings->get((int) $meta['booking_id'])
-                : null;
+            $bookingId = filled($item->booking_id ?? null) ? (int) $item->booking_id : null;
+            $booking = $bookingId ? $bookings->get($bookingId) : null;
 
             $startAt = $booking?->start_at
                 ?? (filled($meta['booking_start_at'] ?? null) ? Carbon::parse($meta['booking_start_at']) : null);
@@ -179,12 +180,11 @@ class OrderResource extends JsonResource
 
     /**
      * @param  Collection<int, array<string, mixed>>  $metas
+     * @param  Collection<int, mixed>  $bookingIds
      * @return array{0: Collection<int, Booking>, 1: Collection<int, Calendar>}
      */
-    private function loadBookingLookups(Collection $metas): array
+    private function loadBookingLookups(Collection $metas, Collection $bookingIds): array
     {
-        $bookingIds = $metas->pluck('booking_id')->filter()->unique()->values();
-
         $bookings = $bookingIds->isEmpty()
             ? collect()
             : Booking::query()

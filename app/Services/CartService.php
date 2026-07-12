@@ -644,6 +644,7 @@ class CartService
                     $booking = Booking::query()->create([
                         'tenant_id' => $tenantId,
                         'client_id' => $client->id,
+                        'order_id' => $order->id,
                         'content_id' => $productId,
                         'calendar_id' => $item->calendarId(),
                         'start_at' => $item->bookingStartAt(),
@@ -666,6 +667,7 @@ class CartService
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
                     'product_id' => $productId,
+                    'booking_id' => $bookingId,
                     'name' => $item->title(),
                     'qty' => $item->quantity,
                     'unit_price' => $item->unit_price,

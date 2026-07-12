@@ -122,7 +122,7 @@ test('owner can create a service booking with linked order', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.status', 'confirmed')
         ->assertJsonPath('data.content.title', 'خدمة تصوير')
-        ->assertJsonPath('data.client', 'محمد العتيبي')
+        ->assertJsonPath('data.client.name', 'محمد العتيبي')
         ->assertJsonPath('data.calendar.name', 'مقدم الخدمة')
         ->assertJsonPath('message', 'تم إنشاء الحجز بنجاح.');
 
@@ -135,6 +135,8 @@ test('owner can create a service booking with linked order', function () {
     expect($booking->content_id)->toBe($service->id)
         ->and($booking->calendar_id)->toBe($calendar->id)
         ->and($booking->status)->toBe('confirmed')
+        ->and($booking->order_id)->toBe(Order::query()->value('id'))
+        ->and($orderItem->booking_id)->toBe($booking->id)
         ->and(json_decode($orderItem->meta, true)['booking_id'])->toBe($booking->id);
 });
 

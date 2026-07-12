@@ -34,7 +34,11 @@ class BookingListResource extends JsonResource
             'status' => $status,
             'status_label' => Booking::statusLabelFor($status),
             'status_color' => Booking::statusBadgeColorFor($status),
-            'client' => $booking->client?->name,
+            'client' => $booking->client ? [
+                'name' => $booking->client->name,
+                'email' => $booking->client->email,
+                'phone' => $booking->client->phone,
+            ] : null,
             'content' => $booking->content ? [
                 'id' => $booking->content->id,
                 'title' => $booking->content->title,
@@ -53,9 +57,9 @@ class BookingListResource extends JsonResource
             'price' => $priceMinor,
             'price_formatted' => Money::formatWithCurrency($priceMinor, $currency),
             'currency' => $currency,
-            'order' => filled($booking->order_number ?? null) ? [
-                'uuid' => $booking->order_uuid ?? null,
-                'number' => $booking->order_number,
+            'order' => $booking->order ? [
+                'uuid' => $booking->order->uuid,
+                'number' => $booking->order->number,
             ] : null,
             'created' => $booking->created_at?->locale(app()->getLocale())->diffForHumans(),
             'created_at' => $booking->created_at?->toIso8601String(),

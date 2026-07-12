@@ -7,6 +7,7 @@ import Button from '../ui/Button.vue';
 import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
 import AddBooking from './AddBooking.vue';
+import BookingsCalendar from './BookingsCalendar.vue';
 import { statusFilterColors, statusFilters, walkingClientLabel } from '../../data/bookings.js';
 import { openModal } from '../../lib/modal.js';
 import { useBookingsStore } from '../../stores/bookings.js';
@@ -18,6 +19,10 @@ const { items, meta, search, status, loading, loaded, error, isEmpty, hasPages }
 
 const searchInput = ref('');
 let searchTimer = null;
+
+const viewMode = computed(() => (route.query.view === 'calendar' ? 'calendar' : 'list'));
+const isListView = computed(() => viewMode.value === 'list');
+const isCalendarView = computed(() => viewMode.value === 'calendar');
 
 const activeStatus = computed(() => {
     const value = route.query.status;
@@ -39,6 +44,24 @@ function allTagClass() {
     return activeStatus.value === '' ? palette.active : palette.idle;
 }
 
+function viewToggleClass(mode) {
+    return viewMode.value === mode
+        ? 'bg-white text-gray-900 shadow-sm'
+        : 'text-gray-600 hover:text-gray-900';
+}
+
+async function setViewMode(mode) {
+    const query = { ...route.query, tab: 'bookings' };
+
+    if (mode === 'calendar') {
+        query.view = 'calendar';
+    } else {
+        delete query.view;
+    }
+
+    await router.replace({ query });
+}
+
 async function setStatusFilter(nextStatus) {
     const query = { ...route.query, tab: 'bookings' };
 
@@ -54,7 +77,7 @@ async function setStatusFilter(nextStatus) {
 watch(searchInput, (value) => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-        bookingsStore.setSearch(value);
+        bookingsStore.setSearch(value, { fetch: isListView.value });
     }, 300);
 });
 
@@ -63,7 +86,17 @@ watch(activeStatus, (value, previous) => {
         return;
     }
 
-    bookingsStore.setStatus(value);
+    bookingsStore.setStatus(value, { fetch: isListView.value });
+});
+
+watch(isListView, (list) => {
+    if (!list) {
+        return;
+    }
+
+    if (!loaded.value) {
+        bookingsStore.fetchBookings({ status: activeStatus.value });
+    }
 });
 
 function goToPage(page) {
@@ -78,7 +111,7 @@ onMounted(() => {
     searchInput.value = search.value;
     const statusFromUrl = activeStatus.value;
 
-    if (!loaded.value || status.value !== statusFromUrl) {
+    if (isListView.value && (!loaded.value || status.value !== statusFromUrl)) {
         bookingsStore.fetchBookings({ status: statusFromUrl });
     }
 });
@@ -111,8 +144,35 @@ onMounted(() => {
                 </button>
             </div>
 
-            <div class="flex w-full items-center gap-x-4">
-                <div class="flex-grow bg-gray-100 rounded-lg">
+            <div class="flex w-full flex-wrap items-center gap-x-3 gap-y-2 sm:flex-nowrap sm:gap-x-4">
+                <div
+                    class="inline-flex shrink-0 rounded-lg bg-gray-100 p-0.5"
+                    role="group"
+                    aria-label="طريقة العرض"
+                >
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition"
+                        :class="viewToggleClass('list')"
+                        :aria-pressed="isListView"
+                        @click="setViewMode('list')"
+                    >
+                        <Icon name="list" class="h-4 w-4" />
+                        قائمة
+                    </button>
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition"
+                        :class="viewToggleClass('calendar')"
+                        :aria-pressed="isCalendarView"
+                        @click="setViewMode('calendar')"
+                    >
+                        <Icon name="calendar" class="h-4 w-4" />
+                        تقويم
+                    </button>
+                </div>
+
+                <div class="min-w-0 flex-grow bg-gray-100 rounded-lg">
                     <div class="relative col-span-3 text-sm text-gray-800">
                         <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
                             <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -129,7 +189,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div>
+                <div class="shrink-0">
                     <Button type="button" label="إضافة حجز" @click="openModal('add-booking')">
                         <template #icon>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
@@ -146,128 +206,139 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="relative p-1">
-            <div
-                v-if="loading"
-                class="animate-pulse"
-                aria-busy="true"
-                aria-label="جاري تحميل الحجوزات"
-            >
+        <BookingsCalendar
+            v-if="isCalendarView"
+            :search="search"
+            :status="status"
+        />
+
+        <template v-else>
+            <div class="relative p-1">
                 <div
-                    v-for="n in 6"
-                    :key="`skeleton-${n}`"
-                    class="flex w-full items-start gap-x-4 px-4 py-3 sm:px-6"
+                    v-if="loading"
+                    class="animate-pulse"
+                    aria-busy="true"
+                    aria-label="جاري تحميل الحجوزات"
                 >
-                    <div class="h-11 w-11 shrink-0 rounded-xl bg-gray-200"></div>
-                    <div class="min-w-0 flex-1 space-y-2.5">
-                        <div class="h-4 rounded-md bg-gray-200" :class="n % 2 === 0 ? 'w-40' : 'w-52'"></div>
-                        <div class="flex flex-wrap gap-1.5">
-                            <div class="h-5 w-20 rounded-md bg-gray-100"></div>
-                            <div class="h-5 w-24 rounded-md bg-gray-100"></div>
-                            <div class="h-5 w-28 rounded-md bg-gray-100"></div>
-                            <div class="h-5 w-16 rounded-md bg-gray-100"></div>
+                    <div
+                        v-for="n in 6"
+                        :key="`skeleton-${n}`"
+                        class="flex w-full items-start gap-x-4 px-4 py-3 sm:px-6"
+                    >
+                        <div class="h-11 w-11 shrink-0 rounded-xl bg-gray-200"></div>
+                        <div class="min-w-0 flex-1 space-y-2.5">
+                            <div class="h-4 rounded-md bg-gray-200" :class="n % 2 === 0 ? 'w-40' : 'w-52'"></div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <div class="h-5 w-20 rounded-md bg-gray-100"></div>
+                                <div class="h-5 w-24 rounded-md bg-gray-100"></div>
+                                <div class="h-5 w-28 rounded-md bg-gray-100"></div>
+                                <div class="h-5 w-16 rounded-md bg-gray-100"></div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="error"
+                    class="flex flex-col items-center justify-center gap-2 p-10 text-center"
+                >
+                    <p class="text-sm text-red-600">{{ error }}</p>
+                    <button
+                        type="button"
+                        class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                        @click="bookingsStore.fetchBookings({ page: meta.current_page })"
+                    >
+                        إعادة المحاولة
+                    </button>
+                </div>
+
+                <div
+                    v-else-if="isEmpty"
+                    class="flex flex-col items-center justify-center gap-2 p-10 text-center"
+                >
+                    <svg class="h-12 w-12 p-0.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M3 10h18M8 3v4M16 3v4" />
+                    </svg>
+                    <p class="text-gray-700">لا توجد حجوزات.</p>
+                    <small class="text-gray-500">سيتم عرض الحجوزات هنا بعد إنشائها من الخدمات أو تأجير الوحدات.</small>
+                </div>
+
+                <div v-else-if="items.length > 0">
+                    <div
+                        v-for="item in items"
+                        :key="item.id"
+                        class="flex w-full items-start gap-x-4 px-4 py-3 last:rounded-b-2xl hover:bg-gray-50 sm:px-6"
+                    >
+                        <RouterLink :to="`/bookings/${item.id}`" class="flex min-w-0 flex-1 items-start gap-x-4">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-primary-600">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                                    <path d="M3 10h18M8 3v4M16 3v4" />
+                                </svg>
+                            </div>
+
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <h2 class="text-sm font-bold text-gray-800">
+                                        {{ item.content?.title ?? 'حجز بدون محتوى' }}
+                                    </h2>
+                                    <Badge v-if="item.content?.type_label" color="blue">{{ item.content.type_label }}</Badge>
+                                </div>
+
+                                <div class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                    <Badge :color="item.status_color">{{ item.status_label }}</Badge>
+                                    <Badge color="gray">{{ item.client?.name ?? walkingClientLabel }}</Badge>
+                                    <Badge v-if="item.calendar" color="purple">
+                                        {{ item.calendar.type_label ? `${item.calendar.type_label}: ` : '' }}{{ item.calendar.name }}
+                                    </Badge>
+                                    <Badge v-if="item.dates_label" color="white">{{ item.dates_label }}</Badge>
+                                    <Badge color="gray"><Money :formatted="item.price_formatted" /></Badge>
+                                    <Badge v-if="!item.order?.uuid" color="gray">بدون طلب</Badge>
+                                </div>
+                            </div>
+                        </RouterLink>
+
+                        <RouterLink
+                            v-if="item.order?.uuid"
+                            :to="`/orders/${item.order.uuid}`"
+                            class="inline-flex shrink-0 self-center"
+                        >
+                            <Badge color="green">طلب #{{ item.order.number }}</Badge>
+                        </RouterLink>
                     </div>
                 </div>
             </div>
 
             <div
-                v-else-if="error"
-                class="flex flex-col items-center justify-center gap-2 p-10 text-center"
+                v-if="hasPages"
+                class="flex items-center justify-between rounded-b-2xl bg-gray-50 p-4 px-6"
             >
-                <p class="text-sm text-red-600">{{ error }}</p>
-                <button
-                    type="button"
-                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
-                    @click="bookingsStore.fetchBookings({ page: meta.current_page })"
-                >
-                    إعادة المحاولة
-                </button>
-            </div>
-
-            <div
-                v-else-if="isEmpty"
-                class="flex flex-col items-center justify-center gap-2 p-10 text-center"
-            >
-                <svg class="h-12 w-12 p-0.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="3" y="5" width="18" height="16" rx="2" />
-                    <path d="M3 10h18M8 3v4M16 3v4" />
-                </svg>
-                <p class="text-gray-700">لا توجد حجوزات.</p>
-                <small class="text-gray-500">سيتم عرض الحجوزات هنا بعد إنشائها من الخدمات أو تأجير الوحدات.</small>
-            </div>
-
-            <div v-else-if="items.length > 0">
-                <div
-                    v-for="item in items"
-                    :key="item.id"
-                    class="flex w-full items-start gap-x-4 px-4 py-3 last:rounded-b-2xl hover:bg-gray-50 sm:px-6"
-                >
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-primary-600">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="5" width="18" height="16" rx="2" />
-                            <path d="M3 10h18M8 3v4M16 3v4" />
-                        </svg>
-                    </div>
-
-                    <div class="min-w-0 flex-1">
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <h2 class="text-sm font-bold text-gray-800">
-                                {{ item.content?.title ?? 'حجز بدون محتوى' }}
-                            </h2>
-                            <Badge v-if="item.content?.type_label" color="blue">{{ item.content.type_label }}</Badge>
-                        </div>
-
-                        <div class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                            <Badge :color="item.status_color">{{ item.status_label }}</Badge>
-                            <Badge color="gray">{{ item.client ?? walkingClientLabel }}</Badge>
-                            <Badge v-if="item.calendar" color="purple">
-                                {{ item.calendar.type_label ? `${item.calendar.type_label}: ` : '' }}{{ item.calendar.name }}
-                            </Badge>
-                            <Badge v-if="item.dates_label" color="white">{{ item.dates_label }}</Badge>
-                            <Badge color="gray"><Money :formatted="item.price_formatted" /></Badge>
-                            <RouterLink
-                                v-if="item.order?.uuid"
-                                :to="`/orders/${item.order.uuid}`"
-                                class="inline-flex"
-                            >
-                                <Badge color="green">طلب #{{ item.order.number }}</Badge>
-                            </RouterLink>
-                            <Badge v-else color="gray">بدون طلب</Badge>
-                        </div>
-                    </div>
+                <div class="text-sm text-gray-500">
+                    النتائج : <b>{{ meta.total.toLocaleString('ar-SA') }}</b>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
+                        :disabled="meta.current_page <= 1 || loading"
+                        @click="goToPage(meta.current_page - 1)"
+                    >
+                        السابق
+                    </button>
+                    <span class="text-sm text-gray-500">
+                        {{ meta.current_page }} / {{ meta.last_page }}
+                    </span>
+                    <button
+                        type="button"
+                        class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
+                        :disabled="meta.current_page >= meta.last_page || loading"
+                        @click="goToPage(meta.current_page + 1)"
+                    >
+                        التالي
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <div
-            v-if="hasPages"
-            class="flex items-center justify-between rounded-b-2xl bg-gray-50 p-4 px-6"
-        >
-            <div class="text-sm text-gray-500">
-                النتائج : <b>{{ meta.total.toLocaleString('ar-SA') }}</b>
-            </div>
-            <div class="flex items-center gap-2">
-                <button
-                    type="button"
-                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
-                    :disabled="meta.current_page <= 1 || loading"
-                    @click="goToPage(meta.current_page - 1)"
-                >
-                    السابق
-                </button>
-                <span class="text-sm text-gray-500">
-                    {{ meta.current_page }} / {{ meta.last_page }}
-                </span>
-                <button
-                    type="button"
-                    class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 disabled:opacity-40"
-                    :disabled="meta.current_page >= meta.last_page || loading"
-                    @click="goToPage(meta.current_page + 1)"
-                >
-                    التالي
-                </button>
-            </div>
-        </div>
+        </template>
     </div>
 </template>

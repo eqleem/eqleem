@@ -101,11 +101,11 @@ function openStep(modal) {
                     <h2 class="text-xl font-bold">مرحباً، {{ userName || '…' }} 👋</h2>
                     <Button
                         variant="light"
-                        class="h-auto shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold sm:px-4 sm:py-2 sm:text-sm"
+                        class="h-auto shrink-0 rounded-lg px-2 py-1.5 text-xs font-semibold sm:px-4 sm:py-2 sm:text-sm"
                         @click="openModal('home-step-content')"
                     >
                         <template #icon>
-                            <iconify-icon icon="solar:add-circle-bold" class="text-base"></iconify-icon>
+                            <iconify-icon icon="hugeicons:plus-sign-square" class="text-xl -mx-1 me-px"></iconify-icon>
                         </template>
                         إضافة محتوى
                     </Button>
@@ -128,11 +128,12 @@ function openStep(modal) {
                     <Button
                         v-if="nextStep"
                         variant="light"
-                        class="mt-4 h-auto w-full rounded-xl px-4 py-2.5 font-semibold sm:w-auto"
+                        class="mt-4 h-auto w-full rounded-lg px-4 py-2.5 font-semibold sm:w-auto"
                         @click="openStep(nextStep.modal)"
+                        icon-position="end"
                     >
                         <template #icon>
-                            <iconify-icon icon="solar:arrow-left-bold" class="text-base"></iconify-icon>
+                            <iconify-icon icon="hugeicons:arrow-left-02" class="text-2xl"></iconify-icon>
                         </template>
                         {{ nextStep.label }}
                     </Button>
@@ -162,40 +163,40 @@ function openStep(modal) {
                         :href="pageUrl || '#'"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-green-500 p-2.5 text-center text-[11px] font-medium text-white transition hover:bg-green-600"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-green-500 p-2 text-center text-[11px] font-medium text-white transition hover:bg-green-600"
                         title="معاينة الصفحة"
                     >
-                        <iconify-icon icon="solar:eye-bold" class="text-lg"></iconify-icon>
+                        <iconify-icon icon="hugeicons:share-05" class="text-2xl -rotate-90"></iconify-icon>
                         معاينة
                     </a>
 
                     <button
                         type="button"
-                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="نسخ الرابط"
                         @click="copyLink"
                     >
-                        <iconify-icon :icon="copied ? 'solar:check-circle-bold' : 'solar:copy-bold'" class="text-lg"></iconify-icon>
+                        <iconify-icon :icon="copied ? 'hugeicons:copy-check' : 'hugeicons:copy-02'" class="text-2xl"></iconify-icon>
                         {{ copied ? 'تم' : 'نسخ' }}
                     </button>
 
                     <button
                         type="button"
-                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2.5 text-center text-[11px] font-medium transition hover:bg-white/20"
+                        class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-white/10 p-2 text-center text-[11px] font-medium transition hover:bg-white/20"
                         title="مشاركة الصفحة"
                         @click="openModal('home-share-page')"
                     >
-                        <iconify-icon icon="solar:share-bold" class="text-lg"></iconify-icon>
+                        <iconify-icon icon="hugeicons:share-03" class="text-2xl"></iconify-icon>
                         مشاركة
                     </button>
 
                     <button
                         type="button"
-                        class="flex cursor-pointer items-center justify-center rounded-xl bg-white p-1 ring-1 ring-white/20 transition hover:bg-white/90"
+                        class="flex cursor-pointer items-center justify-center rounded-xl bg-white p-2 ring-1 ring-white/20 transition hover:bg-white/90"
                         title="رمز QR — اضغط للتكبير"
                         @click="openModal('home-page-qr')"
                     >
-                        <img :src="qrImageUrl(120)" alt="رمز QR للصفحة" class="size-16 rounded-md" loading="lazy">
+                        <img :src="qrImageUrl(120)" alt="رمز QR للصفحة" class="size-12 rounded-md" loading="lazy">
                     </button>
                 </div>
             </div>

@@ -9,8 +9,6 @@ use App\Models\Tenant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -30,49 +28,63 @@ class ListBookings
     {
         return [
             ...$this->listQueryRules(),
+            // Calendar view needs a wider page size for a month of bookings.
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:200'],
             'status' => ['sometimes', 'nullable', 'string', Rule::in(array_keys(Booking::statuses()))],
+            'from' => ['sometimes', 'nullable', 'date'],
+            'to' => ['sometimes', 'nullable', 'date', 'after_or_equal:from'],
         ];
     }
 
     /**
      * @return LengthAwarePaginator<int, Booking>
      */
-    public function handle(Tenant $tenant, ?string $search = null, ?string $status = null, int $perPage = 20): LengthAwarePaginator
-    {
+    public function handle(
+        Tenant $tenant,
+        ?string $search = null,
+        ?string $status = null,
+        int $perPage = 20,
+        ?string $from = null,
+        ?string $to = null,
+    ): LengthAwarePaginator {
         setCurrentTenant($tenant);
 
         $query = Booking::query()
             ->with([
-                'client:id,name',
+                'client:id,name,email,phone',
                 'content:id,title,type',
                 'calendar:id,name,type',
+                'order:id,uuid,number',
             ])
             ->orderByDesc('bookings.start_at')
             ->orderByDesc('bookings.id');
 
         $this->applyStatusFilter($query, $status);
         $this->applySearch($query, $search);
+        $this->applyDateRange($query, $from, $to);
 
         /** @var LengthAwarePaginator<int, Booking> $bookings */
         $bookings = $query->paginate($perPage);
-
-        $this->attachOrderReferences($bookings->getCollection(), $tenant->id);
 
         return $bookings;
     }
 
     public function asController(ActionRequest $request): LengthAwarePaginator
     {
-        /** @var array{search?: string|null, status?: string|null, per_page?: int} $validated */
+        /** @var array{search?: string|null, status?: string|null, per_page?: int, from?: string|null, to?: string|null} $validated */
         $validated = $request->validated();
 
         $status = isset($validated['status']) ? trim((string) $validated['status']) : null;
+        $from = isset($validated['from']) ? trim((string) $validated['from']) : null;
+        $to = isset($validated['to']) ? trim((string) $validated['to']) : null;
 
         return $this->handle(
             $this->currentDashboardTenant($request),
             isset($validated['search']) ? trim((string) $validated['search']) : null,
             $status !== '' ? $status : null,
             (int) ($validated['per_page'] ?? 20),
+            $from !== '' ? $from : null,
+            $to !== '' ? $to : null,
         );
     }
 
@@ -120,53 +132,19 @@ class ListBookings
         });
     }
 
-    /**
-     * @param  Collection<int, Booking>  $bookings
-     */
-    private function attachOrderReferences(Collection $bookings, int $tenantId): void
+    private function applyDateRange(Builder $query, ?string $from, ?string $to): void
     {
-        if ($bookings->isEmpty()) {
+        if ($from === null && $to === null) {
             return;
         }
 
-        $bookingIds = $bookings->pluck('id')->all();
-
-        $rows = DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('orders.tenant_id', $tenantId)
-            ->whereNotNull('order_items.meta')
-            ->orderByDesc('order_items.id')
-            ->get([
-                'orders.uuid as order_uuid',
-                'orders.number as order_number',
-                'order_items.meta',
-            ]);
-
-        $byBookingId = [];
-
-        foreach ($rows as $row) {
-            $meta = json_decode((string) $row->meta, true);
-
-            if (! is_array($meta)) {
-                continue;
-            }
-
-            $bookingId = isset($meta['booking_id']) ? (int) $meta['booking_id'] : 0;
-
-            if ($bookingId <= 0 || ! in_array($bookingId, $bookingIds, true) || isset($byBookingId[$bookingId])) {
-                continue;
-            }
-
-            $byBookingId[$bookingId] = [
-                'order_uuid' => $row->order_uuid,
-                'order_number' => $row->order_number,
-            ];
+        // Inclusive overlap: booking intersects [from, to].
+        if ($from !== null) {
+            $query->where('bookings.end_at', '>=', $from);
         }
 
-        foreach ($bookings as $booking) {
-            $ref = $byBookingId[$booking->id] ?? null;
-            $booking->setAttribute('order_uuid', $ref['order_uuid'] ?? null);
-            $booking->setAttribute('order_number', $ref['order_number'] ?? null);
+        if ($to !== null) {
+            $query->where('bookings.start_at', '<=', $to);
         }
     }
 }

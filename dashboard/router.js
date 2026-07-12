@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from './pages/Home.vue';
+import Analytics from './pages/analytics/Home.vue';
 import Orders from './pages/orders/Home.vue';
 import OrderDetail from './pages/orders/Detail.vue';
+import BookingDetail from './pages/bookings/Detail.vue';
 import PaymentDetail from './pages/payments/Detail.vue';
 import InvoiceDetail from './pages/invoices/Detail.vue';
 import FormSubmissionDetail from './pages/form-submissions/Detail.vue';
@@ -74,8 +76,10 @@ import NotFound from './pages/NotFound.vue';
 
 const routes = [
     { path: '/', name: 'home', component: Home },
+    { path: '/analytics', name: 'analytics', component: Analytics },
     { path: '/orders', name: 'orders', component: Orders },
     { path: '/orders/:uuid', name: 'order-detail', component: OrderDetail },
+    { path: '/bookings/:id', name: 'booking-detail', component: BookingDetail },
     { path: '/payments/:uuid', name: 'payment-detail', component: PaymentDetail },
     { path: '/invoices/:uuid', name: 'invoice-detail', component: InvoiceDetail },
     { path: '/form-submissions/:id', name: 'form-submission-detail', component: FormSubmissionDetail },

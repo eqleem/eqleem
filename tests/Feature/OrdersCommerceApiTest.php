@@ -157,9 +157,13 @@ test('order detail includes booking details for service and unit rental items', 
         'fulfillment_status' => 'unfulfilled',
     ]);
 
+    $serviceBooking->update(['order_id' => $order->id]);
+    $rentalBooking->update(['order_id' => $order->id]);
+
     DB::table('order_items')->insert([
         [
             'order_id' => $order->id,
+            'booking_id' => $serviceBooking->id,
             'name' => 'خدمة تصوير',
             'qty' => 1,
             'unit_price' => 15000,
@@ -177,6 +181,7 @@ test('order detail includes booking details for service and unit rental items', 
         ],
         [
             'order_id' => $order->id,
+            'booking_id' => $rentalBooking->id,
             'name' => 'شقة فاخرة',
             'qty' => 1,
             'unit_price' => 40000,

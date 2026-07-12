@@ -123,7 +123,9 @@ it('creates an order with a booking for a service item', function () {
     $orderItem = DB::table('order_items')->first();
 
     expect(json_decode($orderItem->meta, true)['booking_id'])->toBe($booking->id)
-        ->and(json_decode($orderItem->meta, true)['type'])->toBe('service');
+        ->and(json_decode($orderItem->meta, true)['type'])->toBe('service')
+        ->and($booking->order_id)->toBe(Order::query()->value('id'))
+        ->and($orderItem->booking_id)->toBe($booking->id);
 });
 
 it('requires booking date and time for service items', function () {

@@ -7,6 +7,7 @@ defineProps({
     variant: { type: String, default: 'primary' },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    iconPosition: { type: String, default: 'start' }, // 'start' | 'end'
 });
 
 const variants = {
@@ -43,8 +44,9 @@ const variants = {
         >
             <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
         </svg>
-        <slot v-else name="icon" />
+        <slot v-else-if="iconPosition !== 'end'" name="icon" />
         <span v-if="label">{{ label }}</span>
         <slot />
+        <slot v-if="!loading && iconPosition === 'end'" name="icon" />
     </component>
 </template>

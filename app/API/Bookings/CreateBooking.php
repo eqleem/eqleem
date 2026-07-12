@@ -84,22 +84,6 @@ class CreateBooking
         $currency = Money::defaultCurrencyCode();
 
         return DB::transaction(function () use ($tenant, $clientId, $content, $calendar, $type, $startAt, $endAt, $status, $priceMinor, $currency, $createdBy): Booking {
-            $booking = Booking::query()->create([
-                'tenant_id' => $tenant->id,
-                'client_id' => $clientId,
-                'content_id' => $content->id,
-                'calendar_id' => $calendar->id,
-                'start_at' => $startAt,
-                'end_at' => $endAt,
-                'status' => $status,
-                'price_snapshot' => Order::fromMinor($priceMinor),
-                'currency' => $currency,
-                'meta' => [
-                    'order_channel' => 'manual',
-                    'created_from' => 'dashboard_bookings',
-                ],
-            ]);
-
             $order = Order::query()->create([
                 'tenant_id' => $tenant->id,
                 'type' => 'order',
@@ -126,9 +110,27 @@ class CreateBooking
                 ],
             ]);
 
+            $booking = Booking::query()->create([
+                'tenant_id' => $tenant->id,
+                'client_id' => $clientId,
+                'order_id' => $order->id,
+                'content_id' => $content->id,
+                'calendar_id' => $calendar->id,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'status' => $status,
+                'price_snapshot' => Order::fromMinor($priceMinor),
+                'currency' => $currency,
+                'meta' => [
+                    'order_channel' => 'manual',
+                    'created_from' => 'dashboard_bookings',
+                ],
+            ]);
+
             DB::table('order_items')->insert([
                 'order_id' => $order->id,
                 'product_id' => $content->id,
+                'booking_id' => $booking->id,
                 'name' => $content->title,
                 'qty' => 1,
                 'unit_price' => $priceMinor,
@@ -146,9 +148,8 @@ class CreateBooking
                 'updated_at' => now(),
             ]);
 
+            $booking->setRelation('order', $order);
             $booking->load(['client:id,name', 'content:id,title,type', 'calendar:id,name,type']);
-            $booking->setAttribute('order_uuid', $order->uuid);
-            $booking->setAttribute('order_number', $order->number);
 
             return $booking;
         });

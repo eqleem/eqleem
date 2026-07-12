@@ -66,6 +66,7 @@ function createOrderWithItems(Tenant $tenant, array $items): Order
         DB::table('order_items')->insert([
             'order_id' => $order->id,
             'product_id' => $item['product_id'] ?? null,
+            'booking_id' => $item['booking_id'] ?? null,
             'sku' => $item['sku'] ?? null,
             'name' => $item['name'],
             'qty' => $item['qty'],
@@ -121,6 +122,7 @@ it('shows booking details for service and unit rental items', function () {
             'qty' => 1,
             'unit_price' => 15000,
             'line_total' => 15000,
+            'booking_id' => $serviceBooking->id,
             'meta' => [
                 'type' => 'service',
                 'booking_id' => $serviceBooking->id,
@@ -134,6 +136,7 @@ it('shows booking details for service and unit rental items', function () {
             'qty' => 1,
             'unit_price' => 30000,
             'line_total' => 30000,
+            'booking_id' => $rentalBooking->id,
             'meta' => [
                 'type' => 'unit_rental',
                 'booking_id' => $rentalBooking->id,
@@ -143,6 +146,9 @@ it('shows booking details for service and unit rental items', function () {
             ],
         ],
     ]);
+
+    $serviceBooking->update(['order_id' => $order->id]);
+    $rentalBooking->update(['order_id' => $order->id]);
 
     $this->actingAs($user)
         ->get(route('admin.orders.detail', ['id' => $order->uuid]))

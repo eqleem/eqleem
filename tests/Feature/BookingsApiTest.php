@@ -120,9 +120,30 @@ test('owner lists only current tenant bookings with lean payload', function () {
 
     setCurrentTenant($tenant);
 
+    $orderId = DB::table('orders')->insertGetId([
+        'tenant_id' => $tenant->id,
+        'uuid' => (string) Str::uuid(),
+        'type' => 'order',
+        'status' => 'draft',
+        'channel' => 'manual',
+        'number' => '000777',
+        'currency_code' => 'SAR',
+        'subtotal' => 15000,
+        'discount_total' => 0,
+        'tax_total' => 0,
+        'grand_total' => 15000,
+        'paid_total' => 0,
+        'due_total' => 15000,
+        'payment_status' => 'unpaid',
+        'issued_at' => now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
     $booking = Booking::query()->create([
         'tenant_id' => $tenant->id,
         'client_id' => $client->id,
+        'order_id' => $orderId,
         'content_id' => $service->id,
         'calendar_id' => $calendar->id,
         'start_at' => '2026-07-06 09:00:00',
@@ -133,26 +154,9 @@ test('owner lists only current tenant bookings with lean payload', function () {
     ]);
 
     DB::table('order_items')->insert([
-        'order_id' => DB::table('orders')->insertGetId([
-            'tenant_id' => $tenant->id,
-            'uuid' => (string) Str::uuid(),
-            'type' => 'order',
-            'status' => 'draft',
-            'channel' => 'manual',
-            'number' => '000777',
-            'currency_code' => 'SAR',
-            'subtotal' => 15000,
-            'discount_total' => 0,
-            'tax_total' => 0,
-            'grand_total' => 15000,
-            'paid_total' => 0,
-            'due_total' => 15000,
-            'payment_status' => 'unpaid',
-            'issued_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]),
+        'order_id' => $orderId,
         'product_id' => $service->id,
+        'booking_id' => $booking->id,
         'name' => $service->title,
         'qty' => 1,
         'unit_price' => 15000,
@@ -187,7 +191,7 @@ test('owner lists only current tenant bookings with lean payload', function () {
         ->assertJsonPath('data.0.id', $booking->id)
         ->assertJsonPath('data.0.status', 'new')
         ->assertJsonPath('data.0.status_label', 'جديد')
-        ->assertJsonPath('data.0.client', 'محمد العتيبي')
+        ->assertJsonPath('data.0.client.name', 'محمد العتيبي')
         ->assertJsonPath('data.0.content.title', 'خدمة تصوير')
         ->assertJsonPath('data.0.content.type', 'service')
         ->assertJsonPath('data.0.calendar.name', 'مقدم الخدمة')
@@ -311,11 +315,188 @@ test('search filters bookings by client and content title', function () {
         ->getJson('/api/bookings?'.http_build_query(['search' => 'سارة']))
         ->assertSuccessful()
         ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.client', 'سارة القحطاني');
+        ->assertJsonPath('data.0.client.name', 'سارة القحطاني');
 
     $this->actingAs($user)
         ->getJson('/api/bookings?'.http_build_query(['search' => 'تصوير']))
         ->assertSuccessful()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.content.title', 'خدمة تصوير');
+});
+
+test('date range filter returns overlapping bookings for calendar view', function () {
+    [$user, $tenant] = createBookingsApiUser();
+    $client = createBookingsApiClient($tenant);
+    [$service, $calendar] = createBookingsApiServiceWithCalendar($tenant);
+
+    setCurrentTenant($tenant);
+
+    $inside = Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'client_id' => $client->id,
+        'content_id' => $service->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-07-10 09:00:00',
+        'end_at' => '2026-07-10 10:00:00',
+        'status' => 'confirmed',
+        'price_snapshot' => 150,
+        'currency' => 'SAR',
+    ]);
+
+    Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'client_id' => $client->id,
+        'content_id' => $service->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-08-02 09:00:00',
+        'end_at' => '2026-08-02 10:00:00',
+        'status' => 'new',
+        'price_snapshot' => 90,
+        'currency' => 'SAR',
+    ]);
+
+    $multiDay = Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'client_id' => $client->id,
+        'content_id' => $service->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-06-28 14:00:00',
+        'end_at' => '2026-07-03 11:00:00',
+        'status' => 'confirmed',
+        'price_snapshot' => 400,
+        'currency' => 'SAR',
+    ]);
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/bookings?'.http_build_query([
+            'from' => '2026-07-01',
+            'to' => '2026-07-31T23:59:59',
+            'per_page' => 200,
+        ]))
+        ->assertSuccessful();
+
+    $ids = collect($response->json('data'))->pluck('id')->all();
+
+    expect($ids)->toContain($inside->id)
+        ->and($ids)->toContain($multiDay->id)
+        ->and($ids)->toHaveCount(2);
+
+    $this->actingAs($user)
+        ->getJson('/api/bookings?'.http_build_query([
+            'from' => '2026-08-01',
+            'to' => '2026-07-01',
+        ]))
+        ->assertUnprocessable();
+});
+
+test('guests cannot view a booking', function () {
+    $this->getJson('/api/bookings/1')
+        ->assertUnauthorized();
+});
+
+test('owner can view a booking with full detail payload', function () {
+    [$user, $tenant] = createBookingsApiUser();
+    $client = createBookingsApiClient($tenant);
+    [$service, $calendar] = createBookingsApiServiceWithCalendar($tenant);
+
+    setCurrentTenant($tenant);
+
+    $orderUuid = (string) Str::uuid();
+
+    $orderId = DB::table('orders')->insertGetId([
+        'tenant_id' => $tenant->id,
+        'uuid' => $orderUuid,
+        'type' => 'order',
+        'status' => 'draft',
+        'channel' => 'manual',
+        'number' => '000888',
+        'currency_code' => 'SAR',
+        'subtotal' => 15000,
+        'discount_total' => 0,
+        'tax_total' => 0,
+        'grand_total' => 15000,
+        'paid_total' => 0,
+        'due_total' => 15000,
+        'payment_status' => 'unpaid',
+        'issued_at' => now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $booking = Booking::query()->create([
+        'tenant_id' => $tenant->id,
+        'client_id' => $client->id,
+        'order_id' => $orderId,
+        'content_id' => $service->id,
+        'calendar_id' => $calendar->id,
+        'start_at' => '2026-07-06 09:00:00',
+        'end_at' => '2026-07-06 10:00:00',
+        'status' => 'confirmed',
+        'price_snapshot' => 150,
+        'currency' => 'SAR',
+    ]);
+
+    DB::table('order_items')->insert([
+        'order_id' => $orderId,
+        'product_id' => $service->id,
+        'booking_id' => $booking->id,
+        'name' => $service->title,
+        'qty' => 1,
+        'unit_price' => 15000,
+        'discount_total' => 0,
+        'tax_total' => 0,
+        'line_total' => 15000,
+        'meta' => json_encode([
+            'type' => 'service',
+            'booking_id' => $booking->id,
+            'calendar_id' => $calendar->id,
+        ]),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/bookings/'.$booking->id)
+        ->assertSuccessful()
+        ->assertJsonPath('data.id', $booking->id)
+        ->assertJsonPath('data.status', 'confirmed')
+        ->assertJsonPath('data.status_label', 'مؤكد')
+        ->assertJsonPath('data.client.name', 'محمد العتيبي')
+        ->assertJsonPath('data.client.uuid', $client->uuid)
+        ->assertJsonPath('data.content.title', 'خدمة تصوير')
+        ->assertJsonPath('data.content.type', 'service')
+        ->assertJsonPath('data.calendar.name', 'مقدم الخدمة')
+        ->assertJsonPath('data.time_label', '09:00 – 10:00')
+        ->assertJsonPath('data.order.uuid', $orderUuid)
+        ->assertJsonPath('data.order.number', '000888')
+        ->assertJsonMissingPath('data.meta')
+        ->assertJsonMissingPath('data.data');
+});
+
+test('owner cannot view booking from another tenant', function () {
+    [$user] = createBookingsApiUser();
+    [$otherUser, $otherTenant] = createBookingsApiUser();
+
+    setCurrentTenant($otherTenant);
+
+    $booking = Booking::query()->create([
+        'tenant_id' => $otherTenant->id,
+        'start_at' => '2026-07-06 11:00:00',
+        'end_at' => '2026-07-06 12:00:00',
+        'status' => 'confirmed',
+        'price_snapshot' => 99,
+        'currency' => 'SAR',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/bookings/'.$booking->id)
+        ->assertNotFound();
+});
+
+test('show booking returns not found for missing id', function () {
+    [$user] = createBookingsApiUser();
+
+    $this->actingAs($user)
+        ->getJson('/api/bookings/999999')
+        ->assertNotFound();
 });

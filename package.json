@@ -26,6 +26,11 @@
     "dependencies": {
         "@ckeditor/ckeditor5-core": "^43.0.0",
         "@ckeditor/ckeditor5-ui": "^43.0.0",
+        "@fullcalendar/core": "^6.1.21",
+        "@fullcalendar/daygrid": "^6.1.21",
+        "@fullcalendar/interaction": "^6.1.21",
+        "@fullcalendar/timegrid": "^6.1.21",
+        "@fullcalendar/vue3": "^6.1.21",
         "@ryangjchandler/alpine-clipboard": "^2.3.0",
         "@uppy/core": "^4.2.3",
         "@uppy/dashboard": "^4.1.2",

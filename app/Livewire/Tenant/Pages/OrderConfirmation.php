@@ -45,7 +45,7 @@ class OrderConfirmation extends Component
             return [$item->id => $meta];
         });
 
-        $bookingIds = $metas->pluck('booking_id')->filter()->unique()->values();
+        $bookingIds = $items->pluck('booking_id')->filter()->unique()->values();
 
         $bookings = $bookingIds->isEmpty()
             ? collect()
@@ -72,9 +72,8 @@ class OrderConfirmation extends Component
             $meta = $metas->get($item->id, []);
             $type = (string) ($meta['type'] ?? 'other');
             $isBooking = Order::isBookingItemType($type);
-            $booking = filled($meta['booking_id'] ?? null)
-                ? $bookings->get($meta['booking_id'])
-                : null;
+            $bookingId = filled($item->booking_id ?? null) ? (int) $item->booking_id : null;
+            $booking = $bookingId ? $bookings->get($bookingId) : null;
 
             $startAt = $booking?->start_at
                 ?? (filled($meta['booking_start_at'] ?? null) ? Carbon::parse($meta['booking_start_at']) : null);

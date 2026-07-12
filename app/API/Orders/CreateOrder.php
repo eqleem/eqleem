@@ -138,6 +138,7 @@ class CreateOrder
                     $booking = Booking::query()->create([
                         'tenant_id' => $tenant->id,
                         'client_id' => $clientId,
+                        'order_id' => $order->id,
                         'content_id' => $item['product_id'],
                         'calendar_id' => $item['calendar_id'],
                         'start_at' => $item['booking_start_at'],
@@ -157,6 +158,7 @@ class CreateOrder
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
                     'product_id' => $item['type'] === 'other' ? null : ($item['product_id'] ?? null),
+                    'booking_id' => $bookingId,
                     'name' => $item['name'],
                     'qty' => $qty,
                     'unit_price' => $unitPrice,
