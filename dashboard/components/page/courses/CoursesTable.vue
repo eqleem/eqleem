@@ -156,13 +156,11 @@ async function removeSelected() {
                                     <Badge :color="item.status === 'published' ? 'green' : 'gray'">
                                         {{ item.status_label ?? (item.status === 'published' ? 'منشور' : 'مسودة') }}
                                     </Badge>
-                                    <span v-if="item.level_label" class="text-xs text-stone-500">{{ item.level_label }}</span>
                                     <span v-if="item.hours_label" class="text-xs text-stone-500">{{ item.hours_label }} ساعة</span>
                                     <span v-if="item.lessons_count > 0" class="text-xs text-stone-500">
                                         {{ item.lessons_count }} {{ item.lessons_count === 1 ? 'درس' : 'دروس' }}
                                     </span>
                                     <Money v-if="item.price_label" :formatted="item.price_label" class="text-xs font-medium text-stone-700" />
-                                    <span v-if="item.published_at_label" class="text-xs text-stone-500" dir="ltr">{{ item.published_at_label }}</span>
                                 </div>
                             </div>
                         </RouterLink>

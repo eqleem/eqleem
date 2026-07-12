@@ -260,7 +260,7 @@ function contentManageLabel(block) {
                         <li
                             v-for="block in userBlocks"
                             :key="block.id"
-                            class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
+                            class="group flex items-center lg:gap-2 gap-1 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                             :class="{ 'opacity-50': !block.active }"
                             draggable="true"
                             @dragstart="onDragStart($event, block.id)"
@@ -276,8 +276,20 @@ function contentManageLabel(block) {
                             </button>
 
                             <div class="flex min-w-0 flex-1 items-center gap-2">
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
+                                <img :src="block.icon_url" alt="" class="hidden h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1 sm:block">
+                                <RouterLink
+                                    v-if="contentManageTo(block)"
+                                    :to="contentManageTo(block)"
+                                    class="truncate text-sm font-medium text-stone-800 transition hover:text-primary-600 sm:hidden"
+                                >
+                                    {{ block.title }}
+                                </RouterLink>
+                                <span
+                                    class="truncate text-sm font-medium text-stone-800"
+                                    :class="contentManageTo(block) ? 'hidden sm:inline' : ''"
+                                >
+                                    {{ block.title }}
+                                </span>
                             </div>
 
                             <button
@@ -293,7 +305,7 @@ function contentManageLabel(block) {
                             <RouterLink
                                 v-if="contentManageTo(block)"
                                 :to="contentManageTo(block)"
-                                class="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50"
+                                class="hidden shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50 sm:inline-flex"
                             >
                                 {{ contentManageLabel(block) }}
                             </RouterLink>
