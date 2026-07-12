@@ -27,7 +27,7 @@
                     : \Storage::url((string) $headerImagePath))
                 : asset('assets/images/cover.png');
         @endphp
-        <img src="{{ $headerImage }}" alt="{{ tenant('name') }}" class="w-full max-h-80X object-coverx md:rounded-t-3xl  opacity-80">
+        <img src="{{ $headerImage }}" alt="{{ tenant('name') }}" class="w-full max-h-80X object-coverx md:rounded-t-3xl opacity-90">
     </div>
     <!-- Name, Title and Logo Row -->
     @php
