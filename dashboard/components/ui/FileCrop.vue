@@ -246,18 +246,18 @@ onBeforeUnmount(() => {
                 class="fixed inset-0 z-[100] flex items-center justify-center p-4"
                 data-file-crop-overlay
             >
-                <div class="absolute inset-0 bg-gray-800/75" @click="closeCropper" />
+                <div class="absolute inset-0 bg-stone-800/75" @click="closeCropper" />
 
                 <div
                     class="relative w-full rounded-xl bg-white shadow-xl"
                     :class="modalMaxWidth"
                     @click.stop
                 >
-                    <div class="flex items-center justify-between border-b border-gray-100 p-3 px-4">
-                        <p class="text-sm font-semibold text-gray-600" dir="rtl">{{ cropTitle }}</p>
+                    <div class="flex items-center justify-between border-b border-stone-100 p-3 px-4">
+                        <p class="text-sm font-semibold text-stone-600" dir="rtl">{{ cropTitle }}</p>
                         <button
                             type="button"
-                            class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200"
+                            class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200"
                             :disabled="cropping"
                             @click="closeCropper"
                         >
@@ -265,11 +265,11 @@ onBeforeUnmount(() => {
                         </button>
                     </div>
 
-                    <div v-if="allowShapeSwitch" class="flex justify-center gap-2 border-b border-gray-50 px-4 py-2">
+                    <div v-if="allowShapeSwitch" class="flex justify-center gap-2 border-b border-stone-50 px-4 py-2">
                         <button
                             type="button"
                             class="rounded-md px-3 py-1 text-xs font-medium"
-                            :class="activeShape === 'square' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'"
+                            :class="activeShape === 'square' ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-stone-500'"
                             :disabled="cropping"
                             @click="setCropShape('square')"
                         >
@@ -278,7 +278,7 @@ onBeforeUnmount(() => {
                         <button
                             type="button"
                             class="rounded-md px-3 py-1 text-xs font-medium"
-                            :class="activeShape === 'circle' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'"
+                            :class="activeShape === 'circle' ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-stone-500'"
                             :disabled="cropping"
                             @click="setCropShape('circle')"
                         >
@@ -287,7 +287,7 @@ onBeforeUnmount(() => {
                         <button
                             type="button"
                             class="rounded-md px-3 py-1 text-xs font-medium"
-                            :class="activeShape === 'free' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'"
+                            :class="activeShape === 'free' ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-stone-500'"
                             :disabled="cropping"
                             @click="setCropShape('free')"
                         >
@@ -299,7 +299,7 @@ onBeforeUnmount(() => {
                         <div ref="cropHost" :class="cropHostClass" />
                     </div>
 
-                    <div class="flex flex-wrap justify-end gap-2 border-t border-gray-100 p-3 px-4" dir="rtl">
+                    <div class="flex flex-wrap justify-end gap-2 border-t border-stone-100 p-3 px-4" dir="rtl">
                         <Button
                             type="button"
                             variant="ghost"

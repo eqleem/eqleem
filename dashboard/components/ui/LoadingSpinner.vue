@@ -12,7 +12,7 @@ const sizes = {
 
 <template>
     <svg
-        class="animate-spin text-gray-300"
+        class="animate-spin text-stone-300"
         :class="sizes[size] ?? sizes.md"
         viewBox="0 0 24 24"
         fill="none"

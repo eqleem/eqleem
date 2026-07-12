@@ -19,7 +19,7 @@ defineProps({
 
 <template>
     <div
-        class="relative items-center gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex"
+        class="relative items-center gap-x-2 rounded-md bg-stone-100/75 p-1 lg:flex"
         :class="[block ? 'w-full flex-col items-start' : width, { 'border border-dashed border-red-500 pt-10': prime }]"
     >
         <div v-if="prime" title="هذا الخيار يتطلب اشتراك برايم" class="absolute end-0 top-0 p-px text-end">
@@ -29,14 +29,14 @@ defineProps({
         <label
             v-if="label"
             :for="name"
-            class="inline-block flex-shrink-0 p-2 text-sm font-semibold text-gray-500"
+            class="inline-block flex-shrink-0 p-2 text-sm font-semibold text-stone-500"
             :class="block ? 'w-full' : labelWidth"
         >
             {{ label }}
         </label>
 
         <div class="relative" :class="width" :dir="dir">
-            <div class="flex w-full items-center text-gray-500">
+            <div class="flex w-full items-center text-stone-500">
                 <div v-if="prefix" class="shrink-0 px-2 text-xs opacity-70">
                     {{ prefix }}
                 </div>
@@ -53,7 +53,7 @@ defineProps({
             <div>
                 <small
                     v-if="info"
-                    class="mt-1 flex items-center gap-x-1 rounded-md bg-gray-50 px-1 text-xs text-gray-400"
+                    class="mt-1 flex items-center gap-x-1 rounded-md bg-stone-50 px-1 text-xs text-stone-400"
                     :dir="infoDir"
                 >
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

@@ -10,7 +10,7 @@ import { settingsList } from '../data/settings.js';
     <Container>
         <MainBox title="الإعدادات" subtitle="تعديل وتخصيص النظام حسب مشروعك.">
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" viewBox="0 0 24 24" fill="none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-stone-600" viewBox="0 0 24 24" fill="none">
                     <path
                         opacity=".34"
                         d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
@@ -36,14 +36,14 @@ import { settingsList } from '../data/settings.js';
                     v-for="setting in settingsList"
                     :key="setting.slug"
                     :to="`/settings/${setting.slug}`"
-                    class="flex items-center gap-x-3 rounded-xl bg-gray-100 p-2 hover:bg-gray-200/80"
+                    class="flex items-center gap-x-3 rounded-xl bg-stone-100 p-2 hover:bg-stone-200/80"
                 >
                     <div class="shrink-0 rounded-xl bg-white p-2">
                         <img class="h-10 w-10" :src="`/${setting.icon}`" :alt="setting.name">
                     </div>
                     <div class="truncate">
-                        <p class="text-sm font-medium text-gray-700">{{ setting.name }}</p>
-                        <small class="truncate text-xs font-normal text-gray-500">{{ setting.description }}</small>
+                        <p class="text-sm font-medium text-stone-700">{{ setting.name }}</p>
+                        <small class="truncate text-xs font-normal text-stone-500">{{ setting.description }}</small>
                     </div>
                 </RouterLink>
             </div>

@@ -188,12 +188,12 @@ async function submit() {
             />
         </div>
 
-        <p class="mb-3 text-xs text-gray-500">اختر الفترة الزمنية المتاحة لحجز هذا الأصل.</p>
+        <p class="mb-3 text-xs text-stone-500">اختر الفترة الزمنية المتاحة لحجز هذا الأصل.</p>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200">
-            <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">الأوقات المتاحة</div>
+        <div class="overflow-hidden rounded-xl border border-stone-200">
+            <div class="bg-stone-50 px-4 py-2 text-sm font-medium text-stone-700">الأوقات المتاحة</div>
 
-            <div class="divide-y divide-gray-100">
+            <div class="divide-y divide-stone-100">
                 <div
                     v-for="day in weekdayKeys"
                     :key="day"
@@ -203,9 +203,9 @@ async function submit() {
                         <input
                             v-model="form.availabilities[day].enabled"
                             type="checkbox"
-                            class="rounded border-gray-300"
+                            class="rounded border-stone-300"
                         >
-                        <span class="text-sm text-gray-700">{{ weekdayLabels[day] }}</span>
+                        <span class="text-sm text-stone-700">{{ weekdayLabels[day] }}</span>
                     </label>
 
                     <div class="flex min-w-[220px] flex-1 items-center gap-2">
@@ -213,14 +213,14 @@ async function submit() {
                             v-model="form.availabilities[day].start"
                             type="time"
                             :disabled="!form.availabilities[day].enabled"
-                            class="rounded-lg border border-gray-200 px-2 py-1.5 text-sm text-gray-700 disabled:bg-gray-100 disabled:text-gray-400"
+                            class="rounded-lg border border-stone-200 px-2 py-1.5 text-sm text-stone-700 disabled:bg-stone-100 disabled:text-stone-400"
                         >
-                        <span class="text-sm text-gray-400">إلى</span>
+                        <span class="text-sm text-stone-400">إلى</span>
                         <input
                             v-model="form.availabilities[day].end"
                             type="time"
                             :disabled="!form.availabilities[day].enabled"
-                            class="rounded-lg border border-gray-200 px-2 py-1.5 text-sm text-gray-700 disabled:bg-gray-100 disabled:text-gray-400"
+                            class="rounded-lg border border-stone-200 px-2 py-1.5 text-sm text-stone-700 disabled:bg-stone-100 disabled:text-stone-400"
                         >
                     </div>
                 </div>

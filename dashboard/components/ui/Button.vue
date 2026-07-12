@@ -33,7 +33,7 @@ const variants = {
         :role="href ? null : 'button'"
         :disabled="!href && (disabled || loading) ? true : null"
         class="inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-        :class="variants[variant] ?? 'bg-gray-300 text-black/50'"
+        :class="variants[variant] ?? 'bg-stone-300 text-black/50'"
     >
         <svg
             v-if="loading"

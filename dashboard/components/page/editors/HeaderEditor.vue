@@ -176,30 +176,30 @@ async function onSocialDrop(event, targetId) {
             <Input v-model="form.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
 
             <div class="space-y-2">
-                <div class="my-4 flex items-center justify-between border-b border-dotted border-gray-100 pb-2">
-                    <p class="text-xs font-semibold text-gray-500">روابط التواصل</p>
+                <div class="my-4 flex items-center justify-between border-b border-dotted border-stone-100 pb-2">
+                    <p class="text-xs font-semibold text-stone-500">روابط التواصل</p>
                     <Button type="button" variant="secondary" label="إضافة رابط" @click="socialModal = true">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
                     </Button>
                 </div>
 
-                <p v-if="!socialLinks.length" class="py-2 text-xs text-gray-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
+                <p v-if="!socialLinks.length" class="py-2 text-xs text-stone-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
                 <ul v-else class="space-y-1.5">
                     <li
                         v-for="link in socialLinks"
                         :key="link.id"
-                        class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 transition hover:border-gray-200"
+                        class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2 py-2 transition hover:border-stone-200"
                         draggable="true"
                         @dragstart="onSocialDragStart($event, link.id)"
                         @dragover.prevent
                         @drop="onSocialDrop($event, link.id)"
                     >
-                        <button type="button" class="cursor-grab rounded-md p-1 text-gray-300" aria-label="سحب">
+                        <button type="button" class="cursor-grab rounded-md p-1 text-stone-300" aria-label="سحب">
                             <Icon name="grip-vertical" class="h-4 w-4" />
                         </button>
                         <div class="flex min-w-0 flex-1 flex-col">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ networkMeta(link.network)?.label ?? link.network }}</span>
-                            <span class="truncate text-xs text-gray-400" dir="ltr">{{ link.url }}</span>
+                            <span class="truncate text-sm font-medium text-stone-800">{{ networkMeta(link.network)?.label ?? link.network }}</span>
+                            <span class="truncate text-xs text-stone-400" dir="ltr">{{ link.url }}</span>
                         </div>
                         <button
                             type="button"
@@ -221,11 +221,11 @@ async function onSocialDrop(event, targetId) {
     </Form>
 
     <div v-if="socialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-gray-800/75" @click="socialModal = false"></div>
+        <div class="absolute inset-0 bg-stone-800/75" @click="socialModal = false"></div>
         <div class="relative w-full max-w-md rounded-xl bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-gray-100 p-3 px-4">
-                <p class="text-sm font-semibold text-gray-600">إضافة رابط تواصل</p>
-                <button type="button" class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200" @click="socialModal = false">
+            <div class="flex items-center justify-between border-b border-stone-100 p-3 px-4">
+                <p class="text-sm font-semibold text-stone-600">إضافة رابط تواصل</p>
+                <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200" @click="socialModal = false">
                     <Icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -234,7 +234,7 @@ async function onSocialDrop(event, targetId) {
                 <Input v-model="newUrl" name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" />
                 <p v-if="socialError" class="text-sm text-red-500">{{ socialError }}</p>
             </div>
-            <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4">
+            <div class="flex justify-end gap-2 border-t border-stone-100 p-3 px-4">
                 <Button type="button" variant="ghost" label="إلغاء" @click="socialModal = false" />
                 <Button type="button" label="إضافة" :loading="socialSaving" @click="addSocial" />
             </div>

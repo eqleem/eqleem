@@ -122,10 +122,10 @@ onMounted(load);
                     <div
                         v-for="provider in providers"
                         :key="provider.key"
-                        class="rounded-xl border border-gray-100 bg-gray-50/50 p-4"
+                        class="rounded-xl border border-stone-100 bg-stone-50/50 p-4"
                     >
                         <div class="mb-3 flex items-center justify-between gap-4">
-                            <h3 class="text-sm font-semibold text-gray-700">{{ provider.name }}</h3>
+                            <h3 class="text-sm font-semibold text-stone-700">{{ provider.name }}</h3>
                             <Toggle
                                 v-model="integrations[provider.key].active"
                                 :name="`${provider.key}-active`"
@@ -144,9 +144,9 @@ onMounted(load);
                         />
                     </div>
 
-                    <div class="flex min-h-[80px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/30 p-4 text-center">
-                        <p class="text-sm font-semibold text-gray-500">قريباً</p>
-                        <p class="mt-1 text-xs text-gray-400">سيتم إضافة المزيد من التكاملات لاحقاً.</p>
+                    <div class="flex min-h-[80px] flex-col items-center justify-center rounded-xl border border-dashed border-stone-200 bg-stone-50/30 p-4 text-center">
+                        <p class="text-sm font-semibold text-stone-500">قريباً</p>
+                        <p class="mt-1 text-xs text-stone-400">سيتم إضافة المزيد من التكاملات لاحقاً.</p>
                     </div>
                 </div>
 

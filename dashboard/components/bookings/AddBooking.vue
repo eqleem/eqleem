@@ -359,7 +359,7 @@ onBeforeUnmount(() => {
 
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold text-gray-500">العميل</p>
+                    <p class="text-sm font-semibold text-stone-500">العميل</p>
                     <Button type="button" variant="outline" label="عميل جديد" @click="openCreate">
                         <template #icon>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -369,19 +369,19 @@ onBeforeUnmount(() => {
                     </Button>
                 </div>
 
-                <div v-if="clientId" class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                <div v-if="clientId" class="flex items-center justify-between rounded-lg bg-stone-50 p-3">
                     <div>
-                        <p class="text-sm font-bold text-gray-800">{{ selectedClient?.name }}</p>
-                        <p v-if="selectedClient?.email" class="mt-1 text-xs text-gray-500">{{ selectedClient.email }}</p>
-                        <p v-if="selectedClient?.phone" class="mt-0.5 text-xs text-gray-500" dir="ltr">{{ selectedClient.phone }}</p>
+                        <p class="text-sm font-bold text-stone-800">{{ selectedClient?.name }}</p>
+                        <p v-if="selectedClient?.email" class="mt-1 text-xs text-stone-500">{{ selectedClient.email }}</p>
+                        <p v-if="selectedClient?.phone" class="mt-0.5 text-xs text-stone-500" dir="ltr">{{ selectedClient.phone }}</p>
                     </div>
                     <button type="button" class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700" @click="enterSearch">تغيير</button>
                 </div>
 
-                <div v-else-if="isWalking" class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                <div v-else-if="isWalking" class="flex items-center justify-between rounded-lg bg-stone-50 p-3">
                     <div>
-                        <p class="text-sm font-bold text-gray-800">{{ walkingClientLabel }}</p>
-                        <p class="mt-0.5 text-xs text-gray-500">الافتراضي — بدون حساب عميل</p>
+                        <p class="text-sm font-bold text-stone-800">{{ walkingClientLabel }}</p>
+                        <p class="mt-0.5 text-xs text-stone-500">الافتراضي — بدون حساب عميل</p>
                     </div>
                     <button type="button" class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700" @click="enterSearch">تغيير</button>
                 </div>
@@ -391,27 +391,27 @@ onBeforeUnmount(() => {
                         v-model="clientSearch"
                         type="text"
                         placeholder="ابحث بالاسم أو البريد أو الهاتف .."
-                        class="block w-full rounded-lg border border-gray-200 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none"
+                        class="block w-full rounded-lg border border-stone-200 py-2 px-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-primary-500 focus:outline-none"
                         @focus="showClientResults = true"
                     >
-                    <div v-if="showClientResults" class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-                        <button type="button" class="w-full border-b border-gray-100 bg-gray-50/50 px-3 py-2.5 text-start hover:bg-gray-50" @click="selectWalking">
-                            <p class="text-sm font-semibold text-gray-800">{{ walkingClientLabel }}</p>
+                    <div v-if="showClientResults" class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white shadow-lg">
+                        <button type="button" class="w-full border-b border-stone-100 bg-stone-50/50 px-3 py-2.5 text-start hover:bg-stone-50" @click="selectWalking">
+                            <p class="text-sm font-semibold text-stone-800">{{ walkingClientLabel }}</p>
                         </button>
-                        <p v-if="clientSearching" class="px-3 py-2 text-xs text-gray-400">جاري البحث…</p>
+                        <p v-if="clientSearching" class="px-3 py-2 text-xs text-stone-400">جاري البحث…</p>
                         <button
                             v-for="client in clientResults"
                             :key="client.id"
                             type="button"
-                            class="w-full border-b border-gray-50 px-3 py-2 text-start last:border-0 hover:bg-gray-50"
+                            class="w-full border-b border-stone-50 px-3 py-2 text-start last:border-0 hover:bg-stone-50"
                             @click="selectClient(client)"
                         >
-                            <p class="text-sm font-semibold text-gray-800">{{ client.name }}</p>
+                            <p class="text-sm font-semibold text-stone-800">{{ client.name }}</p>
                         </button>
                     </div>
                 </div>
 
-                <div v-if="showCreate" class="space-y-3 rounded-lg border border-gray-200 bg-white p-3">
+                <div v-if="showCreate" class="space-y-3 rounded-lg border border-stone-200 bg-white p-3">
                     <Input v-model="newClient.name" label="الاسم" :error="newClientErrors.name" />
                     <Input v-model="newClient.phone" label="الهاتف" dir="ltr" :error="newClientErrors.phone" />
                     <Input v-model="newClient.email" label="البريد" dir="ltr" :error="newClientErrors.email" />
@@ -422,10 +422,10 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <Box title="تفاصيل الحجز" class="border border-gray-100 shadow-sm">
+            <Box title="تفاصيل الحجز" class="border border-stone-100 shadow-sm">
                 <div class="space-y-4 p-1">
                     <div>
-                        <label class="mb-1 block text-xs text-gray-500">نوع الحجز</label>
+                        <label class="mb-1 block text-xs text-stone-500">نوع الحجز</label>
                         <div class="flex flex-wrap gap-2">
                             <button
                                 v-for="(label, key) in bookingTypeOptions"
@@ -434,7 +434,7 @@ onBeforeUnmount(() => {
                                 class="rounded-lg border px-3 py-1.5 text-sm transition"
                                 :class="type === key
                                     ? 'border-primary-500 bg-primary-50 font-semibold text-primary-700'
-                                    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'"
+                                    : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'"
                                 @click="type = key"
                             >
                                 {{ label }}
@@ -443,30 +443,30 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div class="relative">
-                        <label class="mb-1 block text-xs text-gray-500">{{ type === 'service' ? 'الخدمة' : 'وحدة التأجير' }}</label>
+                        <label class="mb-1 block text-xs text-stone-500">{{ type === 'service' ? 'الخدمة' : 'وحدة التأجير' }}</label>
                         <input
                             v-model="contentSearch"
                             type="text"
                             :placeholder="bookingTypeSearchPlaceholders[type]"
-                            class="block w-full rounded-lg border border-gray-200 py-2 px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none"
+                            class="block w-full rounded-lg border border-stone-200 py-2 px-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-primary-500 focus:outline-none"
                             @focus="showContentResults = contentResults.length > 0"
                             @input="selectedContent = null"
                         >
                         <p v-if="selectedContent" class="mt-1 text-xs text-green-600">المحدد: {{ selectedContent.name }}</p>
 
-                        <div v-if="showContentResults && !selectedContent" class="absolute z-40 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-                            <p v-if="contentSearching" class="px-3 py-2 text-xs text-gray-400">جاري البحث…</p>
+                        <div v-if="showContentResults && !selectedContent" class="absolute z-40 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white shadow-lg">
+                            <p v-if="contentSearching" class="px-3 py-2 text-xs text-stone-400">جاري البحث…</p>
                             <button
                                 v-for="product in contentResults"
                                 :key="`${product.product_id}-${product.name}`"
                                 type="button"
-                                class="w-full border-b border-gray-50 px-3 py-2 text-start last:border-0 hover:bg-gray-50"
+                                class="w-full border-b border-stone-50 px-3 py-2 text-start last:border-0 hover:bg-stone-50"
                                 @click="selectContent(product)"
                             >
-                                <p class="text-sm font-semibold text-gray-800">{{ product.name }}</p>
-                                <p class="mt-0.5 text-xs text-gray-500" dir="ltr">{{ product.unit_price }}</p>
+                                <p class="text-sm font-semibold text-stone-800">{{ product.name }}</p>
+                                <p class="mt-0.5 text-xs text-stone-500" dir="ltr">{{ product.unit_price }}</p>
                             </button>
-                            <p v-if="!contentSearching && contentResults.length === 0" class="px-3 py-2 text-xs text-gray-400">لا توجد نتائج.</p>
+                            <p v-if="!contentSearching && contentResults.length === 0" class="px-3 py-2 text-xs text-stone-400">لا توجد نتائج.</p>
                         </div>
                     </div>
 
@@ -475,12 +475,12 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div v-if="calendars.length > 0">
-                        <label class="mb-1 block text-xs text-gray-500">
+                        <label class="mb-1 block text-xs text-stone-500">
                             {{ type === 'unit_rental' ? 'مخزون الوحدات / التقويم' : 'مقدم الخدمة / التقويم' }}
                         </label>
                         <select
                             v-model="calendarId"
-                            class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                            class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                             @change="onCalendarChange"
                         >
                             <option value="">اختر التقويم ..</option>
@@ -491,10 +491,10 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div v-if="calendarId && availableDates.length > 0">
-                        <label class="mb-1 block text-xs text-gray-500">تاريخ الحجز</label>
+                        <label class="mb-1 block text-xs text-stone-500">تاريخ الحجز</label>
                         <select
                             v-model="bookingDate"
-                            class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                            class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                             dir="ltr"
                             @change="onDateChange"
                         >
@@ -507,7 +507,7 @@ onBeforeUnmount(() => {
                     <p v-else-if="calendarId && !availabilityLoading" class="text-xs text-amber-600">لا توجد تواريخ متاحة في التقويم المحدد.</p>
 
                     <div v-if="bookingDate && timeSlots.length > 0">
-                        <label class="mb-1 block text-xs text-gray-500">
+                        <label class="mb-1 block text-xs text-stone-500">
                             {{ type === 'unit_rental' ? 'فترة التأجير' : 'وقت الحجز' }}
                         </label>
                         <div class="flex flex-wrap gap-2">
@@ -519,8 +519,8 @@ onBeforeUnmount(() => {
                                 :class="slot.available
                                     ? (startAt === slot.start_at
                                         ? 'border-primary-500 bg-primary-50 font-semibold text-primary-700'
-                                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50')
-                                    : 'cursor-not-allowed select-none border-gray-100 bg-gray-50 text-gray-300 line-through'"
+                                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50')
+                                    : 'cursor-not-allowed select-none border-stone-100 bg-stone-50 text-stone-300 line-through'"
                                 :disabled="!slot.available"
                                 dir="ltr"
                                 @click="selectTimeSlot(slot)"
@@ -533,17 +533,17 @@ onBeforeUnmount(() => {
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div>
-                            <label class="mb-1 block text-xs text-gray-500">الحالة</label>
+                            <label class="mb-1 block text-xs text-stone-500">الحالة</label>
                             <select
                                 v-model="status"
-                                class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                             >
                                 <option v-for="(label, key) in bookingStatusOptions" :key="key" :value="key">{{ label }}</option>
                             </select>
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs text-gray-500">السعر</label>
-                            <div class="rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm font-semibold text-gray-800">
+                            <label class="mb-1 block text-xs text-stone-500">السعر</label>
+                            <div class="rounded-lg border border-stone-100 bg-white px-3 py-2 text-sm font-semibold text-stone-800">
                                 <Money :amount="unitPrice" />
                             </div>
                         </div>
@@ -552,7 +552,7 @@ onBeforeUnmount(() => {
             </Box>
         </div>
 
-        <div class="flex shrink-0 items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 px-5 py-3">
+        <div class="flex shrink-0 items-center justify-end gap-2 border-t border-stone-100 bg-stone-50 px-5 py-3">
             <Button type="button" variant="outline" label="إلغاء" @click="closeModal('add-booking')" />
             <Button type="button" label="تأكيد الحجز" :disabled="!canSubmit" @click="submit" />
         </div>

@@ -174,23 +174,23 @@ function saveAndClose() {
                     <RouterLink
                         to="/manage/pages"
                         title="رجوع"
-                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-gray-50"
+                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-stone-50"
                     >
-                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
-                    <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
+                    <div class="flex min-w-0 items-center gap-2 text-sm text-stone-700">
                         <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ store.type?.name }}</span>
-                        <span class="text-gray-400 hidden md:inline">/</span>
-                        <span class="truncate text-gray-600 hidden md:inline">تحرير الصفحة</span>
+                        <span class="text-stone-400 hidden md:inline">/</span>
+                        <span class="truncate text-stone-600 hidden md:inline">تحرير الصفحة</span>
                     </div>
                 </div>
 
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchFormTab('edit')"
                     >
                         تحرير
@@ -198,7 +198,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchFormTab('advanced')"
                     >
                         متقدم
@@ -237,7 +237,7 @@ function saveAndClose() {
                                 class="flex items-center gap-1.5 px-3 py-2 text-sm transition"
                                 :class="contentTab === 'text'
                                     ? '-mb-px border-b-2 border-primary-500 font-semibold text-stone-900'
-                                    : 'text-gray-500 hover:text-gray-800'"
+                                    : 'text-stone-500 hover:text-stone-800'"
                                 @click.prevent="switchContentTab('text')"
                             >
                                 نص
@@ -247,7 +247,7 @@ function saveAndClose() {
                                 class="flex items-center gap-1.5 px-3 py-2 text-sm transition"
                                 :class="contentTab === 'blocks'
                                     ? '-mb-px border-b-2 border-primary-500 font-semibold text-stone-900'
-                                    : 'text-gray-500 hover:text-gray-800'"
+                                    : 'text-stone-500 hover:text-stone-800'"
                                 @click.prevent="switchContentTab('blocks')"
                             >
                                 البلوكات

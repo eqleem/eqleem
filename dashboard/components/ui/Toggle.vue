@@ -26,7 +26,7 @@ defineEmits(['update:modelValue']);
                 @change="$emit('update:modelValue', $event.target.checked)"
             >
             <div
-                class="relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:bottom-0 after:left-[0.1rem] after:top-0 after:my-auto after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-500 peer-checked:after:translate-x-[1.3rem] peer-checked:after:bg-gray-100"
+                class="relative h-6 w-11 rounded-full bg-stone-200 after:absolute after:bottom-0 after:left-[0.1rem] after:top-0 after:my-auto after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-500 peer-checked:after:translate-x-[1.3rem] peer-checked:after:bg-stone-100"
                 aria-hidden="true"
             ></div>
         </label>

@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
                 </button>
 
                 <div class="hidden md:block">
-                    <Dropdown width="w-48" class="text-gray-800">
+                    <Dropdown width="w-48" class="text-stone-800">
                         <template #trigger>
                             <button type="button" class="flex cursor-pointer items-center gap-2" aria-haspopup="menu">
                                 <div class="flex items-center justify-center gap-x-2 text-center">
@@ -196,11 +196,11 @@ onBeforeUnmount(() => {
                 aria-modal="true"
                 aria-label="قائمة الحساب"
             >
-                <div class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-                    <p class="text-sm font-medium text-gray-700">القائمة</p>
+                <div class="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
+                    <p class="text-sm font-medium text-stone-700">القائمة</p>
                     <button
                         type="button"
-                        class="rounded-lg p-1.5 text-gray-500 transition hover:bg-stone-100 hover:text-gray-800"
+                        class="rounded-lg p-1.5 text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
                         aria-label="إغلاق القائمة"
                         @click="closeMobileMenu"
                     >

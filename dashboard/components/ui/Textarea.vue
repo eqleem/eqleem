@@ -35,7 +35,7 @@ defineEmits(['update:modelValue']);
             :value="modelValue"
             :placeholder="placeholder"
             :rows="rows"
-            class="block w-full rounded-md border-2 border-transparent bg-white px-3 py-1.5 text-sm text-gray-600 placeholder:text-sm focus:border-primary-500 focus:bg-gray-100/50 focus:text-gray-700 focus:outline-none"
+            class="block w-full rounded-md border-2 border-transparent bg-white px-3 py-1.5 text-sm text-stone-600 placeholder:text-sm focus:border-primary-500 focus:bg-stone-100/50 focus:text-stone-700 focus:outline-none"
             :class="{ 'border-red-300': error }"
             @input="$emit('update:modelValue', $event.target.value)"
         />

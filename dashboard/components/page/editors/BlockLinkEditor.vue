@@ -102,7 +102,7 @@ async function submit() {
 
 <template>
     <Form class="!rounded-none !p-4" @submit="submit">
-        <p class="mb-4 text-xs text-gray-400">
+        <p class="mb-4 text-xs text-stone-400">
             اختر نوع الرابط أولاً — يُعبّأ العنوان والوصف تلقائياً ويمكنك تعديلهما لاحقاً.
         </p>
 
@@ -120,14 +120,14 @@ async function submit() {
                     @focus="searchContent"
                     @input="searchContent"
                 />
-                <ul v-if="showContentResults && contentResults.length" class="max-h-40 overflow-y-auto rounded-lg border border-gray-100">
+                <ul v-if="showContentResults && contentResults.length" class="max-h-40 overflow-y-auto rounded-lg border border-stone-100">
                     <li v-for="item in contentResults" :key="item.id">
-                        <button type="button" class="w-full px-3 py-2 text-start text-sm hover:bg-gray-50" @click="selectContent(item)">
+                        <button type="button" class="w-full px-3 py-2 text-start text-sm hover:bg-stone-50" @click="selectContent(item)">
                             {{ item.title }}
                         </button>
                     </li>
                 </ul>
-                <p v-if="form.selected_content_title" class="text-xs text-gray-400">المحدد: {{ form.selected_content_title }}</p>
+                <p v-if="form.selected_content_title" class="text-xs text-stone-400">المحدد: {{ form.selected_content_title }}</p>
             </div>
         </div>
 

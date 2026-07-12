@@ -226,17 +226,17 @@ onMounted(load);
                 <Button label="أضف فرع" @click="openAdd" />
             </template>
 
-            <div class="divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200">
-                <div class="bg-gray-100 p-3">
-                    <div class="relative text-sm text-gray-800">
-                        <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
-                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7" /><path stroke-linecap="round" d="m20 20-3-3" /></svg>
+            <div class="divide-y divide-dotted divide-stone-200 border-t border-dotted border-stone-200">
+                <div class="bg-stone-100 p-3">
+                    <div class="relative text-sm text-stone-800">
+                        <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-stone-500">
+                            <svg class="h-5 w-5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7" /><path stroke-linecap="round" d="m20 20-3-3" /></svg>
                         </div>
                         <input
                             v-model="search"
                             type="text"
                             placeholder="ابحث .."
-                            class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm"
+                            class="block w-full rounded-lg border border-transparent py-1.5 ps-10 text-stone-800 placeholder:text-stone-400 focus:border-primary-500 focus:outline-none sm:text-sm"
                         >
                     </div>
                 </div>
@@ -247,19 +247,19 @@ onMounted(load);
                     لا توجد فروع.
                 </Empty>
 
-                <ul v-else class="divide-y divide-gray-100">
+                <ul v-else class="divide-y divide-stone-100">
                     <li v-for="branch in results" :key="branch.id">
                         <button
                             type="button"
-                            class="group flex w-full items-center gap-3 px-4 py-3 text-start transition hover:bg-gray-50"
+                            class="group flex w-full items-center gap-3 px-4 py-3 text-start transition hover:bg-stone-50"
                             @click="openEdit(branch)"
                         >
                             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
                                 <svg class="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-sm font-semibold text-gray-800">{{ branch.name }}</p>
-                                <p class="mt-0.5 truncate text-xs text-gray-500">{{ branch.city }} · {{ branch.address }}</p>
+                                <p class="truncate text-sm font-semibold text-stone-800">{{ branch.name }}</p>
+                                <p class="mt-0.5 truncate text-xs text-stone-500">{{ branch.city }} · {{ branch.address }}</p>
                             </div>
                         </button>
                     </li>
@@ -313,31 +313,31 @@ onMounted(load);
                 <Toggle v-model="form.is_warehouse" name="is_warehouse" label="مستودع تخزين؟" />
                 <Toggle v-model="form.is_pickup" name="is_pickup" label="يمكن الاستلام منه؟" />
 
-                <div class="mt-2 overflow-hidden rounded-xl border border-gray-200">
-                    <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">ساعات العمل</div>
-                    <div class="divide-y divide-gray-100">
+                <div class="mt-2 overflow-hidden rounded-xl border border-stone-200">
+                    <div class="bg-stone-50 px-4 py-2 text-sm font-medium text-stone-700">ساعات العمل</div>
+                    <div class="divide-y divide-stone-100">
                         <div
                             v-for="(label, day) in weekdayLabels"
                             :key="day"
                             class="flex flex-wrap items-center gap-3 px-4 py-3"
                         >
                             <label class="flex w-28 shrink-0 items-center gap-2">
-                                <input v-model="form.working_hours[day].enabled" type="checkbox" class="rounded border-gray-300">
-                                <span class="text-sm text-gray-700">{{ label }}</span>
+                                <input v-model="form.working_hours[day].enabled" type="checkbox" class="rounded border-stone-300">
+                                <span class="text-sm text-stone-700">{{ label }}</span>
                             </label>
                             <div class="flex min-w-[220px] flex-1 items-center gap-2">
                                 <input
                                     v-model="form.working_hours[day].start"
                                     type="time"
                                     :disabled="!form.working_hours[day].enabled"
-                                    class="rounded-lg border border-gray-200 px-2 py-1.5 text-sm text-gray-700 disabled:bg-gray-100 disabled:text-gray-400"
+                                    class="rounded-lg border border-stone-200 px-2 py-1.5 text-sm text-stone-700 disabled:bg-stone-100 disabled:text-stone-400"
                                 >
-                                <span class="text-sm text-gray-400">إلى</span>
+                                <span class="text-sm text-stone-400">إلى</span>
                                 <input
                                     v-model="form.working_hours[day].end"
                                     type="time"
                                     :disabled="!form.working_hours[day].enabled"
-                                    class="rounded-lg border border-gray-200 px-2 py-1.5 text-sm text-gray-700 disabled:bg-gray-100 disabled:text-gray-400"
+                                    class="rounded-lg border border-stone-200 px-2 py-1.5 text-sm text-stone-700 disabled:bg-stone-100 disabled:text-stone-400"
                                 >
                             </div>
                         </div>

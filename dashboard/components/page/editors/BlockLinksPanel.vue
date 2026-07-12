@@ -246,7 +246,7 @@ defineExpose({ openAdd });
         </template>
 
         <div v-if="!embedded" class="flex items-center justify-between gap-3">
-            <p class="text-xs font-semibold text-gray-500">الروابط</p>
+            <p class="text-xs font-semibold text-stone-500">الروابط</p>
             <Button type="button" variant="secondary" label="إضافة رابط" class="w-auto" @click="openAdd">
                 <template #icon><Icon name="plus" class="h-4 w-4" /></template>
             </Button>
@@ -255,8 +255,8 @@ defineExpose({ openAdd });
         <p
             v-if="!links.length"
             :class="embedded
-                ? 'pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-gray-400'
-                : 'py-2 text-xs text-gray-400'"
+                ? 'pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400'
+                : 'py-2 text-xs text-stone-400'"
         >
             {{ embedded
                 ? 'لا توجد روابط بعد. اضغط «إضافة رابط» لإضافة أول زر إجراء.'
@@ -266,18 +266,18 @@ defineExpose({ openAdd });
             <li
                 v-for="link in links"
                 :key="link.id"
-                class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
+                class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                 draggable="true"
                 @dragstart="dragId = link.id"
                 @dragover.prevent
                 @drop="onDrop($event, link.id)"
             >
-                <button type="button" class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing">
+                <button type="button" class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing">
                     <Icon name="grip-vertical" class="h-4 w-4" />
                 </button>
                 <button type="button" class="flex min-w-0 flex-1 cursor-pointer flex-col items-start text-start hover:text-primary-600" @click="openEdit(link)">
-                    <span class="truncate text-sm font-medium text-gray-800">{{ link.label }}</span>
-                    <span class="truncate text-xs text-gray-400">{{ link.type_label }} · {{ link.summary }}</span>
+                    <span class="truncate text-sm font-medium text-stone-800">{{ link.label }}</span>
+                    <span class="truncate text-xs text-stone-400">{{ link.type_label }} · {{ link.summary }}</span>
                 </button>
                 <button
                     type="button"
@@ -302,11 +302,11 @@ defineExpose({ openAdd });
     </div>
 
     <div v-if="linkModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-gray-800/75" @click="linkModal = false"></div>
+        <div class="absolute inset-0 bg-stone-800/75" @click="linkModal = false"></div>
         <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-3 px-4">
-                <p class="text-sm font-semibold text-gray-600">{{ editingLinkId ? 'تعديل رابط' : 'إضافة رابط' }}</p>
-                <button type="button" class="rounded-md bg-gray-100 p-1 text-gray-400" @click="linkModal = false">
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                <p class="text-sm font-semibold text-stone-600">{{ editingLinkId ? 'تعديل رابط' : 'إضافة رابط' }}</p>
+                <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400" @click="linkModal = false">
                     <Icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -322,18 +322,18 @@ defineExpose({ openAdd });
                         @focus="searchContent"
                         @input="searchContent"
                     />
-                    <ul v-if="showContentResults && contentResults.length" class="max-h-40 overflow-y-auto rounded-lg border border-gray-100">
+                    <ul v-if="showContentResults && contentResults.length" class="max-h-40 overflow-y-auto rounded-lg border border-stone-100">
                         <li v-for="item in contentResults" :key="item.id">
-                            <button type="button" class="w-full px-3 py-2 text-start text-sm hover:bg-gray-50" @click="selectContent(item)">
+                            <button type="button" class="w-full px-3 py-2 text-start text-sm hover:bg-stone-50" @click="selectContent(item)">
                                 {{ item.title }}
                             </button>
                         </li>
                     </ul>
-                    <p v-if="linkForm.selected_content_title" class="text-xs text-gray-400">المحدد: {{ linkForm.selected_content_title }}</p>
+                    <p v-if="linkForm.selected_content_title" class="text-xs text-stone-400">المحدد: {{ linkForm.selected_content_title }}</p>
                 </div>
                 <p v-if="linkError" class="text-sm text-red-500">{{ linkError }}</p>
             </div>
-            <div class="sticky bottom-0 flex justify-end gap-2 border-t border-gray-100 bg-white p-3 px-4">
+            <div class="sticky bottom-0 flex justify-end gap-2 border-t border-stone-100 bg-white p-3 px-4">
                 <Button type="button" variant="ghost" label="إلغاء" @click="linkModal = false" />
                 <Button type="button" :label="editingLinkId ? 'حفظ' : 'إضافة'" :loading="linkSaving" @click="saveLink" />
             </div>

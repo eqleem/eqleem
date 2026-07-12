@@ -226,23 +226,23 @@ function saveAndClose() {
                     <RouterLink
                         to="/manage/blog"
                         title="رجوع"
-                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-gray-50"
+                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-stone-50"
                     >
-                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
-                    <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
+                    <div class="flex min-w-0 items-center gap-2 text-sm text-stone-700">
                         <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ store.type?.name }}</span>
-                        <span class="text-gray-400 hidden md:inline">/</span>
-                        <span class="truncate text-gray-600 hidden md:inline">تحرير التدوينة</span>
+                        <span class="text-stone-400 hidden md:inline">/</span>
+                        <span class="truncate text-stone-600 hidden md:inline">تحرير التدوينة</span>
                     </div>
                 </div>
 
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('edit')"
                     >
                         تحرير
@@ -250,7 +250,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('advanced')"
                     >
                         متقدم
@@ -280,8 +280,8 @@ function saveAndClose() {
                         :rows="2"
                     />
 
-                    <div class="relative rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">الصورة الرئيسية</span>
+                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">الصورة الرئيسية</span>
                         <div class="w-full space-y-2 p-2">
                             <img
                                 v-if="form.featuredImage"
@@ -330,25 +330,25 @@ function saveAndClose() {
                     class="space-y-2"
                     :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
                 >
-                    <div class="relative rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">القسم</span>
+                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
                         <div class="w-full space-y-1.5 p-2">
                             <label
                                 v-for="option in categories"
                                 :key="option.id"
                                 class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-gray-700' : 'text-gray-400'"
+                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                             >
                                 <input
                                     type="checkbox"
-                                    class="h-4 w-4 rounded border-gray-300"
+                                    class="h-4 w-4 rounded border-stone-300"
                                     :disabled="!option.selectable"
                                     :checked="form.categoryIds.includes(String(option.id))"
                                     @change="toggleCategory(option.id, $event.target.checked)"
                                 >
                                 <span>{{ option.label }}</span>
                             </label>
-                            <p v-if="categories.length === 0" class="text-xs text-gray-400">لا توجد تصنيفات بعد.</p>
+                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
                         </div>
                     </div>
 

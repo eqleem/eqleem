@@ -181,14 +181,14 @@ function blockHref(block) {
         <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
 
         <div v-else class="space-y-4 p-4">
-            <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+            <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <ul class="space-y-1.5 p-2">
                     <li
                         v-for="block in topBlocks"
                         :key="block.id"
                         class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
                     >
-                        <div class="rounded-md p-1 text-gray-200">
+                        <div class="rounded-md p-1 text-stone-200">
                             <Icon name="lock" class="h-4 w-4" />
                         </div>
 
@@ -198,18 +198,18 @@ function blockHref(block) {
                             class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
                             @click="openEdit(block.id, block.title)"
                         >
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                         </button>
                         <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                         </div>
 
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="cursor-pointer rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
                             aria-label="خيارات البلوك"
                             @click="openEdit(block.id, block.title)"
                         >
@@ -219,11 +219,11 @@ function blockHref(block) {
                 </ul>
             </div>
 
-            <div v-if="ctaBlock?.editor" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
-                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+            <div v-if="ctaBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-700">أزرار الإجراء</p>
-                        <p class="text-xs text-gray-400">هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين</p>
+                        <p class="text-sm font-medium text-stone-700">أزرار الإجراء</p>
+                        <p class="text-xs text-stone-400">هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين</p>
                     </div>
                     <Button label="إضافة رابط" variant="secondary" class="shrink-0" @click="openAddCtaLink">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
@@ -239,11 +239,11 @@ function blockHref(block) {
                 />
             </div>
 
-            <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
-                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+            <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-700">بلوكات الصفحة</p>
-                        <p class="text-xs text-gray-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
+                        <p class="text-sm font-medium text-stone-700">بلوكات الصفحة</p>
+                        <p class="text-xs text-stone-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
                     </div>
                     <Button label="إضافة بلوك" variant="secondary" class="shrink-0" :disabled="saving" @click="openAddModal">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
@@ -255,7 +255,7 @@ function blockHref(block) {
                         <li
                             v-for="block in userBlocks"
                             :key="block.id"
-                            class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
+                            class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                             :class="{ 'opacity-50': !block.active }"
                             draggable="true"
                             @dragstart="onDragStart($event, block.id)"
@@ -264,7 +264,7 @@ function blockHref(block) {
                         >
                             <button
                                 type="button"
-                                class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing"
+                                class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
                                 aria-label="سحب لإعادة الترتيب"
                             >
                                 <Icon name="grip-vertical" class="h-4 w-4" />
@@ -275,8 +275,8 @@ function blockHref(block) {
                                 :href="blockHref(block)"
                                 class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
                             >
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                             </a>
                             <button
                                 v-else-if="block.editable"
@@ -284,12 +284,12 @@ function blockHref(block) {
                                 class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
                                 @click="openEdit(block.id, block.title)"
                             >
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                             </button>
                             <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                                <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                             </div>
 
                             <button
@@ -305,7 +305,7 @@ function blockHref(block) {
                             <button
                                 v-if="block.editable"
                                 type="button"
-                                class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                                class="rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
                                 aria-label="خيارات البلوك"
                                 @click="openEdit(block.id, block.title)"
                             >
@@ -323,21 +323,21 @@ function blockHref(block) {
 
                     <p
                         v-if="!userBlocks.length"
-                        class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-gray-400"
+                        class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
                         لا توجد بلوكات بعد. اضغط «إضافة بلوك» لإضافة أول بلوك في هذا القسم.
                     </p>
                 </div>
             </div>
 
-            <div v-if="bottomBlocks.length" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
+            <div v-if="bottomBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <ul class="space-y-1.5 p-2">
                     <li
                         v-for="block in bottomBlocks"
                         :key="block.id"
                         class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
                     >
-                        <div class="rounded-md p-1 text-gray-200">
+                        <div class="rounded-md p-1 text-stone-200">
                             <Icon name="lock" class="h-4 w-4" />
                         </div>
 
@@ -347,18 +347,18 @@ function blockHref(block) {
                             class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
                             @click="openEdit(block.id, block.title)"
                         >
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                         </button>
                         <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                         </div>
 
                         <button
                             v-if="block.editable"
                             type="button"
-                            class="cursor-pointer rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                            class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
                             aria-label="خيارات البلوك"
                             @click="openEdit(block.id, block.title)"
                         >
@@ -368,11 +368,11 @@ function blockHref(block) {
                 </ul>
             </div>
 
-            <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/80">
-                <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
+            <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-700">الأزرار الطافية</p>
-                        <p class="text-xs text-gray-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
+                        <p class="text-sm font-medium text-stone-700">الأزرار الطافية</p>
+                        <p class="text-xs text-stone-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
                     </div>
                     <Button label="الموضع" variant="secondary" class="shrink-0" @click="openFloatLinksPosition">
                         <template #icon><Icon name="settings" class="h-4 w-4" /></template>
@@ -394,14 +394,14 @@ function blockHref(block) {
                     v-for="blockType in blockTypes"
                     :key="blockType.slug"
                     type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+                    class="flex w-full items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:opacity-50"
                     :disabled="saving"
                     @click="addBlock(blockType.slug)"
                 >
-                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-gray-100 p-1.5">
+                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-stone-100 p-1.5">
                     <span class="min-w-0">
-                        <span class="block text-sm font-medium text-gray-800">{{ blockType.name }}</span>
-                        <span class="block text-xs text-gray-400">{{ blockType.description }}</span>
+                        <span class="block text-sm font-medium text-stone-800">{{ blockType.name }}</span>
+                        <span class="block text-xs text-stone-400">{{ blockType.description }}</span>
                     </span>
                 </button>
             </div>

@@ -152,15 +152,15 @@ onMounted(load);
                         :error="errors.country"
                     />
 
-                    <div class="relative items-start gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-                        <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">ملف الهوية</span>
+                    <div class="relative items-start gap-x-2 rounded-md bg-stone-100/75 p-1 lg:flex">
+                        <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-stone-500">ملف الهوية</span>
                         <div class="space-y-2 p-2">
-                            <p class="text-xs text-gray-400">الرجاء إرفاق صورة الهوية أو صورة السجل التجاري حسب نوع الكيان.</p>
+                            <p class="text-xs text-stone-400">الرجاء إرفاق صورة الهوية أو صورة السجل التجاري حسب نوع الكيان.</p>
                             <a
                                 v-if="form.current_file_url"
                                 :href="form.current_file_url"
                                 target="_blank"
-                                class="block truncate rounded-md bg-white p-2 text-sm text-gray-500 hover:bg-primary-50"
+                                class="block truncate rounded-md bg-white p-2 text-sm text-stone-500 hover:bg-primary-50"
                             >
                                 عرض الملف الحالي
                             </a>
@@ -168,7 +168,7 @@ onMounted(load);
                                 ref="fileInput"
                                 type="file"
                                 accept="image/*"
-                                class="block w-full text-sm text-gray-600"
+                                class="block w-full text-sm text-stone-600"
                                 @change="onFileChange"
                             >
                             <p v-if="errors.file" class="text-xs text-red-500">{{ errors.file }}</p>

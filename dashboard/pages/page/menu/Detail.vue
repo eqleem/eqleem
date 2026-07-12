@@ -280,23 +280,23 @@ function saveAndClose() {
                     <RouterLink
                         to="/manage/menu"
                         title="رجوع"
-                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-gray-50"
+                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-stone-50"
                     >
-                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
-                    <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
+                    <div class="flex min-w-0 items-center gap-2 text-sm text-stone-700">
                         <img v-if="menu.type?.icon" :src="`/${menu.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ menu.type?.name }}</span>
-                        <span class="text-gray-400 hidden md:inline">/</span>
-                        <span class="truncate text-gray-600 hidden md:inline">تحرير الطبق</span>
+                        <span class="text-stone-400 hidden md:inline">/</span>
+                        <span class="truncate text-stone-600 hidden md:inline">تحرير الطبق</span>
                     </div>
                 </div>
 
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('edit')"
                     >
                         تحرير
@@ -304,7 +304,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('advanced')"
                     >
                         متقدم
@@ -359,14 +359,14 @@ function saveAndClose() {
                     <div class="space-y-3 rounded-xl border border-stone-200 bg-stone-50/50 p-4">
                         <div class="flex items-center justify-between gap-3">
                             <div>
-                                <p class="text-sm font-semibold text-gray-800">خيارات الوجبة</p>
-                                <p class="mt-0.5 text-xs text-gray-500">مثل الحجم والإضافات — كل خيار له اختيارات وأسعار إضافية</p>
+                                <p class="text-sm font-semibold text-stone-800">خيارات الوجبة</p>
+                                <p class="mt-0.5 text-xs text-stone-500">مثل الحجم والإضافات — كل خيار له اختيارات وأسعار إضافية</p>
                             </div>
                             <Button type="button" variant="outline" label="إضافة خيار" @click="addMealOptionGroup" />
                         </div>
 
                         <div v-if="form.mealOptions.length === 0" class="rounded-lg border border-dashed border-stone-300 bg-white px-4 py-6 text-center">
-                            <p class="text-sm text-gray-500">لا توجد خيارات بعد. أضف خياراً مثل «حجم الوجبة» أو «الإضافات».</p>
+                            <p class="text-sm text-stone-500">لا توجد خيارات بعد. أضف خياراً مثل «حجم الوجبة» أو «الإضافات».</p>
                         </div>
 
                         <div
@@ -397,10 +397,10 @@ function saveAndClose() {
 
                             <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">نوع الاختيار</label>
+                                    <label class="mb-1 block text-sm font-medium text-stone-700">نوع الاختيار</label>
                                     <select
                                         v-model="group.type"
-                                        class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-primary-500 focus:outline-none"
+                                        class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-800 focus:border-primary-500 focus:outline-none"
                                     >
                                         <option value="single">اختيار واحد (مثل الحجم)</option>
                                         <option value="multiple">اختيار متعدد (مثل الإضافات)</option>
@@ -412,7 +412,7 @@ function saveAndClose() {
                             </div>
 
                             <div class="space-y-2">
-                                <p class="text-sm font-semibold text-gray-600">الاختيارات</p>
+                                <p class="text-sm font-semibold text-stone-600">الاختيارات</p>
 
                                 <div
                                     v-for="(choice, choiceIndex) in group.choices"
@@ -458,25 +458,25 @@ function saveAndClose() {
                 </div>
 
                 <div class="space-y-2" :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'">
-                    <div class="relative rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">القسم</span>
+                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
                         <div class="w-full space-y-1.5 p-2">
                             <label
                                 v-for="option in categories"
                                 :key="option.id"
                                 class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-gray-700' : 'text-gray-400'"
+                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                             >
                                 <input
                                     type="checkbox"
-                                    class="h-4 w-4 rounded border-gray-300"
+                                    class="h-4 w-4 rounded border-stone-300"
                                     :disabled="!option.selectable"
                                     :checked="form.categoryIds.includes(String(option.id))"
                                     @change="toggleCategory(option.id, $event.target.checked)"
                                 >
                                 <span>{{ option.label }}</span>
                             </label>
-                            <p v-if="categories.length === 0" class="text-xs text-gray-400">لا توجد تصنيفات بعد.</p>
+                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
                         </div>
                     </div>
 

@@ -31,7 +31,7 @@ const swatchClass = {
     emerald: 'bg-emerald-500',
     lime: 'bg-lime-500',
     rose: 'bg-rose-500',
-    gray: 'bg-gray-500',
+    gray: 'bg-stone-500',
     stone: 'bg-stone-500',
     slate: 'bg-slate-500',
 };
@@ -91,7 +91,7 @@ function openCustomPicker() {
             <label
                 v-if="label"
                 :for="name"
-                class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500"
+                class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-stone-500"
             >
                 {{ label }}
             </label>
@@ -118,7 +118,7 @@ function openCustomPicker() {
                     <div
                         class="flex h-7 w-7 items-center justify-center rounded-md ring-offset-1 transition"
                         :class="[
-                            swatchClass[color] ?? 'bg-gray-400',
+                            swatchClass[color] ?? 'bg-stone-400',
                             isActive(color) ? 'ring-2 ring-black ring-offset-1' : '',
                         ]"
                     >

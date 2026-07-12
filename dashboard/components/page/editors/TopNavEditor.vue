@@ -51,7 +51,7 @@ async function submit() {
 
 <template>
     <Form class="!rounded-none !p-4" @submit="submit">
-        <p class="mb-4 text-xs text-gray-400">تحكم في العناصر الظاهرة في الشريط العلوي للصفحة.</p>
+        <p class="mb-4 text-xs text-stone-400">تحكم في العناصر الظاهرة في الشريط العلوي للصفحة.</p>
 
         <div class="space-y-2">
             <Toggle v-model="form.show_share_button" name="show_share_button" label="زر المشاركة" />

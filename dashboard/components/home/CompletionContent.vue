@@ -36,14 +36,14 @@ function openAddModal(slug) {
             v-for="type in contentTypes"
             :key="type.slug"
             type="button"
-            class="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="!addForms[type.slug]"
             @click="openAddModal(type.slug)"
         >
-            <img :src="`/${type.icon}`" alt="" class="size-9 shrink-0 rounded-lg bg-gray-100 p-1.5">
+            <img :src="`/${type.icon}`" alt="" class="size-9 shrink-0 rounded-lg bg-stone-100 p-1.5">
             <span class="min-w-0">
-                <span class="block text-sm font-medium text-gray-800">{{ type.name }}</span>
-                <span class="block text-xs text-gray-400">{{ type.description }}</span>
+                <span class="block text-sm font-medium text-stone-800">{{ type.name }}</span>
+                <span class="block text-xs text-stone-400">{{ type.description }}</span>
             </span>
         </button>
     </div>

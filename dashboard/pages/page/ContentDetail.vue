@@ -22,9 +22,9 @@ function submit() {}
 <template>
     <ManageLayout v-if="contentType">
         <ContentShell :content-type="contentType">
-            <div class="flex items-center justify-between gap-2 border-b border-dotted border-gray-200 bg-gray-50/60 px-4 py-2.5">
-                <p class="truncate text-sm text-gray-500">
-                    تعديل العنصر <span class="font-medium text-gray-700">#{{ itemId }}</span>
+            <div class="flex items-center justify-between gap-2 border-b border-dotted border-stone-200 bg-stone-50/60 px-4 py-2.5">
+                <p class="truncate text-sm text-stone-500">
+                    تعديل العنصر <span class="font-medium text-stone-700">#{{ itemId }}</span>
                 </p>
                 <RouterLink :to="`/manage/${contentType.slug}`" class="shrink-0 text-xs text-primary-600 hover:text-primary-700">
                     رجوع للقائمة

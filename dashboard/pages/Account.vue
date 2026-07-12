@@ -216,7 +216,7 @@ async function submitPassword() {
             <!-- Personal info -->
             <MainBox title="المعلومات الشخصية" subtitle="الصورة والاسم والبريد والجوال.">
                 <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none">
                         <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         <path opacity=".4" d="M20.59 22c0-3.87-3.85-7-8.59-7s-8.59 3.13-8.59 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
@@ -240,7 +240,7 @@ async function submitPassword() {
                         @change="uploadAvatar"
                     />
 
-                    <div v-if="uploadingAvatar" class="px-1 text-xs text-gray-400">جاري رفع الصورة…</div>
+                    <div v-if="uploadingAvatar" class="px-1 text-xs text-stone-400">جاري رفع الصورة…</div>
 
                     <Input
                         v-model="profile.name"
@@ -276,7 +276,7 @@ async function submitPassword() {
             <!-- Password -->
             <MainBox title="كلمة المرور" subtitle="حدّث كلمة المرور وأبطل رموز الوصول القديمة.">
                 <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none">
                         <path d="M6 10V8c0-3.31 1-6 6-6s6 2.69 6 6v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M17 22H7c-4 0-5-1-5-5v-2c0-4 1-5 5-5h10c4 0 5 1 5 5v2c0 4-1 5-5 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         <path opacity=".4" d="M12 18.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />

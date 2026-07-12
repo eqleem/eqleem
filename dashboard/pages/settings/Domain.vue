@@ -161,7 +161,7 @@ async function submitCustomDomain() {
 
         <MainBox title="الدومين المخصص" subtitle="اربط دومينك الخاص بصفحتك على إقليم.">
             <template #icon>
-                <svg class="h-7 w-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" /></svg>
+                <svg class="h-7 w-7 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" /></svg>
             </template>
             <template #actions>
                 <Badge :color="statusColor">{{ statusLabel }}</Badge>
@@ -183,21 +183,21 @@ async function submitCustomDomain() {
                     <p class="mt-1 text-xs text-blue-700/80">أضف السجل التالي من لوحة تحكم مزوّد الدومين. قد يستغرق الانتشار من 5 دقائق إلى 48 ساعة.</p>
                     <dl class="mt-3 divide-y divide-blue-100 rounded-lg border border-blue-100 bg-white text-sm">
                         <div class="flex items-center justify-between gap-4 px-3 py-2.5">
-                            <dt class="text-xs font-medium text-gray-500">النوع</dt>
-                            <dd class="font-mono text-xs text-gray-800" dir="ltr">CNAME</dd>
+                            <dt class="text-xs font-medium text-stone-500">النوع</dt>
+                            <dd class="font-mono text-xs text-stone-800" dir="ltr">CNAME</dd>
                         </div>
                         <div class="flex items-center justify-between gap-4 px-3 py-2.5">
-                            <dt class="text-xs font-medium text-gray-500">الاسم (Host)</dt>
-                            <dd class="font-mono text-xs text-gray-800" dir="ltr">{{ customDomainHost }}</dd>
+                            <dt class="text-xs font-medium text-stone-500">الاسم (Host)</dt>
+                            <dd class="font-mono text-xs text-stone-800" dir="ltr">{{ customDomainHost }}</dd>
                         </div>
                         <div class="flex items-center justify-between gap-4 px-3 py-2.5">
-                            <dt class="text-xs font-medium text-gray-500">القيمة (يشير إلى)</dt>
-                            <dd class="break-all text-left font-mono text-xs text-gray-800" dir="ltr">host.{{ appDomain }}</dd>
+                            <dt class="text-xs font-medium text-stone-500">القيمة (يشير إلى)</dt>
+                            <dd class="break-all text-left font-mono text-xs text-stone-800" dir="ltr">host.{{ appDomain }}</dd>
                         </div>
                     </dl>
                 </div>
-                <div v-else class="mx-4 mb-2 rounded-xl border border-dashed border-gray-200 bg-gray-50/60 p-4">
-                    <p class="text-xs text-gray-500">بعد إدخال الدومين المخصص، ستظهر هنا تعليمات إعداد سجل CNAME في DNS.</p>
+                <div v-else class="mx-4 mb-2 rounded-xl border border-dashed border-stone-200 bg-stone-50/60 p-4">
+                    <p class="text-xs text-stone-500">بعد إدخال الدومين المخصص، ستظهر هنا تعليمات إعداد سجل CNAME في DNS.</p>
                 </div>
 
                 <template #footer>

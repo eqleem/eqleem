@@ -80,8 +80,8 @@ async function submit() {
 
 <template>
     <Form class="!gap-4 !p-5 !py-6" @submit="submit">
-        <div class="rounded-xl bg-gray-50 px-4 py-3">
-            <p class="text-xs text-gray-400">الحالة الحالية</p>
+        <div class="rounded-xl bg-stone-50 px-4 py-3">
+            <p class="text-xs text-stone-400">الحالة الحالية</p>
             <div class="mt-1">
                 <Badge :color="order.status_color">{{ order.status_label }}</Badge>
             </div>
@@ -104,7 +104,7 @@ async function submit() {
             :error="errors.reason"
         />
 
-        <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4">
+        <div class="flex items-center justify-end gap-2 border-t border-stone-100 pt-4">
             <Button type="button" variant="ghost" label="إلغاء" @click="closeModal('change-order-status')" />
             <Button type="submit" label="حفظ التغيير" :loading="saving" />
         </div>

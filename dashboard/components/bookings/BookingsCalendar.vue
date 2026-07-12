@@ -215,7 +215,7 @@ const calendarOptions = {
 
 <template>
     <div class="space-y-3 p-3 sm:p-4">
-        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-600">
+        <div class="flex flex-wrap items-center gap-3 text-xs text-stone-600">
             <span
                 v-for="item in typeLegend"
                 :key="item.type"
@@ -224,7 +224,7 @@ const calendarOptions = {
                 <span class="h-2.5 w-2.5 rounded-sm" :class="item.swatch"></span>
                 {{ item.label }}
             </span>
-            <span v-if="loading" class="text-gray-400">جاري التحميل…</span>
+            <span v-if="loading" class="text-stone-400">جاري التحميل…</span>
         </div>
 
         <p v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -232,7 +232,7 @@ const calendarOptions = {
             <button type="button" class="ms-2 underline" @click="refetch">إعادة المحاولة</button>
         </p>
 
-        <div class="bookings-calendar overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <div class="bookings-calendar overflow-hidden rounded-xl border border-stone-200 bg-white">
             <FullCalendar ref="calendarRef" :options="calendarOptions" />
         </div>
 
@@ -240,28 +240,28 @@ const calendarOptions = {
             <div v-if="selectedBooking" class="space-y-4 p-4 sm:p-5">
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <h3 class="text-base font-bold text-gray-900">{{ selectedBooking.title }}</h3>
+                        <h3 class="text-base font-bold text-stone-900">{{ selectedBooking.title }}</h3>
                         <Badge v-if="selectedBooking.type_label" color="blue">{{ selectedBooking.type_label }}</Badge>
                     </div>
-                    <p class="mt-1 text-xs text-gray-400">حجز #{{ selectedBooking.id }}</p>
+                    <p class="mt-1 text-xs text-stone-400">حجز #{{ selectedBooking.id }}</p>
                 </div>
 
-                <dl class="divide-y divide-gray-100 rounded-xl border border-gray-100 bg-gray-50/60">
+                <dl class="divide-y divide-stone-100 rounded-xl border border-stone-100 bg-stone-50/60">
                     <div class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                        <dt class="text-gray-500">الحالة</dt>
+                        <dt class="text-stone-500">الحالة</dt>
                         <dd><Badge :color="selectedBooking.status_color">{{ selectedBooking.status_label }}</Badge></dd>
                     </div>
                     <div class="space-y-2 px-4 py-3 text-sm">
                         <div class="flex items-center justify-between gap-3">
-                            <dt class="text-gray-500">العميل</dt>
-                            <dd class="font-medium text-gray-800">{{ selectedBooking.client?.name ?? walkingClientLabel }}</dd>
+                            <dt class="text-stone-500">العميل</dt>
+                            <dd class="font-medium text-stone-800">{{ selectedBooking.client?.name ?? walkingClientLabel }}</dd>
                         </div>
                         <div v-if="selectedBooking.client?.phone || selectedBooking.client?.email" class="space-y-2 pt-1">
                             <div
                                 v-if="selectedBooking.client?.phone"
-                                class="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-gray-100"
+                                class="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-stone-100"
                             >
-                                <span class="truncate text-gray-700" dir="ltr">{{ selectedBooking.client.phone }}</span>
+                                <span class="truncate text-stone-700" dir="ltr">{{ selectedBooking.client.phone }}</span>
                                 <div class="flex shrink-0 items-center gap-1">
                                     <a
                                         v-if="telHref(selectedBooking.client.phone)"
@@ -287,13 +287,13 @@ const calendarOptions = {
                             </div>
                             <div
                                 v-if="selectedBooking.client?.email"
-                                class="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-gray-100"
+                                class="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-stone-100"
                             >
-                                <span class="truncate text-gray-700" dir="ltr">{{ selectedBooking.client.email }}</span>
+                                <span class="truncate text-stone-700" dir="ltr">{{ selectedBooking.client.email }}</span>
                                 <a
                                     v-if="mailtoHref(selectedBooking.client.email)"
                                     :href="mailtoHref(selectedBooking.client.email)"
-                                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-stone-100 text-stone-700 hover:bg-stone-200"
                                     title="بريد"
                                     aria-label="إرسال بريد"
                                 >
@@ -303,22 +303,22 @@ const calendarOptions = {
                         </div>
                     </div>
                     <div v-if="selectedBooking.calendar_name" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                        <dt class="text-gray-500">التقويم</dt>
-                        <dd class="text-end font-medium text-gray-800">
-                            <span v-if="selectedBooking.calendar_type_label" class="text-gray-500">{{ selectedBooking.calendar_type_label }}: </span>
+                        <dt class="text-stone-500">التقويم</dt>
+                        <dd class="text-end font-medium text-stone-800">
+                            <span v-if="selectedBooking.calendar_type_label" class="text-stone-500">{{ selectedBooking.calendar_type_label }}: </span>
                             {{ selectedBooking.calendar_name }}
                         </dd>
                     </div>
                     <div v-if="selectedBooking.dates_label" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                        <dt class="text-gray-500">الموعد</dt>
-                        <dd class="text-end font-medium text-gray-800">{{ selectedBooking.dates_label }}</dd>
+                        <dt class="text-stone-500">الموعد</dt>
+                        <dd class="text-end font-medium text-stone-800">{{ selectedBooking.dates_label }}</dd>
                     </div>
                     <div v-if="selectedBooking.price_formatted" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                        <dt class="text-gray-500">السعر</dt>
-                        <dd class="font-medium text-gray-800"><Money :formatted="selectedBooking.price_formatted" /></dd>
+                        <dt class="text-stone-500">السعر</dt>
+                        <dd class="font-medium text-stone-800"><Money :formatted="selectedBooking.price_formatted" /></dd>
                     </div>
                     <div class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                        <dt class="text-gray-500">الطلب</dt>
+                        <dt class="text-stone-500">الطلب</dt>
                         <dd>
                             <Badge v-if="selectedBooking.order_number" color="green">#{{ selectedBooking.order_number }}</Badge>
                             <Badge v-else color="gray">بدون طلب</Badge>

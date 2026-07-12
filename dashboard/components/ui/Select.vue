@@ -47,7 +47,7 @@ const normalized = computed(() => {
             :id="name"
             :value="modelValue"
             :disabled="disabled"
-            class="shrink-0 rounded-md border border-transparent bg-white p-2 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-primary-400 focus:outline-none"
+            class="shrink-0 rounded-md border border-transparent bg-white p-2 px-3 py-2 text-sm text-stone-700 placeholder-stone-400 focus:border-primary-400 focus:outline-none"
             @change="$emit('update:modelValue', $event.target.value)"
         >
             <option v-if="placeholder !== ''" value="">{{ placeholder }}</option>

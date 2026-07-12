@@ -25,7 +25,7 @@ defineEmits(['update:modelValue']);
                 type="checkbox"
                 :value="value"
                 :checked="Array.isArray(modelValue) ? modelValue.includes(value) : Boolean(modelValue)"
-                class="w-auto shrink-0 rounded-md border border-transparent bg-white p-2 py-2 text-sm text-gray-700 focus:border-primary-400 focus:outline-none"
+                class="w-auto shrink-0 rounded-md border border-transparent bg-white p-2 py-2 text-sm text-stone-700 focus:border-primary-400 focus:outline-none"
                 @change="$emit('update:modelValue', Array.isArray(modelValue)
                     ? ($event.target.checked ? [...modelValue, value] : modelValue.filter((item) => item !== value))
                     : $event.target.checked)"

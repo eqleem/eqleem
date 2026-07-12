@@ -22,7 +22,7 @@ const variants = [50, 100, 200, 300];
 
 // Explicit class map so Tailwind keeps the utilities.
 const lightSwatches = {
-    'gray-50': 'bg-gray-50', 'gray-100': 'bg-gray-100', 'gray-200': 'bg-gray-200', 'gray-300': 'bg-gray-300',
+    'gray-50': 'bg-stone-50', 'gray-100': 'bg-stone-100', 'gray-200': 'bg-stone-200', 'gray-300': 'bg-stone-300',
     'stone-50': 'bg-stone-50', 'stone-100': 'bg-stone-100', 'stone-200': 'bg-stone-200', 'stone-300': 'bg-stone-300',
     'slate-50': 'bg-slate-50', 'slate-100': 'bg-slate-100', 'slate-200': 'bg-slate-200', 'slate-300': 'bg-slate-300',
     'zinc-50': 'bg-zinc-50', 'zinc-100': 'bg-zinc-100', 'zinc-200': 'bg-zinc-200', 'zinc-300': 'bg-zinc-300',
@@ -44,8 +44,8 @@ const lightSwatches = {
     'lime-50': 'bg-lime-50', 'lime-100': 'bg-lime-100', 'lime-200': 'bg-lime-200', 'lime-300': 'bg-lime-300',
     'rose-50': 'bg-rose-50', 'rose-100': 'bg-rose-100', 'rose-200': 'bg-rose-200', 'rose-300': 'bg-rose-300',
     white: 'bg-white',
-    'bg-tranparent': 'bg-gray-100',
-    transparent: 'bg-gray-100',
+    'bg-tranparent': 'bg-stone-100',
+    transparent: 'bg-stone-100',
 };
 
 function normalizeValue(value) {
@@ -61,7 +61,7 @@ function normalizeValue(value) {
 
 const currentValue = computed(() => normalizeValue(props.modelValue));
 
-const triggerClass = computed(() => lightSwatches[currentValue.value] ?? 'bg-gray-300');
+const triggerClass = computed(() => lightSwatches[currentValue.value] ?? 'bg-stone-300');
 
 const displayLabel = computed(() => {
     if (currentValue.value === 'bg-tranparent' || currentValue.value === 'transparent') {
@@ -79,7 +79,7 @@ function swatchClass(value) {
     const key = normalizeValue(value);
 
     return [
-        lightSwatches[key] ?? 'bg-gray-200',
+        lightSwatches[key] ?? 'bg-stone-200',
         'mx-1 my-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-stone-300 transition hover:opacity-80',
         isActive(key)
             ? 'scale-110 ring-2 ring-black ring-offset-1'
@@ -103,12 +103,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick));
 </script>
 
 <template>
-    <div ref="root" class="rounded-lg bg-gray-100/75 p-1">
+    <div ref="root" class="rounded-lg bg-stone-100/75 p-1">
         <div class="items-center sm:flex">
             <label
                 v-if="label"
                 :for="name"
-                class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500"
+                class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-stone-500"
             >
                 {{ label }}
             </label>
@@ -132,7 +132,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick));
 
                 <div
                     v-if="open"
-                    class="absolute top-full z-10 mt-2 rounded-md border border-gray-300 shadow-lg ltr:left-0 ltr:origin-top-left rtl:right-0"
+                    class="absolute top-full z-10 mt-2 rounded-md border border-stone-300 shadow-lg ltr:left-0 ltr:origin-top-left rtl:right-0"
                     @click.stop
                 >
                     <div class="rounded-md bg-white p-2 shadow-xs">

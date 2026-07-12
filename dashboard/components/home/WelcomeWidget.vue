@@ -35,7 +35,7 @@ const qrImageUrl = (size = 220) =>
 const socials = [
     { platform: 'whatsapp', label: 'واتساب', icon: 'mdi:whatsapp', class: 'text-green-600' },
     { platform: 'telegram', label: 'تيلجرام', icon: 'mdi:telegram', class: 'text-sky-500' },
-    { platform: 'x', label: 'X', icon: 'ri:twitter-x-fill', class: 'text-gray-900' },
+    { platform: 'x', label: 'X', icon: 'ri:twitter-x-fill', class: 'text-stone-900' },
     { platform: 'facebook', label: 'فيسبوك', icon: 'ic:baseline-facebook', class: 'text-blue-600' },
 ];
 
@@ -203,8 +203,8 @@ function openStep(modal) {
         </div>
 
         <Modal title="مشاركة الصفحة" size="lg" name="home-share-page">
-            <div class="space-y-4 p-4 text-gray-800" dir="rtl">
-                <p class="text-sm text-gray-600">انسخ الرابط أو شاركه مباشرة عبر المنصات.</p>
+            <div class="space-y-4 p-4 text-stone-800" dir="rtl">
+                <p class="text-sm text-stone-600">انسخ الرابط أو شاركه مباشرة عبر المنصات.</p>
 
                 <div class="flex items-center gap-2">
                     <input
@@ -212,7 +212,7 @@ function openStep(modal) {
                         dir="ltr"
                         readonly
                         :value="pageUrl"
-                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700"
+                        class="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm text-stone-700"
                     >
                     <Button
                         variant="primary"
@@ -233,7 +233,7 @@ function openStep(modal) {
                         :href="shareLink(social.platform)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
                     >
                         <iconify-icon :icon="social.icon" class="text-lg" :class="social.class"></iconify-icon>
                         {{ social.label }}
@@ -243,12 +243,12 @@ function openStep(modal) {
         </Modal>
 
         <Modal title="رمز QR للصفحة" size="md" name="home-page-qr">
-            <div class="space-y-4 p-4 text-center text-gray-800" dir="rtl">
-                <p class="text-sm text-gray-600">امسح الرمز لمشاركة صفحتك بسرعة.</p>
-                <div class="mx-auto inline-block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div class="space-y-4 p-4 text-center text-stone-800" dir="rtl">
+                <p class="text-sm text-stone-600">امسح الرمز لمشاركة صفحتك بسرعة.</p>
+                <div class="mx-auto inline-block rounded-2xl border border-stone-100 bg-white p-4 shadow-sm">
                     <img :src="qrImageUrl(220)" alt="رمز QR للصفحة" class="mx-auto size-[220px]" loading="lazy">
                 </div>
-                <p class="truncate text-xs text-gray-500" dir="ltr">{{ pageUrl }}</p>
+                <p class="truncate text-xs text-stone-500" dir="ltr">{{ pageUrl }}</p>
                 <Button
                     variant="primary"
                     class="h-auto rounded-xl px-4 py-2.5 font-semibold"

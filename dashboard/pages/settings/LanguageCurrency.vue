@@ -153,15 +153,15 @@ onMounted(load);
                     :error="errors.default_language"
                 />
 
-                <div class="relative items-start gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-                    <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">اللغات المتاحة</span>
+                <div class="relative items-start gap-x-2 rounded-md bg-stone-100/75 p-1 lg:flex">
+                    <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-stone-500">اللغات المتاحة</span>
                     <div class="flex flex-wrap gap-2 p-2">
                         <label
                             v-for="(label, code) in languages"
                             :key="code"
                             class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm"
                         >
-                            <input v-model="form.availableLanguages" type="checkbox" :value="code" class="rounded border-gray-300">
+                            <input v-model="form.availableLanguages" type="checkbox" :value="code" class="rounded border-stone-300">
                             {{ label }}
                         </label>
                     </div>
@@ -186,15 +186,15 @@ onMounted(load);
                     :error="errors.default_currency"
                 />
 
-                <div class="relative items-start gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-                    <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-gray-500">العملات المتاحة</span>
+                <div class="relative items-start gap-x-2 rounded-md bg-stone-100/75 p-1 lg:flex">
+                    <span class="inline-block w-36 shrink-0 p-2 text-sm font-semibold text-stone-500">العملات المتاحة</span>
                     <div class="flex flex-wrap gap-2 p-2">
                         <label
                             v-for="(label, code) in currencies"
                             :key="code"
                             class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm"
                         >
-                            <input v-model="form.availableCurrencies" type="checkbox" :value="code" class="rounded border-gray-300">
+                            <input v-model="form.availableCurrencies" type="checkbox" :value="code" class="rounded border-stone-300">
                             {{ label }}
                         </label>
                     </div>

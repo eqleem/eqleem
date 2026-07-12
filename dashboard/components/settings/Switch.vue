@@ -12,7 +12,7 @@ defineEmits(['update:modelValue']);
 <template>
     <button
         type="button"
-        class="shrink-0 rounded-lg p-1 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+        class="shrink-0 rounded-lg p-1 transition hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
         role="switch"
         :aria-checked="modelValue ? 'true' : 'false'"
         :aria-label="label"
@@ -21,7 +21,7 @@ defineEmits(['update:modelValue']);
     >
         <span
             class="relative inline-block h-6 w-11 rounded-full transition-colors duration-200"
-            :class="modelValue ? 'bg-primary-500' : 'bg-gray-200'"
+            :class="modelValue ? 'bg-primary-500' : 'bg-stone-200'"
         >
             <span
                 class="absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-all duration-200"

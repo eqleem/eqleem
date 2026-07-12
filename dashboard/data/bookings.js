@@ -106,7 +106,7 @@ export const statusFilterColors = {
         active: 'border-red-400 bg-red-100 text-red-800 ring-0 ring-red-300',
     },
     gray: {
-        idle: 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
-        active: 'border-gray-400 bg-gray-100 text-gray-900 ring-0 ring-gray-300',
+        idle: 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50',
+        active: 'border-stone-400 bg-stone-100 text-stone-900 ring-0 ring-stone-300',
     },
 };

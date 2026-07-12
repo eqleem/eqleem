@@ -11,7 +11,7 @@ defineEmits(['submit']);
 
 <template>
     <form class="flex w-full flex-col gap-y-4 rounded-xl bg-white p-5 py-8" @submit.prevent="$emit('submit')">
-        <div v-if="title" class="mb-6 text-gray-600">
+        <div v-if="title" class="mb-6 text-stone-600">
             <h2 class="text-sm font-semibold">{{ title }}</h2>
             <small v-if="subtitle" class="opacity-50">{{ subtitle }}</small>
         </div>

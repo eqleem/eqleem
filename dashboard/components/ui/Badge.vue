@@ -6,7 +6,7 @@ defineProps({
 });
 
 const colors = {
-    gray: 'bg-gray-50 text-gray-500',
+    gray: 'bg-stone-50 text-stone-500',
     green: 'bg-green-50 text-green-500',
     yellow: 'bg-yellow-50 text-yellow-500',
     blue: 'bg-blue-50 text-blue-500',
@@ -14,7 +14,7 @@ const colors = {
     red: 'bg-red-50 text-red-500',
     purple: 'bg-purple-50 text-purple-500',
     pink: 'bg-pink-50 text-pink-500',
-    white: 'bg-white text-gray-500',
+    white: 'bg-white text-stone-500',
 };
 </script>
 

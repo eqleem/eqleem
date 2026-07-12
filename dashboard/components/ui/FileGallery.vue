@@ -89,7 +89,7 @@ function onDrop(targetId) {
 <template>
     <Field :label="label" block>
         <div class="space-y-3">
-            <div v-if="files.length === 0" class="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
+            <div v-if="files.length === 0" class="rounded-lg border border-dashed border-stone-200 bg-stone-50 p-4 text-sm text-stone-500">
                 لم يتم رفع ملفات تحميل بعد. سيحصل العميل على هذه الملفات بعد إتمام الشراء.
             </div>
 
@@ -97,16 +97,16 @@ function onDrop(targetId) {
                 <div
                     v-for="file in files"
                     :key="file.id"
-                    class="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2"
+                    class="group flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2"
                     draggable="true"
                     @dragstart="onDragStart($event, file.id)"
                     @dragover.prevent
                     @drop.prevent="onDrop(file.id)"
                 >
-                    <span class="shrink-0 text-gray-400">⋮⋮</span>
+                    <span class="shrink-0 text-stone-400">⋮⋮</span>
                     <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-medium text-gray-700">{{ file.name }}</p>
-                        <p class="text-xs text-gray-400">{{ formatSize(file.size) }}</p>
+                        <p class="truncate text-sm font-medium text-stone-700">{{ file.name }}</p>
+                        <p class="text-xs text-stone-400">{{ formatSize(file.size) }}</p>
                     </div>
                     <button
                         type="button"
@@ -122,7 +122,7 @@ function onDrop(targetId) {
             <button
                 v-if="canUpload"
                 type="button"
-                class="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-2 text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600 disabled:opacity-50"
+                class="rounded-lg border border-dashed border-stone-300 bg-white px-4 py-2 text-sm text-stone-500 hover:border-primary-400 hover:text-primary-600 disabled:opacity-50"
                 :disabled="uploading || disabled"
                 @click="pickFiles"
             >
@@ -130,7 +130,7 @@ function onDrop(targetId) {
                 <span v-else>رفع ملفات التحميل</span>
             </button>
 
-            <p class="text-xs text-gray-400">يمكنك سحب الملفات لإعادة ترتيبها.</p>
+            <p class="text-xs text-stone-400">يمكنك سحب الملفات لإعادة ترتيبها.</p>
 
             <input
                 ref="fileInput"

@@ -79,7 +79,7 @@ function onDrop(targetId) {
                 <div
                     v-for="image in images"
                     :key="image.id"
-                    class="group relative h-20 w-20 overflow-hidden rounded-lg bg-gray-200"
+                    class="group relative h-20 w-20 overflow-hidden rounded-lg bg-stone-200"
                     draggable="true"
                     @dragstart="onDragStart($event, image.id)"
                     @dragover.prevent
@@ -99,7 +99,7 @@ function onDrop(targetId) {
                 <button
                     v-if="canUpload"
                     type="button"
-                    class="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400 hover:border-primary-400 hover:text-primary-600 disabled:opacity-50"
+                    class="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-stone-300 bg-white text-center text-xs text-stone-400 hover:border-primary-400 hover:text-primary-600 disabled:opacity-50"
                     :disabled="uploading || disabled"
                     @click="pickFiles"
                 >
@@ -108,7 +108,7 @@ function onDrop(targetId) {
                 </button>
             </div>
 
-            <p class="text-xs text-gray-400">يمكنك سحب الصور لإعادة ترتيبها. الحد الأقصى {{ maxFiles }} صور.</p>
+            <p class="text-xs text-stone-400">يمكنك سحب الصور لإعادة ترتيبها. الحد الأقصى {{ maxFiles }} صور.</p>
 
             <input
                 ref="fileInput"

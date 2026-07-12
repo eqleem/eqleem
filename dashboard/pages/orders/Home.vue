@@ -28,7 +28,7 @@ const active = computed(() => (tabs.some((tab) => tab.name === route.query.tab) 
     <Container>
         <MainBox title="الطلبات والحجوزات" subtitle="الطلبات والحجوزات والمبيعات وكل تعاملات العملاء تجدها هنا.">
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-500" viewBox="0 0 24 24" fill="none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-stone-500" viewBox="0 0 24 24" fill="none">
                     <path
                         d="M8.5 19H8c-4 0-6-1-6-6V8c0-4 2-6 6-6h8c4 0 6 2 6 6v5c0 4-2 6-6 6h-.5c-.31 0-.61.15-.8.4l-1.5 2c-.66.88-1.74.88-2.4 0l-1.5-2c-.16-.22-.53-.4-.8-.4Z"
                         stroke="currentColor"
@@ -57,7 +57,7 @@ const active = computed(() => (tabs.some((tab) => tab.name === route.query.tab) 
                         class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition shrink-0"
                         :class="active === tab.name
                             ? 'border-b-2 border-primary-500 text-stone-900'
-                            : 'text-gray-500 hover:text-gray-800'"
+                            : 'text-stone-500 hover:text-stone-800'"
                     >
                         <Icon :name="tab.icon" class="h-4 w-4 opacity-75" />
                         {{ tab.label }}

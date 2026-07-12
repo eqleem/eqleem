@@ -21,17 +21,17 @@ function onNavigate() {
 
 const linkClass = {
     compact: 'flex items-center gap-x-2 rounded bg-stone-100 p-1.5 hover:bg-stone-200',
-    panel: 'flex items-center gap-x-3 rounded-xl px-3 py-2.5 text-sm text-gray-700 transition hover:bg-white',
+    panel: 'flex items-center gap-x-3 rounded-xl px-3 py-2.5 text-sm text-stone-700 transition hover:bg-white',
 };
 </script>
 
 <template>
-    <div v-if="variant === 'panel'" class="border-b border-gray-200 bg-white px-4 py-5">
+    <div v-if="variant === 'panel'" class="border-b border-stone-200 bg-white px-4 py-5">
         <div class="flex items-center gap-3">
             <img :src="userImage" alt="" class="h-12 w-12 rounded-full ring-2 ring-primary-100">
             <div class="min-w-0 flex-1">
-                <p class="truncate font-semibold text-gray-900">{{ userName || '…' }}</p>
-                <p class="truncate text-sm text-gray-500">{{ userEmail }}</p>
+                <p class="truncate font-semibold text-stone-900">{{ userName || '…' }}</p>
+                <p class="truncate text-sm text-stone-500">{{ userEmail }}</p>
             </div>
         </div>
 
@@ -42,7 +42,7 @@ const linkClass = {
                 class="h-9 w-9 rounded-lg object-cover"
             >
             <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-gray-800">{{ tenantName }}</p>
+                <p class="truncate text-sm font-medium text-stone-800">{{ tenantName }}</p>
                 <span class="mt-0.5 inline-block rounded-md bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-700">
                     {{ tenantPlan }}
                 </span>

@@ -13,7 +13,7 @@ import { openModal } from '../../lib/modal.js';
     <Container>
         <MainBox title="العملاء" subtitle="العملاء والزبائن، تجدها هنا.">
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-500" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-stone-500" viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0z" fill="none" />
                     <circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4" />
                     <ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3" />

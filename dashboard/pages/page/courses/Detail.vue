@@ -419,23 +419,23 @@ function saveAndClose() {
                     <RouterLink
                         to="/manage/courses"
                         title="رجوع"
-                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-gray-50"
+                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-stone-50"
                     >
-                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
-                    <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
+                    <div class="flex min-w-0 items-center gap-2 text-sm text-stone-700">
                         <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ store.type?.name }}</span>
-                        <span class="text-gray-400 hidden md:inline">/</span>
-                        <span class="truncate text-gray-600 hidden md:inline">تحرير الدورة</span>
+                        <span class="text-stone-400 hidden md:inline">/</span>
+                        <span class="truncate text-stone-600 hidden md:inline">تحرير الدورة</span>
                     </div>
                 </div>
 
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('edit')"
                     >
                         تحرير
@@ -443,7 +443,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'curriculum' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'curriculum' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('curriculum')"
                     >
                         المحتوى التعليمي
@@ -451,7 +451,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('advanced')"
                     >
                         متقدم
@@ -492,10 +492,10 @@ function saveAndClose() {
                     />
 
                     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <div class="rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                            <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">نوع الدورة</span>
+                        <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                            <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">نوع الدورة</span>
                             <div class="w-full p-2">
-                                <select v-model="form.courseType" class="block w-full rounded-lg border-gray-300 text-sm">
+                                <select v-model="form.courseType" class="block w-full rounded-lg border-stone-300 text-sm">
                                     <option v-for="(label, key) in courseTypeOptions" :key="key" :value="key">{{ label }}</option>
                                 </select>
                             </div>
@@ -503,11 +503,11 @@ function saveAndClose() {
                         <Input v-model="form.hours" name="hours" label="عدد ساعات الدورة" type="number" dir="ltr" step="0.5" min="0" placeholder="0" />
                     </div>
 
-                    <div class="rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">المستوى</span>
+                    <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">المستوى</span>
                         <div class="flex w-full flex-wrap gap-3 p-2">
-                            <label v-for="(label, key) in levelOptions" :key="key" class="flex items-center gap-2 text-sm text-gray-700">
-                                <input v-model="form.level" type="radio" name="level" :value="key" class="h-4 w-4 border-gray-300">
+                            <label v-for="(label, key) in levelOptions" :key="key" class="flex items-center gap-2 text-sm text-stone-700">
+                                <input v-model="form.level" type="radio" name="level" :value="key" class="h-4 w-4 border-stone-300">
                                 <span>{{ label }}</span>
                             </label>
                         </div>
@@ -524,14 +524,14 @@ function saveAndClose() {
                     />
 
                     <div class="flex items-center justify-between gap-3">
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm text-stone-600">
                             {{ form.chapters.length }} {{ form.chapters.length === 1 ? 'فصل' : 'فصول' }}
                             — {{ totalLessons }} {{ totalLessons === 1 ? 'درس' : 'دروس' }}
                         </p>
                         <Button type="button" variant="secondary" label="إضافة فصل" @click="addChapter" />
                     </div>
 
-                    <div v-if="form.chapters.length === 0" class="rounded-xl border border-dashed border-stone-200 p-8 text-center text-sm text-gray-500">
+                    <div v-if="form.chapters.length === 0" class="rounded-xl border border-dashed border-stone-200 p-8 text-center text-sm text-stone-500">
                         لا يوجد محتوى تعليمي بعد. أضف فصولاً ودروساً لبناء محتوى الدورة.
                     </div>
 
@@ -543,17 +543,17 @@ function saveAndClose() {
                         >
                             <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 py-3">
                                 <button type="button" class="flex min-w-0 items-center gap-2 text-start" @click="openChapters[chapterIndex] = !openChapters[chapterIndex]">
-                                    <span class="truncate text-sm font-semibold text-gray-800">
+                                    <span class="truncate text-sm font-semibold text-stone-800">
                                         فصل {{ chapterIndex + 1 }}
                                         <template v-if="chapter.title"> — {{ chapter.title }}</template>
                                     </span>
-                                    <span class="shrink-0 text-xs text-gray-500">{{ chapter.lessons.length }} دروس</span>
+                                    <span class="shrink-0 text-xs text-stone-500">{{ chapter.lessons.length }} دروس</span>
                                 </button>
                                 <div class="flex shrink-0 items-center gap-1">
-                                    <button type="button" class="rounded-lg px-2.5 py-1.5 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-600" @click="addLesson(chapterIndex)">
+                                    <button type="button" class="rounded-lg px-2.5 py-1.5 text-sm text-stone-600 hover:bg-primary-50 hover:text-primary-600" @click="addLesson(chapterIndex)">
                                         إضافة درس
                                     </button>
-                                    <button type="button" class="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600" @click="removeChapter(chapterIndex)">
+                                    <button type="button" class="rounded-lg p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeChapter(chapterIndex)">
                                         حذف
                                     </button>
                                 </div>
@@ -563,7 +563,7 @@ function saveAndClose() {
                                 <Input v-model="chapter.title" :name="`chapter-title-${chapterIndex}`" label="عنوان الفصل" placeholder="مثال: الأساسيات والتحضير" />
                                 <Textarea v-model="chapter.description" :name="`chapter-desc-${chapterIndex}`" label="وصف الفصل" :rows="2" />
 
-                                <div v-if="chapter.lessons.length === 0" class="text-sm text-gray-500">لا توجد دروس في هذا الفصل بعد.</div>
+                                <div v-if="chapter.lessons.length === 0" class="text-sm text-stone-500">لا توجد دروس في هذا الفصل بعد.</div>
 
                                 <div v-else class="space-y-2">
                                     <div
@@ -573,14 +573,14 @@ function saveAndClose() {
                                     >
                                         <div class="flex items-center justify-between gap-3 border-b border-stone-100 bg-stone-50 px-3 py-2.5">
                                             <button type="button" class="flex min-w-0 flex-1 items-center gap-2 text-start" @click="openLessons[`${chapterIndex}-${lessonIndex}`] = !openLessons[`${chapterIndex}-${lessonIndex}`]">
-                                                <span class="truncate text-sm font-semibold text-gray-700">
+                                                <span class="truncate text-sm font-semibold text-stone-700">
                                                     درس {{ lessonIndex + 1 }}
                                                     <template v-if="lesson.title"> — {{ lesson.title }}</template>
                                                 </span>
                                                 <span v-if="lesson.source === 'link' && lesson.link" class="shrink-0 rounded-md bg-primary-50 px-2 py-0.5 text-xs text-primary-600">رابط</span>
                                                 <span v-else-if="lesson.file_name" class="shrink-0 rounded-md bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">ملف</span>
                                             </button>
-                                            <button type="button" class="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-red-50 hover:text-red-600" @click="removeLesson(chapterIndex, lessonIndex)">
+                                            <button type="button" class="shrink-0 rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLesson(chapterIndex, lessonIndex)">
                                                 حذف
                                             </button>
                                         </div>
@@ -589,10 +589,10 @@ function saveAndClose() {
                                             <Input v-model="lesson.title" :name="`lesson-title-${chapterIndex}-${lessonIndex}`" label="عنوان الدرس" />
                                             <Textarea v-model="lesson.description" :name="`lesson-desc-${chapterIndex}-${lessonIndex}`" label="وصف الدرس" :rows="2" />
 
-                                            <div class="rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                                                <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">مصدر المحتوى</span>
+                                            <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                                                <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">مصدر المحتوى</span>
                                                 <div class="w-full p-2">
-                                                    <select v-model="lesson.source" class="block w-full rounded-lg border-gray-300 text-sm">
+                                                    <select v-model="lesson.source" class="block w-full rounded-lg border-stone-300 text-sm">
                                                         <option value="file">رفع ملف</option>
                                                         <option value="link">رابط خارجي</option>
                                                     </select>
@@ -609,17 +609,17 @@ function saveAndClose() {
                                             />
 
                                             <div v-else class="space-y-2">
-                                                <div v-if="lesson.file_name" class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                                                <div v-if="lesson.file_name" class="flex items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="truncate text-sm font-medium text-gray-800">{{ lesson.file_name }}</p>
+                                                        <p class="truncate text-sm font-medium text-stone-800">{{ lesson.file_name }}</p>
                                                         <a v-if="lesson.file_url" :href="lesson.file_url" target="_blank" class="text-xs text-primary-600 hover:underline">معاينة الملف</a>
                                                     </div>
-                                                    <button type="button" class="rounded-lg p-1 text-gray-400 hover:bg-red-50 hover:text-red-600" @click="removeLessonFile(chapterIndex, lessonIndex)">
+                                                    <button type="button" class="rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLessonFile(chapterIndex, lessonIndex)">
                                                         حذف الملف
                                                     </button>
                                                 </div>
-                                                <p v-else class="text-sm text-gray-500">لم يتم رفع ملف بعد.</p>
-                                                <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover:bg-primary-50">
+                                                <p v-else class="text-sm text-stone-500">لم يتم رفع ملف بعد.</p>
+                                                <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm text-stone-700 shadow-sm hover:bg-primary-50">
                                                     <span>{{ lesson.file_name ? 'استبدال الملف' : 'رفع ملف الدرس' }}</span>
                                                     <input
                                                         type="file"
@@ -628,7 +628,7 @@ function saveAndClose() {
                                                         @change="uploadLessonFile(chapterIndex, lessonIndex, $event)"
                                                     >
                                                 </label>
-                                                <p v-if="uploadingLesson === `${chapterIndex}-${lessonIndex}`" class="text-xs text-gray-500">جاري الرفع…</p>
+                                                <p v-if="uploadingLesson === `${chapterIndex}-${lessonIndex}`" class="text-xs text-stone-500">جاري الرفع…</p>
                                             </div>
                                         </div>
                                     </div>
@@ -641,25 +641,25 @@ function saveAndClose() {
                 </div>
 
                 <div class="space-y-2" :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'">
-                    <div class="relative rounded-md bg-gray-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">القسم</span>
+                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
                         <div class="w-full space-y-1.5 p-2">
                             <label
                                 v-for="option in categories"
                                 :key="option.id"
                                 class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-gray-700' : 'text-gray-400'"
+                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                             >
                                 <input
                                     type="checkbox"
-                                    class="h-4 w-4 rounded border-gray-300"
+                                    class="h-4 w-4 rounded border-stone-300"
                                     :disabled="!option.selectable"
                                     :checked="form.categoryIds.includes(String(option.id))"
                                     @change="toggleCategory(option.id, $event.target.checked)"
                                 >
                                 <span>{{ option.label }}</span>
                             </label>
-                            <p v-if="categories.length === 0" class="text-xs text-gray-400">لا توجد تصنيفات بعد.</p>
+                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
                         </div>
                     </div>
 

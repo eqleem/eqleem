@@ -10,13 +10,13 @@ defineProps({
     <div class="w-full rounded-xl bg-white">
         <div
             v-if="title"
-            class="relative z-40 flex items-center justify-between overflow-visible rounded-t-xl border-b-2 border-gray-100 bg-gray-50 p-4 text-gray-600"
+            class="relative z-40 flex items-center justify-between overflow-visible rounded-t-xl border-b-2 border-stone-100 bg-stone-50 p-4 text-stone-600"
         >
             <div>
                 <div class="flex items-center gap-x-2">
                     <slot name="rightAction" />
                     <div>
-                        <h2 class="text-sm font-semibold text-gray-500">{{ title }}</h2>
+                        <h2 class="text-sm font-semibold text-stone-500">{{ title }}</h2>
                         <small v-if="subtitle" class="text-xs opacity-50">{{ subtitle }}</small>
                     </div>
                 </div>

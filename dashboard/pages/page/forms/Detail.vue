@@ -328,23 +328,23 @@ function saveAndClose() {
                     <RouterLink
                         to="/manage/forms"
                         title="رجوع"
-                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-gray-50"
+                        class="flex shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm hover:bg-stone-50"
                     >
-                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                     </RouterLink>
-                    <div class="flex min-w-0 items-center gap-2 text-sm text-gray-700">
+                    <div class="flex min-w-0 items-center gap-2 text-sm text-stone-700">
                         <img v-if="store.type?.icon" :src="`/${store.type.icon}`" class="h-5 w-5 shrink-0" alt="">
                         <span class="truncate font-semibold">{{ store.type?.name }}</span>
-                        <span class="text-gray-400 hidden md:inline">/</span>
-                        <span class="truncate text-gray-600 hidden md:inline">تحرير النموذج</span>
+                        <span class="text-stone-400 hidden md:inline">/</span>
+                        <span class="truncate text-stone-600 hidden md:inline">تحرير النموذج</span>
                     </div>
                 </div>
 
-                <nav class="flex shrink-0 items-center gap-1 rounded-xl bg-gray-300/40 p-0.5">
+                <nav class="flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('edit')"
                     >
                         تحرير
@@ -352,7 +352,7 @@ function saveAndClose() {
                     <button
                         type="button"
                         class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'"
+                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                         @click.prevent.stop="switchTab('advanced')"
                     >
                         متقدم
@@ -384,8 +384,8 @@ function saveAndClose() {
                     <div class="space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
-                                <p class="text-sm font-semibold text-gray-700">حقول النموذج</p>
-                                <p class="mt-0.5 text-xs text-gray-400">رتّب الحقول بالسحب والإفلات.</p>
+                                <p class="text-sm font-semibold text-stone-700">حقول النموذج</p>
+                                <p class="mt-0.5 text-xs text-stone-400">رتّب الحقول بالسحب والإفلات.</p>
                             </div>
 
                             <div class="relative shrink-0">
@@ -400,13 +400,13 @@ function saveAndClose() {
 
                                 <div
                                     v-if="addFieldOpen"
-                                    class="absolute z-50 mt-2 min-w-48 rounded-lg border border-gray-100 bg-white p-1 shadow-lg ltr:right-0 rtl:left-0"
+                                    class="absolute z-50 mt-2 min-w-48 rounded-lg border border-stone-100 bg-white p-1 shadow-lg ltr:right-0 rtl:left-0"
                                 >
                                     <button
                                         v-for="(label, type) in fieldTypeOptions"
                                         :key="type"
                                         type="button"
-                                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-start text-sm text-gray-700 transition hover:bg-gray-100"
+                                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-start text-sm text-stone-700 transition hover:bg-stone-100"
                                         @click="addField(type)"
                                     >
                                         {{ label }}
@@ -415,7 +415,7 @@ function saveAndClose() {
                             </div>
                         </div>
 
-                        <div v-if="form.fields.length === 0" class="rounded-xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-500">
+                        <div v-if="form.fields.length === 0" class="rounded-xl border border-dashed border-stone-200 p-8 text-center text-sm text-stone-500">
                             لا توجد حقول بعد. أضف حقولاً لبناء النموذج.
                         </div>
 
@@ -424,14 +424,14 @@ function saveAndClose() {
                                 v-for="field in form.fields"
                                 :key="field.id"
                                 draggable="true"
-                                class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 transition hover:border-gray-200"
+                                class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2 py-2 transition hover:border-stone-200"
                                 @dragstart="onDragStart(field.id)"
                                 @dragover.prevent
                                 @drop.prevent="onDrop(field.id)"
                             >
                                 <button
                                     type="button"
-                                    class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing"
+                                    class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
                                     aria-label="سحب لإعادة الترتيب"
                                 >
                                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="7" r="1.2" /><circle cx="15" cy="7" r="1.2" /><circle cx="9" cy="12" r="1.2" /><circle cx="15" cy="12" r="1.2" /><circle cx="9" cy="17" r="1.2" /><circle cx="15" cy="17" r="1.2" /></svg>
@@ -442,11 +442,11 @@ function saveAndClose() {
                                     class="flex min-w-0 flex-1 flex-col items-start text-start transition hover:text-primary-600"
                                     @click="openFieldEditor(field.id)"
                                 >
-                                    <span class="truncate text-sm font-medium text-gray-800">
+                                    <span class="truncate text-sm font-medium text-stone-800">
                                         {{ field.label || 'حقل بدون عنوان' }}
                                     </span>
-                                    <span class="truncate font-mono text-xs text-gray-500" dir="ltr">{{ field.name }}</span>
-                                    <span class="truncate text-xs text-gray-400">
+                                    <span class="truncate font-mono text-xs text-stone-500" dir="ltr">{{ field.name }}</span>
+                                    <span class="truncate text-xs text-stone-400">
                                         {{ fieldTypeLabel(field.type) }}
                                         <template v-if="field.required"> · مطلوب</template>
                                     </span>
@@ -506,12 +506,12 @@ function saveAndClose() {
                 v-if="fieldModal && editingField"
                 class="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-                <div class="absolute inset-0 bg-gray-800/75" @click="closeFieldModal" />
+                <div class="absolute inset-0 bg-stone-800/75" @click="closeFieldModal" />
 
                 <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-                    <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-3 px-4">
-                        <p class="text-sm font-semibold text-gray-600">تعديل الحقل</p>
-                        <button type="button" class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200" @click="closeFieldModal">
+                    <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                        <p class="text-sm font-semibold text-stone-600">تعديل الحقل</p>
+                        <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200" @click="closeFieldModal">
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18" /></svg>
                         </button>
                     </div>
@@ -561,7 +561,7 @@ function saveAndClose() {
                         />
 
                         <div v-if="fieldTypeHasOptions(editingField.type)" class="space-y-2">
-                            <p class="px-1 text-sm font-semibold text-gray-600">الخيارات</p>
+                            <p class="px-1 text-sm font-semibold text-stone-600">الخيارات</p>
 
                             <div
                                 v-for="(option, optionIndex) in editingField.options"

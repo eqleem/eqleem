@@ -36,7 +36,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutside));
                 width,
                 placement === 'top' ? 'bottom-full mb-2' : 'mt-2',
             ]"
-            class="absolute z-[100] space-y-1 rounded-lg bg-white p-1 text-gray-800 shadow-lg ring-1 ring-black/5 ltr:right-0 rtl:left-0"
+            class="absolute z-[100] space-y-1 rounded-lg bg-white p-1 text-stone-800 shadow-lg ring-1 ring-black/5 ltr:right-0 rtl:left-0"
             @click="open = false"
         >
             <slot />

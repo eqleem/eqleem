@@ -65,7 +65,7 @@ provide('tabs', {
 
 <template>
     <div class="rounded-b-2xl">
-        <div v-if="$slots.nav" class="overflow-x-auto whitespace-nowrap rounded-t-lg text-sm text-gray-600">
+        <div v-if="$slots.nav" class="overflow-x-auto whitespace-nowrap rounded-t-lg text-sm text-stone-600">
             <slot name="nav" />
         </div>
         <div class="rounded-b-2xl [&>*:first-child]:rounded-ts-none">

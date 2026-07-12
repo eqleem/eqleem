@@ -51,7 +51,7 @@ async function submit() {
 
 <template>
     <Form class="!rounded-none !p-4" @submit="submit">
-        <p class="mb-4 text-xs text-gray-400">تخصيص الأزرار الطافية الثابتة على الصفحة.</p>
+        <p class="mb-4 text-xs text-stone-400">تخصيص الأزرار الطافية الثابتة على الصفحة.</p>
 
         <div class="space-y-2">
             <Select

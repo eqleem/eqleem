@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const linkClass =
-    'h-12 md:h-9 text-base w-full md:w-auto justify-center flex items-center gap-x-2 py-3 px-2.5 md:py-1.5 rounded-sm hover:bg-gray-300 hover:text-gray-900';
+    'h-12 md:h-9 text-base w-full md:w-auto justify-center flex items-center gap-x-2 py-3 px-2.5 md:py-1.5 rounded-sm hover:bg-stone-300 hover:text-stone-900';
 
 const iconClass = 'h-7 w-7 md:h-5 md:w-5 shrink-0';
 
@@ -15,7 +15,7 @@ function activeClass(base) {
         ? route.path === '/'
         : route.path === base || route.path.startsWith(`${base}/`);
 
-    return isActive ? 'bg-gray-100 text-gray-900' : '';
+    return isActive ? 'bg-stone-100 text-stone-900' : '';
 }
 </script>
 

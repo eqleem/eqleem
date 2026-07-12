@@ -11,12 +11,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="antialiased bg-stone-200 min-h-screen">
+    <div class="antialiased bg-stone-200">
         <Header />
         <Nav />
         <Notify />
-        <main class="min-h-[calc(100vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
+        <main class="bg-stone-200 min-h-[calc(102.5vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
             <RouterView />
         </main>
-    </div>
+    </div> 
 </template>

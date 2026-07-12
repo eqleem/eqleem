@@ -46,7 +46,7 @@ onUnmounted(() => clientsStore.clearDetail());
             v-if="loading && !client"
             class="flex items-center justify-center rounded-xl bg-white p-16"
         >
-            <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class="h-10 w-10 animate-spin text-stone-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
             </svg>
         </div>
@@ -58,7 +58,7 @@ onUnmounted(() => clientsStore.clearDetail());
             <p class="text-sm text-red-600">{{ error }}</p>
             <button
                 type="button"
-                class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                class="rounded-lg border bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
                 @click="loadClient(route.params.uuid)"
             >
                 إعادة المحاولة
@@ -71,7 +71,7 @@ onUnmounted(() => clientsStore.clearDetail());
                 <div class="-mt-6 sm:-mt-10 sm:flex sm:items-end sm:gap-x-5">
                     <img class="z-50 h-16 w-16 rounded-full ring-4 ring-white/50 sm:h-20 sm:w-20" :src="client.avatar" alt="">
                     <div class="mt-6 min-w-0 flex-1">
-                        <h1 class="ms-3 truncate text-2xl font-bold text-gray-900">{{ client.name }}</h1>
+                        <h1 class="ms-3 truncate text-2xl font-bold text-stone-900">{{ client.name }}</h1>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@ onUnmounted(() => clientsStore.clearDetail());
                         :key="tab.name"
                         :to="{ query: { tab: tab.name } }"
                         class="flex items-center gap-x-2 px-4 py-3 text-sm"
-                        :class="active === tab.name ? 'border-b-2 border-blue-800 text-gray-900' : 'text-gray-500 hover:text-gray-800'"
+                        :class="active === tab.name ? 'border-b-2 border-blue-800 text-stone-900' : 'text-stone-500 hover:text-stone-800'"
                     >
                         <Icon :name="tab.icon" class="h-4 w-4" />
                         {{ tab.label }}
@@ -92,20 +92,20 @@ onUnmounted(() => clientsStore.clearDetail());
 
                 <div v-if="active === 'info'" class="grid grid-cols-1 gap-x-4 gap-y-8 p-5 sm:grid-cols-2 xl:p-10">
                     <div>
-                        <dt class="text-sm text-gray-400">رقم الجوال</dt>
-                        <dd class="mt-2 inline-block text-base font-bold text-gray-700" dir="ltr">{{ client.phone || '-' }}</dd>
+                        <dt class="text-sm text-stone-400">رقم الجوال</dt>
+                        <dd class="mt-2 inline-block text-base font-bold text-stone-700" dir="ltr">{{ client.phone || '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm text-gray-400">البريد الإلكتروني</dt>
-                        <dd class="mt-2 text-base font-bold text-gray-700">{{ client.email || '-' }}</dd>
+                        <dt class="text-sm text-stone-400">البريد الإلكتروني</dt>
+                        <dd class="mt-2 text-base font-bold text-stone-700">{{ client.email || '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm text-gray-400">العنوان</dt>
-                        <dd class="mt-2 text-base font-bold text-gray-700">{{ client.address || '-' }}</dd>
+                        <dt class="text-sm text-stone-400">العنوان</dt>
+                        <dd class="mt-2 text-base font-bold text-stone-700">{{ client.address || '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm text-gray-400">المدينة</dt>
-                        <dd class="mt-2 text-base font-bold text-gray-700">{{ client.city || '-' }}</dd>
+                        <dt class="text-sm text-stone-400">المدينة</dt>
+                        <dd class="mt-2 text-base font-bold text-stone-700">{{ client.city || '-' }}</dd>
                     </div>
                 </div>
                 <OrdersTable v-else-if="active === 'orders'" />

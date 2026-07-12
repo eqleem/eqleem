@@ -34,7 +34,7 @@ onUnmounted(() => bookingsStore.clearDetail());
 <template>
     <Container :title="`الحجوزات / #${booking?.id ?? '...'}`" back-route="/orders?tab=bookings">
         <div v-if="loading && !booking" class="flex items-center justify-center rounded-xl bg-white p-16">
-            <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class="h-10 w-10 animate-spin text-stone-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" d="M12 3a9 9 0 1 0 9 9" />
             </svg>
         </div>
@@ -43,7 +43,7 @@ onUnmounted(() => bookingsStore.clearDetail());
             <p class="text-sm text-red-600">{{ error }}</p>
             <button
                 type="button"
-                class="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                class="rounded-lg border bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
                 @click="loadBooking(route.params.id)"
             >
                 إعادة المحاولة
@@ -55,19 +55,19 @@ onUnmounted(() => bookingsStore.clearDetail());
                 <Section title="ملخص الحجز" icon="calendar">
                     <div class="space-y-3 p-5">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-500">السعر</span>
-                            <span class="font-medium text-gray-800"><Money :formatted="booking.price_formatted" /></span>
+                            <span class="text-stone-500">السعر</span>
+                            <span class="font-medium text-stone-800"><Money :formatted="booking.price_formatted" /></span>
                         </div>
-                        <div class="border-t border-gray-100 pt-4">
+                        <div class="border-t border-stone-100 pt-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm font-semibold text-gray-800">الإجمالي</span>
+                                <span class="text-sm font-semibold text-stone-800">الإجمالي</span>
                                 <span class="text-xl font-bold text-primary-700"><Money :formatted="booking.price_formatted" /></span>
                             </div>
                         </div>
-                        <div class="space-y-2 border-t border-gray-100 pt-3">
+                        <div class="space-y-2 border-t border-stone-100 pt-3">
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500">العملة</span>
-                                <span class="font-medium text-gray-800" dir="ltr">{{ booking.currency }}</span>
+                                <span class="text-stone-500">العملة</span>
+                                <span class="font-medium text-stone-800" dir="ltr">{{ booking.currency }}</span>
                             </div>
                         </div>
                     </div>
@@ -77,11 +77,11 @@ onUnmounted(() => bookingsStore.clearDetail());
                     <div class="p-5">
                         <template v-if="booking.client">
                             <div class="flex items-center gap-3">
-                                <img :src="booking.client.avatar" :alt="booking.client.name" class="h-12 w-12 shrink-0 rounded-full bg-gray-100 object-cover">
+                                <img :src="booking.client.avatar" :alt="booking.client.name" class="h-12 w-12 shrink-0 rounded-full bg-stone-100 object-cover">
                                 <div class="min-w-0">
-                                    <p class="truncate font-semibold text-gray-900">{{ booking.client.name }}</p>
-                                    <p v-if="booking.client.email" class="truncate text-sm text-gray-500">{{ booking.client.email }}</p>
-                                    <p v-if="booking.client.phone" class="text-sm text-gray-500" dir="ltr">{{ booking.client.phone }}</p>
+                                    <p class="truncate font-semibold text-stone-900">{{ booking.client.name }}</p>
+                                    <p v-if="booking.client.email" class="truncate text-sm text-stone-500">{{ booking.client.email }}</p>
+                                    <p v-if="booking.client.phone" class="text-sm text-stone-500" dir="ltr">{{ booking.client.phone }}</p>
                                 </div>
                             </div>
                             <RouterLink v-if="booking.client.uuid" :to="`/clients/${booking.client.uuid}`" class="mt-4 block">
@@ -89,11 +89,11 @@ onUnmounted(() => bookingsStore.clearDetail());
                             </RouterLink>
                         </template>
                         <div v-else class="flex flex-col items-center py-4 text-center">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-400">
                                 <Icon name="user" class="h-6 w-6" />
                             </div>
-                            <p class="mt-3 text-sm font-semibold text-gray-700">{{ walkingClientLabel }}</p>
-                            <p class="mt-1 text-xs text-gray-400">حجز بدون حساب عميل</p>
+                            <p class="mt-3 text-sm font-semibold text-stone-700">{{ walkingClientLabel }}</p>
+                            <p class="mt-1 text-xs text-stone-400">حجز بدون حساب عميل</p>
                         </div>
                     </div>
                 </Section>
@@ -104,48 +104,48 @@ onUnmounted(() => bookingsStore.clearDetail());
                     <div class="p-5">
                         <dl class="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
                             <div>
-                                <dt class="mb-1 text-xs text-gray-400">رقم الحجز</dt>
-                                <dd class="text-sm font-semibold text-gray-900">#{{ booking.id }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">رقم الحجز</dt>
+                                <dd class="text-sm font-semibold text-stone-900">#{{ booking.id }}</dd>
                             </div>
                             <div>
-                                <dt class="mb-1 text-xs text-gray-400">الحالة</dt>
+                                <dt class="mb-1 text-xs text-stone-400">الحالة</dt>
                                 <dd><Badge :color="booking.status_color">{{ booking.status_label }}</Badge></dd>
                             </div>
                             <div>
-                                <dt class="mb-1 text-xs text-gray-400">تاريخ الإنشاء</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.created_label ?? booking.created }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">تاريخ الإنشاء</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.created_label ?? booking.created }}</dd>
                             </div>
                             <div v-if="booking.content?.type_label">
-                                <dt class="mb-1 text-xs text-gray-400">النوع</dt>
+                                <dt class="mb-1 text-xs text-stone-400">النوع</dt>
                                 <dd><Badge color="blue">{{ booking.content.type_label }}</Badge></dd>
                             </div>
                             <div v-if="booking.content">
-                                <dt class="mb-1 text-xs text-gray-400">{{ booking.content.type === 'unit_rental' ? 'الوحدة' : 'الخدمة' }}</dt>
-                                <dd class="text-sm font-medium text-gray-900">{{ booking.content.title }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">{{ booking.content.type === 'unit_rental' ? 'الوحدة' : 'الخدمة' }}</dt>
+                                <dd class="text-sm font-medium text-stone-900">{{ booking.content.title }}</dd>
                             </div>
                             <div v-if="booking.calendar">
-                                <dt class="mb-1 text-xs text-gray-400">{{ booking.calendar.type_label || 'التقويم' }}</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.calendar.name }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">{{ booking.calendar.type_label || 'التقويم' }}</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.calendar.name }}</dd>
                             </div>
                             <div v-if="booking.content?.type === 'service' && booking.date_label">
-                                <dt class="mb-1 text-xs text-gray-400">التاريخ</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.date_label }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">التاريخ</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.date_label }}</dd>
                             </div>
                             <div v-if="booking.time_label">
-                                <dt class="mb-1 text-xs text-gray-400">الوقت</dt>
-                                <dd class="text-sm text-gray-800" dir="ltr">{{ booking.time_label }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">الوقت</dt>
+                                <dd class="text-sm text-stone-800" dir="ltr">{{ booking.time_label }}</dd>
                             </div>
                             <div v-if="booking.content?.type === 'unit_rental' && booking.dates_label">
-                                <dt class="mb-1 text-xs text-gray-400">التواريخ</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.dates_label }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">التواريخ</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.dates_label }}</dd>
                             </div>
                             <div v-if="booking.duration_label">
-                                <dt class="mb-1 text-xs text-gray-400">المدة</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.duration_label }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">المدة</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.duration_label }}</dd>
                             </div>
                             <div v-if="booking.content?.type !== 'service' && booking.content?.type !== 'unit_rental' && booking.dates_label">
-                                <dt class="mb-1 text-xs text-gray-400">الموعد</dt>
-                                <dd class="text-sm text-gray-800">{{ booking.dates_label }}</dd>
+                                <dt class="mb-1 text-xs text-stone-400">الموعد</dt>
+                                <dd class="text-sm text-stone-800">{{ booking.dates_label }}</dd>
                             </div>
                         </dl>
                     </div>
@@ -155,14 +155,14 @@ onUnmounted(() => bookingsStore.clearDetail());
                     <div class="p-5">
                         <RouterLink
                             :to="`/orders/${booking.order.uuid}`"
-                            class="flex items-center justify-between gap-4 rounded-lg bg-gray-50 p-4 transition hover:bg-gray-100"
+                            class="flex items-center justify-between gap-4 rounded-lg bg-stone-50 p-4 transition hover:bg-stone-100"
                         >
                             <div>
-                                <p class="font-semibold text-gray-800">طلب #{{ booking.order.number }}</p>
-                                <p class="mt-1 text-sm text-gray-500">عرض تفاصيل الطلب</p>
+                                <p class="font-semibold text-stone-800">طلب #{{ booking.order.number }}</p>
+                                <p class="mt-1 text-sm text-stone-500">عرض تفاصيل الطلب</p>
                             </div>
                             <div class="text-end">
-                                <p class="font-bold text-gray-900"><Money :formatted="booking.price_formatted" /></p>
+                                <p class="font-bold text-stone-900"><Money :formatted="booking.price_formatted" /></p>
                                 <Icon name="link" class="mt-2 h-4 w-4 text-primary-500" />
                             </div>
                         </RouterLink>
@@ -171,8 +171,8 @@ onUnmounted(() => bookingsStore.clearDetail());
 
                 <Section v-else title="الطلب المرتبط" icon="receipt">
                     <div class="flex flex-col items-center gap-2 p-8 text-center">
-                        <Icon name="receipt" class="h-12 w-12 p-0.5 text-gray-400" />
-                        <p class="text-gray-700">لا يوجد طلب مرتبط بهذا الحجز.</p>
+                        <Icon name="receipt" class="h-12 w-12 p-0.5 text-stone-400" />
+                        <p class="text-stone-700">لا يوجد طلب مرتبط بهذا الحجز.</p>
                     </div>
                 </Section>
             </div>

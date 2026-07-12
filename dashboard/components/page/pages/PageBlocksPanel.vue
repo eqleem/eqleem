@@ -138,8 +138,8 @@ async function onDrop(event, targetId) {
     <div class="space-y-3">
         <div class="flex items-center justify-between gap-3">
             <div>
-                <p class="text-sm font-semibold text-gray-800">بلوكات الصفحة</p>
-                <p class="mt-0.5 text-xs text-gray-400">أضف ورتّب بلوكات محتوى الصفحة.</p>
+                <p class="text-sm font-semibold text-stone-800">بلوكات الصفحة</p>
+                <p class="mt-0.5 text-xs text-stone-400">أضف ورتّب بلوكات محتوى الصفحة.</p>
             </div>
             <Button
                 type="button"
@@ -155,12 +155,12 @@ async function onDrop(event, targetId) {
         <div v-if="store.blocksLoading && !store.blocks.length" class="flex items-center justify-center"><LoadingSpinner /></div>
         <p v-else-if="store.blocksError" class="text-sm text-red-500">{{ store.blocksError }}</p>
 
-        <div v-else class="relative min-h-20 rounded-xl border border-gray-200 bg-gray-50/80">
+        <div v-else class="relative min-h-20 rounded-xl border border-stone-200 bg-stone-50/80">
             <ul class="space-y-1.5 p-2">
                 <li
                     v-for="block in store.blocks"
                     :key="block.id"
-                    class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
+                    class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                     :class="{ 'opacity-50': !block.active }"
                     draggable="true"
                     @dragstart="onDragStart($event, block.id)"
@@ -169,7 +169,7 @@ async function onDrop(event, targetId) {
                 >
                     <button
                         type="button"
-                        class="cursor-grab rounded-md p-1 text-gray-300 transition hover:bg-gray-100 hover:text-gray-500 active:cursor-grabbing"
+                        class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
                         aria-label="سحب لإعادة الترتيب"
                     >
                         <Icon name="grip-vertical" class="h-4 w-4" />
@@ -181,12 +181,12 @@ async function onDrop(event, targetId) {
                         class="flex min-w-0 flex-1 items-center gap-2 text-start transition hover:text-primary-600"
                         @click="openEdit(block.id, block.title)"
                     >
-                        <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                        <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                        <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                     </button>
                     <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                        <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-gray-100 p-1">
-                        <span class="truncate text-sm font-medium text-gray-800">{{ block.title }}</span>
+                        <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                        <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                     </div>
 
                     <button
@@ -202,7 +202,7 @@ async function onDrop(event, targetId) {
                     <button
                         v-if="block.editable"
                         type="button"
-                        class="rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-primary-600"
+                        class="rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
                         aria-label="خيارات البلوك"
                         @click="openEdit(block.id, block.title)"
                     >
@@ -220,7 +220,7 @@ async function onDrop(event, targetId) {
 
             <p
                 v-if="!store.blocks.length && !store.blocksLoading"
-                class="pointer-events-none flex min-h-20 select-none items-center justify-center pb-3 text-[11px] text-gray-300"
+                class="pointer-events-none flex min-h-20 select-none items-center justify-center pb-3 text-[11px] text-stone-300"
             >
                 أضف بلوكات لصفحتك من الزر بالأعلى
             </p>
@@ -232,14 +232,14 @@ async function onDrop(event, targetId) {
                     v-for="blockType in store.blockTypes"
                     :key="blockType.slug"
                     type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-gray-100 px-3 py-3 text-start transition hover:border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+                    class="flex w-full items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:opacity-50"
                     :disabled="store.saving"
                     @click="addBlock(blockType.slug)"
                 >
-                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-gray-100 p-1.5">
+                    <img :src="blockType.icon_url" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-stone-100 p-1.5">
                     <span class="min-w-0">
-                        <span class="block text-sm font-medium text-gray-800">{{ blockType.name }}</span>
-                        <span class="block text-xs text-gray-400">{{ blockType.description }}</span>
+                        <span class="block text-sm font-medium text-stone-800">{{ blockType.name }}</span>
+                        <span class="block text-xs text-stone-400">{{ blockType.description }}</span>
                     </span>
                 </button>
             </div>

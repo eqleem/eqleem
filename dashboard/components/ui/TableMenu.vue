@@ -12,10 +12,10 @@ defineProps({
         <template #trigger>
             <button
                 type="button"
-                class="inline-block rounded-lg p-1 hover:bg-gray-200"
+                class="inline-block rounded-lg p-1 hover:bg-stone-200"
                 aria-haspopup="menu"
             >
-                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="h-5 w-5 text-stone-400" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="12" cy="5" r="1.6" />
                     <circle cx="12" cy="12" r="1.6" />
                     <circle cx="12" cy="19" r="1.6" />

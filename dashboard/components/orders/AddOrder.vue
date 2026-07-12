@@ -760,7 +760,7 @@ onBeforeUnmount(() => {
                 <!-- Client -->
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <p class="text-sm font-semibold text-gray-500">العميل</p>
+                        <p class="text-sm font-semibold text-stone-500">العميل</p>
                         <Button type="button" variant="outline" label="عميل جديد" @click="openCreate">
                             <template #icon>
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -770,26 +770,26 @@ onBeforeUnmount(() => {
                         </Button>
                     </div>
 
-                    <div v-if="clientId" class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                    <div v-if="clientId" class="flex items-center justify-between rounded-lg bg-stone-50 p-3">
                         <div>
-                            <p class="text-sm font-bold text-gray-800">{{ selectedClient?.name }}</p>
-                            <p v-if="selectedClient?.email" class="mt-1 text-xs text-gray-500">{{ selectedClient.email }}</p>
-                            <p v-if="selectedClient?.phone" class="mt-0.5 text-xs text-gray-500" dir="ltr">{{ selectedClient.phone }}</p>
+                            <p class="text-sm font-bold text-stone-800">{{ selectedClient?.name }}</p>
+                            <p v-if="selectedClient?.email" class="mt-1 text-xs text-stone-500">{{ selectedClient.email }}</p>
+                            <p v-if="selectedClient?.phone" class="mt-0.5 text-xs text-stone-500" dir="ltr">{{ selectedClient.phone }}</p>
                         </div>
                         <button type="button" class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700" @click="enterSearch">تغيير</button>
                     </div>
 
-                    <div v-else-if="isWalking" class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                    <div v-else-if="isWalking" class="flex items-center justify-between rounded-lg bg-stone-50 p-3">
                         <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-gray-400 ring-1 ring-gray-100">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-stone-400 ring-1 ring-stone-100">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <circle cx="12" cy="8" r="4" />
                                     <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-gray-800">{{ walkingClientLabel }}</p>
-                                <p class="mt-0.5 text-xs text-gray-500">الافتراضي — بدون حساب عميل</p>
+                                <p class="text-sm font-bold text-stone-800">{{ walkingClientLabel }}</p>
+                                <p class="mt-0.5 text-xs text-stone-500">الافتراضي — بدون حساب عميل</p>
                             </div>
                         </div>
                         <button type="button" class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700" @click="enterSearch">تغيير</button>
@@ -797,8 +797,8 @@ onBeforeUnmount(() => {
 
                     <div v-else class="relative">
                         <div class="relative flex-1">
-                            <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-stone-500">
+                                <svg class="h-5 w-5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <circle cx="11" cy="11" r="7" />
                                     <path stroke-linecap="round" d="m20 20-3-3" />
                                 </svg>
@@ -807,26 +807,26 @@ onBeforeUnmount(() => {
                                 v-model="clientSearch"
                                 type="text"
                                 placeholder="ابحث بالاسم أو البريد أو الهاتف .."
-                                class="block w-full rounded-lg border border-gray-200 py-2 ps-10 text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm"
+                                class="block w-full rounded-lg border border-stone-200 py-2 ps-10 text-stone-800 placeholder:text-stone-400 focus:border-primary-500 focus:outline-none sm:text-sm"
                                 @focus="showClientResults = true"
                             >
                         </div>
 
-                        <div v-if="showClientResults" class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-                            <button type="button" class="w-full border-b border-gray-100 bg-gray-50/50 px-3 py-2.5 text-start hover:bg-gray-50" @click="selectWalking">
-                                <p class="text-sm font-semibold text-gray-800">{{ walkingClientLabel }}</p>
-                                <p class="mt-0.5 text-xs text-gray-500">بدون حساب عميل</p>
+                        <div v-if="showClientResults" class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white shadow-lg">
+                            <button type="button" class="w-full border-b border-stone-100 bg-stone-50/50 px-3 py-2.5 text-start hover:bg-stone-50" @click="selectWalking">
+                                <p class="text-sm font-semibold text-stone-800">{{ walkingClientLabel }}</p>
+                                <p class="mt-0.5 text-xs text-stone-500">بدون حساب عميل</p>
                             </button>
-                            <p v-if="clientSearching" class="px-3 py-2 text-xs text-gray-400">جاري البحث…</p>
+                            <p v-if="clientSearching" class="px-3 py-2 text-xs text-stone-400">جاري البحث…</p>
                             <button
                                 v-for="client in clientResults"
                                 :key="client.id"
                                 type="button"
-                                class="w-full border-b border-gray-50 px-3 py-2 text-start last:border-0 hover:bg-gray-50"
+                                class="w-full border-b border-stone-50 px-3 py-2 text-start last:border-0 hover:bg-stone-50"
                                 @click="selectClient(client)"
                             >
-                                <p class="text-sm font-semibold text-gray-800">{{ client.name }}</p>
-                                <p class="mt-0.5 text-xs text-gray-500">
+                                <p class="text-sm font-semibold text-stone-800">{{ client.name }}</p>
+                                <p class="mt-0.5 text-xs text-stone-500">
                                     <span v-if="client.email">{{ client.email }}</span>
                                     <span v-if="client.phone" class="ms-2" dir="ltr">{{ client.phone }}</span>
                                 </p>
@@ -834,7 +834,7 @@ onBeforeUnmount(() => {
                             <button
                                 v-if="clientSearch !== '' && !clientSearching && clientResults.length === 0"
                                 type="button"
-                                class="w-full border-t border-gray-100 px-3 py-2.5 text-start text-sm text-primary-600 hover:bg-primary-50"
+                                class="w-full border-t border-stone-100 px-3 py-2.5 text-start text-sm text-primary-600 hover:bg-primary-50"
                                 @click="openCreate"
                             >
                                 <span class="font-semibold">إضافة "{{ clientSearch }}"</span>
@@ -847,21 +847,21 @@ onBeforeUnmount(() => {
 
         <div class="relative z-30 min-h-0 flex-1 overflow-visible px-5 py-4">
                 <!-- Items -->
-                <Box title="العناصر" class="relative z-30 border border-gray-100 shadow-sm">
+                <Box title="العناصر" class="relative z-30 border border-stone-100 shadow-sm">
                     <template #action>
                         <Dropdown width="min-w-52 w-52" placement="top">
                             <template #trigger>
-                                <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
                                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
                                     <span>إضافة عنصر</span>
-                                    <svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
+                                    <svg class="h-4 w-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
                                 </button>
                             </template>
                             <button
                                 v-for="(label, type) in addItemTypeOptions"
                                 :key="type"
                                 type="button"
-                                class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-start text-sm text-gray-700 hover:bg-gray-50"
+                                class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-start text-sm text-stone-700 hover:bg-stone-50"
                                 @click="addItem(type)"
                             >
                                 {{ label }}
@@ -870,18 +870,18 @@ onBeforeUnmount(() => {
                     </template>
 
                     <div class="max-h-[40vh] space-y-4 overflow-y-auto overflow-x-visible p-4">
-                        <p v-if="items.length === 0" class="py-6 text-center text-sm text-gray-400">اختر نوع العنصر من القائمة لبدء إضافة الطلب.</p>
+                        <p v-if="items.length === 0" class="py-6 text-center text-sm text-stone-400">اختر نوع العنصر من القائمة لبدء إضافة الطلب.</p>
 
                         <div
                             v-for="(item, index) in items"
                             :key="item.key"
-                            class="relative space-y-3 rounded-lg border border-gray-100 bg-gray-50 p-3"
+                            class="relative space-y-3 rounded-lg border border-stone-100 bg-stone-50 p-3"
                         >
                             <button type="button" class="absolute left-2 top-2 rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-600" @click="removeItem(index)">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /></svg>
                             </button>
 
-                            <p class="pe-8 text-xs font-semibold text-gray-500">{{ itemTypeOptions[item.type] ?? item.type }}</p>
+                            <p class="pe-8 text-xs font-semibold text-stone-500">{{ itemTypeOptions[item.type] ?? item.type }}</p>
 
                             <div class="relative">
                                 <textarea
@@ -889,36 +889,36 @@ onBeforeUnmount(() => {
                                     v-model="item.name"
                                     rows="2"
                                     :placeholder="itemSearchPlaceholders.other"
-                                    class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-primary-500 focus:outline-none"
+                                    class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-800 focus:border-primary-500 focus:outline-none"
                                 ></textarea>
                                 <template v-else>
                                     <input
                                         v-model="item.search"
                                         type="text"
                                         :placeholder="itemSearchPlaceholders[item.type] ?? 'ابحث أو أدخل الاسم ..'"
-                                        class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-primary-500 focus:outline-none"
+                                        class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-800 focus:border-primary-500 focus:outline-none"
                                         @input="onItemSearchInput(item)"
                                         @focus="item.showResults = !item.name && String(item.search || '').trim() !== ''"
                                     >
 
                                     <div
                                         v-if="!item.name && item.showResults && String(item.search || '').trim() !== ''"
-                                        class="absolute z-40 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+                                        class="absolute z-40 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white shadow-lg"
                                     >
-                                        <p v-if="item.searching" class="px-3 py-2 text-xs text-gray-400">جاري البحث…</p>
+                                        <p v-if="item.searching" class="px-3 py-2 text-xs text-stone-400">جاري البحث…</p>
                                         <button
                                             v-for="product in item.results"
                                             :key="`${product.product_id}-${product.name}`"
                                             type="button"
-                                            class="w-full border-b border-gray-50 px-3 py-2 text-start last:border-0 hover:bg-gray-50"
+                                            class="w-full border-b border-stone-50 px-3 py-2 text-start last:border-0 hover:bg-stone-50"
                                             @click="selectContent(item, product)"
                                         >
-                                            <p class="text-sm font-semibold text-gray-800">{{ product.name }}</p>
-                                            <p class="mt-0.5 text-xs text-gray-500"><Money :amount="product.unit_price" /></p>
+                                            <p class="text-sm font-semibold text-stone-800">{{ product.name }}</p>
+                                            <p class="mt-0.5 text-xs text-stone-500"><Money :amount="product.unit_price" /></p>
                                         </button>
                                         <button
                                             type="button"
-                                            class="w-full border-t border-gray-100 px-3 py-2.5 text-start text-sm text-primary-600 hover:bg-primary-50 disabled:opacity-60"
+                                            class="w-full border-t border-stone-100 px-3 py-2.5 text-start text-sm text-primary-600 hover:bg-primary-50 disabled:opacity-60"
                                             :disabled="item.creating"
                                             @click="useAsNewContent(item)"
                                         >
@@ -943,18 +943,18 @@ onBeforeUnmount(() => {
                                 v-if="isBookingType(item.type) && item.name"
                                 class="space-y-3 rounded-lg border border-dashed border-primary-100 bg-white p-3"
                             >
-                                <p v-if="item.availabilityLoading" class="text-xs text-gray-400">جاري تحميل التوفر…</p>
+                                <p v-if="item.availabilityLoading" class="text-xs text-stone-400">جاري تحميل التوفر…</p>
                                 <p v-else-if="item.calendars.length === 0" class="text-xs text-amber-600">
                                     لا يوجد تقويم / مخزون مرتبط بهذا العنصر.
                                 </p>
 
                                 <div v-if="item.calendars.length > 0">
-                                    <label class="mb-1 block text-xs text-gray-500">
+                                    <label class="mb-1 block text-xs text-stone-500">
                                         {{ item.type === 'unit_rental' ? 'مخزون الوحدات / التقويم' : 'التقويم' }}
                                     </label>
                                     <select
                                         v-model="item.calendar_id"
-                                        class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                        class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                         @change="onItemCalendarChange(item)"
                                     >
                                         <option value="">اختر التقويم ..</option>
@@ -966,10 +966,10 @@ onBeforeUnmount(() => {
 
                                 <template v-if="item.type === 'service' && item.calendar_id">
                                     <div v-if="item.available_dates.length > 0">
-                                        <label class="mb-1 block text-xs text-gray-500">اليوم</label>
+                                        <label class="mb-1 block text-xs text-stone-500">اليوم</label>
                                         <select
                                             v-model="item.booking_date"
-                                            class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                            class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                             @change="onItemBookingDateChange(item)"
                                         >
                                             <option value="">اختر التاريخ ..</option>
@@ -981,7 +981,7 @@ onBeforeUnmount(() => {
                                     <p v-else-if="!item.availabilityLoading" class="text-xs text-amber-600">لا توجد تواريخ متاحة في التقويم المحدد.</p>
 
                                     <div v-if="item.booking_date && item.time_slots.length > 0">
-                                        <label class="mb-1 block text-xs text-gray-500">وقت الحجز</label>
+                                        <label class="mb-1 block text-xs text-stone-500">وقت الحجز</label>
                                         <div class="flex flex-wrap gap-2">
                                             <button
                                                 v-for="slot in item.time_slots"
@@ -991,8 +991,8 @@ onBeforeUnmount(() => {
                                                 :class="slot.available
                                                     ? (item.booking_start_at === slot.start_at
                                                         ? 'border-primary-500 bg-primary-50 font-semibold text-primary-700'
-                                                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50')
-                                                    : 'cursor-not-allowed select-none border-gray-100 bg-gray-50 text-gray-300 line-through'"
+                                                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50')
+                                                    : 'cursor-not-allowed select-none border-stone-100 bg-stone-50 text-stone-300 line-through'"
                                                 :disabled="!slot.available"
                                                 dir="ltr"
                                                 @click="selectItemTimeSlot(item, slot)"
@@ -1007,10 +1007,10 @@ onBeforeUnmount(() => {
                                 <template v-else-if="item.type === 'unit_rental' && item.calendar_id">
                                     <div v-if="selectableCheckInDates(item).length > 0" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                         <div>
-                                            <label class="mb-1 block text-xs text-gray-500">من تاريخ (وصول)</label>
+                                            <label class="mb-1 block text-xs text-stone-500">من تاريخ (وصول)</label>
                                             <select
                                                 v-model="item.check_in"
-                                                class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                                class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                                 @change="item.check_out = ''; onRentalRangeChange(item)"
                                             >
                                                 <option value="">اختر الوصول ..</option>
@@ -1020,10 +1020,10 @@ onBeforeUnmount(() => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="mb-1 block text-xs text-gray-500">إلى تاريخ (مغادرة)</label>
+                                            <label class="mb-1 block text-xs text-stone-500">إلى تاريخ (مغادرة)</label>
                                             <select
                                                 v-model="item.check_out"
-                                                class="block w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                                class="block w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                                 :disabled="!item.check_in"
                                                 @change="onRentalRangeChange(item)"
                                             >
@@ -1035,7 +1035,7 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
                                     <p v-else-if="!item.availabilityLoading" class="text-xs text-amber-600">لا توجد ليالٍ متاحة في هذا المخزون.</p>
-                                    <p v-if="rentalNights(item) > 0" class="text-xs text-gray-500">
+                                    <p v-if="rentalNights(item) > 0" class="text-xs text-stone-500">
                                         {{ rentalNights(item) }} ليلة · السعر لليلة <Money :amount="item.base_unit_price" class="inline-flex" />
                                     </p>
                                 </template>
@@ -1045,7 +1045,7 @@ onBeforeUnmount(() => {
 
                             <div class="grid grid-cols-1 gap-3" :class="isBookingType(item.type) ? 'sm:grid-cols-2' : 'sm:grid-cols-3'">
                                 <div>
-                                    <label class="mb-1 block text-xs text-gray-500">
+                                    <label class="mb-1 block text-xs text-stone-500">
                                         {{ item.type === 'unit_rental' ? 'سعر الإقامة' : 'سعر الوحدة' }}
                                     </label>
                                     <div class="relative">
@@ -1055,28 +1055,28 @@ onBeforeUnmount(() => {
                                             min="0"
                                             step="0.01"
                                             dir="ltr"
-                                            class="block w-full rounded-lg border border-gray-200 py-2 pe-9 ps-3 text-sm focus:border-primary-500 focus:outline-none"
+                                            class="block w-full rounded-lg border border-stone-200 py-2 pe-9 ps-3 text-sm focus:border-primary-500 focus:outline-none"
                                             @change="onDraftUnitPriceChange(item)"
                                             @blur="onDraftUnitPriceChange(item)"
                                         >
-                                        <span class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3 text-gray-400" aria-hidden="true">
+                                        <span class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3 text-stone-400" aria-hidden="true">
                                             <span class="money-symbol icon-saudi_riyal_new"></span>
                                         </span>
                                     </div>
                                 </div>
                                 <div v-if="!isBookingType(item.type)">
-                                    <label class="mb-1 block text-xs text-gray-500">الكمية</label>
+                                    <label class="mb-1 block text-xs text-stone-500">الكمية</label>
                                     <div v-if="!item.qtyCustom" class="flex gap-2">
                                         <select
                                             v-model.number="item.qty"
                                             dir="ltr"
-                                            class="block min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                            class="block min-w-0 flex-1 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                         >
                                             <option v-for="n in qtyPresetOptions" :key="n" :value="n">{{ n }}</option>
                                         </select>
                                         <button
                                             type="button"
-                                            class="inline-flex shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                            class="inline-flex shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
                                             @click="enableCustomQty(item)"
                                         >
                                             <iconify-icon icon="solar:add-circle-bold" class="text-2xl"></iconify-icon>
@@ -1088,11 +1088,11 @@ onBeforeUnmount(() => {
                                             type="number"
                                             min="1"
                                             dir="ltr"
-                                            class="block min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+                                            class="block min-w-0 flex-1 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
                                         >
                                         <button
                                             type="button"
-                                            class="shrink-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                            class="shrink-0 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                                             title="العودة للقائمة"
                                             @click="usePresetQty(item)"
                                         >
@@ -1101,8 +1101,8 @@ onBeforeUnmount(() => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-xs text-gray-500">الإجمالي</label>
-                                    <div class="rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm font-bold text-gray-800"><Money :amount="lineTotal(item)" /></div>
+                                    <label class="mb-1 block text-xs text-stone-500">الإجمالي</label>
+                                    <div class="rounded-lg border border-stone-100 bg-white px-3 py-2 text-sm font-bold text-stone-800"><Money :amount="lineTotal(item)" /></div>
                                 </div>
                             </div>
                         </div>
@@ -1110,35 +1110,35 @@ onBeforeUnmount(() => {
                 </Box>
         </div>
 
-        <div class="relative z-10 shrink-0 border-t-2 border-gray-100 bg-white">
+        <div class="relative z-10 shrink-0 border-t-2 border-stone-100 bg-white">
             <div class="space-y-2 px-5 py-4">
                 <div class="ms-auto max-w-sm space-y-2">
-                    <div class="flex items-center justify-between text-sm text-gray-600">
+                    <div class="flex items-center justify-between text-sm text-stone-600">
                         <span>المجموع الفرعي</span>
-                        <span class="font-semibold text-gray-800"><Money :amount="totals.subtotal" /></span>
+                        <span class="font-semibold text-stone-800"><Money :amount="totals.subtotal" /></span>
                     </div>
-                    <div class="flex items-center justify-between text-sm text-gray-600">
+                    <div class="flex items-center justify-between text-sm text-stone-600">
                         <span>الضريبة</span>
-                        <span class="font-semibold text-gray-800"><Money :amount="totals.tax" /></span>
+                        <span class="font-semibold text-stone-800"><Money :amount="totals.tax" /></span>
                     </div>
-                    <div class="flex items-center justify-between border-t border-gray-100 pt-2 text-base font-bold text-gray-800">
+                    <div class="flex items-center justify-between border-t border-stone-100 pt-2 text-base font-bold text-stone-800">
                         <span>الإجمالي النهائي</span>
                         <span><Money :amount="totals.grand" /></span>
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end border-t border-gray-100 px-5 py-4 shadow">
+            <div class="flex justify-end border-t border-stone-100 px-5 py-4 shadow">
                 <Button type="button" label="أنشئ الطلب" :loading="submitting" @click="submit" />
             </div>
         </div>
 
         <Teleport to="body">
             <div v-if="showCreate" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                <div class="fixed inset-0 bg-gray-900/60" @click="showCreate = false"></div>
+                <div class="fixed inset-0 bg-stone-900/60" @click="showCreate = false"></div>
                 <div class="relative w-full max-w-lg rounded-xl bg-white shadow-2xl ring-1 ring-black/5">
-                    <div class="flex items-center justify-between border-b border-gray-100 p-3">
-                        <p class="px-1 text-sm font-semibold text-gray-600">إضافة عميل جديد</p>
-                        <button type="button" class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200" @click="showCreate = false">
+                    <div class="flex items-center justify-between border-b border-stone-100 p-3">
+                        <p class="px-1 text-sm font-semibold text-stone-600">إضافة عميل جديد</p>
+                        <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200" @click="showCreate = false">
                             <span class="sr-only">Close</span>
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
@@ -1147,7 +1147,7 @@ onBeforeUnmount(() => {
                         <Input v-model="newClient.name" name="newClientName" label="الاسم" placeholder="الاسم" :error="newClientErrors.name" />
                         <Input v-model="newClient.phone" name="newClientPhone" type="number" label="رقم الجوال" placeholder="123456789" dir="ltr" :error="newClientErrors.phone" />
                         <Input v-model="newClient.email" name="newClientEmail" type="email" label="البريد الإلكتروني" placeholder="client@email.com" dir="ltr" :error="newClientErrors.email" />
-                        <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+                        <div class="flex justify-end gap-2 border-t border-stone-100 pt-4">
                             <Button type="button" variant="outline" label="إلغاء" @click="showCreate = false" />
                             <Button type="button" label="حفظ" :loading="creatingClient" @click="saveNewClient" />
                         </div>

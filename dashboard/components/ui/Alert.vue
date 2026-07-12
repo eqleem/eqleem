@@ -9,7 +9,7 @@ const props = defineProps({
 });
 
 const tones = {
-    gray: { wrap: 'bg-gray-100', heading: 'text-gray-700', text: 'text-gray-600' },
+    gray: { wrap: 'bg-stone-100', heading: 'text-stone-700', text: 'text-stone-600' },
     blue: { wrap: 'bg-blue-100', heading: 'text-blue-700', text: 'text-blue-600' },
     green: { wrap: 'bg-green-100', heading: 'text-green-700', text: 'text-green-600' },
     red: { wrap: 'bg-red-100', heading: 'text-red-700', text: 'text-red-600' },

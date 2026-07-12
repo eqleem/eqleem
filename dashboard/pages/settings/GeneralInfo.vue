@@ -272,22 +272,22 @@ onMounted(load);
 
         <MainBox title="حسابات السوشال ميديا" subtitle="روابط حساباتك على شبكات التواصل.">
             <div class="space-y-2 px-4 pb-4">
-                <div class="my-4 flex items-center justify-between border-b border-dotted border-gray-100 pb-2">
-                    <p class="text-xs font-semibold text-gray-500">روابط التواصل</p>
+                <div class="my-4 flex items-center justify-between border-b border-dotted border-stone-100 pb-2">
+                    <p class="text-xs font-semibold text-stone-500">روابط التواصل</p>
                     <Button type="button" variant="secondary" label="إضافة رابط" @click="openModal('add-social-link')" />
                 </div>
 
-                <p v-if="socialLinks.length === 0" class="py-2 text-xs text-gray-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
+                <p v-if="socialLinks.length === 0" class="py-2 text-xs text-stone-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
 
                 <ul v-else class="space-y-1.5">
                     <li
                         v-for="link in socialLinks"
                         :key="link.id"
-                        class="group flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-2 py-2 transition hover:border-gray-200"
+                        class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2 py-2 transition hover:border-stone-200"
                     >
                         <div class="flex min-w-0 flex-1 flex-col">
-                            <span class="truncate text-sm font-medium text-gray-800">{{ socialNetworks[link.network] ?? link.network }}</span>
-                            <span class="truncate text-xs text-gray-400" dir="ltr">{{ link.url }}</span>
+                            <span class="truncate text-sm font-medium text-stone-800">{{ socialNetworks[link.network] ?? link.network }}</span>
+                            <span class="truncate text-xs text-stone-400" dir="ltr">{{ link.url }}</span>
                         </div>
                         <button
                             type="button"
@@ -307,7 +307,7 @@ onMounted(load);
                 <Select v-model="newSocial.network" name="newNetwork" label="الشبكة" :options="socialNetworks" :error="errors.network" />
                 <Input v-model="newSocial.url" name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" :error="errors.url" />
             </div>
-            <div class="flex justify-end gap-2 border-t border-gray-100 p-3 px-4">
+            <div class="flex justify-end gap-2 border-t border-stone-100 p-3 px-4">
                 <Button type="button" variant="ghost" label="إلغاء" @click="closeModal('add-social-link')" />
                 <Button type="button" label="إضافة" :disabled="saving.social" @click="addSocialLink" />
             </div>

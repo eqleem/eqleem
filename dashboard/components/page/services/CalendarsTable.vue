@@ -50,12 +50,12 @@ async function remove(calendarId) {
 </script>
 
 <template>
-    <div class="divide-y divide-dotted divide-gray-200">
+    <div class="divide-y divide-dotted divide-stone-200">
         <div class="border-b border-stone-100 px-4 py-4">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-800">الأصول القابلة للحجز</h3>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <h3 class="text-base font-semibold text-stone-800">الأصول القابلة للحجز</h3>
+                    <p class="mt-1 text-sm text-stone-500">
                         مقدمي الخدمات بالساعة، يمكنك إدارة ساعات العمل المتاحة للحجز من هنا.
                     </p>
                 </div>
@@ -70,15 +70,15 @@ async function remove(calendarId) {
 
         <div class="flex w-full items-center gap-x-4 bg-white p-3">
             <div class="flex-grow">
-                <div class="relative text-sm text-gray-800">
-                    <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-gray-500">
-                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7" /><path stroke-linecap="round" d="m20 20-3-3" /></svg>
+                <div class="relative text-sm text-stone-800">
+                    <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex items-center ps-2 text-stone-500">
+                        <svg class="h-5 w-5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7" /><path stroke-linecap="round" d="m20 20-3-3" /></svg>
                     </div>
                     <input
                         v-model="search"
                         type="text"
                         placeholder="ابحث .."
-                        class="block w-full bg-gray-100 rounded-lg border border-transparent py-1.5 ps-10 text-gray-800 ring-inset ring-gray-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
+                        class="block w-full bg-stone-100 rounded-lg border border-transparent py-1.5 ps-10 text-stone-800 ring-inset ring-stone-200 placeholder:text-stone-400 focus:border-primary-500 focus:outline-none sm:text-sm sm:leading-6"
                     >
                 </div>
             </div>
@@ -111,7 +111,7 @@ async function remove(calendarId) {
             </Empty>
 
             <table v-else class="min-w-full text-sm">
-                <thead class="bg-gray-50 text-gray-500">
+                <thead class="bg-stone-50 text-stone-500">
                     <tr>
                         <th class="px-6 py-3 text-start font-medium">الاسم</th>
                         <th class="px-4 py-3 text-start font-medium">النوع</th>
@@ -120,11 +120,11 @@ async function remove(calendarId) {
                         <th class="px-4 py-3 text-end font-medium" />
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-stone-100">
                     <tr
                         v-for="calendar in store.calendars"
                         :key="calendar.id"
-                        class="hover:bg-gray-50"
+                        class="hover:bg-stone-50"
                     >
                         <td class="px-6 py-4">
                             <div class="flex min-w-0 items-center gap-2">
@@ -134,20 +134,20 @@ async function remove(calendarId) {
                                 />
                                 <button
                                     type="button"
-                                    class="truncate text-start font-medium text-gray-800 transition hover:text-primary-600"
+                                    class="truncate text-start font-medium text-stone-800 transition hover:text-primary-600"
                                     @click="openEdit(calendar.id)"
                                 >
                                     {{ calendar.name }}
                                 </button>
                             </div>
                         </td>
-                        <td class="px-4 py-4 text-gray-600">{{ calendar.type_label }}</td>
-                        <td class="px-4 py-4 text-gray-600">{{ calendar.from_label ?? '—' }}</td>
-                        <td class="px-4 py-4 text-gray-600">{{ calendar.to_label ?? '—' }}</td>
+                        <td class="px-4 py-4 text-stone-600">{{ calendar.type_label }}</td>
+                        <td class="px-4 py-4 text-stone-600">{{ calendar.from_label ?? '—' }}</td>
+                        <td class="px-4 py-4 text-stone-600">{{ calendar.to_label ?? '—' }}</td>
                         <td class="px-4 py-4 text-end">
                             <Dropdown width="w-40" class="inline-block">
                                 <template #trigger>
-                                    <button type="button" class="rounded p-1.5 text-gray-500 hover:bg-gray-100" aria-label="menu">
+                                    <button type="button" class="rounded p-1.5 text-stone-500 hover:bg-stone-100" aria-label="menu">
                                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
                                     </button>
                                 </template>
@@ -180,7 +180,7 @@ async function remove(calendarId) {
                 v-if="store.calendarsLoading && store.calendarsLoaded"
                 class="absolute inset-0 flex items-center justify-center"
             >
-                <svg class="h-10 w-10 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" /></svg>
+                <svg class="h-10 w-10 animate-spin text-stone-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" /></svg>
             </div>
         </div>
     </div>

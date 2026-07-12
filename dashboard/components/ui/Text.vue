@@ -13,7 +13,7 @@ const sizes = {
 </script>
 
 <template>
-    <div class="text-gray-500 [*+&]:mt-2" :class="sizes[size] ?? 'text-sm'">
+    <div class="text-stone-500 [*+&]:mt-2" :class="sizes[size] ?? 'text-sm'">
         <slot>{{ text }}</slot>
     </div>
 </template>

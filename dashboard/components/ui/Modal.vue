@@ -66,7 +66,7 @@ onBeforeUnmount(() => {
 <template>
     <Teleport to="body">
         <div v-if="show" class="relative z-40" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-gray-800/75 transition-opacity"></div>
+            <div class="fixed inset-0 bg-stone-800/75 transition-opacity"></div>
 
             <div class="fixed inset-0 overflow-y-auto">
                 <div
@@ -77,8 +77,8 @@ onBeforeUnmount(() => {
                         class="relative m-4 w-full max-w-5xl transform rounded-xl bg-white pb-2.5 shadow-xl transition-all lg:m-auto"
                         :class="sizeClasses[size]"
                     >
-                        <div class="flex w-full items-center justify-between border-b border-gray-100 p-2">
-                            <p v-if="title" class="flex items-center gap-x-2 px-2 text-sm font-semibold text-gray-600">
+                        <div class="flex w-full items-center justify-between border-b border-stone-100 p-2">
+                            <p v-if="title" class="flex items-center gap-x-2 px-2 text-sm font-semibold text-stone-600">
                                 {{ title }}
                             </p>
                             <span v-else></span>
@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
                             <button
                                 v-if="close"
                                 type="button"
-                                class="rounded-md bg-gray-100 p-1 text-gray-400 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                 @click.prevent="hide"
                             >
                                 <span class="sr-only">Close</span>
@@ -100,7 +100,7 @@ onBeforeUnmount(() => {
                             <slot />
                         </div>
 
-                        <div v-if="$slots.footer" class="border-t-2 border-gray-100 p-3 px-5 shadow">
+                        <div v-if="$slots.footer" class="border-t-2 border-stone-100 p-3 px-5 shadow">
                             <slot name="footer" />
                         </div>
                     </div>

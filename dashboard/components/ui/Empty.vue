@@ -7,13 +7,13 @@ defineProps({
 
 <template>
     <div>
-        <div class="rounded-xl bg-gray-100 py-8 text-center">
-            <div v-if="$slots.icon" class="mx-auto h-12 w-12 text-gray-500">
+        <div class="rounded-xl bg-stone-100 py-8 text-center">
+            <div v-if="$slots.icon" class="mx-auto h-12 w-12 text-stone-500">
                 <slot name="icon" />
             </div>
             <svg
                 v-else
-                class="mx-auto h-12 w-12 text-gray-400"
+                class="mx-auto h-12 w-12 text-stone-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -28,10 +28,10 @@ defineProps({
                 />
             </svg>
 
-            <h3 class="mt-3 text-sm font-semibold text-gray-600">
+            <h3 class="mt-3 text-sm font-semibold text-stone-600">
                 <slot />
             </h3>
-            <p v-if="subtitle" class="mt-3 text-sm text-gray-500">{{ subtitle }}</p>
+            <p v-if="subtitle" class="mt-3 text-sm text-stone-500">{{ subtitle }}</p>
             <div v-if="$slots.button" class="mx-auto mt-6 w-full text-center">
                 <slot name="button" />
             </div>

@@ -69,7 +69,7 @@ function copy() {
                 :value="modelValue"
                 :disabled="disabled"
                 :placeholder="placeholder"
-                class="block rounded-md border-2 bg-white py-1.5 px-3 text-sm text-gray-600 placeholder:text-sm focus:bg-gray-100/50 focus:text-gray-700 focus:border-primary-500 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400/50"
+                class="block rounded-md border-2 bg-white py-1.5 px-3 text-sm text-stone-600 placeholder:text-sm focus:bg-stone-100/50 focus:text-stone-700 focus:border-primary-500 focus:outline-none disabled:cursor-not-allowed disabled:text-stone-400/50"
                 :class="[
                     inputWidth,
                     error ? 'border-red-300' : 'border-transparent',

@@ -237,11 +237,11 @@ onMounted(load);
                 <img :src="`/assets/icons/ecommerce/018-cart.svg`" alt="" class="h-6 w-6">
             </template>
 
-            <div class="divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200">
+            <div class="divide-y divide-dotted divide-stone-200 border-t border-dotted border-stone-200">
                 <div
                     v-for="method in methods"
                     :key="method.slug"
-                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-gray-50/80"
+                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-stone-50/80"
                 >
                     <button
                         type="button"
@@ -249,10 +249,10 @@ onMounted(load);
                         @click="openMethod(method.slug)"
                     >
                         <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-gray-800">{{ method.name }}</p>
-                            <p class="mt-0.5 line-clamp-2 text-xs text-gray-500">{{ method.description }}</p>
+                            <p class="text-sm font-semibold text-stone-800">{{ method.name }}</p>
+                            <p class="mt-0.5 line-clamp-2 text-xs text-stone-500">{{ method.description }}</p>
                         </div>
-                        <div class="shrink-0 rounded-lg border border-gray-100 bg-white p-2">
+                        <div class="shrink-0 rounded-lg border border-stone-100 bg-white p-2">
                             <img :src="method.icon_url || `/${method.icon}`" :alt="method.name" class="h-8 w-auto max-w-[72px] object-contain">
                         </div>
                     </button>
@@ -271,7 +271,7 @@ onMounted(load);
                 <Button label="أضف خدمة شحن" @click="openCustomForm()" />
             </template>
 
-            <div class="divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200">
+            <div class="divide-y divide-dotted divide-stone-200 border-t border-dotted border-stone-200">
                 <Empty v-if="customOptions.length === 0" subtitle="سيتم عرض خيارات الشحن المخصصة هنا بعد إضافتها.">
                     لا توجد خيارات شحن مخصصة.
                 </Empty>
@@ -279,7 +279,7 @@ onMounted(load);
                 <div
                     v-for="option in customOptions"
                     :key="option.id"
-                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-gray-50/80"
+                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-stone-50/80"
                 >
                     <button
                         type="button"
@@ -292,11 +292,11 @@ onMounted(load);
                         <div class="min-w-0 flex-1">
                             <p
                                 class="truncate text-sm font-semibold"
-                                :class="option.active ? 'text-gray-800' : 'text-gray-400 line-through'"
+                                :class="option.active ? 'text-stone-800' : 'text-stone-400 line-through'"
                             >
                                 {{ option.name }}
                             </p>
-                            <p class="mt-0.5 truncate text-xs text-gray-500">
+                            <p class="mt-0.5 truncate text-xs text-stone-500">
                                 <Money :amount="option.price" class="inline-flex" /> · {{ option.country_label }}
                                 <template v-if="option.cities_summary"> · {{ option.cities_summary }}</template>
                             </p>

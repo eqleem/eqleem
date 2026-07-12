@@ -20,11 +20,11 @@ defineProps({
             </RouterLink>
         </div>
 
-        <div class="flex items-start justify-between border-gray-200 p-4">
+        <div class="flex items-start justify-between border-stone-200 p-4">
             <div class="flex gap-x-4">
                 <div
                     v-if="$slots.icon"
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gray-200 p-1"
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-stone-200 p-1"
                 >
                     <slot name="icon" />
                 </div>

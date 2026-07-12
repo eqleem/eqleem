@@ -51,7 +51,7 @@ onBeforeUnmount(() => chart?.destroy());
 
 <template>
     <div class="rounded-2xl bg-white" :class="{ 'animate-pulse opacity-70': loading }">
-        <div class="border-b-2 border-gray-200/50 p-3 text-sm font-semibold text-gray-500">
+        <div class="border-b-2 border-stone-200/50 p-3 text-sm font-semibold text-stone-500">
             {{ chartTitle }}
         </div>
         <div class="relative min-h-48 p-3">

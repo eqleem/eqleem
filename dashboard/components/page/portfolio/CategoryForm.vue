@@ -129,15 +129,15 @@ async function submit() {
             :error="errors.slug"
         />
 
-        <div class="relative items-center gap-x-2 rounded-md bg-gray-100/75 p-1 lg:flex">
-            <label for="parentId" class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-gray-500">
+        <div class="relative items-center gap-x-2 rounded-md bg-stone-100/75 p-1 lg:flex">
+            <label for="parentId" class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">
                 التصنيف الأب
             </label>
             <div class="w-full">
                 <select
                     id="parentId"
                     v-model="form.parentId"
-                    class="block w-full rounded-md border-2 border-transparent bg-white px-3 py-1.5 text-sm text-gray-600 focus:border-primary-500 focus:bg-gray-100/50 focus:outline-none"
+                    class="block w-full rounded-md border-2 border-transparent bg-white px-3 py-1.5 text-sm text-stone-600 focus:border-primary-500 focus:bg-stone-100/50 focus:outline-none"
                 >
                     <option v-for="option in parentOptions" :key="option.id || 'root'" :value="option.id">
                         {{ option.label }}

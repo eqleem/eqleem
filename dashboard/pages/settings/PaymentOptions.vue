@@ -240,7 +240,7 @@ onMounted(load);
 
             <div
                 v-if="loading"
-                class="animate-pulse divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200"
+                class="animate-pulse divide-y divide-dotted divide-stone-200 border-t border-dotted border-stone-200"
                 aria-busy="true"
                 aria-label="جاري تحميل وسائل الدفع"
             >
@@ -251,24 +251,24 @@ onMounted(load);
                 >
                     <div class="min-w-0 flex-1 space-y-2">
                         <div
-                            class="h-4 rounded-md bg-gray-200"
+                            class="h-4 rounded-md bg-stone-200"
                             :class="n % 2 === 0 ? 'w-28' : 'w-36'"
                         ></div>
                         <div
-                            class="h-3 rounded-md bg-gray-100"
+                            class="h-3 rounded-md bg-stone-100"
                             :class="n % 3 === 0 ? 'w-48' : n % 2 === 0 ? 'w-64' : 'w-56'"
                         ></div>
                     </div>
-                    <div class="h-12 w-[88px] shrink-0 rounded-lg bg-gray-100"></div>
-                    <div class="h-6 w-11 shrink-0 rounded-full bg-gray-200"></div>
+                    <div class="h-12 w-[88px] shrink-0 rounded-lg bg-stone-100"></div>
+                    <div class="h-6 w-11 shrink-0 rounded-full bg-stone-200"></div>
                 </div>
             </div>
 
-            <div v-else class="divide-y divide-dotted divide-gray-200 border-t border-dotted border-gray-200">
+            <div v-else class="divide-y divide-dotted divide-stone-200 border-t border-dotted border-stone-200">
                 <div
                     v-for="method in methods"
                     :key="method.slug"
-                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-gray-50/80"
+                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-stone-50/80"
                 >
                     <button
                         type="button"
@@ -276,10 +276,10 @@ onMounted(load);
                         @click="openMethod(method.slug)"
                     >
                         <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-gray-800">{{ method.name }}</p>
-                            <p class="mt-0.5 line-clamp-2 text-xs text-gray-500">{{ method.description }}</p>
+                            <p class="text-sm font-semibold text-stone-800">{{ method.name }}</p>
+                            <p class="mt-0.5 line-clamp-2 text-xs text-stone-500">{{ method.description }}</p>
                         </div>
-                        <div class="shrink-0 rounded-lg border border-gray-100 bg-white p-2">
+                        <div class="shrink-0 rounded-lg border border-stone-100 bg-white p-2">
                             <img :src="method.icon_url || `/${method.icon}`" :alt="method.name" class="h-8 w-auto max-w-[72px] object-contain">
                         </div>
                     </button>
@@ -306,10 +306,10 @@ onMounted(load);
                     <div
                         v-for="(account, index) in modalForm.accounts"
                         :key="index"
-                        class="mb-3 space-y-2 rounded-xl border border-gray-100 bg-gray-50/50 p-3"
+                        class="mb-3 space-y-2 rounded-xl border border-stone-100 bg-stone-50/50 p-3"
                     >
                         <div class="flex items-center justify-between">
-                            <p class="text-sm font-semibold text-gray-700">حساب بنكي {{ index + 1 }}</p>
+                            <p class="text-sm font-semibold text-stone-700">حساب بنكي {{ index + 1 }}</p>
                             <button
                                 v-if="modalForm.accounts.length > 1"
                                 type="button"

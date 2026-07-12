@@ -169,10 +169,10 @@ async function saveEdit() {
             <li
                 v-for="item in items"
                 :key="item.key"
-                class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-gray-200"
+                class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                 :class="{ 'opacity-50': !item.active }"
             >
-                <div class="rounded-md bg-gray-100 p-1.5 text-gray-500">
+                <div class="rounded-md bg-stone-100 p-1.5 text-stone-500">
                     <Icon :name="item.icon" class="h-4 w-4" />
                 </div>
 
@@ -183,8 +183,8 @@ async function saveEdit() {
                     :class="{ 'cursor-default hover:text-inherit': !item.editable }"
                     @click="openEdit(item)"
                 >
-                    <span class="truncate text-sm font-medium text-gray-800">{{ item.label }}</span>
-                    <span class="truncate text-xs text-gray-400" dir="ltr">{{ item.summary }}</span>
+                    <span class="truncate text-sm font-medium text-stone-800">{{ item.label }}</span>
+                    <span class="truncate text-xs text-stone-400" dir="ltr">{{ item.summary }}</span>
                 </button>
 
                 <Switch
@@ -198,15 +198,15 @@ async function saveEdit() {
     </div>
 
     <div v-if="editModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-gray-800/75" @click="editModal = false"></div>
+        <div class="absolute inset-0 bg-stone-800/75" @click="editModal = false"></div>
         <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-3 px-4">
-                <p class="text-sm font-semibold text-gray-600">
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                <p class="text-sm font-semibold text-stone-600">
                     <template v-if="editingKey === 'position'">موضع الأزرار</template>
                     <template v-else-if="editingKey === 'whatsapp'">رقم واتساب</template>
                     <template v-else>رقم الاتصال</template>
                 </p>
-                <button type="button" class="cursor-pointer rounded-md bg-gray-100 p-1 text-gray-400" @click="editModal = false">
+                <button type="button" class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400" @click="editModal = false">
                     <Icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -234,10 +234,10 @@ async function saveEdit() {
                     placeholder="+966500000000"
                     dir="ltr"
                 />
-                <p v-if="editingKey === 'position'" class="text-xs text-gray-400">الموضع الحالي: {{ positionLabel }}</p>
+                <p v-if="editingKey === 'position'" class="text-xs text-stone-400">الموضع الحالي: {{ positionLabel }}</p>
                 <p v-if="editError" class="text-sm text-red-500">{{ editError }}</p>
             </div>
-            <div class="sticky bottom-0 flex justify-end gap-2 border-t border-gray-100 bg-white p-3 px-4">
+            <div class="sticky bottom-0 flex justify-end gap-2 border-t border-stone-100 bg-white p-3 px-4">
                 <Button type="button" variant="ghost" label="إلغاء" @click="editModal = false" />
                 <Button type="button" label="حفظ" :loading="editSaving" @click="saveEdit" />
             </div>

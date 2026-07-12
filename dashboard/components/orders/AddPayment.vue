@@ -89,8 +89,8 @@ async function submit() {
 
 <template>
     <Form class="!gap-4 !p-5 !py-6" @submit="submit">
-        <div class="rounded-xl bg-gray-50 px-4 py-3">
-            <p class="text-xs text-gray-400">المبلغ المتبقي</p>
+        <div class="rounded-xl bg-stone-50 px-4 py-3">
+            <p class="text-xs text-stone-400">المبلغ المتبقي</p>
             <p class="mt-1 text-lg font-bold text-amber-700"><Money :formatted="order.due_total_formatted" /></p>
         </div>
 
@@ -124,7 +124,7 @@ async function submit() {
             :error="errors.notes"
         />
 
-        <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4">
+        <div class="flex items-center justify-end gap-2 border-t border-stone-100 pt-4">
             <Button type="button" variant="ghost" label="إلغاء" @click="closeModal('add-order-payment')" />
             <Button type="submit" label="تسجيل الدفعة" :loading="saving" />
         </div>
