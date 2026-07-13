@@ -29,6 +29,7 @@ class PageStructureResource extends JsonResource
                 ? new PageBlockResource($payload['float_links_block'])
                 : null,
             'block_types' => collect($payload['block_types'] ?? [])->values()->all(),
+            'block_link_editor' => $payload['block_link_editor'] ?? null,
         ];
     }
 }

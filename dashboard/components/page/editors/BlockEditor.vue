@@ -55,6 +55,7 @@ const blockId = computed(() => props.payload?.block?.id);
         :block-id="blockId"
         :editor="payload.editor"
         @saved="$emit('saved', $event)"
+        @close="$emit('close')"
     />
     <div v-else class="p-4 text-sm text-stone-400">
         لا يتوفر محرر لهذا النوع من البلوكات حالياً.

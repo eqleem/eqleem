@@ -4,6 +4,7 @@ namespace App\API\Page\Concerns;
 
 use App\Models\Block;
 use App\Models\Content;
+use App\Support\BlockBrandMark;
 use App\Support\BlockTypeRegistry;
 use App\Support\CtaLink;
 use Illuminate\Support\Collection;
@@ -158,6 +159,40 @@ trait MapsPageBlocks
                 ];
             })
             ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function blockLinkEditorPayload(array $data): array
+    {
+        $contentId = filled($data['content_id'] ?? null) ? (int) $data['content_id'] : null;
+        $linkType = filled($data['link_type'] ?? null)
+            ? CtaLink::typeKeyFromStoredData($data)
+            : CtaLink::defaultTypeKey('block');
+        $allowed = CtaLink::allowedBlockLinkTypeKeys();
+
+        if (! in_array($linkType, $allowed, true)) {
+            $linkType = CtaLink::defaultTypeKey('block');
+        }
+
+        return [
+            'type' => 'block-link',
+            'title' => (string) ($data['title'] ?? ''),
+            'description' => (string) ($data['description'] ?? ''),
+            'url' => (string) ($data['url'] ?? ''),
+            'link_type' => $linkType,
+            'content_id' => $contentId,
+            'selected_content_title' => $contentId
+                ? (Content::query()->find($contentId)?->title ?? '')
+                : '',
+            'brand_mark' => BlockBrandMark::forEditor(
+                is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+            ),
+            'link_type_options' => CtaLink::linkTypeOptions('block'),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+        ];
     }
 
     /**

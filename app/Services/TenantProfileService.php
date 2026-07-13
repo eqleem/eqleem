@@ -6,6 +6,8 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\BlockBrandMark;
+use App\Support\TablerIconsCatalog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -106,6 +108,12 @@ class TenantProfileService
 
     public function logo(Tenant $tenant): string
     {
+        $mark = $this->brandMark($tenant);
+
+        if (in_array($mark['type'], ['emoji', 'icon'], true)) {
+            return $this->brandMarkDataUri($mark);
+        }
+
         $stored = data_get($tenant->meta, 'logo') ?? data_get($tenant->data, 'logo');
 
         if (Str::startsWith((string) $stored, 'http')) {
@@ -129,8 +137,77 @@ class TenantProfileService
         return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$tenant->uuid;
     }
 
+    /**
+     * @return array{type: string, value: string, color: string, url: string|null}
+     */
+    public function brandMark(Tenant $tenant): array
+    {
+        $stored = data_get($tenant->meta, 'brand_mark');
+
+        if (is_array($stored)) {
+            $type = (string) ($stored['type'] ?? '');
+
+            if (in_array($type, ['emoji', 'icon'], true) && filled($stored['value'] ?? null)) {
+                return [
+                    'type' => $type,
+                    'value' => (string) $stored['value'],
+                    'color' => $this->normalizeBrandMarkColor($stored['color'] ?? null),
+                    'url' => null,
+                ];
+            }
+
+            if ($type === 'image') {
+                $url = $this->imageLogoUrl($tenant);
+
+                return [
+                    'type' => 'image',
+                    'value' => '',
+                    'color' => '',
+                    'url' => $url !== '' ? $url : null,
+                ];
+            }
+        }
+
+        $url = $this->imageLogoUrl($tenant);
+
+        if ($url !== '') {
+            return [
+                'type' => 'image',
+                'value' => '',
+                'color' => '',
+                'url' => $url,
+            ];
+        }
+
+        if (! (bool) data_get($tenant->meta, 'logo_saved')) {
+            $default = $this->userLogoDefault($tenant->loadMissing('user')->user);
+
+            if (filled($default)) {
+                return [
+                    'type' => 'image',
+                    'value' => '',
+                    'color' => '',
+                    'url' => $default,
+                ];
+            }
+        }
+
+        return [
+            'type' => 'image',
+            'value' => '',
+            'color' => '',
+            'url' => 'https://api.dicebear.com/9.x/shapes/svg?seed='.$tenant->uuid,
+        ];
+    }
+
     public function hasLogo(Tenant $tenant): bool
     {
+        $mark = data_get($tenant->meta, 'brand_mark');
+
+        if (is_array($mark) && in_array(($mark['type'] ?? null), ['emoji', 'icon'], true) && filled($mark['value'] ?? null)) {
+            return true;
+        }
+
         $stored = data_get($tenant->meta, 'logo') ?? data_get($tenant->data, 'logo');
 
         if (filled($stored)) {
@@ -148,7 +225,108 @@ class TenantProfileService
     {
         $tenant->meta->set('logo', $path);
         $tenant->meta->set('logo_saved', true);
+        $tenant->meta->set('brand_mark', [
+            'type' => 'image',
+            'value' => '',
+            'color' => '',
+        ]);
         $tenant->save();
+    }
+
+    /**
+     * @param  array{type: string, value?: string|null, color?: string|null}  $mark
+     */
+    public function saveBrandMark(Tenant $tenant, array $mark): void
+    {
+        $type = (string) ($mark['type'] ?? '');
+
+        if ($type === 'emoji') {
+            $value = trim((string) ($mark['value'] ?? ''));
+
+            if ($value === '') {
+                return;
+            }
+
+            $tenant->meta->set('brand_mark', [
+                'type' => 'emoji',
+                'value' => mb_substr($value, 0, 16),
+                'color' => '',
+            ]);
+            $tenant->meta->set('logo_saved', true);
+            $tenant->save();
+
+            return;
+        }
+
+        if ($type === 'icon') {
+            $iconId = app(TablerIconsCatalog::class)->normalizeId((string) ($mark['value'] ?? ''));
+
+            if ($iconId === null) {
+                return;
+            }
+
+            $tenant->meta->set('brand_mark', [
+                'type' => 'icon',
+                'value' => $iconId,
+                'color' => $this->normalizeBrandMarkColor($mark['color'] ?? null),
+            ]);
+            $tenant->meta->set('logo_saved', true);
+            $tenant->save();
+        }
+    }
+
+    public function clearBrandMark(Tenant $tenant): void
+    {
+        $tenant->meta->set('brand_mark', null);
+        $tenant->meta->set('logo', null);
+        $tenant->meta->set('logo_saved', true);
+        $tenant->save();
+    }
+
+    protected function imageLogoUrl(Tenant $tenant): string
+    {
+        $stored = data_get($tenant->meta, 'logo') ?? data_get($tenant->data, 'logo');
+
+        if (Str::startsWith((string) $stored, 'http')) {
+            return (string) $stored;
+        }
+
+        $path = is_array($stored) ? ($stored['path'] ?? null) : $stored;
+
+        if (filled($path)) {
+            return Storage::url((string) $path);
+        }
+
+        return '';
+    }
+
+    protected function normalizeBrandMarkColor(mixed $color): string
+    {
+        return BlockBrandMark::normalizeColor($color);
+    }
+
+    /**
+     * @param  array{type: string, value: string, color: string, url: string|null}  $mark
+     */
+    protected function brandMarkDataUri(array $mark): string
+    {
+        if ($mark['type'] === 'emoji') {
+            $emoji = htmlspecialchars($mark['value'], ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+                .'<text x="32" y="42" text-anchor="middle" font-size="40">'.$emoji.'</text>'
+                .'</svg>';
+
+            return 'data:image/svg+xml;charset=utf-8,'.rawurlencode($svg);
+        }
+
+        $color = htmlspecialchars($mark['color'] !== '' ? $mark['color'] : '#e5e7eb', ENT_QUOTES | ENT_XML1, 'UTF-8');
+        $label = htmlspecialchars(str_replace('tabler:', '', $mark['value']), ENT_QUOTES | ENT_XML1, 'UTF-8');
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+            .'<rect width="64" height="64" rx="12" fill="#111827"/>'
+            .'<text x="32" y="38" text-anchor="middle" font-size="10" fill="'.$color.'">'.$label.'</text>'
+            .'</svg>';
+
+        return 'data:image/svg+xml;charset=utf-8,'.rawurlencode($svg);
     }
 
     /**

@@ -7,6 +7,8 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Support\ContentTypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
@@ -158,7 +160,7 @@ test('owner can update block-link settings', function () {
         ->postJson('/api/page/blocks', ['type' => 'block-link'])
         ->assertSuccessful();
 
-    $blockId = (int) $create->json('data.id');
+    $blockId = (int) $create->json('data.block.id');
 
     $this->actingAs($user)
         ->putJson('/api/page/blocks/'.$blockId, [
@@ -205,7 +207,7 @@ test('owner can update block-link to external url and specific item', function (
 
     $blockId = (int) $this->actingAs($user)
         ->postJson('/api/page/blocks', ['type' => 'block-link'])
-        ->json('data.id');
+        ->json('data.block.id');
 
     $this->actingAs($user)
         ->putJson('/api/page/blocks/'.$blockId, [
@@ -248,7 +250,7 @@ test('external block-link requires a full url', function () {
 
     $blockId = (int) $this->actingAs($user)
         ->postJson('/api/page/blocks', ['type' => 'block-link'])
-        ->json('data.id');
+        ->json('data.block.id');
 
     $this->actingAs($user)
         ->putJson('/api/page/blocks/'.$blockId, [
@@ -283,4 +285,174 @@ test('owner can search specific content items for block-link picker', function (
         ->getJson('/api/page/link-content?link_type=item:blog')
         ->assertSuccessful()
         ->assertJsonFragment(['id' => $post->id]);
+});
+
+test('owner can create block-link with settings in one request', function () {
+    [$user] = createUserWithTenantForPageBlockSettings();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks', [
+            'type' => 'block-link',
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'description' => 'اقرأ مقالاتنا',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.block.type', 'block-link')
+        ->assertJsonPath('data.block.title', 'المدونة')
+        ->assertJsonPath('data.editor.link_type', 'section:blog')
+        ->assertJsonPath('data.editor.title', 'المدونة');
+});
+
+test('failed block-link create with settings does not leave an orphan block', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $before = Block::queryForTenantRoots()->userBlocks()->count();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks', [
+            'type' => 'block-link',
+            'link_type' => 'external',
+            'title' => 'بدون رابط',
+        ])
+        ->assertStatus(422);
+
+    setCurrentTenant($tenant);
+    expect(Block::queryForTenantRoots()->userBlocks()->count())->toBe($before);
+});
+
+test('owner can save an emoji brand mark on a block-link', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.block.id');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'description' => 'اقرأ مقالاتنا',
+            'brand_mark_type' => 'emoji',
+            'brand_mark_value' => '🚀',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.editor.brand_mark.value', '🚀');
+
+    setCurrentTenant($tenant);
+    $block = Block::query()->findOrFail($blockId);
+
+    expect(data_get($block->data, 'brand_mark.type'))->toBe('emoji')
+        ->and(data_get($block->data, 'brand_mark.value'))->toBe('🚀')
+        ->and(data_get($tenant->fresh()->meta, 'brand_mark'))->toBeNull();
+});
+
+test('owner can save an icon brand mark on a block-link', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.block.id');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'description' => 'اقرأ مقالاتنا',
+            'brand_mark_type' => 'icon',
+            'brand_mark_value' => 'tabler:home',
+            'brand_mark_color' => '#DC2626',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark.type', 'icon')
+        ->assertJsonPath('data.editor.brand_mark.value', 'tabler:home')
+        ->assertJsonPath('data.editor.brand_mark.color', '#dc2626');
+
+    setCurrentTenant($tenant);
+    $block = Block::query()->findOrFail($blockId);
+
+    expect(data_get($block->data, 'brand_mark.type'))->toBe('icon')
+        ->and(data_get($block->data, 'brand_mark.value'))->toBe('tabler:home')
+        ->and(data_get($tenant->fresh()->meta, 'brand_mark'))->toBeNull();
+});
+
+test('owner can upload an image brand mark on a block-link', function () {
+    Storage::fake('spaces');
+
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.block.id');
+
+    $this->actingAs($user)
+        ->post('/api/page/blocks/'.$blockId, [
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'description' => 'اقرأ مقالاتنا',
+            'brand_mark_type' => 'image',
+            'logo' => UploadedFile::fake()->image('icon.jpg', 200, 200),
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark.type', 'image');
+
+    setCurrentTenant($tenant);
+    $block = Block::query()->findOrFail($blockId);
+
+    expect(data_get($block->data, 'brand_mark.type'))->toBe('image')
+        ->and(data_get($block->data, 'brand_mark.path'))->not->toBeEmpty()
+        ->and(data_get($tenant->fresh()->meta, 'brand_mark'))->toBeNull()
+        ->and(data_get($tenant->fresh()->meta, 'logo'))->toBeNull();
+});
+
+test('owner can remove a brand mark from a block-link', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', ['type' => 'block-link'])
+        ->json('data.block.id');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'brand_mark_type' => 'emoji',
+            'brand_mark_value' => '🔥',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark.type', 'emoji');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$blockId, [
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+            'brand_mark_type' => 'none',
+            'remove_logo' => true,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark', null);
+
+    setCurrentTenant($tenant);
+    $block = Block::query()->findOrFail($blockId);
+
+    expect(data_get($block->data, 'brand_mark'))->toBeNull();
+});
+
+test('block-link editor returns null brand mark when unset', function () {
+    [$user] = createUserWithTenantForPageBlockSettings();
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', [
+            'type' => 'block-link',
+            'link_type' => 'section:blog',
+            'title' => 'المدونة',
+        ])
+        ->json('data.block.id');
+
+    $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$blockId)
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.brand_mark', null);
 });

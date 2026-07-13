@@ -101,17 +101,10 @@ class GetOnboarding
             'fonts' => data_get($schema, 'fontFamily.options', [
                 'sarmady' => 'سرمدي',
                 'ibmps' => 'IBM Plex',
-                'milligram' => 'ميليجرام',
-                'eqleem' => 'إقليد',
+                'effra' => 'Effra',
             ]),
             'color_options' => data_get($schema, 'primaryColor.options', []),
-            'radius_options' => [
-                'rounded-full' => 'دائري بالكامل',
-                'rounded-2xl' => 'منحني كبير',
-                'rounded-lg' => 'منحني متوسط',
-                'rounded-md' => 'منحني خفيف',
-                'rounded-none' => 'بدون انحناء',
-            ],
+            'radius_options' => [],
             'catalog_options' => $catalogOptions,
         ];
     }

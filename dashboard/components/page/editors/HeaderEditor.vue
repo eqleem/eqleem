@@ -7,7 +7,7 @@ import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
 import Select from '../../ui/Select.vue';
 import CountrySelect from '../../ui/CountrySelect.vue';
-import FileCrop from '../../ui/FileCrop.vue';
+import BrandMarkField from '../../ui/BrandMarkField.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
 import { notifyApiError } from '../../../lib/notify.js';
@@ -27,6 +27,38 @@ function normalizeCountry(value) {
     return /^[A-Za-z]{2}$/.test(country) ? country.toUpperCase() : defaultCountryCode;
 }
 
+function brandMarkFromEditor(editor) {
+    const mark = editor?.brand_mark;
+
+    if (mark && typeof mark === 'object' && mark.type) {
+        return {
+            type: mark.type,
+            value: mark.value ?? '',
+            color: mark.color ?? '',
+            url: mark.type === 'image' ? (mark.url || editor?.logo || null) : null,
+            file: null,
+        };
+    }
+
+    if (editor?.logo) {
+        return {
+            type: 'image',
+            value: '',
+            color: '',
+            url: editor.logo,
+            file: null,
+        };
+    }
+
+    return {
+        type: null,
+        value: '',
+        color: '',
+        url: null,
+        file: null,
+    };
+}
+
 const form = reactive({
     name: props.editor.name ?? '',
     bio: props.editor.bio ?? '',
@@ -34,8 +66,7 @@ const form = reactive({
     city: props.editor.city ?? '',
 });
 
-const logoFile = ref(null);
-const logoPreview = ref(props.editor.logo || null);
+const brandMark = ref(brandMarkFromEditor(props.editor));
 const socialLinks = ref([...(props.editor.social_links ?? [])]);
 const networks = computed(() => props.editor.social_networks ?? []);
 const networkOptions = computed(() => Object.fromEntries(
@@ -58,8 +89,8 @@ watch(() => props.editor, (value) => {
     form.bio = value.bio ?? '';
     form.country = normalizeCountry(value.country);
     form.city = value.city ?? '';
-    if (!logoFile.value) {
-        logoPreview.value = value.logo || null;
+    if (!brandMark.value?.file) {
+        brandMark.value = brandMarkFromEditor(value);
     }
     socialLinks.value = [...(value.social_links ?? [])];
 
@@ -83,11 +114,25 @@ async function submit() {
         body.append('bio', form.bio.trim());
         body.append('country', form.country.trim());
         body.append('city', form.city.trim());
-        if (logoFile.value) {
-            body.append('logo', logoFile.value);
+
+        const mark = brandMark.value ?? {};
+
+        if (mark.type === 'image' && mark.file) {
+            body.append('logo', mark.file);
+            body.append('brand_mark_type', 'image');
+        } else if (mark.type === 'emoji' || mark.type === 'icon') {
+            body.append('brand_mark_type', mark.type);
+            body.append('brand_mark_value', mark.value ?? '');
+            if (mark.type === 'icon') {
+                body.append('brand_mark_color', mark.color ?? '');
+            }
+        } else if (mark.type === 'none') {
+            body.append('brand_mark_type', 'none');
+            body.append('remove_logo', '1');
         }
 
         const payload = await store.updateBlock(props.blockId, body);
+        brandMark.value = brandMarkFromEditor(payload?.editor ?? props.editor);
         emit('saved', payload);
     } catch (error) {
         if (error instanceof ApiError) {
@@ -179,15 +224,11 @@ async function onSocialDrop(event, targetId) {
         <div class="space-y-2">
             <Input v-model="form.name" name="name" label="اسم النشاط" placeholder="اسم النشاط" :error="errors.name" />
 
-            <FileCrop
-                v-model="logoFile"
-                v-model:preview="logoPreview"
+            <BrandMarkField
+                v-model="brandMark"
                 name="logo"
                 label="الشعار"
-                upload-label="رفع شعار"
-                crop-title="قص الشعار"
-                shape="square"
-                :error="errors.logo"
+                :error="errors.logo || errors.brand_mark_value || errors.brand_mark_type"
             />
 
             <Textarea v-model="form.bio" name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" :maxlength="250" :rows="3" :error="errors.bio" />

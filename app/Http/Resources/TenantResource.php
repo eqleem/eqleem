@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Tenant;
+use App\Services\TenantProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,6 +25,7 @@ class TenantResource extends JsonResource
             'name' => $this->name,
             'handle' => $this->handle,
             'logo' => $this->logo,
+            'brand_mark' => app(TenantProfileService::class)->brandMark($this->resource),
             'url' => $this->url,
             'active' => (bool) $this->active,
             'plan' => filled($planName) ? __((string) $planName) : __('free'),

@@ -21,6 +21,7 @@ class GeneralInfoSettingsResource extends JsonResource
         return [
             'name' => $payload['name'],
             'logo' => $payload['logo'],
+            'brand_mark' => $payload['brand_mark'],
             'contact' => $payload['contact'],
             'social_links' => $payload['social_links'],
             'social_networks' => $payload['social_networks'],

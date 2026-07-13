@@ -15,8 +15,13 @@ onMounted(() => {
         <Header />
         <Nav />
         <Notify />
-        <main class="bg-stone-200 min-h-[calc(102.5vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
+        <main class="bg-stone-200 min-h-[calc(100.3vh-var(--dashboard-chrome-h))] pt-[var(--dashboard-chrome-h)]">
             <RouterView />
         </main>
+        <div class="bg-stone-200 p-4 pt-10 pb-6">
+            <a href="https://eqleem.com" target="_blank" class="flex items-center justify-center gap-2">
+                <img :src="'/assets/images/logo.webp'" class="h-5 mx-auto" alt="إقليم">
+            </a>
+        </div>
     </div> 
 </template>

@@ -73,7 +73,7 @@ return [
         'slug' => 'store',
         'model_type' => 'product',
         'name' => 'المتجر الإلكتروني',
-        'description' => 'إدارة المنتجات والتصنيفات وإعدادات المتجر.',
+        'description' => 'لبيع المنتجات القابلة للشحن.',
         'icon' => 'assets/icons/ecommerce/018-cart.svg',
         'color' => 'green',
         'components' => [
@@ -89,7 +89,7 @@ return [
         'slug' => 'digital-products',
         'model_type' => 'digital-product',
         'name' => 'المنتجات الرقمية',
-        'description' => 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
+        'description' => 'لبيع المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
         'icon' => 'assets/icons/business/035-file.svg',
         'color' => 'red',
         'components' => [
@@ -105,7 +105,7 @@ return [
         'slug' => 'digital-services',
         'model_type' => 'digital-service',
         'name' => 'الخدمات الرقمية',
-        'description' => 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.',
+        'description' => 'لبيع الخدمات الرقمية مع تحديد مدة التسليم.',
         'icon' => 'assets/icons/business/015-cloud-network.svg',
         'color' => 'blue',
         'components' => [
@@ -121,7 +121,7 @@ return [
         'slug' => 'services',
         'model_type' => 'service',
         'name' => 'خدمات بالساعة',
-        'description' => 'عرض وإدارة الخدمات المقدمة بالساعة أو الحجز.',
+        'description' => 'لبيع الخدمات المقدمة بالساعة وحجزها مع ربط مقدمي الخدمة.',
         'icon' => 'assets/icons/business/025-team work.svg',
         'color' => 'teal',
         'components' => [

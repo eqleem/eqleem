@@ -4,6 +4,7 @@ use App\Actions\SubscribeTenantToPlan;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\TenantProfileService;
 use Database\Seeders\PlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -52,9 +53,32 @@ test('authenticated owner receives dashboard context with tenant and permissions
         ->assertJsonPath('data.tenant.id', $tenant->id)
         ->assertJsonPath('data.tenant.name', $tenant->name)
         ->assertJsonPath('data.tenant.handle', $tenant->handle)
+        ->assertJsonStructure([
+            'data' => [
+                'tenant' => [
+                    'logo',
+                    'brand_mark' => ['type', 'value', 'color', 'url'],
+                ],
+            ],
+        ])
         ->assertJsonPath('data.permissions.can_access_dashboard', true)
         ->assertJsonPath('data.permissions.can_manage_tenant', true)
         ->assertJsonPath('data.app.name', config('app.name'));
+});
+
+test('dashboard context exposes emoji brand mark for the tenant', function () {
+    [$user, $tenant] = createDashboardUserWithTenant();
+
+    app(TenantProfileService::class)->saveBrandMark($tenant, [
+        'type' => 'emoji',
+        'value' => '🚀',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/dashboard/context')
+        ->assertSuccessful()
+        ->assertJsonPath('data.tenant.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.tenant.brand_mark.value', '🚀');
 });
 
 test('inactive tenant denies dashboard access but still reports ownership', function () {

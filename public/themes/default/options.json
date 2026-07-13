@@ -35,7 +35,7 @@
     },
     "bgColor": {
         "type": "tailwindcss-colorpicker-light",
-        "label": "Background color",
+        "label": "لون الخلفية",
         "default": "gray-300"
     },
 
@@ -63,8 +63,7 @@
         "options": {
             "sarmady": "سرمدي",
             "ibmps": "IBM Plex",
-            "milligram": "ميليجرام",
-            "eqleem": "إقليد"
+            "effra": "Effra"
         },
         "default": "sarmady"
     }

@@ -126,18 +126,30 @@ it('saves identity theme options including font', function () {
     $this->actingAs($user)
         ->putJson('/api/dashboard/onboarding/identity', [
             'primary_color' => 'teal',
-            'logo_radius' => 'rounded-lg',
-            'font_family' => 'ibmps',
+            'font_family' => 'effra',
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.forms.identity.primary_color', 'teal')
-        ->assertJsonPath('data.forms.identity.logo_radius', 'rounded-lg')
-        ->assertJsonPath('data.forms.identity.font_family', 'ibmps');
+        ->assertJsonPath('data.forms.identity.font_family', 'effra');
 
     $saved = $tenant->fresh()->themeSettingsFor((int) $tenant->theme_id);
 
     expect($saved['primaryColor'])->toBe('teal')
-        ->and($saved['fontFamily'])->toBe('ibmps');
+        ->and($saved['fontFamily'])->toBe('effra')
+        ->and($saved['logoRadius'])->not->toBeEmpty();
+});
+
+it('exposes onboarding fonts without milligram or eqleem and includes effra', function () {
+    [$user] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->getJson('/api/dashboard/onboarding')
+        ->assertSuccessful()
+        ->assertJsonPath('data.fonts.sarmady', 'سرمدي')
+        ->assertJsonPath('data.fonts.ibmps', 'IBM Plex')
+        ->assertJsonPath('data.fonts.effra', 'Effra')
+        ->assertJsonMissingPath('data.fonts.milligram')
+        ->assertJsonMissingPath('data.fonts.eqleem');
 });
 
 it('saves catalog enabled content types', function () {

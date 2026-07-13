@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import MainBox from '../ui/MainBox.vue';
 import Button from '../ui/Button.vue';
@@ -39,8 +39,19 @@ const editTitle = ref('إعدادات البلوك');
 const ctaLinksPanel = ref(null);
 const floatLinksPanel = ref(null);
 
+function onEditModalClosed(event) {
+    if (event.detail?.modal === 'edit-block') {
+        store.clearEditing();
+    }
+}
+
 onMounted(() => {
     store.fetchStructure();
+    window.addEventListener('closemodal', onEditModalClosed);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('closemodal', onEditModalClosed);
 });
 
 function openAddCtaLink() {
@@ -63,16 +74,10 @@ function onFloatLinksUpdated(payload) {
     }
 }
 
-async function addLinkBlock() {
-    try {
-        const block = await store.createBlock('block-link');
-
-        if (block?.id) {
-            await openEdit(block.id, block.title);
-        }
-    } catch {
-        // error surfaced via store
-    }
+function addLinkBlock() {
+    editTitle.value = 'إضافة رابط';
+    store.beginCreateBlockLink();
+    openModal('edit-block');
 }
 
 async function openEdit(id, title = null) {
@@ -85,6 +90,11 @@ async function openEdit(id, title = null) {
     } catch {
         // error surfaced via store
     }
+}
+
+function onCloseEdit() {
+    closeModal('edit-block');
+    store.clearEditing();
 }
 
 async function onSaved(payload) {
@@ -190,7 +200,7 @@ function contentManageLabel(block) {
         <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
 
         <div v-else class="space-y-4 p-4">
-            <div class="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
+            <!-- <div class="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
                 <button
                     type="button"
                     class="min-w-0 flex-1 text-start transition hover:text-primary-600"
@@ -207,7 +217,7 @@ function contentManageLabel(block) {
                 >
                     <Icon name="settings" class="h-5 w-5" />
                 </button>
-            </div>
+            </div> -->
 
             <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <ul class="space-y-1.5 p-2">
@@ -285,18 +295,20 @@ function contentManageLabel(block) {
                             :key="block.id"
                             class="group flex items-center lg:gap-2 gap-1 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                             :class="{ 'opacity-50': !block.active }"
-                            draggable="true"
-                            @dragstart="onDragStart($event, block.id)"
                             @dragover="onDragOver"
                             @drop="onDrop($event, block.id)"
                         >
-                            <button
-                                type="button"
+                            <div
+                                draggable="true"
                                 class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
+                                role="button"
+                                tabindex="0"
                                 aria-label="سحب لإعادة الترتيب"
+                                @dragstart="onDragStart($event, block.id)"
+                                @dragend="dragId = null"
                             >
                                 <Icon name="grip-vertical" class="h-4 w-4" />
-                            </button>
+                            </div>
 
                             <div class="flex min-w-0 flex-1 items-center gap-2">
                                 <img :src="block.icon_url" alt="" class="hidden h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1 sm:block">
@@ -426,7 +438,7 @@ function contentManageLabel(block) {
                 v-else-if="editing"
                 :payload="editing"
                 @saved="onSaved"
-                @close="closeModal('edit-block'); store.clearEditing()"
+                @close="onCloseEdit"
             />
         </Modal>
     </MainBox>

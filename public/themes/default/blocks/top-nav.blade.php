@@ -27,8 +27,13 @@
 
         <div class="flex items-center justify-center w-full h-14">
             @if ($showBackButtonLink)
-                <a href="{{ $homeUrl }}" wire:navigate id="backBtn" class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5X flex items-center justify-center transition-all duration-200">
-                    <img src="{{tenant('logo')}}" alt="Eqleem" class="w-full h-full object-cover rounded-full transition-transform duration-500">
+                <a href="{{ $homeUrl }}" wire:navigate id="backBtn" class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden">
+                    <x-brand-mark
+                        :mark="app(\App\Services\TenantProfileService::class)->brandMark(tenant())"
+                        :url="tenant('logo')"
+                        alt="{{ tenant('name') }}"
+                        class="w-full h-full object-cover rounded-full transition-transform duration-500"
+                    />
                 </a>
             @endif
         </div>

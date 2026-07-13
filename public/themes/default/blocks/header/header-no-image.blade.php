@@ -1,8 +1,14 @@
 <header class="flex flex-col items-center justify-center mt-2 md:mt-5">
     @if ($showAvatar)
         <a href="#" class="relative mb-5 animate-fade-in-up delay-100 group">
-            <div class="w-28 h-28 rounded-full p-1 bg-white overflow-hidden ">
-                <img src="{{ $avatarUrl }}" alt="{{ $tenantName }}" class="w-full h-full object-cover rounded-full transition-transform duration-500">
+            <div class="w-28 h-28 rounded-full p-1 bg-white overflow-hidden flex items-center justify-center">
+                <x-brand-mark
+                    :mark="$brandMark ?? null"
+                    :url="$avatarUrl"
+                    :alt="$tenantName"
+                    icon-size="4.5rem"
+                    class="w-full h-full object-cover rounded-full transition-transform duration-500"
+                />
             </div>
             @if ($showVerifiedBadge)
                 <div class="absolute bottom-1 bg-white rounded-full p-1 flex items-center justify-center">

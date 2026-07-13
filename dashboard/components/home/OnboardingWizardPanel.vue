@@ -36,7 +36,6 @@ const {
     socialNetworks,
     fonts,
     colorOptions,
-    radiusOptions,
     catalogOptions,
     saving,
     completed,
@@ -60,7 +59,6 @@ const socialDraft = reactive({ network: 'twitter', url: '' });
 const socialLinks = ref([]);
 const identity = reactive({
     primary_color: 'blue',
-    logo_radius: 'rounded-full',
     font_family: 'sarmady',
 });
 const enabledCatalog = ref([]);
@@ -99,7 +97,7 @@ const canContinue = computed(() => {
                 && socialLinks.value.length > 0,
             );
         case 'identity':
-            return Boolean(identity.primary_color && identity.logo_radius && identity.font_family);
+            return Boolean(identity.primary_color && identity.font_family);
         case 'catalog':
             return enabledCatalog.value.length > 0;
         case 'orders':
@@ -151,7 +149,6 @@ watch(
         }
 
         identity.primary_color = value.identity?.primary_color ?? 'blue';
-        identity.logo_radius = value.identity?.logo_radius ?? 'rounded-full';
         identity.font_family = value.identity?.font_family ?? 'sarmady';
 
         const enabled = value.catalog?.enabled ?? [];
@@ -329,7 +326,6 @@ async function continueStep() {
     if (activeKey.value === 'identity') {
         const result = await store.saveIdentity({
             primary_color: identity.primary_color,
-            logo_radius: identity.logo_radius,
             font_family: identity.font_family,
         });
 
@@ -562,13 +558,6 @@ async function continueStep() {
                     label="اللون الأساسي"
                     :options="colorOptions"
                     allow-custom
-                />
-                <Radio
-                    v-model="identity.logo_radius"
-                    name="logo_radius"
-                    label="انحناء الحدود"
-                    :options="radiusOptions"
-                    :error="errors.logo_radius"
                 />
                 <Radio
                     v-model="identity.font_family"

@@ -7,7 +7,13 @@ use App\Models\Block;
 class BlockLinkCard
 {
     /**
-     * @return array{title: string, url: string, icon: string, desc: string}|null
+     * @return array{
+     *     title: string,
+     *     url: string,
+     *     icon: string,
+     *     desc: string,
+     *     brand_mark: array{type: string, value: string, color: string, url: string|null}|null
+     * }|null
      */
     public static function fromBlock(?Block $block): ?array
     {
@@ -29,6 +35,9 @@ class BlockLinkCard
                 'url' => (string) $url,
                 'icon' => 'hugeicons:link-04',
                 'desc' => '',
+                'brand_mark' => BlockBrandMark::forDisplay(
+                    is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+                ),
             ];
         }
 
@@ -43,6 +52,9 @@ class BlockLinkCard
             'url' => $url,
             'icon' => CtaLink::iconFromData($data),
             'desc' => CtaLink::descriptionFromData($data),
+            'brand_mark' => BlockBrandMark::forDisplay(
+                is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+            ),
         ];
     }
 }

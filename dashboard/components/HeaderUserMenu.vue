@@ -1,4 +1,6 @@
 <script setup>
+import BrandMark from './ui/BrandMark.vue';
+
 defineProps({
     variant: { type: String, default: 'compact' },
     userName: { type: String, default: '' },
@@ -6,6 +8,7 @@ defineProps({
     userImage: { type: String, default: '' },
     tenantName: { type: String, default: '' },
     tenantLogo: { type: String, default: null },
+    tenantBrandMark: { type: Object, default: null },
     tenantPlan: { type: String, default: '' },
     tenantUrl: { type: String, default: '#' },
     appName: { type: String, default: '' },
@@ -36,11 +39,14 @@ const linkClass = {
         </div>
 
         <div class="mt-4 flex items-center gap-2.5 rounded-xl bg-stone-50 p-2.5">
-            <img
-                :src="tenantLogo ?? '/assets/images/user.png'"
-                alt=""
-                class="h-9 w-9 rounded-lg object-cover"
-            >
+            <BrandMark
+                :mark="tenantBrandMark"
+                :url="tenantLogo"
+                :alt="tenantName"
+                size-class="size-9 rounded-lg"
+                icon-class="text-2xl leading-none"
+                img-class="rounded-lg object-cover"
+            />
             <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium text-stone-800">{{ tenantName }}</p>
                 <span class="mt-0.5 inline-block rounded-md bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-700">

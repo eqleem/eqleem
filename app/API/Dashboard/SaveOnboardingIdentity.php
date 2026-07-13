@@ -13,7 +13,7 @@ use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Saves onboarding step 3: brand identity (color, radius, font).
+ * Saves onboarding step 3: brand identity (color, font).
  */
 class SaveOnboardingIdentity
 {
@@ -27,7 +27,7 @@ class SaveOnboardingIdentity
     {
         return [
             'primary_color' => ['required', 'string', 'max:40'],
-            'logo_radius' => ['required', 'string', Rule::in([
+            'logo_radius' => ['nullable', 'string', Rule::in([
                 'rounded-full',
                 'rounded-2xl',
                 'rounded-lg',
@@ -40,7 +40,7 @@ class SaveOnboardingIdentity
     }
 
     /**
-     * @param  array{primary_color: string, logo_radius: string, font_family: string}  $data
+     * @param  array{primary_color: string, logo_radius?: string|null, font_family: string}  $data
      * @return array<string, mixed>
      */
     public function handle(Tenant $tenant, array $data, Onboarding $onboarding): array
@@ -54,7 +54,9 @@ class SaveOnboardingIdentity
         $schema = app(TenantThemeOptions::class)->schemaForTheme($themeSlug);
         $saved = $tenant->themeSettingsFor($themeId);
 
-        $radius = $data['logo_radius'];
+        $radius = $data['logo_radius']
+            ?? data_get($saved, 'logoRadius')
+            ?? data_get($schema, 'logoRadius.default', 'rounded-full');
 
         if ($radius === 'full') {
             $radius = 'rounded-full';
@@ -80,7 +82,7 @@ class SaveOnboardingIdentity
     {
         $tenant = $this->currentDashboardTenant($request);
 
-        /** @var array{primary_color: string, logo_radius: string, font_family: string} $validated */
+        /** @var array{primary_color: string, logo_radius?: string|null, font_family: string} $validated */
         $validated = $request->validated();
 
         return $this->handle($tenant, $validated, $onboarding);

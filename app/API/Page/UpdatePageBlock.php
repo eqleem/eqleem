@@ -8,6 +8,7 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
+use App\Support\BlockBrandMark;
 use App\Support\BlockTypeRegistry;
 use App\Support\BusinessDocuments;
 use App\Support\CtaLink;
@@ -64,6 +65,10 @@ class UpdatePageBlock
                 'show_avatar' => ['sometimes', 'boolean'],
                 'show_verified_badge' => ['sometimes', 'boolean'],
                 'logo' => ['nullable', 'image', 'max:15024'],
+                'brand_mark_type' => ['nullable', 'string', Rule::in(['image', 'emoji', 'icon', 'none'])],
+                'brand_mark_value' => ['nullable', 'string', 'max:64'],
+                'brand_mark_color' => ['nullable', 'string', 'max:20'],
+                'remove_logo' => ['sometimes', 'boolean'],
             ],
             'footer' => [
                 'show_documents_warranties' => ['required', 'boolean'],
@@ -76,6 +81,11 @@ class UpdatePageBlock
                 'description' => ['nullable', 'string', 'max:500'],
                 'url' => ['nullable', 'url', 'max:500'],
                 'content_id' => ['nullable', 'integer'],
+                'logo' => ['nullable', 'image', 'max:15024'],
+                'brand_mark_type' => ['nullable', 'string', Rule::in(['image', 'emoji', 'icon', 'none'])],
+                'brand_mark_value' => ['nullable', 'string', 'max:64'],
+                'brand_mark_color' => ['nullable', 'string', 'max:20'],
+                'remove_logo' => ['sometimes', 'boolean'],
             ],
             'cta' => [],
             default => [
@@ -103,7 +113,7 @@ class UpdatePageBlock
             'float-links' => $this->updateFloatLinks($block, $data),
             'header' => $this->updateHeader($block, $tenant, $data),
             'footer' => $this->updateFooter($block, $data),
-            'block-link' => $this->updateBlockLink($block, $data),
+            'block-link' => $this->updateBlockLink($block, $tenant, $data),
             'cta' => null,
             default => $block->update(['data' => $data['data'] ?? $block->data]),
         };
@@ -123,6 +133,10 @@ class UpdatePageBlock
 
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo');
+        }
+
+        if ($request->boolean('remove_logo')) {
+            $validated['remove_logo'] = true;
         }
 
         return $this->handle($tenant, $id, $validated, $blockTypes);
@@ -199,17 +213,26 @@ class UpdatePageBlock
     protected function updateHeader(Block $block, Tenant $tenant, array $data): void
     {
         $tenant->name = $data['name'];
+        $tenant->save();
 
+        $profile = app(TenantProfileService::class);
         $logo = $data['logo'] ?? null;
+        $markType = (string) ($data['brand_mark_type'] ?? '');
 
         if ($logo instanceof UploadedFile) {
             $path = $logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
-            app(TenantProfileService::class)->saveLogo($tenant, $path);
-        } else {
-            $tenant->save();
+            $profile->saveLogo($tenant, $path);
+        } elseif ((bool) ($data['remove_logo'] ?? false) || $markType === 'none') {
+            $profile->clearBrandMark($tenant);
+        } elseif (in_array($markType, ['emoji', 'icon'], true)) {
+            $profile->saveBrandMark($tenant, [
+                'type' => $markType,
+                'value' => (string) ($data['brand_mark_value'] ?? ''),
+                'color' => (string) ($data['brand_mark_color'] ?? ''),
+            ]);
         }
 
-        app(TenantProfileService::class)->saveContact($tenant, [
+        $profile->saveContact($tenant, [
             'country' => $data['country'] ?? '',
             'city' => $data['city'] ?? '',
         ]);
@@ -244,7 +267,7 @@ class UpdatePageBlock
     /**
      * @param  array<string, mixed>  $data
      */
-    protected function updateBlockLink(Block $block, array $data): void
+    protected function updateBlockLink(Block $block, Tenant $tenant, array $data): void
     {
         $linkType = (string) $data['link_type'];
         $parsed = CtaLink::parseTypeKey($linkType);
@@ -269,6 +292,11 @@ class UpdatePageBlock
             }
         }
 
+        $existingData = is_array($block->data) ? $block->data : [];
+        $existingMark = is_array($existingData['brand_mark'] ?? null)
+            ? $existingData['brand_mark']
+            : null;
+
         $payload = [
             'link_type' => $parsed['link_type'],
             'content_type' => $parsed['content_type'],
@@ -278,6 +306,12 @@ class UpdatePageBlock
             'url' => $isExternal ? (string) ($data['url'] ?? '') : null,
             'icon' => $isExternal ? (string) ($data['icon'] ?? config('cta-link-types.icons.external')) : null,
         ];
+
+        $brandMark = BlockBrandMark::resolveStored($tenant, (int) $block->id, $data, $existingMark);
+
+        if ($brandMark !== null) {
+            $payload['brand_mark'] = $brandMark;
+        }
 
         $blockTitle = filled($payload['title'])
             ? $payload['title']

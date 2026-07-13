@@ -21,6 +21,7 @@ trait BuildsGeneralInfoSettings
         return [
             'name' => (string) ($tenant->name ?? ''),
             'logo' => $profile->logo($tenant),
+            'brand_mark' => $profile->brandMark($tenant),
             'contact' => $profile->contact($tenant),
             'social_links' => $profile->socialLinks($tenant)->values()->all(),
             'social_networks' => collect(config('social-networks', []))

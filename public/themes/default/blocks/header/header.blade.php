@@ -58,9 +58,15 @@
         $logoRadius = theme_option('logoRadius', 'full');
         $logoRadiusClass = str_starts_with((string) $logoRadius, 'rounded-') ? $logoRadius : 'rounded-'.$logoRadius;
     @endphp
-    <div class="flex items-center gap-x-3  p-4">
+    <div class="flex items-center gap-x-3 p-2">
         <!-- Logo -->
-        <img src="{{ tenant('logo') }}" alt="{{ tenant('name') }}" class="size-20 {{ $logoRadiusClass }} flex items-center justify-center object-cover">
+        <x-brand-mark
+            :mark="$brandMark ?? null"
+            :url="tenant('logo')"
+            :alt="tenant('name')"
+            icon-size="4.5rem"
+            class="size-24 {{ $logoRadiusClass }} flex items-center justify-center object-cover"
+        />
         
         <!-- Name and Title -->
         <div class="flex-1">

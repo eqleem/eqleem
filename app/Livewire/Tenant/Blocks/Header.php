@@ -26,10 +26,15 @@ class Header extends Component
         $profile = app(TenantProfileService::class);
         $contact = $tenant ? $profile->contact($tenant) : [];
 
+        $brandMark = $tenant
+            ? $profile->brandMark($tenant)
+            : ['type' => 'image', 'value' => '', 'color' => '', 'url' => ''];
+
         return $this->renderTenantBlockView($block, [
             'tenantName' => (string) ($tenant?->name ?? ''),
             'showAvatar' => (bool) ($data['show_avatar'] ?? true),
             'avatarUrl' => (string) ($tenant?->logo ?? ''),
+            'brandMark' => $brandMark,
             'showVerifiedBadge' => (bool) ($data['show_verified_badge'] ?? true),
             'bio' => (string) ($data['bio'] ?? ''),
             'location' => $this->locationLabel($contact),

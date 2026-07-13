@@ -256,6 +256,7 @@ async function submitPassword() {
                         placeholder="your@email.com"
                         dir="ltr"
                         :error="profileErrors.email"
+                        infoDir="rtl"
                         info="تغيير البريد يعيد حالة التوثيق."
                     />
                     <Input
@@ -300,6 +301,7 @@ async function submitPassword() {
                         label="كلمة المرور الجديدة"
                         placeholder="••••••••"
                         dir="ltr"
+                        infoDir="rtl"
                         :error="passwordErrors.password"
                         info="6 أحرف على الأقل."
                     />

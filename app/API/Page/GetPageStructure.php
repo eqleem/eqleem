@@ -35,6 +35,7 @@ class GetPageStructure
             'bottom_blocks' => $grouped['bottom']->all(),
             'float_links_block' => $grouped['float_links'],
             'block_types' => $blockTypes->options(addableOnly: true),
+            'block_link_editor' => $this->blockLinkEditorPayload([]),
         ];
     }
 

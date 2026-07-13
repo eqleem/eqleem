@@ -98,6 +98,7 @@ use App\API\Forms\ShowForm;
 use App\API\Forms\UpdateForm;
 use App\API\FormSubmissions\ListFormSubmissions;
 use App\API\FormSubmissions\ShowFormSubmission;
+use App\API\Icons\SearchTablerIcons;
 use App\API\Invoices\ListInvoices;
 use App\API\Invoices\ShowInvoice;
 use App\API\Menu\CreateMenuCategory;
@@ -568,6 +569,9 @@ Route::delete('/page/blocks/{id}/links/{linkId}', DeletePageBlockLink::class)
     ->name('api.page.blocks.links.destroy')
     ->whereNumber('id')
     ->whereNumber('linkId');
+
+Route::get('/icons/tabler', SearchTablerIcons::class)
+    ->name('api.icons.tabler');
 
 Route::get('/page/link-content', SearchPageLinkContent::class)
     ->name('api.page.link-content');

@@ -69,15 +69,21 @@ test('owner can list page structure with system and user blocks', function () {
                 'bottom_blocks',
                 'float_links_block',
                 'block_types',
+                'block_link_editor',
             ],
         ])
         ->assertJsonFragment(['id' => $block->id, 'title' => 'بطاقة تجريبية'])
         ->assertJsonPath('data.block_types.0.slug', 'block-link')
+        ->assertJsonPath('data.block_link_editor.type', 'block-link')
         ->assertJsonPath('data.top_blocks.0.type', 'top-nav')
         ->assertJsonPath('data.cta_block.type', 'cta')
         ->assertJsonPath('data.float_links_block.type', 'float-links')
         ->assertJsonStructure([
             'data' => [
+                'block_link_editor' => [
+                    'type',
+                    'link_type_picker_options',
+                ],
                 'cta_block' => [
                     'id',
                     'editor' => [
@@ -127,16 +133,17 @@ test('owner can create reorder toggle and delete user blocks', function () {
     $create = $this->actingAs($user)
         ->postJson('/api/page/blocks', ['type' => 'block-link'])
         ->assertSuccessful()
-        ->assertJsonPath('data.type', 'block-link')
-        ->assertJsonPath('data.active', true);
+        ->assertJsonPath('data.block.type', 'block-link')
+        ->assertJsonPath('data.block.active', true)
+        ->assertJsonPath('data.editor.type', 'block-link');
 
-    $firstId = (int) $create->json('data.id');
+    $firstId = (int) $create->json('data.block.id');
 
     $second = $this->actingAs($user)
         ->postJson('/api/page/blocks', ['type' => 'block-link'])
         ->assertSuccessful();
 
-    $secondId = (int) $second->json('data.id');
+    $secondId = (int) $second->json('data.block.id');
 
     setCurrentTenant($tenant);
     $existingOrder = Block::queryForTenantRoots()

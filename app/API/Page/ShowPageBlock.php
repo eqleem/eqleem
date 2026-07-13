@@ -5,7 +5,6 @@ namespace App\API\Page;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Page\Concerns\MapsPageBlocks;
 use App\Models\Block;
-use App\Models\Content;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\BlockTypeRegistry;
@@ -102,10 +101,13 @@ class ShowPageBlock
         $contact = $profile->contact($tenant);
         $networks = config('social-networks', []);
 
+        $brandMark = $profile->brandMark($tenant);
+
         return [
             'type' => 'header',
             'name' => (string) ($tenant->name ?? ''),
             'logo' => (string) ($tenant->logo ?? ''),
+            'brand_mark' => $brandMark,
             'bio' => (string) ($data['bio'] ?? ''),
             'show_avatar' => (bool) ($data['show_avatar'] ?? true),
             'show_verified_badge' => (bool) ($data['show_verified_badge'] ?? true),
@@ -144,37 +146,6 @@ class ShowPageBlock
                 ->all(),
             'links' => $this->mapBlockLinks($block, 'footer-link'),
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function blockLinkEditorPayload(array $data): array
-    {
-        $contentId = filled($data['content_id'] ?? null) ? (int) $data['content_id'] : null;
-        $linkType = filled($data['link_type'] ?? null)
-            ? CtaLink::typeKeyFromStoredData($data)
-            : CtaLink::defaultTypeKey('block');
-        $allowed = CtaLink::allowedBlockLinkTypeKeys();
-
-        if (! in_array($linkType, $allowed, true)) {
-            $linkType = CtaLink::defaultTypeKey('block');
-        }
-
-        return [
-            'type' => 'block-link',
-            'title' => (string) ($data['title'] ?? ''),
-            'description' => (string) ($data['description'] ?? ''),
-            'url' => (string) ($data['url'] ?? ''),
-            'link_type' => $linkType,
-            'content_id' => $contentId,
-            'selected_content_title' => $contentId
-                ? (Content::query()->find($contentId)?->title ?? '')
-                : '',
-            'link_type_options' => CtaLink::linkTypeOptions('block'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];
     }
 }

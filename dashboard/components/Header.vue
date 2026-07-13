@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Dropdown from './Dropdown.vue';
 import HeaderUserMenu from './HeaderUserMenu.vue';
+import BrandMark from './ui/BrandMark.vue';
 import Icon from './ui/Icon.vue';
 import { useSession } from '../stores/session.js';
 
@@ -13,6 +14,7 @@ const mobileMenuOpen = ref(false);
 
 const tenantName = computed(() => tenant.value?.name ?? '…');
 const tenantLogo = computed(() => tenant.value?.logo ?? null);
+const tenantBrandMark = computed(() => tenant.value?.brand_mark ?? null);
 const tenantUrl = computed(() => tenant.value?.url ?? '#');
 const tenantPlan = computed(() => tenant.value?.plan ?? 'بداية');
 const userName = computed(() => user.value?.name ?? '');
@@ -28,6 +30,7 @@ const menuProps = computed(() => ({
     userImage: userImage.value,
     tenantName: tenantName.value,
     tenantLogo: tenantLogo.value,
+    tenantBrandMark: tenantBrandMark.value,
     tenantPlan: tenantPlan.value,
     tenantUrl: tenantUrl.value,
     appName: appName.value,
@@ -68,11 +71,15 @@ onBeforeUnmount(() => {
         <div class="mx-auto flex max-w-7xl justify-between gap-x-2 lg:gap-x-3">
             <div class="flex min-w-0 flex-1 items-center gap-x-2 justify-between ">
                 <RouterLink to="/" class="flex min-w-0 items-center gap-x-2">
-                    <img
-                        :src="tenantLogo ?? '/assets/images/user.png'"
-                        alt=""
-                        class="ms-1 h-8 shrink-0 rounded-sm"
-                    >
+                    <BrandMark
+                        class="ms-1"
+                        :mark="tenantBrandMark"
+                        :url="tenantLogo"
+                        :alt="tenantName"
+                        size-class="size-8 rounded-sm"
+                        icon-class="text-2xl leading-none"
+                        img-class="rounded-sm object-cover"
+                    />
                     <span class="truncate">{{ loaded ? tenantName : '…' }}</span>
                 </RouterLink>
 

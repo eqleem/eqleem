@@ -8,6 +8,16 @@ $sarmadyMetrics = [
     'sizeAdjust' => '160%',
 ];
 
+/*
+ * Display/trial Arabic fonts often include placeholder glyphs for Latin digits ("TRIAL FONT").
+ * Restrict them to Arabic script so Western digits (and Arabic-Indic digits) fall through to ibmps.
+ */
+$arabicScriptUnicodeRange = 'U+0600-065F, U+066A-06EF, U+06FA-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200F, U+25CC';
+
+$arabicOnlyFace = static fn (array $face): array => array_merge($face, [
+    'unicodeRange' => $arabicScriptUnicodeRange,
+]);
+
 return [
     'darkMode' => 'class',
     'hash' => false,
@@ -63,96 +73,105 @@ return [
                 'logo' => 'allabbad',
                 'almushaf' => 'almushaf',
                 'eqleem' => 'eqleem',
+                'effra' => 'effra',
             ],
         ],
     ],
     'preflight' => [
         '@font-face' => [
-            array_merge([
+            $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-compressed-black.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 900,
                 'fontDisplay' => 'auto',
-            ], $sarmadyMetrics),
-            array_merge([
+            ], $sarmadyMetrics)),
+            $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-bold.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 700,
                 'fontDisplay' => 'auto',
-            ], $sarmadyMetrics),
-            array_merge([
+            ], $sarmadyMetrics)),
+            $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-regular.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 400,
                 'fontDisplay' => 'auto',
-            ], $sarmadyMetrics),
-            array_merge([
+            ], $sarmadyMetrics)),
+            $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-light.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 300,
                 'fontDisplay' => 'auto',
-            ], $sarmadyMetrics),
+            ], $sarmadyMetrics)),
 
-            [
+            $arabicOnlyFace([
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-bold.ttf)',
                 'fontStyle' => 'bold',
                 'fontWeight' => 'bold',
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-regular.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 400,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'milligram',
                 'src' => 'url(/assets/fonts/milligram/arabic-light.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 300,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'eqleem',
                 'src' => 'url(/assets/fonts/as-wc26-bold.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 600,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'codec-ultra',
                 'src' => 'url(/assets/fonts/codec-pro-me-ultra-trial.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 600,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'vesterbro-poster',
                 'src' => 'url(/assets/fonts/try-vesterbro-poster.ttf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 600,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'wicklow',
                 'src' => 'url(/assets/fonts/f37-wicklow-arabic-stencil-trial-black.otf)',
                 'fontStyle' => 'normal',
                 'fontWeight' => 600,
                 'fontDisplay' => 'auto',
-            ],
-            [
+            ]),
+            $arabicOnlyFace([
                 'fontFamily' => 'effra',
-                'src' => 'url(/assets/fonts/Effra_WArbc_Rg.woff) format("woff2")',
+                'src' => 'url(/assets/fonts/Effra_WArbc_Rg.woff) format("woff")',
                 'fontStyle' => 'normal',
                 'fontWeight' => 400,
                 'fontDisplay' => 'auto',
-            ], [
+            ]),
+            $arabicOnlyFace([
+                'fontFamily' => 'effra',
+                'src' => 'url(/assets/fonts/Effra_WArbc_Md.woff) format("woff")',
+                'fontStyle' => 'normal',
+                'fontWeight' => 500,
+                'fontDisplay' => 'auto',
+            ]),
+            [
                 'fontFamily' => 'ibmps',
                 'src' => 'url(/assets/fonts/ibmps/IBMPlexSansArabic-Regular.ttf)',
                 'fontStyle' => 'normal',

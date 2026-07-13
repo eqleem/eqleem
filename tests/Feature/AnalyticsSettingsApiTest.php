@@ -46,9 +46,19 @@ test('owner can get analytics settings', function () {
         ->assertJsonStructure([
             'data' => [
                 'integrations',
-                'providers',
+                'providers' => [
+                    'google_analytics' => [
+                        'name',
+                        'description',
+                        'label',
+                        'placeholder',
+                        'icon',
+                    ],
+                ],
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.providers.google_analytics.name', 'إحصائيات جوجل')
+        ->assertJsonPath('data.providers.meta.name', 'بيكسل ميتا');
 });
 
 test('owner can update analytics settings', function () {

@@ -7,18 +7,20 @@ import Textarea from '../../ui/Textarea.vue';
 import Toggle from '../../ui/Toggle.vue';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
+import BrandMarkField from '../../ui/BrandMarkField.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
 import { notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
-    blockId: { type: Number, required: true },
+    blockId: { type: Number, default: null },
     editor: { type: Object, required: true },
 });
 
-const emit = defineEmits(['saved']);
+const emit = defineEmits(['saved', 'close']);
 const store = usePageStructureStore();
 const blockActions = inject('blockActions', null);
+const isNew = computed(() => !props.blockId);
 
 const pickerOptions = computed(() => props.editor.link_type_picker_options ?? []);
 
@@ -48,6 +50,28 @@ function parseInitialSpecificItem(linkType, option) {
     return false;
 }
 
+function brandMarkFromEditor(editor) {
+    const mark = editor?.brand_mark;
+
+    if (mark && typeof mark === 'object' && mark.type) {
+        return {
+            type: mark.type,
+            value: mark.value ?? '',
+            color: mark.color ?? '',
+            url: mark.type === 'image' ? (mark.url || null) : null,
+            file: null,
+        };
+    }
+
+    return {
+        type: null,
+        value: '',
+        color: '',
+        url: null,
+        file: null,
+    };
+}
+
 const initialPickerKey = parseInitialPickerKey(props.editor.link_type);
 const initialOption = pickerOptions.value.find((option) => option.key === initialPickerKey) ?? null;
 
@@ -61,6 +85,8 @@ const form = reactive({
     content_search: props.editor.selected_content_title ?? '',
     selected_content_title: props.editor.selected_content_title ?? '',
 });
+
+const brandMark = ref(brandMarkFromEditor(props.editor));
 
 const pickerOpen = ref(false);
 const pickerQuery = ref('');
@@ -291,16 +317,47 @@ async function submit() {
 
     saving.value = true;
 
+    const body = new FormData();
+    body.append('link_type', linkType.value);
+    body.append('title', form.title ?? '');
+    body.append('description', form.description ?? '');
+
+    if (isExternal.value) {
+        body.append('url', form.url ?? '');
+    }
+
+    if (needsContentPicker.value && form.content_id) {
+        body.append('content_id', String(form.content_id));
+    }
+
+    const mark = brandMark.value ?? {};
+
+    if (mark.type === 'image' && mark.file) {
+        body.append('logo', mark.file);
+        body.append('brand_mark_type', 'image');
+    } else if (mark.type === 'emoji' || mark.type === 'icon') {
+        body.append('brand_mark_type', mark.type);
+        body.append('brand_mark_value', mark.value ?? '');
+        if (mark.type === 'icon') {
+            body.append('brand_mark_color', mark.color ?? '');
+        }
+    } else if (mark.type === 'none') {
+        body.append('brand_mark_type', 'none');
+        body.append('remove_logo', '1');
+    }
+
     try {
-        const updater = blockActions?.updateBlock
-            ?? ((id, body) => store.updateBlock(id, body));
-        const payload = await updater(props.blockId, {
-            link_type: linkType.value,
-            title: form.title,
-            description: form.description,
-            url: isExternal.value ? form.url : null,
-            content_id: needsContentPicker.value ? form.content_id : null,
-        });
+        let payload;
+
+        if (isNew.value) {
+            payload = await store.createBlock('block-link', body);
+        } else {
+            const updater = blockActions?.updateBlock
+                ?? ((id, fields) => store.updateBlock(id, fields));
+            payload = await updater(props.blockId, body);
+        }
+
+        brandMark.value = brandMarkFromEditor(payload?.editor ?? props.editor);
         emit('saved', payload);
     } catch (error) {
         if (error instanceof ApiError) {
@@ -455,11 +512,22 @@ async function submit() {
 
                 <Input v-model="form.title" name="title" label="العنوان" :error="errors.title" />
                 <Textarea v-model="form.description" name="description" label="الوصف" :rows="3" :error="errors.description" />
+
+                <BrandMarkField
+                    v-model="brandMark"
+                    name="logo"
+                    label="الأيقونة"
+                    pick-label="اختيار أيقونة"
+                    :error="errors.logo || errors.brand_mark_value || errors.brand_mark_type"
+                />
             </template>
         </div>
 
         <template #footer>
-            <Button type="submit" label="حفظ" :loading="saving" :disabled="!hasLinkType" />
+            <div class="flex items-center gap-2">
+                <Button type="button" variant="ghost" label="إلغاء" :disabled="saving" @click="emit('close')" />
+                <Button type="submit" label="حفظ" :loading="saving" :disabled="!hasLinkType" />
+            </div>
         </template>
     </Form>
 </template>

@@ -9,6 +9,7 @@ function emptyStructure() {
         bottom_blocks: [],
         float_links_block: null,
         block_types: [],
+        block_link_editor: null,
     };
 }
 
@@ -20,6 +21,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
         bottomBlocks: [],
         floatLinksBlock: null,
         blockTypes: [],
+        blockLinkEditor: null,
         loading: false,
         loaded: false,
         error: null,
@@ -27,6 +29,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
         editing: null,
         editingLoading: false,
         editingError: null,
+        creating: false,
     }),
 
     getters: {
@@ -42,6 +45,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
             this.bottomBlocks = Array.isArray(data.bottom_blocks) ? data.bottom_blocks : [];
             this.floatLinksBlock = data.float_links_block ?? null;
             this.blockTypes = Array.isArray(data.block_types) ? data.block_types : [];
+            this.blockLinkEditor = data.block_link_editor ?? null;
             this.loaded = true;
         },
 
@@ -64,6 +68,56 @@ export const usePageStructureStore = defineStore('pageStructure', {
             this.floatLinksBlock = {
                 ...this.floatLinksBlock,
                 editor: editor ?? this.floatLinksBlock.editor,
+            };
+        },
+
+        upsertUserBlock(block) {
+            if (!block?.id) {
+                return;
+            }
+
+            const index = this.userBlocks.findIndex((item) => item.id === block.id);
+
+            if (index === -1) {
+                this.userBlocks = [...this.userBlocks, block];
+
+                return;
+            }
+
+            this.userBlocks[index] = { ...this.userBlocks[index], ...block };
+        },
+
+        beginCreateBlockLink() {
+            const editor = this.blockLinkEditor ?? {
+                type: 'block-link',
+                title: '',
+                description: '',
+                url: '',
+                link_type: '',
+                content_id: null,
+                selected_content_title: '',
+                link_type_options: [],
+                link_type_picker_options: [],
+            };
+
+            this.creating = true;
+            this.editingLoading = false;
+            this.editingError = null;
+            this.editing = {
+                block: {
+                    id: null,
+                    type: 'block-link',
+                    title: 'رابط جديد',
+                },
+                editor: {
+                    ...editor,
+                    title: '',
+                    description: '',
+                    url: '',
+                    link_type: '',
+                    content_id: null,
+                    selected_content_title: '',
+                },
             };
         },
 
@@ -94,19 +148,38 @@ export const usePageStructureStore = defineStore('pageStructure', {
             }
         },
 
-        async createBlock(type) {
+        async createBlock(type, fields = {}) {
             this.saving = true;
             this.error = null;
 
             try {
+                let body;
+
+                if (fields instanceof FormData) {
+                    body = fields;
+                    if (!body.has('type')) {
+                        body.append('type', type);
+                    }
+                } else {
+                    body = { type, ...fields };
+                }
+
                 const payload = await api('/page/blocks', {
                     method: 'POST',
-                    body: { type },
+                    body,
                 });
 
-                await this.fetchStructure({ force: true });
+                const data = payload?.data ?? null;
+                const block = data?.block ?? null;
 
-                return payload?.data ?? null;
+                if (block) {
+                    this.upsertUserBlock(block);
+                }
+
+                this.editing = data;
+                this.creating = false;
+
+                return data;
             } catch (error) {
                 this.error = error instanceof ApiError ? error.message : 'تعذر إضافة البلوك.';
                 throw error;
@@ -179,6 +252,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
         },
 
         async fetchBlock(id) {
+            this.creating = false;
             this.editing = null;
             this.editingLoading = true;
             this.editingError = null;
@@ -207,7 +281,12 @@ export const usePageStructureStore = defineStore('pageStructure', {
 
                 const payload = await api(`/page/blocks/${id}`, options);
                 this.editing = payload?.data ?? this.editing;
-                await this.fetchStructure({ force: true });
+
+                const block = this.editing?.block;
+
+                if (block) {
+                    this.upsertUserBlock(block);
+                }
 
                 return this.editing;
             } catch (error) {
@@ -220,6 +299,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
         clearEditing() {
             this.editing = null;
             this.editingError = null;
+            this.creating = false;
         },
     },
 });

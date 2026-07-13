@@ -14,11 +14,6 @@
 <body class="antialiased bg-stone-100">
     <div id="dashboard-app"></div>
 
-    <div class="bg-stone-200 p-4 pt-10 pb-6">
-        <a href="{{ config('app.url') }}" target="_blank" class="flex items-center justify-center gap-2">
-            <img src="{{ asset('assets/images/logo.webp') }}" class="h-5 mx-auto" alt="{{config('app.name')}}">
-            
-        </a>
-    </div>
+  
 </body>
 </html>
