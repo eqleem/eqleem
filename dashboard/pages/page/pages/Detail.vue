@@ -72,6 +72,17 @@ function loadForm(page, { syncEditor = true } = {}) {
 onMounted(async () => {
     try {
         const page = await store.fetchPage(uuid.value);
+
+        if (page?.template === 'contact') {
+            router.replace(`/manage/pages/contact/${page.uuid}`);
+            return;
+        }
+
+        if (page?.template === 'faq') {
+            router.replace(`/manage/pages/faq/${page.uuid}`);
+            return;
+        }
+
         loadForm(page);
     } catch (error) {
         notFound.value = error instanceof ApiError && error.status === 404;
@@ -89,6 +100,17 @@ watch(() => route.params.id, async (id) => {
 
     try {
         const page = await store.fetchPage(String(id));
+
+        if (page?.template === 'contact') {
+            router.replace(`/manage/pages/contact/${page.uuid}`);
+            return;
+        }
+
+        if (page?.template === 'faq') {
+            router.replace(`/manage/pages/faq/${page.uuid}`);
+            return;
+        }
+
         loadForm(page);
     } catch (error) {
         notFound.value = error instanceof ApiError && error.status === 404;

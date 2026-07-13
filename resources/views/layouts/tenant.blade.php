@@ -30,6 +30,9 @@
         <style>
             html {
                 scroll-behavior: smooth;
+                @if (filled(theme_option('fontFamily')))
+                    font-family: {{ theme_option('fontFamily') }}, ibmps, sans-serif;
+                @endif
             }
 
             [x-cloak] {

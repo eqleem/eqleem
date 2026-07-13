@@ -129,6 +129,16 @@ function onFileUpdate(key, file) {
     fieldErrors[key] = null;
 }
 
+function onPositionUpdate(field, value) {
+    const positionKey = field?.positionKey;
+
+    if (! positionKey) {
+        return;
+    }
+
+    options.value[positionKey] = value;
+}
+
 async function saveOptions() {
     Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key]);
 
@@ -444,8 +454,10 @@ async function saveOptions() {
                                     v-model="options[key]"
                                     :file="uploads[key] ?? null"
                                     :preview="optionPreviews[key] ?? null"
+                                    :position="field.positionKey ? (options[field.positionKey] ?? 50) : 50"
                                     :error="fieldErrors[key] ?? null"
                                     @update:file="onFileUpdate(key, $event)"
+                                    @update:position="onPositionUpdate(field, $event)"
                                 />
 
                                 <template #footer>

@@ -50,7 +50,7 @@ class PaymentMethodRegistry
                     'checkout_component' => $method->component('checkout'),
                 ]);
             })
-            ->filter(fn (array $method): bool => (bool) ($method['active'] ?? false))
+            ->filter(fn (array $method): bool => (bool) ($method['available'] ?? false) && (bool) ($method['active'] ?? false))
             ->values();
     }
 }

@@ -56,7 +56,7 @@ class SavePageThemeOptions
         foreach ($schema as $key => $field) {
             $type = $field['type'] ?? 'text';
 
-            if ($type === 'upload-single-image') {
+            if (in_array($type, ['upload-single-image', 'upload-cover'], true)) {
                 $upload = $uploads[$key] ?? null;
 
                 if ($upload instanceof UploadedFile) {
@@ -65,9 +65,19 @@ class SavePageThemeOptions
                     $incoming = data_get($options, $key);
                     $fallback = data_get($saved, $key, $field['default'] ?? '');
 
-                    // Preserve the saved media path when the client omits/clears the option
-                    // without sending a replacement upload.
-                    $merged[$key] = filled($incoming) ? $incoming : $fallback;
+                    if ($incoming === '__clear__') {
+                        $merged[$key] = '';
+                    } elseif (filled($incoming)) {
+                        if ($type === 'upload-cover' && ! $this->isAllowedCoverValue($incoming)) {
+                            abort(422, __('Invalid cover value.'));
+                        }
+
+                        $merged[$key] = $incoming;
+                    } else {
+                        // Preserve the saved media path when the client omits the option
+                        // without sending a replacement upload.
+                        $merged[$key] = $fallback;
+                    }
                 }
 
                 continue;
@@ -113,5 +123,30 @@ class SavePageThemeOptions
             ->additional([
                 'message' => __('Settings updated successfully.'),
             ]);
+    }
+
+    private function isAllowedCoverValue(mixed $value): bool
+    {
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (str_starts_with($value, 'color:')) {
+            return (bool) preg_match('/^color:#[0-9a-fA-F]{3,8}$/', $value);
+        }
+
+        if (str_starts_with($value, 'gradient:')) {
+            $css = substr($value, strlen('gradient:'));
+
+            return (bool) preg_match('/^(linear|radial)-gradient\([a-zA-Z0-9#%.,\s()\-]+\)$/', $css);
+        }
+
+        if (str_starts_with($value, 'https://') || str_starts_with($value, 'http://')) {
+            return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        }
+
+        // Stored media relative path (no schemes).
+        return (bool) preg_match('#^[A-Za-z0-9_./-]+$#', $value)
+            && ! str_contains($value, '..');
     }
 }

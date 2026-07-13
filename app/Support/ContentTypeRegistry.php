@@ -2,14 +2,44 @@
 
 namespace App\Support;
 
+use App\Models\Tenant;
 use Illuminate\Support\Collection;
 
 class ContentTypeRegistry
 {
     /**
+     * Active content types from config/content-types.php, ordered for nav/tabs.
+     * Sellable types respect per-tenant `config.enabled_content_types` when set.
+     *
      * @return Collection<int, ContentType>
      */
-    public function all(): Collection
+    public function all(?Tenant $tenant = null): Collection
+    {
+        $tenant = $tenant ?? currentTenant();
+        $enabled = data_get($tenant?->config, 'enabled_content_types');
+        $hasPrefs = is_array($enabled);
+
+        return $this->configured()
+            ->filter(function (ContentType $contentType) use ($hasPrefs, $enabled): bool {
+                if (! $contentType->sellable) {
+                    return $contentType->active;
+                }
+
+                if ($hasPrefs) {
+                    return in_array($contentType->slug, $enabled, true);
+                }
+
+                return $contentType->active;
+            })
+            ->values();
+    }
+
+    /**
+     * Every configured content type, including inactive ones.
+     *
+     * @return Collection<int, ContentType>
+     */
+    public function configured(): Collection
     {
         return collect(config('content-types', []))
             ->map(fn (array $config, string $slug): ContentType => ContentType::fromConfig($slug, $config))
@@ -26,6 +56,11 @@ class ContentTypeRegistry
         }
 
         return ContentType::fromConfig($slug, $config);
+    }
+
+    public function findActive(string $slug): ?ContentType
+    {
+        return $this->all()->firstWhere('slug', $slug);
     }
 
     /**

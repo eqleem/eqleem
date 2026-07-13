@@ -1,15 +1,20 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import Button from '../../ui/Button.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddPage from './AddPage.vue';
 import { usePagesStore } from '../../../stores/pages.js';
 import { openModal } from '../../../lib/modal.js';
+import { pageEditPath } from '../../../lib/pagePaths.js';
+import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const store = usePagesStore();
+const router = useRouter();
 const search = ref('');
 const selectedIds = ref([]);
+const creatingTemplate = ref(null);
 let searchTimer = null;
 
 onMounted(() => {
@@ -25,6 +30,12 @@ watch(search, (value) => {
 });
 
 const selectableItems = computed(() => store.items.filter((item) => !item.is_system_page));
+
+const hasContactPage = computed(() => store.existingTemplates.includes('contact')
+    || store.items.some((item) => item.template === 'contact'));
+
+const hasFaqPage = computed(() => store.existingTemplates.includes('faq')
+    || store.items.some((item) => item.template === 'faq'));
 
 const allSelected = computed({
     get: () => selectableItems.value.length > 0
@@ -72,11 +83,42 @@ async function removeOne(item) {
 async function toggleActive(item) {
     await store.togglePageActive(item.uuid, !item.active);
 }
+
+async function createTemplatePage(template) {
+    if (creatingTemplate.value) {
+        return;
+    }
+
+    if ((template === 'contact' && hasContactPage.value) || (template === 'faq' && hasFaqPage.value)) {
+        return;
+    }
+
+    const defaults = {
+        contact: 'اتصل بنا',
+        faq: 'الأسئلة المتكررة',
+    };
+
+    creatingTemplate.value = template;
+
+    try {
+        const page = await store.createPage({
+            title: defaults[template],
+            template,
+        });
+
+        notifySuccess('Saved');
+        router.push(pageEditPath(page));
+    } catch (error) {
+        notifyApiError(error, 'تعذر إنشاء الصفحة.');
+    } finally {
+        creatingTemplate.value = null;
+    }
+}
 </script>
 
 <template>
     <div class="divide-y divide-dotted divide-stone-200">
-        <div class="flex w-full items-center gap-x-4 bg-white p-3">
+        <div class="relative z-40 flex w-full items-center gap-x-4 bg-white p-3">
             <div class="hidden ps-3 sm:block">
                 <input v-model="allSelected" type="checkbox" class="h-4 w-4 rounded-xl border-stone-300 shadow-sm">
             </div>
@@ -110,18 +152,78 @@ async function toggleActive(item) {
                 </button>
             </div>
 
-            <Button label="صفحة جديدة" @click="openModal('add-page')">
-                <template #icon>
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+            <Dropdown width="w-60">
+                <template #trigger>
+                    <Button label="صفحة جديدة" :disabled="Boolean(creatingTemplate) || store.saving">
+                        <template #icon>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+                        </template>
+                        <template #default>
+                            <svg class="h-4 w-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+                        </template>
+                    </Button>
                 </template>
-            </Button>
+
+                <button
+                    type="button"
+                    class="flex w-full items-center gap-x-2.5 rounded-md p-2 text-start text-sm text-stone-700 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                    :disabled="Boolean(creatingTemplate) || store.saving || hasContactPage"
+                    @click="createTemplatePage('contact')"
+                >
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                        </svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block font-medium">صفحة اتصل بنا</span>
+                        <span class="block text-xs text-stone-500">
+                            {{ hasContactPage ? 'تمت إضافتها مسبقاً' : 'نموذج تواصل وبيانات الاتصال' }}
+                        </span>
+                    </span>
+                </button>
+                <button
+                    type="button"
+                    class="flex w-full items-center gap-x-2.5 rounded-md p-2 text-start text-sm text-stone-700 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                    :disabled="Boolean(creatingTemplate) || store.saving || hasFaqPage"
+                    @click="createTemplatePage('faq')"
+                >
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                        </svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block font-medium">صفحة أسئلة متكررة</span>
+                        <span class="block text-xs text-stone-500">
+                            {{ hasFaqPage ? 'تمت إضافتها مسبقاً' : 'أسئلة وأجوبة جاهزة للزوار' }}
+                        </span>
+                    </span>
+                </button>
+                <button
+                    type="button"
+                    class="flex w-full items-center gap-x-2.5 rounded-md p-2 text-start text-sm text-stone-700 hover:bg-stone-100"
+                    :disabled="Boolean(creatingTemplate) || store.saving"
+                    @click="openModal('add-page')"
+                >
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block font-medium">صفحة مخصصة</span>
+                        <span class="block text-xs text-stone-500">محتوى حر مع محرر وبلوكات</span>
+                    </span>
+                </button>
+            </Dropdown>
 
             <Modal title="إضافة صفحة جديدة" size="2xl" name="add-page">
                 <AddPage />
             </Modal>
         </div>
 
-        <div class="relative p-1">
+        <div class="relative z-0 p-1">
             <div v-if="store.loading && !store.loaded" class="flex items-center justify-center p-10"><LoadingSpinner size="lg" /></div>
 
             <div v-else-if="store.error" class="p-6 text-center text-sm text-red-600">
@@ -153,7 +255,7 @@ async function toggleActive(item) {
 
                     <div class="w-full py-3">
                         <RouterLink
-                            :to="`/manage/pages/detail/${item.uuid}`"
+                            :to="pageEditPath(item)"
                             class="flex w-full items-center gap-x-3 text-start"
                         >
                             <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-stone-100">
@@ -177,7 +279,7 @@ async function toggleActive(item) {
                                             {{ item.status_label }}
                                         </span>
                                         <span
-                                            v-if="item.is_system_page && item.template_label"
+                                            v-if="item.template_label"
                                             class="inline-flex items-center gap-x-1 rounded-md bg-blue-50 p-1 px-2 text-xs text-blue-700"
                                         >
                                             {{ item.template_label }}
@@ -196,7 +298,7 @@ async function toggleActive(item) {
                                 </button>
                             </template>
                             <RouterLink
-                                :to="`/manage/pages/detail/${item.uuid}`"
+                                :to="pageEditPath(item)"
                                 class="flex items-center gap-x-2 rounded p-1.5 hover:bg-stone-100"
                             >
                                 تعديل

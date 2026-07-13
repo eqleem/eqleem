@@ -65,8 +65,8 @@ onBeforeUnmount(() => {
 
 <template>
     <header class="fixed inset-x-0 top-0 z-40 bg-primary-700 p-2 text-white">
-        <div class="mx-auto flex max-w-7xl justify-between gap-x-2">
-            <div class="flex min-w-0 flex-1 items-center gap-x-2">
+        <div class="mx-auto flex max-w-7xl justify-between gap-x-2 lg:gap-x-3">
+            <div class="flex min-w-0 flex-1 items-center gap-x-2 justify-between ">
                 <RouterLink to="/" class="flex min-w-0 items-center gap-x-2">
                     <img
                         :src="tenantLogo ?? '/assets/images/user.png'"
@@ -82,11 +82,10 @@ onBeforeUnmount(() => {
                     :title="tenantPlan"
                     :aria-label="`الباقة: ${tenantPlan}`"
                 >
-                    <span class="flex items-center justify-center rounded bg-purple-500 p-1 text-purple-100 hover:bg-purple-600 md:hidden">
-                        <Icon name="coin" class="h-4 w-4" />
-                    </span>
-                    <span class="hidden rounded bg-purple-500 p-0.5 px-1.5 text-xs text-purple-100 hover:bg-purple-600 md:inline">
-                        {{ tenantPlan }}
+                    <span class="flex items-center gap-x-1 rounded-full bg-amber-700  p-1 ms-0 lg:ms-3 text-amber-100 hover:bg-amber-600 md:px-1.5">
+                        <!-- <Icon name="coin" class="h-4 w-4 shrink-0" /> -->
+                        <iconify-icon icon="hugeicons:crown-03" class="text-lg md:text-base shrink-0" />
+                        <span class="hidden text-sm md:inline">{{ tenantPlan }}</span>
                     </span>
                 </RouterLink>
             </div>
@@ -121,7 +120,7 @@ onBeforeUnmount(() => {
                     class="flex items-center gap-x-2 rounded-full p-1 px-2 text-sm text-white hover:bg-black/30 md:hidden"
                     :class="{ 'bg-black/30': route.name === 'settings' }"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-6 md:size-5" viewBox="0 0 24 24" fill="none">
                         <path
                             d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
                             stroke="currentColor"
@@ -146,7 +145,7 @@ onBeforeUnmount(() => {
                     <img :src="userImage" alt="" class="w-8 rounded-full">
                 </button>
 
-                <div class="hidden md:block">
+                <div class="hidden md:block ms-0 md:ms-2">
                     <Dropdown width="w-48" class="text-stone-800">
                         <template #trigger>
                             <button type="button" class="flex cursor-pointer items-center gap-2" aria-haspopup="menu">

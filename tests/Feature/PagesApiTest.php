@@ -204,6 +204,129 @@ test('owner can reorder page blocks', function () {
         ->assertJsonPath('data.1.id', $firstId);
 });
 
+test('owner can update contact and faq template pages', function () {
+    [$user, $tenant] = createUserWithTenantForPages();
+
+    setCurrentTenant($tenant);
+
+    $contact = Content::query()
+        ->type(contentTypeModel('pages'))
+        ->template('contact')
+        ->firstOrFail();
+
+    $this->actingAs($user)
+        ->getJson("/api/pages/{$contact->uuid}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.template', 'contact')
+        ->assertJsonPath('data.show_form', true)
+        ->assertJsonPath('data.form_fields.name', true)
+        ->assertJsonPath('data.show_social_links', true);
+
+    $this->actingAs($user)
+        ->putJson("/api/pages/{$contact->uuid}", [
+            'title' => 'تواصل معنا',
+            'subtitle' => 'وصف التواصل',
+            'slug' => 'get-in-touch',
+            'published' => true,
+            'show_form' => true,
+            'form_fields' => [
+                'name' => true,
+                'email' => false,
+                'phone' => true,
+                'message' => true,
+                'address' => true,
+                'subject' => false,
+            ],
+            'show_social_links' => false,
+            'show_contact_info' => true,
+            'show_extra_links' => false,
+            'success_message' => 'تم الاستلام بنجاح',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.subtitle', 'وصف التواصل')
+        ->assertJsonPath('data.form_fields.email', false)
+        ->assertJsonPath('data.form_fields.address', true)
+        ->assertJsonPath('data.show_social_links', false)
+        ->assertJsonPath('data.show_extra_links', false)
+        ->assertJsonPath('data.success_message', 'تم الاستلام بنجاح');
+
+    $faq = Content::query()
+        ->type(contentTypeModel('pages'))
+        ->template('faq')
+        ->firstOrFail();
+
+    $this->actingAs($user)
+        ->getJson("/api/pages/{$faq->uuid}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.template', 'faq')
+        ->assertJsonPath('data.faqs', []);
+
+    $this->actingAs($user)
+        ->putJson("/api/pages/{$faq->uuid}", [
+            'title' => 'أسئلة شائعة',
+            'subtitle' => 'اقرأ الإجابات',
+            'slug' => 'common-questions',
+            'published' => true,
+            'faqs' => [
+                [
+                    'id' => 'q1',
+                    'question' => 'كيف أبدأ؟',
+                    'answer' => 'من لوحة التحكم.',
+                ],
+                [
+                    'question' => 'هل يوجد دعم؟',
+                    'answer' => 'نعم.',
+                ],
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.faqs.0.question', 'كيف أبدأ؟')
+        ->assertJsonPath('data.faqs.0.answer', 'من لوحة التحكم.')
+        ->assertJsonPath('data.faqs.1.question', 'هل يوجد دعم؟')
+        ->assertJsonCount(2, 'data.faqs');
+});
+
+test('create page rejects unknown templates', function () {
+    [$user] = createUserWithTenantForPages();
+
+    $this->actingAs($user)
+        ->postJson('/api/pages', [
+            'title' => 'صفحة',
+            'template' => 'pricing',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['template']);
+});
+
+test('create page rejects duplicate contact and faq templates', function () {
+    [$user] = createUserWithTenantForPages();
+
+    $this->actingAs($user)
+        ->postJson('/api/pages', [
+            'title' => 'اتصل بنا مرة أخرى',
+            'template' => 'contact',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['template']);
+
+    $this->actingAs($user)
+        ->postJson('/api/pages', [
+            'title' => 'أسئلة مرة أخرى',
+            'template' => 'faq',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['template']);
+});
+
+test('pages list exposes existing templates', function () {
+    [$user] = createUserWithTenantForPages();
+
+    $this->actingAs($user)
+        ->getJson('/api/pages')
+        ->assertSuccessful()
+        ->assertJsonPath('existing_templates', fn ($templates) => collect($templates)->sort()->values()->all() === ['contact', 'faq']);
+});
+
 test('pages search filters by title', function () {
     [$user, $tenant] = createUserWithTenantForPages();
 

@@ -64,6 +64,16 @@ class ListPages
 
     public function jsonResponse(LengthAwarePaginator $pages): AnonymousResourceCollection
     {
-        return PageListResource::collection($pages);
+        $existingTemplates = Content::query()
+            ->type($this->pagesType())
+            ->whereIn('template', Content::creatablePageTemplates())
+            ->pluck('template')
+            ->unique()
+            ->values()
+            ->all();
+
+        return PageListResource::collection($pages)->additional([
+            'existing_templates' => $existingTemplates,
+        ]);
     }
 }

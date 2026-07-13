@@ -49,7 +49,33 @@ it('defines all payment methods in config', function () {
             'tabby',
             'tamara',
             'custom',
-        ]);
+        ])
+        ->and($methods->firstWhere('slug', 'bank-transfer')->available)->toBeTrue()
+        ->and($methods->firstWhere('slug', 'tabby')->available)->toBeFalse()
+        ->and($methods->firstWhere('slug', 'tamara')->available)->toBeFalse()
+        ->and($methods->firstWhere('slug', 'custom')->available)->toBeFalse();
+});
+
+it('marks unavailable payment methods as coming soon in the settings list', function () {
+    [$user] = createTenantWithUserForPaymentOptions();
+
+    Livewire::actingAs($user)
+        ->test('admin::settings.payment-options.payment-options')
+        ->assertSee('تابي')
+        ->assertSee('تمارا')
+        ->assertSee('مخصص')
+        ->assertSee('قريباً');
+});
+
+it('does not toggle unavailable payment methods', function () {
+    [$user] = createTenantWithUserForPaymentOptions();
+
+    Livewire::actingAs($user)
+        ->test('admin::settings.payment-options.payment-options')
+        ->call('toggleActive', 'tabby')
+        ->assertHasNoErrors();
+
+    expect(data_get(Setting::paymentMethod('tabby'), 'active'))->toBeFalsy();
 });
 
 it('toggles a payment method active state for the tenant', function () {

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import PickerColor from '../../ui/PickerColor.vue';
 import TailwindColorPickerLight from '../../ui/TailwindColorPickerLight.vue';
 import FileCrop from '../../ui/FileCrop.vue';
+import UploadCover from '../../ui/UploadCover.vue';
 import Radio from '../../ui/Radio.vue';
 import Input from '../../ui/Input.vue';
 import Textarea from '../../ui/Textarea.vue';
@@ -14,10 +15,11 @@ const props = defineProps({
     modelValue: { default: '' },
     file: { default: null },
     preview: { type: String, default: null },
+    position: { type: [Number, String], default: 50 },
     error: { type: String, default: null },
 });
 
-const emit = defineEmits(['update:modelValue', 'update:file']);
+const emit = defineEmits(['update:modelValue', 'update:file', 'update:position']);
 
 const localFile = ref(props.file);
 const localPreview = ref(props.preview);
@@ -94,6 +96,24 @@ function onFileChange(file) {
         :error="error"
         @change="onFileChange"
     />
+
+    <UploadCover
+        v-else-if="type === 'upload-cover'"
+        :model-value="modelValue"
+        :file="localFile"
+        :preview="localPreview"
+        :position="position"
+        :name="fieldKey"
+        :label="label"
+        :info="info"
+        :error="error"
+        @update:model-value="$emit('update:modelValue', $event)"
+        @update:file="onFileChange"
+        @update:preview="localPreview = $event"
+        @update:position="$emit('update:position', $event)"
+    />
+
+    <template v-else-if="type === 'cover-position'" />
 
     <Radio
         v-else-if="type === 'radio'"

@@ -26,18 +26,22 @@
         ],
         "default": "blue"
     },
+    "headerImage": {
+        "type": "upload-cover",
+        "label": "صورة الغلاف",
+        "info": "اختر لوناً أو تدرجاً أو ارفع صورة أو اختر من Unsplash.",
+        "positionKey": "headerImagePosition",
+        "default": ""
+    },
     "bgColor": {
         "type": "tailwindcss-colorpicker-light",
         "label": "Background color",
         "default": "gray-300"
     },
-    "headerImage": {
-        "type": "upload-single-image",
-        "crop": true,
-        "cropShape": "free",
-        "label": "صورة الهيدر",
-        "info": "إذا كنت ترغب بإظهار صورة في أعلى الموقع.",
-        "default": ""
+
+    "headerImagePosition": {
+        "type": "cover-position",
+        "default": 50
     },
     "logoRadius": {
         "type": "radio",
@@ -51,6 +55,17 @@
             "rounded-none"
         ],
         "default": "full"
-    } 
-    
+    },
+    "fontFamily": {
+        "type": "radio",
+        "label": "نوع الخط",
+        "info": "اختر الخط الأساسي لصفحتك.",
+        "options": {
+            "sarmady": "سرمدي",
+            "ibmps": "IBM Plex",
+            "milligram": "ميليجرام",
+            "eqleem": "إقليد"
+        },
+        "default": "sarmady"
+    }
 }

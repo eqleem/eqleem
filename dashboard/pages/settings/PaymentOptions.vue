@@ -65,6 +65,11 @@ async function load() {
 
 function openMethod(slug) {
     const method = methods.value.find((item) => item.slug === slug);
+
+    if (!method?.available) {
+        return;
+    }
+
     activeSlug.value = slug;
     clearErrors();
 
@@ -168,6 +173,10 @@ function settingsBody(slug) {
 }
 
 async function toggleActive(method) {
+    if (!method.available) {
+        return;
+    }
+
     const next = !method.active;
     toggling.value = method.slug;
     message.value = null;
@@ -268,15 +277,25 @@ onMounted(load);
                 <div
                     v-for="method in methods"
                     :key="method.slug"
-                    class="group flex items-center gap-4 px-4 py-4 transition hover:bg-stone-50/80"
+                    class="group flex items-center gap-4 px-4 py-4 transition"
+                    :class="method.available ? 'hover:bg-stone-50/80' : 'opacity-40'"
                 >
                     <button
                         type="button"
-                        class="flex min-w-0 flex-1 items-center gap-4 text-start"
+                        class="flex min-w-0 flex-1 items-center gap-4 text-start disabled:cursor-not-allowed"
+                        :disabled="!method.available"
                         @click="openMethod(method.slug)"
                     >
                         <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-stone-800">{{ method.name }}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="text-sm font-semibold text-stone-800">{{ method.name }}</p>
+                                <span
+                                    v-if="!method.available"
+                                    class="rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-stone-500"
+                                >
+                                    قريباً
+                                </span>
+                            </div>
                             <p class="mt-0.5 line-clamp-2 text-xs text-stone-500">{{ method.description }}</p>
                         </div>
                         <div class="shrink-0 rounded-lg border border-stone-100 bg-white p-2">
@@ -285,9 +304,9 @@ onMounted(load);
                     </button>
 
                     <Switch
-                        :model-value="method.active"
+                        :model-value="method.available ? method.active : false"
                         :label="method.active ? `تعطيل ${method.name}` : `تفعيل ${method.name}`"
-                        :disabled="toggling === method.slug"
+                        :disabled="!method.available || toggling === method.slug"
                         @update:model-value="toggleActive(method)"
                     />
                 </div>
@@ -295,7 +314,7 @@ onMounted(load);
         </MainBox>
 
         <Modal
-            v-for="method in methods"
+            v-for="method in methods.filter((item) => item.available)"
             :key="`modal-${method.slug}`"
             :title="method.name"
             size="3xl"

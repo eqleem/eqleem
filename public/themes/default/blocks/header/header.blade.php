@@ -21,13 +21,37 @@
     <div class="w-full sm:relative Xfixed Xobject-cover min-h-[56px] md:rounded-t-3xl bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-primary-600 via-primary-700 to-primary-900 ">
         @php
             $headerImagePath = $themeOptions['headerImage'] ?? null;
-            $headerImage = filled($headerImagePath)
+            $isCssCover = filled($headerImagePath) && (
+                str_starts_with((string) $headerImagePath, 'color:')
+                || str_starts_with((string) $headerImagePath, 'gradient:')
+            );
+            $cssCoverBackground = $isCssCover
+                ? (string) preg_replace('/^(color|gradient):/', '', (string) $headerImagePath)
+                : null;
+            $headerImagePosition = max(0, min(100, (int) ($themeOptions['headerImagePosition'] ?? 50)));
+            $headerImage = (! $isCssCover && filled($headerImagePath))
                 ? (str_starts_with((string) $headerImagePath, 'http')
                     ? $headerImagePath
                     : \Storage::url((string) $headerImagePath))
-                : asset('assets/images/cover.png');
+                : null;
         @endphp
-        <img src="{{ $headerImage }}" alt="{{ tenant('name') }}" class="w-full max-h-80X object-coverx md:rounded-t-3xl opacity-90">
+        @if ($isCssCover)
+            <div
+                class="h-52 w-full md:rounded-t-3xl"
+                style="background: {{ $cssCoverBackground }}"
+                role="img"
+                aria-label="{{ tenant('name') }}"
+            ></div>
+        @elseif ($headerImage)
+            <img
+                src="{{ $headerImage }}"
+                alt="{{ tenant('name') }}"
+                class="h-52 w-full object-cover md:rounded-t-3xl opacity-90"
+                style="object-position: 50% {{ $headerImagePosition }}%"
+            >
+        @else
+            <img src="{{ asset('assets/images/cover.png') }}" alt="{{ tenant('name') }}" class="h-52 w-full object-cover md:rounded-t-3xl opacity-90">
+        @endif
     </div>
     <!-- Name, Title and Logo Row -->
     @php

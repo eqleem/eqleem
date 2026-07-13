@@ -4,6 +4,8 @@ namespace App\Livewire\Tenant\Page;
 
 use App\Models\Block;
 use App\Models\Content;
+use App\Support\ContactPageView;
+use App\Support\FaqPageView;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
@@ -23,12 +25,24 @@ class Detail extends Component
 
     public function render()
     {
-        return tenantView('page.detail', [
-            'page' => $this->page,
-            'subtitle' => (string) data_get($this->page->data, 'subtitle', ''),
-            'body' => (string) data_get($this->page->data, 'body', ''),
-            'pageBlocks' => $this->pageBlocks(),
-        ])->title($this->page->title);
+        $view = match ($this->page->template) {
+            'contact' => 'page.contact',
+            'faq' => 'page.faq',
+            default => 'page.detail',
+        };
+
+        $data = match ($this->page->template) {
+            'contact' => ContactPageView::make($this->page),
+            'faq' => FaqPageView::make($this->page),
+            default => [
+                'page' => $this->page,
+                'subtitle' => (string) data_get($this->page->data, 'subtitle', ''),
+                'body' => (string) data_get($this->page->data, 'body', ''),
+                'pageBlocks' => $this->pageBlocks(),
+            ],
+        };
+
+        return tenantView($view, $data)->title($this->page->title);
     }
 
     /**

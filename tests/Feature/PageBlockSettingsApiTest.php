@@ -5,6 +5,7 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\ContentTypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -190,6 +191,13 @@ test('owner can update block-link settings', function () {
     expect(collect($picker)->pluck('key'))->toContain('blog', 'store', 'external');
     expect(collect($picker)->where('group', 'content')->pluck('key'))
         ->not->toContain('item:blog');
+
+    $activeContentTypeSlugs = app(ContentTypeRegistry::class)->all()->pluck('slug')->values();
+    $contentPickerKeys = collect($picker)->where('group', 'content')->pluck('key')->values();
+
+    expect($contentPickerKeys->sort()->values()->all())
+        ->toBe($activeContentTypeSlugs->sort()->values()->all());
+    expect($contentPickerKeys)->not->toContain('forms', 'courses', 'services', 'newsletter');
 });
 
 test('owner can update block-link to external url and specific item', function () {

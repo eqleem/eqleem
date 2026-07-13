@@ -2,6 +2,7 @@
 
 return [
     'bank-transfer' => [
+        'active' => true,
         'order' => 1,
         'slug' => 'bank-transfer',
         'name' => 'التحويل البنكي',
@@ -16,6 +17,7 @@ return [
         ],
     ],
     'credit-card' => [
+        'active' => true,
         'order' => 2,
         'slug' => 'credit-card',
         'name' => 'البطاقة الإئتمانية',
@@ -31,6 +33,7 @@ return [
         ],
     ],
     'cash-on-delivery' => [
+        'active' => true,
         'order' => 3,
         'slug' => 'cash-on-delivery',
         'name' => 'الدفع عند الاستلام',
@@ -47,6 +50,7 @@ return [
         ],
     ],
     'tabby' => [
+        'active' => false,
         'order' => 4,
         'slug' => 'tabby',
         'name' => 'تابي',
@@ -66,6 +70,7 @@ return [
         ],
     ],
     'tamara' => [
+        'active' => false,
         'order' => 5,
         'slug' => 'tamara',
         'name' => 'تمارا',
@@ -84,6 +89,7 @@ return [
         ],
     ],
     'custom' => [
+        'active' => false,
         'order' => 6,
         'slug' => 'custom',
         'name' => 'مخصص',

@@ -84,6 +84,12 @@ class UpdatePaymentOptionSettings
             throw new NotFoundHttpException;
         }
 
+        if (! $method->available) {
+            throw ValidationException::withMessages([
+                'slug' => __('This payment method is not available yet.'),
+            ]);
+        }
+
         $active = (bool) data_get(Setting::paymentMethod($slug), 'active', false);
         $settings = $this->normalizeSettings($slug, $data);
 
@@ -97,6 +103,7 @@ class UpdatePaymentOptionSettings
             'description' => $method->description,
             'icon' => $method->icon,
             'icon_url' => asset($method->icon),
+            'available' => $method->available,
             'active' => (bool) data_get($fresh, 'active', false),
             'settings' => collect($fresh)->except('active')->all(),
             'order' => $method->order,

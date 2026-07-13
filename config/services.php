@@ -53,4 +53,10 @@ return [
         'base_url' => env('MOYASAR_BASE_URL', 'https://api.moyasar.com/v1/'),
     ],
 
+    'unsplash' => [
+        'access_key' => env('UNSPLASH_ACCESS_KEY'),
+        'app_name' => env('UNSPLASH_APP_NAME', env('APP_NAME', 'Eqleem')),
+        'utm_source' => env('UNSPLASH_UTM_SOURCE', 'eqleem'),
+    ],
+
 ];

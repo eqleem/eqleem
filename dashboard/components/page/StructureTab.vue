@@ -14,6 +14,10 @@ import { openModal, closeModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
 
+function openCatalogSections() {
+    openModal('catalog-sections');
+}
+
 const store = usePageStructureStore();
 const {
     topBlocks,
@@ -186,6 +190,25 @@ function contentManageLabel(block) {
         <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
 
         <div v-else class="space-y-4 p-4">
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
+                <button
+                    type="button"
+                    class="min-w-0 flex-1 text-start transition hover:text-primary-600"
+                    @click="openCatalogSections"
+                >
+                    <span class="block text-sm font-medium text-stone-800">الكتالوج</span>
+                    <span class="mt-0.5 block text-xs text-stone-400">ايش تبيع؟ — اختيار الأقسام المفعّلة</span>
+                </button>
+                <button
+                    type="button"
+                    class="shrink-0 rounded-lg p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
+                    aria-label="إعدادات الكتالوج"
+                    @click="openCatalogSections"
+                >
+                    <Icon name="settings" class="h-5 w-5" />
+                </button>
+            </div>
+
             <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <ul class="space-y-1.5 p-2">
                     <li

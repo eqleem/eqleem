@@ -120,6 +120,7 @@ test('owner can list themes and default theme options schema', function () {
         ->assertJsonPath('data.selected_theme.features.0', 'تصميم متجاوب')
         ->assertJsonPath('data.options_schema.primaryColor.type', 'picker-color')
         ->assertJsonPath('data.options_schema.primaryColor.allowCustom', true)
+        ->assertJsonPath('data.options_schema.headerImage.type', 'upload-cover')
         ->assertJsonPath('data.options.primaryColor', 'blue')
         ->assertJsonPath('data.options.logoRadius', 'full')
         ->assertJsonFragment(['slug' => 'default'])
@@ -262,4 +263,91 @@ test('saving theme options without a new upload preserves existing header image'
         ->assertJsonPath('data.options.headerImage', $existing);
 
     expect($tenant->fresh()->themeSettingsFor($default->id)['headerImage'])->toBe($existing);
+});
+
+test('owner can save a css cover and clear it', function () {
+    [$user, $tenant, $default] = createUserWithThemesForPageDesign();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => 'color:#e11d48',
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.headerImage', 'color:#e11d48');
+
+    expect($tenant->fresh()->themeSettingsFor($default->id)['headerImage'])->toBe('color:#e11d48');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => 'gradient:linear-gradient(135deg, #0d9488 0%, #2563eb 100%)',
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.headerImage', 'gradient:linear-gradient(135deg, #0d9488 0%, #2563eb 100%)');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => '__clear__',
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.headerImage', '');
+
+    expect($tenant->fresh()->themeSettingsFor($default->id)['headerImage'])->toBe('');
+});
+
+test('owner can save an unsplash cover url', function () {
+    [$user, $tenant, $default] = createUserWithThemesForPageDesign();
+
+    $url = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200';
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => $url,
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.headerImage', $url)
+        ->assertJsonPath('data.option_previews.headerImage', $url);
+
+    expect($tenant->fresh()->themeSettingsFor($default->id)['headerImage'])->toBe($url);
+});
+
+test('owner can save cover image position', function () {
+    [$user, $tenant, $default] = createUserWithThemesForPageDesign();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200',
+                'headerImagePosition' => 28,
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.options.headerImagePosition', 28);
+
+    expect($tenant->fresh()->themeSettingsFor($default->id)['headerImagePosition'])->toEqual(28);
+});
+
+test('invalid cover values are rejected', function () {
+    [$user, , $default] = createUserWithThemesForPageDesign();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/design/options', [
+            'theme_id' => $default->id,
+            'options' => [
+                'headerImage' => 'javascript:alert(1)',
+            ],
+        ])
+        ->assertStatus(422);
 });

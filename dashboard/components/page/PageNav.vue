@@ -1,14 +1,26 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import Icon from '../ui/Icon.vue';
-import { fixedTabs, contentTabs } from '../../data/page.js';
+import CatalogSectionsModal from './CatalogSectionsModal.vue';
+import { fixedTabs } from '../../data/page.js';
+import { openModal } from '../../lib/modal.js';
+import { useContentTypesStore } from '../../stores/contentTypes.js';
 
 // Mirror Nav.vue: a content type stays lit across its whole section
 // (/manage/:type, /categories, /settings, /detail/:id). Fixed tabs only
 // light on /manage itself, keyed by the `tab` query param.
 const route = useRoute();
 const mobileNavOpen = ref(false);
+const contentTypesStore = useContentTypesStore();
+const { contentTabs, sellableTabs } = storeToRefs(contentTypesStore);
+
+/** Shared section order for desktop sidebar + mobile slideout. Catalog always shown. */
+const contentSections = computed(() => [
+    { id: 'catalog', label: 'الكتالوج', tabs: sellableTabs.value, alwaysShow: true },
+    { id: 'content', label: 'المحتوى والنشر', tabs: contentTabs.value, alwaysShow: false },
+].filter((section) => section.alwaysShow || section.tabs.length > 0));
 
 function isFixedActive(tabId) {
     if (route.path !== '/manage') {
@@ -32,6 +44,11 @@ function closeMobileNav() {
     mobileNavOpen.value = false;
 }
 
+function openCatalogSections() {
+    closeMobileNav();
+    openModal('catalog-sections');
+}
+
 function onEscape(event) {
     if (event.key === 'Escape') {
         closeMobileNav();
@@ -44,6 +61,7 @@ watch(mobileNavOpen, (open) => {
 
 onMounted(() => {
     window.addEventListener('keydown', onEscape);
+    contentTypesStore.fetchContentTypes();
 });
 
 onBeforeUnmount(() => {
@@ -76,21 +94,41 @@ onBeforeUnmount(() => {
             <span class="hidden truncate lg:block">{{ tab.label }}</span>
         </RouterLink>
 
-        <div>
-            <p class="mt-3 hidden px-3 py-1 text-xs text-stone-400 lg:block">المحتوى</p>
-            <div class="mx-1 mb-2 border-t border-dotted border-stone-300 max-lg:mb-6"></div>
-        </div>
+        <template v-for="section in contentSections" :key="section.id">
+            <div class="mt-3 hidden items-center justify-between gap-1 px-2 lg:flex">
+                <button
+                    v-if="section.id === 'catalog'"
+                    type="button"
+                    class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600"
+                    @click="openCatalogSections"
+                >
+                    {{ section.label }}
+                </button>
+                <p v-else class="min-w-0 truncate px-1 text-xs text-stone-400">{{ section.label }}</p>
 
-        <RouterLink
-            v-for="tab in contentTabs"
-            :key="tab.id"
-            :to="`/manage/${tab.contentType.slug}`"
-            class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
-            :class="isTypeActive(tab.contentType.slug) ? 'bg-white text-stone-700' : 'xbg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-        >
-            <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5 shrink-0">
-            <span class="hidden truncate lg:block">{{ tab.label }}</span>
-        </RouterLink>
+                <button
+                    v-if="section.id === 'catalog'"
+                    type="button"
+                    class="shrink-0 rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
+                    aria-label="إعدادات الكتالوج"
+                    @click="openCatalogSections"
+                >
+                    <Icon name="settings" class="size-3.5" />
+                </button>
+            </div>
+            <div class="mx-1 mb-2 border-t border-dotted border-stone-300 max-lg:mb-6"></div>
+
+            <RouterLink
+                v-for="tab in section.tabs"
+                :key="tab.id"
+                :to="`/manage/${tab.slug}`"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+                :class="isTypeActive(tab.slug) ? 'bg-white text-stone-700' : 'xbg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
+            >
+                <img :src="`/${tab.icon}`" :alt="tab.label" class="size-6 lg:size-5 shrink-0">
+                <span class="hidden truncate lg:block">{{ tab.label }}</span>
+            </RouterLink>
+        </template>
     </nav>
 
     <Teleport to="body">
@@ -142,30 +180,52 @@ onBeforeUnmount(() => {
                     :key="`slideout-${tab.id}`"
                     :to="{ path: '/manage', query: { tab: tab.id } }"
                     class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
-                    :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : '  text-stone-600 hover:bg-white/60 hover:text-stone-800'"
+                    :class="isFixedActive(tab.id) ? 'bg-white text-stone-700' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
                     @click="closeMobileNav"
                 >
                     <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
                     <span class="truncate">{{ tab.label }}</span>
                 </RouterLink>
 
-                <div>
-                    <p class="mt-3 px-3 py-1 text-xs text-stone-400">المحتوى</p>
+                <template v-for="section in contentSections" :key="`slideout-section-${section.id}`">
+                    <div class="mt-3 flex items-center justify-between gap-1 px-2">
+                        <button
+                            v-if="section.id === 'catalog'"
+                            type="button"
+                            class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600"
+                            @click="openCatalogSections"
+                        >
+                            {{ section.label }}
+                        </button>
+                        <p v-else class="min-w-0 truncate px-1 text-xs text-stone-400">{{ section.label }}</p>
+
+                        <button
+                            v-if="section.id === 'catalog'"
+                            type="button"
+                            class="shrink-0 rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
+                            aria-label="إعدادات الكتالوج"
+                            @click="openCatalogSections"
+                        >
+                            <Icon name="settings" class="size-3.5" />
+                        </button>
+                    </div>
                     <div class="mx-1 mb-2 border-t border-dotted border-stone-300"></div>
-                </div>
 
-                <RouterLink
-                    v-for="tab in contentTabs"
-                    :key="`slideout-${tab.id}`"
-                    :to="`/manage/${tab.contentType.slug}`"
-                    class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
-                    :class="isTypeActive(tab.contentType.slug) ? 'bg-white text-stone-700' : 'bg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                    @click="closeMobileNav"
-                >
-                    <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
-                    <span class="truncate">{{ tab.label }}</span>
-                </RouterLink>
+                    <RouterLink
+                        v-for="tab in section.tabs"
+                        :key="`slideout-${section.id}-${tab.id}`"
+                        :to="`/manage/${tab.slug}`"
+                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-start text-sm transition"
+                        :class="isTypeActive(tab.slug) ? 'bg-white text-stone-700' : 'bg-stone-100/50 text-stone-600 hover:bg-white/60 hover:text-stone-800'"
+                        @click="closeMobileNav"
+                    >
+                        <img :src="`/${tab.icon}`" :alt="tab.label" class="h-5 w-5 shrink-0">
+                        <span class="truncate">{{ tab.label }}</span>
+                    </RouterLink>
+                </template>
             </nav>
         </Transition>
     </Teleport>
+
+    <CatalogSectionsModal />
 </template>

@@ -66,7 +66,7 @@ Route::prefix('{tenant}')
         Route::get('/changelog', Changelog::class)->name('pages.changelog');
         Route::get('/resume', Resume::class)->name('pages.resume');
         Route::get('/reviews', Reviews::class)->name('pages.reviews');
-        Route::get('/faq', Faq::class)->name('pages.faq');
+        // Route::get('/faq', Faq::class)->name('pages.faq');
         Route::get('/features', Features::class)->name('pages.features');
         Route::get('/pricing', Pricing::class)->name('pages.pricing');
         Route::get('/contact', Contact::class)->name('pages.contact');

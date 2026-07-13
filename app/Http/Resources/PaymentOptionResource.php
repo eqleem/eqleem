@@ -24,6 +24,7 @@ class PaymentOptionResource extends JsonResource
             'description' => $payload['description'],
             'icon' => $payload['icon'],
             'icon_url' => $payload['icon_url'] ?? null,
+            'available' => (bool) ($payload['available'] ?? true),
             'active' => (bool) ($payload['active'] ?? false),
             'settings' => $payload['settings'] ?? [],
             'order' => $payload['order'] ?? 0,

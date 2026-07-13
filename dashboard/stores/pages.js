@@ -22,6 +22,7 @@ export const usePagesStore = defineStore('pages', {
         type: contentTypeBySlug('pages'),
         items: [],
         meta: emptyMeta(),
+        existingTemplates: [],
         search: '',
         loading: false,
         loaded: false,
@@ -69,6 +70,9 @@ export const usePagesStore = defineStore('pages', {
                 const payload = await api(`/pages?${params.toString()}`);
 
                 this.items = Array.isArray(payload?.data) ? payload.data : [];
+                this.existingTemplates = Array.isArray(payload?.existing_templates)
+                    ? payload.existing_templates
+                    : [];
                 this.meta = {
                     current_page: payload?.meta?.current_page ?? page,
                     last_page: payload?.meta?.last_page ?? 1,
@@ -94,14 +98,20 @@ export const usePagesStore = defineStore('pages', {
             await this.fetchPages({ page });
         },
 
-        async createPage(title) {
+        async createPage({ title, template = null } = {}) {
             this.saving = true;
             this.error = null;
 
             try {
+                const body = { title };
+
+                if (template) {
+                    body.template = template;
+                }
+
                 const payload = await api('/pages', {
                     method: 'POST',
-                    body: { title },
+                    body,
                 });
 
                 this.detail = payload?.data ?? null;

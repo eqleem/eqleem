@@ -5,14 +5,31 @@
 
     <div class="divide-y divide-gray-200 divide-dotted border-t border-dotted border-gray-200">
         @foreach ($methods as $method)
-            <div wire:key="payment-method-{{ $method['slug'] }}" class="group flex items-center gap-4 px-4 py-4 hover:bg-gray-50/80 transition">
+            <div
+                wire:key="payment-method-{{ $method['slug'] }}"
+                @class([
+                    'group flex items-center gap-4 px-4 py-4 transition',
+                    'hover:bg-gray-50/80' => $method['available'],
+                    'opacity-40' => ! $method['available'],
+                ])
+            >
                 <button
                     type="button"
-                    wire:click="openModal('{{ $method['slug'] }}')"
-                    class="flex min-w-0 flex-1 items-center gap-4 text-start"
+                    @if ($method['available'])
+                        wire:click="openModal('{{ $method['slug'] }}')"
+                    @endif
+                    @disabled(! $method['available'])
+                    class="flex min-w-0 flex-1 items-center gap-4 text-start disabled:cursor-not-allowed"
                 >
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold text-gray-800">{{ $method['name'] }}</p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="text-sm font-semibold text-gray-800">{{ $method['name'] }}</p>
+                            @unless ($method['available'])
+                                <span class="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-gray-500">
+                                    قريباً
+                                </span>
+                            @endunless
+                        </div>
                         <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">{{ $method['description'] }}</p>
                     </div>
 
@@ -27,26 +44,29 @@
 
                 <button
                     type="button"
-                    wire:click.stop="toggleActive('{{ $method['slug'] }}')"
+                    @if ($method['available'])
+                        wire:click.stop="toggleActive('{{ $method['slug'] }}')"
+                    @endif
                     wire:loading.attr="disabled"
                     wire:target="toggleActive('{{ $method['slug'] }}')"
-                    class="shrink-0 rounded-lg p-1 hover:bg-gray-100 transition disabled:opacity-50"
+                    @disabled(! $method['available'])
+                    class="shrink-0 rounded-lg p-1 hover:bg-gray-100 transition disabled:cursor-not-allowed disabled:opacity-50"
                     aria-label="{{ $method['active'] ? 'تعطيل' : 'تفعيل' }} {{ $method['name'] }}"
                     role="switch"
-                    aria-checked="{{ $method['active'] ? 'true' : 'false' }}"
+                    aria-checked="{{ ($method['available'] && $method['active']) ? 'true' : 'false' }}"
                 >
                     <span
                         @class([
                             'relative inline-block h-6 w-11 rounded-full transition-colors duration-200',
-                            'bg-gray-200' => ! $method['active'],
-                            'bg-primary-500' => $method['active'],
+                            'bg-gray-200' => ! ($method['available'] && $method['active']),
+                            'bg-primary-500' => $method['available'] && $method['active'],
                         ])
                     >
                         <span
                             @class([
                                 'absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-all duration-200',
-                                'start-0.5' => ! $method['active'],
-                                'end-0.5 start-auto' => $method['active'],
+                                'start-0.5' => ! ($method['available'] && $method['active']),
+                                'end-0.5 start-auto' => $method['available'] && $method['active'],
                             ])
                         ></span>
                     </span>
@@ -56,6 +76,7 @@
     </div>
 
     @foreach ($methods as $method)
+        @continue(! $method['available'])
         <ui:modal
             :title="$method['name']"
             size="3xl"
@@ -83,7 +104,9 @@ new class extends \Livewire\Component
 
     public function toggleActive(string $slug): void
     {
-        if (! config("payment-methods.{$slug}")) {
+        $method = app(PaymentMethodRegistry::class)->find($slug);
+
+        if (! $method || ! $method->available) {
             return;
         }
 
@@ -99,7 +122,9 @@ new class extends \Livewire\Component
 
     public function openModal(string $slug): void
     {
-        if (! config("payment-methods.{$slug}")) {
+        $method = app(PaymentMethodRegistry::class)->find($slug);
+
+        if (! $method || ! $method->available) {
             return;
         }
 

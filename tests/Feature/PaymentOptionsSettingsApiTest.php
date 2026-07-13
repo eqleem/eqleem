@@ -45,9 +45,13 @@ test('owner can list and toggle payment options', function () {
         ->assertSuccessful()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['slug', 'name', 'description', 'icon', 'active', 'settings'],
+                '*' => ['slug', 'name', 'description', 'icon', 'available', 'active', 'settings'],
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.0.available', true)
+        ->assertJsonFragment(['slug' => 'tabby', 'available' => false])
+        ->assertJsonFragment(['slug' => 'tamara', 'available' => false])
+        ->assertJsonFragment(['slug' => 'custom', 'available' => false]);
 
     $this->actingAs($user)
         ->putJson('/api/settings/payment-options/bank-transfer/active', [
@@ -56,10 +60,22 @@ test('owner can list and toggle payment options', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.slug', 'bank-transfer')
         ->assertJsonPath('data.active', true)
+        ->assertJsonPath('data.available', true)
         ->assertJsonStructure(['message']);
 
     setCurrentTenant($tenant);
     expect((bool) data_get(Setting::paymentMethod('bank-transfer'), 'active'))->toBeTrue();
+});
+
+test('owner cannot activate unavailable payment methods', function () {
+    [$user] = createUserWithTenantForPaymentOptionsSettings();
+
+    $this->actingAs($user)
+        ->putJson('/api/settings/payment-options/tabby/active', [
+            'active' => true,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['active']);
 });
 
 test('owner can update bank transfer settings and preserve active', function () {

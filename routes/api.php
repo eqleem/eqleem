@@ -47,7 +47,12 @@ use App\API\Dashboard\GetDashboardChart;
 use App\API\Dashboard\GetDashboardContext;
 use App\API\Dashboard\GetDashboardStat;
 use App\API\Dashboard\GetDashboardStats;
+use App\API\Dashboard\GetOnboarding;
 use App\API\Dashboard\GetWelcomeWidget;
+use App\API\Dashboard\SaveOnboardingBusiness;
+use App\API\Dashboard\SaveOnboardingCatalog;
+use App\API\Dashboard\SaveOnboardingContact;
+use App\API\Dashboard\SaveOnboardingIdentity;
 use App\API\Dashboard\UpdateWelcomeBasicInfo;
 use App\API\Dashboard\UpdateWelcomeContact;
 use App\API\DigitalProducts\CreateDigitalProduct;
@@ -135,9 +140,12 @@ use App\API\Page\DeletePageBlockLink;
 use App\API\Page\DeletePageHeaderSocialLink;
 use App\API\Page\GetPageDesign;
 use App\API\Page\GetPageStructure;
+use App\API\Page\ListCatalogSections;
+use App\API\Page\ListContentTypes;
 use App\API\Page\ReorderPageBlockLinks;
 use App\API\Page\ReorderPageBlocks;
 use App\API\Page\ReorderPageHeaderSocialLinks;
+use App\API\Page\SaveCatalogSections;
 use App\API\Page\SavePageThemeOptions;
 use App\API\Page\SearchPageLinkContent;
 use App\API\Page\SetDefaultPageTheme;
@@ -265,6 +273,8 @@ use App\API\UnitRental\UpdateUnitRentalCategory;
 use App\API\UnitRental\UpdateUnitRentalSettings;
 use App\API\UnitRental\UploadUnitRentalEditorImage;
 use App\API\UnitRental\UploadUnitRentalImage;
+use App\API\Unsplash\SearchUnsplashPhotos;
+use App\API\Unsplash\SelectUnsplashPhoto;
 use App\API\User\UpdateAccountPassword;
 use App\API\User\UpdateAccountProfile;
 use App\API\User\UploadAccountAvatar;
@@ -298,6 +308,21 @@ Route::put('/dashboard/welcome/contact', UpdateWelcomeContact::class)
 
 Route::post('/dashboard/welcome/social', AddWelcomeSocialLink::class)
     ->name('api.dashboard.welcome.social');
+
+Route::get('/dashboard/onboarding', GetOnboarding::class)
+    ->name('api.dashboard.onboarding');
+
+Route::post('/dashboard/onboarding/business', SaveOnboardingBusiness::class)
+    ->name('api.dashboard.onboarding.business');
+
+Route::put('/dashboard/onboarding/contact', SaveOnboardingContact::class)
+    ->name('api.dashboard.onboarding.contact');
+
+Route::put('/dashboard/onboarding/identity', SaveOnboardingIdentity::class)
+    ->name('api.dashboard.onboarding.identity');
+
+Route::put('/dashboard/onboarding/catalog', SaveOnboardingCatalog::class)
+    ->name('api.dashboard.onboarding.catalog');
 
 Route::get('/plans', ListPlans::class)
     ->name('api.plans.index');
@@ -480,6 +505,15 @@ Route::put('/settings/shipping-options/custom/{id}/active', UpdateCustomShipping
 Route::get('/page/structure', GetPageStructure::class)
     ->name('api.page.structure');
 
+Route::get('/page/content-types', ListContentTypes::class)
+    ->name('api.page.content-types');
+
+Route::get('/page/catalog-sections', ListCatalogSections::class)
+    ->name('api.page.catalog-sections');
+
+Route::put('/page/catalog-sections', SaveCatalogSections::class)
+    ->name('api.page.catalog-sections.update');
+
 Route::get('/page/design', GetPageDesign::class)
     ->name('api.page.design');
 
@@ -488,6 +522,12 @@ Route::put('/page/design/theme', SetDefaultPageTheme::class)
 
 Route::match(['put', 'post'], '/page/design/options', SavePageThemeOptions::class)
     ->name('api.page.design.options');
+
+Route::get('/unsplash/photos', SearchUnsplashPhotos::class)
+    ->name('api.unsplash.photos');
+
+Route::post('/unsplash/photos/select', SelectUnsplashPhoto::class)
+    ->name('api.unsplash.photos.select');
 
 Route::post('/page/blocks', CreatePageBlock::class)
     ->name('api.page.blocks.store');

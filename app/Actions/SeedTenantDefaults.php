@@ -238,17 +238,13 @@ class SeedTenantDefaults
                 'template' => 'contact',
                 'title' => 'اتصل بنا',
                 'slug' => 'contact-us',
-                'data' => [
-                    'subtitle' => 'يسعدنا تواصلك معنا. املأ النموذج وسنرد عليك في أقرب وقت.',
-                ],
+                'data' => Content::defaultContactPageData(),
             ],
             [
                 'template' => 'faq',
                 'title' => 'الأسئلة المتكررة',
                 'slug' => 'faq',
-                'data' => [
-                    'subtitle' => 'إجابات على أكثر الأسئلة شيوعاً حول خدماتنا.',
-                ],
+                'data' => Content::defaultFaqPageData(),
             ],
         ];
 

@@ -11,6 +11,12 @@ import { api, ApiError } from '../../lib/api.js';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { notifyApiSuccess, notifyApiError } from '../../lib/notify.js';
 
+const props = defineProps({
+    skipWelcomeFlow: { type: Boolean, default: false },
+});
+
+const emit = defineEmits(['saved']);
+
 const store = useWelcomeStore();
 
 const form = reactive({
@@ -105,7 +111,11 @@ async function submit() {
         }
 
         notifyApiSuccess({ message: 'تم إرسال طلب التوثيق.' }, 'تم إرسال طلب التوثيق.');
-        await store.afterStepSaved('home-step-verification');
+        emit('saved');
+
+        if (!props.skipWelcomeFlow) {
+            await store.afterStepSaved('home-step-verification');
+        }
     } catch (error) {
         if (error instanceof ApiError) {
             errors.identity_type = error.errors?.identity_type?.[0] ?? null;

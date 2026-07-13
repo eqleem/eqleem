@@ -7,6 +7,7 @@ use App\Http\Resources\PaymentOptionResource;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Support\PaymentMethodRegistry;
+use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -42,6 +43,12 @@ class UpdatePaymentOptionActive
             throw new NotFoundHttpException;
         }
 
+        if (! $method->available) {
+            throw ValidationException::withMessages([
+                'active' => __('This payment method is not available yet.'),
+            ]);
+        }
+
         $saved = Setting::paymentMethod($slug);
         $settings = collect($saved)->except('active')->all();
 
@@ -55,6 +62,7 @@ class UpdatePaymentOptionActive
             'description' => $method->description,
             'icon' => $method->icon,
             'icon_url' => asset($method->icon),
+            'available' => $method->available,
             'active' => (bool) data_get($fresh, 'active', false),
             'settings' => collect($fresh)->except('active')->all(),
             'order' => $method->order,

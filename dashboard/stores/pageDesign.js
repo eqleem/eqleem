@@ -19,7 +19,8 @@ export const usePageDesignStore = defineStore('pageDesign', {
     }),
 
     getters: {
-        schemaEntries: (state) => Object.entries(state.optionsSchema ?? {}),
+        schemaEntries: (state) => Object.entries(state.optionsSchema ?? {})
+            .filter(([, field]) => (field?.type ?? '') !== 'cover-position'),
         hasOptions: (state) => Object.keys(state.optionsSchema ?? {}).length > 0,
         themesEmpty: (state) => state.loaded && !state.loading && state.themes.length === 0,
     },
@@ -132,8 +133,13 @@ export const usePageDesignStore = defineStore('pageDesign', {
                         return;
                     }
 
-                    // Don't wipe existing images with an empty string.
-                    if (value === '' && (this.optionsSchema?.[key]?.type === 'upload-single-image')) {
+                    const fieldType = this.optionsSchema?.[key]?.type;
+
+                    // Don't wipe existing images with an empty string (unless explicitly cleared).
+                    if (
+                        value === ''
+                        && (fieldType === 'upload-single-image' || fieldType === 'upload-cover')
+                    ) {
                         return;
                     }
 

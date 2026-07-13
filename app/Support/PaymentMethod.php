@@ -16,6 +16,7 @@ class PaymentMethod
         public array $defaults = [],
         public array $components = [],
         public int $order = 0,
+        public bool $available = true,
     ) {}
 
     /**
@@ -31,6 +32,7 @@ class PaymentMethod
             defaults: $config['defaults'] ?? [],
             components: $config['components'] ?? [],
             order: $config['order'] ?? 0,
+            available: (bool) ($config['active'] ?? true),
         );
     }
 
@@ -53,6 +55,7 @@ class PaymentMethod
             'defaults' => $this->defaults,
             'components' => $this->components,
             'order' => $this->order,
+            'available' => $this->available,
         ];
     }
 }

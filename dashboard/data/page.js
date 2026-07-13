@@ -4,8 +4,10 @@ export const fixedTabs = [
     { id: 'design', slug: 'design', label: 'تصميم الصفحة', icon: 'assets/icons/tabler/color-swatch.svg' },
 ];
 
-// Content tabs — from config/content-types.php (id is `content-<slug>`).
-export const contentTypes = [
+// Static metadata catalog for dedicated section pages/stores.
+// Dashboard nav tabs are loaded dynamically from /api/page/content-types
+// (config/content-types.php via ContentTypeRegistry) — see stores/contentTypes.js.
+export const contentTypeCatalog = [
     { slug: 'pages', name: 'الصفحات', description: 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.', icon: 'assets/icons/ecommerce/031-content.svg', color: 'blue' },
     { slug: 'blog', name: 'المدونة', description: 'كتابة ونشر المقالات وتنظيم التصنيفات.', icon: 'assets/icons/stationery/002-book.svg', color: 'orange' },
     { slug: 'portfolio', name: 'معرض الأعمال', description: 'عرض وإدارة مشاريعك وأعمالك السابقة.', icon: 'assets/icons/business/047-portfolio.svg', color: 'violet' },
@@ -20,19 +22,10 @@ export const contentTypes = [
     { slug: 'courses', name: 'الدورات التدريبية', description: 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.', icon: 'assets/icons/business/011-presentation.svg', color: 'pink' },
 ];
 
-export const contentTabs = contentTypes.map((type) => ({
-    id: `content-${type.slug}`,
-    type: 'content',
-    label: type.name,
-    icon: type.icon,
-    color: type.color,
-    contentType: type,
-}));
+/** @deprecated Prefer useContentTypesStore().contentTypes for nav — kept for section stores. */
+export const contentTypes = contentTypeCatalog;
 
-export const allTabs = [
-    ...fixedTabs.map((tab) => ({ ...tab, type: 'fixed' })),
-    ...contentTabs,
-];
+export const contentTypeBySlug = (slug) => contentTypeCatalog.find((type) => type.slug === slug);
 
 // Structure tab — live data comes from /api/page/structure (see stores/pageStructure.js).
 // Design tab — live data comes from /api/page/design (see stores/pageDesign.js).
@@ -54,5 +47,3 @@ export function categoriesFor(slug) {
         { id: `${slug}-cat-3`, name: 'تصنيف مؤرشف', count: 0, active: false },
     ];
 }
-
-export const contentTypeBySlug = (slug) => contentTypes.find((type) => type.slug === slug);

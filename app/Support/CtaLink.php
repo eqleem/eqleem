@@ -14,9 +14,9 @@ class CtaLink
     {
         $options = [];
 
-        foreach (config('content-types', []) as $slug => $type) {
-            $options['section:'.$slug] = 'رابط '.$type['name'];
-            $options['item:'.$slug] = config('cta-link-types.item_labels.'.$slug, 'محتوى محدد من '.$type['name']);
+        foreach (self::activeContentTypes() as $type) {
+            $options['section:'.$type->slug] = 'رابط '.$type->name;
+            $options['item:'.$type->slug] = config('cta-link-types.item_labels.'.$type->slug, 'محتوى محدد من '.$type->name);
         }
 
         return $options;
@@ -29,8 +29,8 @@ class CtaLink
     {
         $options = [];
 
-        foreach (config('content-types', []) as $slug => $type) {
-            $options['section:'.$slug] = 'رابط '.$type['name'];
+        foreach (self::activeContentTypes() as $type) {
+            $options['section:'.$type->slug] = 'رابط '.$type->name;
         }
 
         $options['external'] = 'رابط خارجي';
@@ -47,9 +47,9 @@ class CtaLink
     {
         $keys = [''];
 
-        foreach (config('content-types', []) as $slug => $type) {
-            $keys[] = 'section:'.$slug;
-            $keys[] = 'item:'.$slug;
+        foreach (self::activeContentTypes() as $type) {
+            $keys[] = 'section:'.$type->slug;
+            $keys[] = 'item:'.$type->slug;
         }
 
         $keys[] = 'external';
@@ -76,26 +76,24 @@ class CtaLink
     {
         $options = [];
 
-        foreach (config('content-types', []) as $slug => $type) {
-            $icon = (string) ($type['icon'] ?? 'assets/icons/tabler/Link.svg');
-
+        foreach (self::activeContentTypes() as $type) {
             $options[] = [
-                'key' => $slug,
-                'label' => 'رابط '.$type['name'],
-                'icon_url' => asset($icon),
+                'key' => $type->slug,
+                'label' => 'رابط '.$type->name,
+                'icon_url' => asset($type->icon),
                 'group' => 'content',
-                'supports_section' => self::contentTypeHasSectionRoute($slug),
-                'supports_item' => self::contentTypeHasItemRoute($slug),
+                'supports_section' => self::contentTypeHasSectionRoute($type->slug),
+                'supports_item' => self::contentTypeHasItemRoute($type->slug),
                 'section_title' => (string) config(
-                    "cta-link-types.block_link.sections.{$slug}.title",
-                    $type['name'] ?? ''
+                    "cta-link-types.block_link.sections.{$type->slug}.title",
+                    $type->name
                 ),
                 'section_description' => (string) config(
-                    "cta-link-types.block_link.sections.{$slug}.description",
+                    "cta-link-types.block_link.sections.{$type->slug}.description",
                     ''
                 ),
                 'item_description' => (string) config(
-                    "cta-link-types.block_link.items.{$slug}.description",
+                    "cta-link-types.block_link.items.{$type->slug}.description",
                     ''
                 ),
             ];
@@ -114,6 +112,14 @@ class CtaLink
         ];
 
         return $options;
+    }
+
+    /**
+     * @return Collection<int, ContentType>
+     */
+    protected static function activeContentTypes(): Collection
+    {
+        return app(ContentTypeRegistry::class)->all();
     }
 
     public static function contentTypeHasSectionRoute(string $contentType): bool

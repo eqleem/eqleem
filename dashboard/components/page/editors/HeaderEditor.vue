@@ -6,10 +6,12 @@ import Textarea from '../../ui/Textarea.vue';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
 import Select from '../../ui/Select.vue';
+import CountrySelect from '../../ui/CountrySelect.vue';
 import FileCrop from '../../ui/FileCrop.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
 import { notifyApiError } from '../../../lib/notify.js';
+import { defaultCountryCode } from '../../../data/countries.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -19,10 +21,16 @@ const props = defineProps({
 const emit = defineEmits(['saved']);
 const store = usePageStructureStore();
 
+function normalizeCountry(value) {
+    const country = String(value ?? '').trim();
+
+    return /^[A-Za-z]{2}$/.test(country) ? country.toUpperCase() : defaultCountryCode;
+}
+
 const form = reactive({
     name: props.editor.name ?? '',
     bio: props.editor.bio ?? '',
-    country: props.editor.country ?? '',
+    country: normalizeCountry(props.editor.country),
     city: props.editor.city ?? '',
 });
 
@@ -34,9 +42,10 @@ const networkOptions = computed(() => Object.fromEntries(
     networks.value.map((network) => [network.key, network.label]),
 ));
 
-const socialModal = ref(false);
-const newNetwork = ref(networks.value[0]?.key ?? 'twitter');
-const newUrl = ref('');
+const socialDraft = reactive({
+    network: networks.value[0]?.key ?? 'twitter',
+    url: '',
+});
 const socialError = ref(null);
 const socialSaving = ref(false);
 
@@ -47,12 +56,17 @@ const dragSocialId = ref(null);
 watch(() => props.editor, (value) => {
     form.name = value.name ?? '';
     form.bio = value.bio ?? '';
-    form.country = value.country ?? '';
+    form.country = normalizeCountry(value.country);
     form.city = value.city ?? '';
     if (!logoFile.value) {
         logoPreview.value = value.logo || null;
     }
     socialLinks.value = [...(value.social_links ?? [])];
+
+    const firstNetwork = networks.value[0]?.key ?? 'twitter';
+    if (!networks.value.some((network) => network.key === socialDraft.network)) {
+        socialDraft.network = firstNetwork;
+    }
 }, { deep: true });
 
 function networkMeta(key) {
@@ -88,17 +102,22 @@ async function submit() {
 }
 
 async function addSocial() {
+    const url = socialDraft.url.trim();
+
+    if (!socialDraft.network || !url) {
+        return;
+    }
+
     socialError.value = null;
     socialSaving.value = true;
 
     try {
         const payload = await api('/page/header/social', {
             method: 'POST',
-            body: { network: newNetwork.value, url: newUrl.value },
+            body: { network: socialDraft.network, url },
         });
         socialLinks.value = Array.isArray(payload?.data) ? payload.data : [];
-        socialModal.value = false;
-        newUrl.value = '';
+        socialDraft.url = '';
     } catch (error) {
         socialError.value = error instanceof ApiError ? error.message : 'تعذر إضافة الرابط.';
     } finally {
@@ -158,7 +177,7 @@ async function onSocialDrop(event, targetId) {
 <template>
     <Form class="!rounded-none !p-4" @submit="submit">
         <div class="space-y-2">
-            <Input v-model="form.name" name="name" label="اسم الصفحة" placeholder="اسم الصفحة" :error="errors.name" />
+            <Input v-model="form.name" name="name" label="اسم النشاط" placeholder="اسم النشاط" :error="errors.name" />
 
             <FileCrop
                 v-model="logoFile"
@@ -172,23 +191,49 @@ async function onSocialDrop(event, targetId) {
             />
 
             <Textarea v-model="form.bio" name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" :maxlength="250" :rows="3" :error="errors.bio" />
-            <Input v-model="form.country" name="country" label="الدولة" placeholder="السعودية" :error="errors.country" />
-            <Input v-model="form.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
 
-            <div class="space-y-2">
-                <div class="my-4 flex items-center justify-between border-b border-dotted border-stone-100 pb-2">
-                    <p class="text-xs font-semibold text-stone-500">روابط التواصل</p>
-                    <Button type="button" variant="secondary" label="إضافة رابط" @click="socialModal = true">
-                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
-                    </Button>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <CountrySelect v-model="form.country" name="country" :error="errors.country" />
+                <Input v-model="form.city" name="city" placeholder="المدينة" :error="errors.city" />
+            </div>
+
+            <div class="rounded-xl border border-stone-100 bg-stone-50/60 p-3">
+                <p class="mb-2 text-sm font-semibold text-stone-700">روابط السوشال ميديا</p>
+                <div class="space-y-2">
+                    <Select
+                        v-model="socialDraft.network"
+                        name="social_network"
+                        class="w-full"
+                        width="w-full"
+                        :options="networkOptions"
+                    />
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+                        <Input
+                            v-model="socialDraft.url"
+                            name="social_url"
+                            label="المعرف أو الرابط"
+                            placeholder="https://... أو @username"
+                            dir="ltr"
+                        />
+                        <div class="flex items-end">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                class="w-full sm:w-auto"
+                                label="إضافة"
+                                :loading="socialSaving"
+                                @click="addSocial"
+                            />
+                        </div>
+                    </div>
                 </div>
+                <p v-if="socialError" class="mt-2 text-xs text-red-500">{{ socialError }}</p>
 
-                <p v-if="!socialLinks.length" class="py-2 text-xs text-stone-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
-                <ul v-else class="space-y-1.5">
+                <ul v-if="socialLinks.length" class="mt-3 space-y-1.5">
                     <li
                         v-for="link in socialLinks"
                         :key="link.id"
-                        class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2 py-2 transition hover:border-stone-200"
+                        class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2.5 py-2"
                         draggable="true"
                         @dragstart="onSocialDragStart($event, link.id)"
                         @dragover.prevent
@@ -197,13 +242,13 @@ async function onSocialDrop(event, targetId) {
                         <button type="button" class="cursor-grab rounded-md p-1 text-stone-300" aria-label="سحب">
                             <Icon name="grip-vertical" class="h-4 w-4" />
                         </button>
-                        <div class="flex min-w-0 flex-1 flex-col">
-                            <span class="truncate text-sm font-medium text-stone-800">{{ networkMeta(link.network)?.label ?? link.network }}</span>
-                            <span class="truncate text-xs text-stone-400" dir="ltr">{{ link.url }}</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-stone-800">{{ networkMeta(link.network)?.label ?? link.network }}</p>
+                            <p class="truncate text-xs text-stone-400" dir="ltr">{{ link.url }}</p>
                         </div>
                         <button
                             type="button"
-                            class="shrink-0 rounded-lg p-1 text-red-400/80 hover:bg-red-50 hover:text-red-500"
+                            class="shrink-0 rounded-md p-1 text-red-400 hover:bg-red-50"
                             aria-label="حذف"
                             @click="deleteSocial(link.id)"
                         >
@@ -211,33 +256,12 @@ async function onSocialDrop(event, targetId) {
                         </button>
                     </li>
                 </ul>
+                <p v-else class="mt-3 text-xs text-stone-400">لا توجد روابط بعد. أضف أول رابط تواصل.</p>
             </div>
         </div>
-
 
         <template #footer>
             <Button type="submit" label="حفظ" :loading="saving" />
         </template>
     </Form>
-
-    <div v-if="socialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-stone-800/75" @click="socialModal = false"></div>
-        <div class="relative w-full max-w-md rounded-xl bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-stone-100 p-3 px-4">
-                <p class="text-sm font-semibold text-stone-600">إضافة رابط تواصل</p>
-                <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200" @click="socialModal = false">
-                    <Icon name="x" class="h-4 w-4" />
-                </button>
-            </div>
-            <div class="space-y-3 p-4">
-                <Select v-model="newNetwork" name="newNetwork" label="الشبكة" :options="networkOptions" />
-                <Input v-model="newUrl" name="newUrl" label="الرابط" placeholder="https://..." dir="ltr" />
-                <p v-if="socialError" class="text-sm text-red-500">{{ socialError }}</p>
-            </div>
-            <div class="flex justify-end gap-2 border-t border-stone-100 p-3 px-4">
-                <Button type="button" variant="ghost" label="إلغاء" @click="socialModal = false" />
-                <Button type="button" label="إضافة" :loading="socialSaving" @click="addSocial" />
-            </div>
-        </div>
-    </div>
 </template>

@@ -1,6 +1,8 @@
 <script setup>
-import { contentTypes } from '../../data/page.js';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import { closeModal, openModal } from '../../lib/modal.js';
+import { useContentTypesStore } from '../../stores/contentTypes.js';
 
 /** @type {Record<string, { modal: string }>} */
 const addForms = {
@@ -17,6 +19,13 @@ const addForms = {
     menu: { modal: 'add-menu-item' },
     'unit-rental': { modal: 'add-unit' },
 };
+
+const contentTypesStore = useContentTypesStore();
+const { contentTypes } = storeToRefs(contentTypesStore);
+
+onMounted(() => {
+    contentTypesStore.fetchContentTypes();
+});
 
 function openAddModal(slug) {
     const form = addForms[slug];

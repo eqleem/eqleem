@@ -115,7 +115,14 @@ trait MapsPageThemes
             $value = data_get($saved, $key, $field['default'] ?? '');
             $options[$key] = $value;
 
-            if (($field['type'] ?? null) === 'upload-single-image' && filled($value)) {
+            $type = $field['type'] ?? null;
+
+            if (
+                in_array($type, ['upload-single-image', 'upload-cover'], true)
+                && filled($value)
+                && ! str_starts_with((string) $value, 'color:')
+                && ! str_starts_with((string) $value, 'gradient:')
+            ) {
                 $previews[$key] = str_starts_with((string) $value, 'http')
                     ? (string) $value
                     : Storage::url((string) $value);

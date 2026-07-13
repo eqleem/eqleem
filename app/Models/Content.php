@@ -161,6 +161,58 @@ class Content extends Model implements HasMedia
         return ['contact', 'faq'];
     }
 
+    /**
+     * Templates that can be chosen when creating a page from the dashboard.
+     *
+     * @return list<string>
+     */
+    public static function creatablePageTemplates(): array
+    {
+        return ['contact', 'faq'];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function contactFormFieldKeys(): array
+    {
+        return ['name', 'email', 'phone', 'message', 'address', 'subject'];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function defaultContactPageData(): array
+    {
+        return [
+            'subtitle' => 'يسعدنا تواصلك معنا. املأ النموذج وسنرد عليك في أقرب وقت.',
+            'show_form' => true,
+            'form_fields' => [
+                'name' => true,
+                'email' => true,
+                'phone' => true,
+                'message' => true,
+                'address' => false,
+                'subject' => true,
+            ],
+            'show_social_links' => true,
+            'show_contact_info' => true,
+            'show_extra_links' => true,
+            'success_message' => 'شكراً لتواصلك معنا. سنرد عليك في أقرب وقت.',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function defaultFaqPageData(): array
+    {
+        return [
+            'subtitle' => 'إجابات على أكثر الأسئلة شيوعاً حول خدماتنا.',
+            'faqs' => [],
+        ];
+    }
+
     public function isSystemPage(): bool
     {
         return $this->type === contentTypeModel('pages')

@@ -38,6 +38,7 @@ class ListPaymentOptions
                     'description' => $method->description,
                     'icon' => $method->icon,
                     'icon_url' => asset($method->icon),
+                    'available' => $method->available,
                     'active' => (bool) data_get($saved, 'active', false),
                     'settings' => $settings,
                     'order' => $method->order,

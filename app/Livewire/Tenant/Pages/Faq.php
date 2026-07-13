@@ -2,41 +2,28 @@
 
 namespace App\Livewire\Tenant\Pages;
 
+use App\Models\Content;
+use App\Support\FaqPageView;
 use Livewire\Component;
 
 class Faq extends Component
 {
-    /** @var array<int, array{question: string, answer: string}> */
-    public array $faqs = [];
+    public Content $page;
 
     public function mount(): void
     {
-        $this->faqs = [
-            [
-                'question' => 'كيف أبدأ طلب خدمة التشطيب؟',
-                'answer' => 'يمكنك بدء الطلب من صفحة الخدمات واختيار الخدمة المناسبة، ثم تعبئة بيانات التواصل والموقع. بعدها يتواصل معك الفريق لتأكيد المعاينة والخطوات التالية.',
-            ],
-            [
-                'question' => 'هل تقدمون زيارة معاينة قبل التنفيذ؟',
-                'answer' => 'نعم، نوفر معاينة مبدئية لتقييم المكان واحتياجات العمل بدقة، ثم نشاركك نطاق التنفيذ والمدة التقديرية قبل بدء المشروع.',
-            ],
-            [
-                'question' => 'كم يستغرق تنفيذ المشروع عادة؟',
-                'answer' => 'المدة تختلف حسب نوع التشطيب وحجم المساحة، لكن يتم تحديد جدول زمني واضح بعد المعاينة واعتماد خطة التنفيذ.',
-            ],
-            [
-                'question' => 'هل يمكن تقسيط التكلفة على دفعات؟',
-                'answer' => 'نعم، غالبا يتم تقسيم الدفعات على مراحل التنفيذ المتفق عليها في العقد، بحيث تكون واضحة ومرتبطة بالتقدم الفعلي في المشروع.',
-            ],
-            [
-                'question' => 'هل تتوفر ضمانات على الأعمال المنفذة؟',
-                'answer' => 'نعم، يتم توضيح الضمانات لكل بند حسب نوع الخدمة والخامات المستخدمة، مع دعم ما بعد التسليم لمعالجة الملاحظات.',
-            ],
-        ];
+        $this->page = Content::query()
+            ->type(contentTypeModel('pages'))
+            ->template('faq')
+            ->published()
+            ->where('active', true)
+            ->orderBy('id')
+            ->firstOrFail();
     }
 
     public function render()
     {
-        return tenantView('pages.faq')->title('الأسئلة المتكررة');
+        return tenantView('page.faq', FaqPageView::make($this->page))
+            ->title($this->page->title);
     }
 }

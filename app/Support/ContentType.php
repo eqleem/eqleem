@@ -25,6 +25,8 @@ class ContentType
         public array $components = [],
         public int $order = 0,
         public string $color = 'gray',
+        public bool $active = true,
+        public bool $sellable = false,
     ) {}
 
     /**
@@ -41,6 +43,8 @@ class ContentType
             components: $config['components'] ?? [],
             order: $config['order'] ?? 0,
             color: $config['color'] ?? 'gray',
+            active: array_key_exists('active', $config) ? (bool) $config['active'] : true,
+            sellable: array_key_exists('sellable', $config) ? (bool) $config['sellable'] : false,
         );
     }
 
@@ -99,6 +103,8 @@ class ContentType
             'order' => $this->order,
             'tab_id' => $this->tabId(),
             'color' => $this->color,
+            'active' => $this->active,
+            'sellable' => $this->sellable,
         ];
     }
 
@@ -115,9 +121,20 @@ class ContentType
             'icon_url' => asset($this->icon),
             'description' => $this->description,
             'type' => 'content',
+            'color' => $this->color,
+            'sellable' => $this->sellable,
             'color_bg_class' => self::backgroundClassFor($this->color),
             'color_hover_class' => self::hoverBackgroundClassFor($this->color),
             'color_bg_hex' => self::backgroundHexFor($this->color),
+            'content_type' => [
+                'slug' => $this->slug,
+                'name' => $this->name,
+                'description' => $this->description,
+                'icon' => $this->icon,
+                'icon_url' => asset($this->icon),
+                'color' => $this->color,
+                'sellable' => $this->sellable,
+            ],
         ];
     }
 }

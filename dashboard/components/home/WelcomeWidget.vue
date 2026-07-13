@@ -1,33 +1,31 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import Modal from '../ui/Modal.vue';
 import Button from '../ui/Button.vue';
-import CompletionBasicInfo from './CompletionBasicInfo.vue';
-import CompletionContact from './CompletionContact.vue';
-import CompletionSocial from './CompletionSocial.vue';
 import CompletionContent from './CompletionContent.vue';
 import CompletionContentAddModals from './CompletionContentAddModals.vue';
-import CompletionVerification from './CompletionVerification.vue';
+import OnboardingWidget from './OnboardingWidget.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
+import { useOnboardingStore } from '../../stores/onboarding.js';
 import { openModal } from '../../lib/modal.js';
 
 const store = useWelcomeStore();
+const onboardingStore = useOnboardingStore();
 const {
-    greeting,
     userName,
     pageUrl,
     shareText,
-    percentage,
-    completedSteps,
-    totalSteps,
-    nextStep,
     loading,
     loaded,
 } = storeToRefs(store);
 
+const { completed: onboardingCompleted } = storeToRefs(onboardingStore);
+
 const copied = ref(false);
 const shareInput = ref(null);
+
+const isReady = computed(() => onboardingCompleted.value);
 
 const qrImageUrl = (size = 220) =>
     `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(pageUrl.value || '')}`;
@@ -74,14 +72,6 @@ function shareLink(platform) {
             return pageUrl.value;
     }
 }
-
-function openStep(modal) {
-    if (!modal) {
-        return;
-    }
-
-    openModal(modal);
-}
 </script>
 
 <template>
@@ -91,11 +81,11 @@ function openStep(modal) {
     >
         <div
             class="gap-0"
-            :class="percentage >= 100 ? 'flex flex-col' : 'grid lg:grid-cols-[1fr_auto]'"
+            :class="isReady ? 'flex flex-col' : 'grid lg:grid-cols-[1fr_auto]'"
         >
             <div
                 class="p-5 sm:p-6"
-                :class="percentage >= 100 ? 'border-b border-white/10 pb-4' : ''"
+                :class="isReady ? 'border-b border-white/10 pb-4' : ''"
             >
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="text-xl font-bold">مرحباً، {{ userName || '…' }} 👋</h2>
@@ -111,39 +101,14 @@ function openStep(modal) {
                     </Button>
                 </div>
 
-                <template v-if="percentage < 100">
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between text-xs sm:text-sm">
-                            <span class="text-primary-100">{{ completedSteps }}/{{ totalSteps }} خطوات</span>
-                            <span class="font-bold">{{ percentage }}%</span>
-                        </div>
-                        <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20 sm:h-2">
-                            <div
-                                class="h-full rounded-full bg-amber-300 transition-all duration-700 ease-out"
-                                :style="{ width: percentage + '%' }"
-                            ></div>
-                        </div>
-                    </div>
-
-                    <Button
-                        v-if="nextStep"
-                        variant="light"
-                        class="mt-4 h-auto w-full rounded-lg px-4 py-2.5 font-semibold sm:w-auto"
-                        @click="openStep(nextStep.modal)"
-                        icon-position="end"
-                    >
-                        <template #icon>
-                            <iconify-icon icon="hugeicons:arrow-left-02" class="text-2xl"></iconify-icon>
-                        </template>
-                        {{ nextStep.label }}
-                    </Button>
-                </template>
-                <p v-else class="mt-2 text-sm text-primary-100/90">صفحتك جاهزة — شاركها مع عملائك.</p>
+                <div class="mt-8">
+                    <OnboardingWidget on-primary />
+                </div>
             </div>
 
             <div
                 class="bg-black/10 p-5 sm:p-6"
-                :class="percentage >= 100 ? '' : 'border-t border-white/10 lg:w-96 lg:border-s lg:border-t-0'"
+                :class="isReady ? '' : 'border-t border-white/10 lg:w-96 lg:border-s lg:border-t-0'"
             >
                 <p class="mb-2 text-xs font-medium text-primary-100">رابط صفحتك</p>
 
@@ -262,26 +227,10 @@ function openStep(modal) {
             </div>
         </Modal>
 
-        <Modal title="البيانات الأساسية" size="lg" name="home-step-basic-info">
-            <CompletionBasicInfo />
-        </Modal>
-
-        <Modal title="بيانات الاتصال" size="lg" name="home-step-contact">
-            <CompletionContact />
-        </Modal>
-
-        <Modal title="السوشال ميديا" size="lg" name="home-step-social">
-            <CompletionSocial />
-        </Modal>
-
         <Modal title="إضافة محتوى" size="2xl" name="home-step-content">
             <CompletionContent />
         </Modal>
 
         <CompletionContentAddModals />
-
-        <Modal title="توثيق المتجر" size="lg" name="home-step-verification">
-            <CompletionVerification />
-        </Modal>
     </div>
 </template>

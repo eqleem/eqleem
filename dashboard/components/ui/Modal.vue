@@ -26,8 +26,13 @@ const sizeClasses = {
 };
 
 function hide() {
+    if (!show.value) {
+        return;
+    }
+
     show.value = false;
     document.body.classList.remove('overflow-hidden');
+    window.dispatchEvent(new CustomEvent('closemodal', { detail: { modal: props.name } }));
 }
 
 function onOpen(event) {
@@ -39,7 +44,10 @@ function onOpen(event) {
 
 function onClose(event) {
     if (!event.detail?.modal || event.detail.modal === props.name) {
-        hide();
+        if (show.value) {
+            show.value = false;
+            document.body.classList.remove('overflow-hidden');
+        }
     }
 }
 
