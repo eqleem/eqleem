@@ -68,7 +68,7 @@ it('returns onboarding payload for the current tenant', function () {
                 'completed',
                 'steps',
                 'forms' => [
-                    'business' => ['industry', 'name', 'bio', 'logo'],
+                    'business' => ['industry', 'name', 'bio', 'logo', 'brand_mark'],
                     'contact' => ['phone', 'email', 'whatsapp', 'country', 'city', 'social_links'],
                     'identity' => ['theme_id', 'primary_color', 'logo_radius', 'font_family'],
                     'catalog' => ['enabled'],
@@ -91,14 +91,58 @@ it('saves business step with industry name bio and logo', function () {
             'name' => 'متجر أحمد',
             'bio' => 'نبيع منتجات مميزة',
             'logo' => UploadedFile::fake()->image('logo.png', 120, 120),
+            'brand_mark_type' => 'image',
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonPath('data.forms.business.industry', 'retail')
         ->assertJsonPath('data.forms.business.name', 'متجر أحمد')
+        ->assertJsonPath('data.forms.business.brand_mark.type', 'image')
         ->assertJsonPath('data.steps.0.done', true);
 
     expect($tenant->fresh()->meta->get('industry'))->toBe('retail')
         ->and($tenant->fresh()->name)->toBe('متجر أحمد');
+});
+
+it('saves business step with an emoji brand mark', function () {
+    [$user, $tenant] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->postJson('/api/dashboard/onboarding/business', [
+            'industry' => 'retail',
+            'name' => 'متجر بالإيموجي',
+            'bio' => 'نبذة قصيرة عن النشاط',
+            'brand_mark_type' => 'emoji',
+            'brand_mark_value' => '🚀',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.forms.business.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.forms.business.brand_mark.value', '🚀')
+        ->assertJsonPath('data.steps.0.done', true);
+
+    expect(data_get($tenant->fresh()->meta, 'brand_mark.type'))->toBe('emoji')
+        ->and(data_get($tenant->fresh()->meta, 'brand_mark.value'))->toBe('🚀');
+});
+
+it('saves business step with an icon brand mark', function () {
+    [$user, $tenant] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->postJson('/api/dashboard/onboarding/business', [
+            'industry' => 'retail',
+            'name' => 'متجر بالأيقونة',
+            'bio' => 'نبذة قصيرة عن النشاط',
+            'brand_mark_type' => 'icon',
+            'brand_mark_value' => 'tabler:chart-line',
+            'brand_mark_color' => '#DC2626',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.forms.business.brand_mark.type', 'icon')
+        ->assertJsonPath('data.forms.business.brand_mark.value', 'tabler:chart-line')
+        ->assertJsonPath('data.forms.business.brand_mark.color', '#dc2626')
+        ->assertJsonPath('data.steps.0.done', true);
+
+    expect(data_get($tenant->fresh()->meta, 'brand_mark.type'))->toBe('icon')
+        ->and(data_get($tenant->fresh()->meta, 'brand_mark.value'))->toBe('tabler:chart-line');
 });
 
 it('saves contact step with whatsapp and social links', function () {

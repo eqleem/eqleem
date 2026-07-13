@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api, ApiError } from '../lib/api.js';
 
 const emptyForms = () => ({
-    business: { industry: '', name: '', bio: '', logo: '' },
+    business: { industry: '', name: '', bio: '', logo: '', brand_mark: null },
     contact: {
         phone: '',
         email: '',
@@ -69,6 +69,7 @@ export const useOnboardingStore = defineStore('onboarding', {
                     name: data.forms?.business?.name ?? '',
                     bio: data.forms?.business?.bio ?? '',
                     logo: data.forms?.business?.logo ?? '',
+                    brand_mark: data.forms?.business?.brand_mark ?? null,
                 },
                 contact: {
                     phone: data.forms?.contact?.phone ?? '',

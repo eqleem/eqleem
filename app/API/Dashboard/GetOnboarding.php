@@ -71,6 +71,7 @@ class GetOnboarding
                     'name' => (string) ($tenant->name ?? ''),
                     'bio' => (string) ($headerData['bio'] ?? ''),
                     'logo' => $profile->hasLogo($tenant) ? $profile->logo($tenant) : '',
+                    'brand_mark' => $profile->hasLogo($tenant) ? $profile->brandMark($tenant) : null,
                 ],
                 'contact' => [
                     ...$contact,

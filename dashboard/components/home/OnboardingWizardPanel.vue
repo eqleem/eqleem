@@ -5,7 +5,7 @@ import Input from '../ui/Input.vue';
 import Textarea from '../ui/Textarea.vue';
 import Select from '../ui/Select.vue';
 import CountrySelect from '../ui/CountrySelect.vue';
-import FileCrop from '../ui/FileCrop.vue';
+import BrandMarkField from '../ui/BrandMarkField.vue';
 import PickerColor from '../ui/PickerColor.vue';
 import Radio from '../ui/Radio.vue';
 import Button from '../ui/Button.vue';
@@ -44,8 +44,13 @@ const {
 const { tenant } = useSession();
 
 const activeKey = ref(props.initialStep || store.currentStep || 'business');
-const logoFile = ref(null);
-const logoPreview = ref(null);
+const brandMark = ref({
+    type: null,
+    value: '',
+    color: '',
+    url: null,
+    file: null,
+});
 
 const business = reactive({ industry: '', name: '', bio: '' });
 const contact = reactive({
@@ -78,6 +83,22 @@ const nextLabel = computed(() => {
     return props.allowAllSteps || completed.value ? 'حفظ ومتابعة' : 'التالي';
 });
 
+function hasBrandMark(mark) {
+    if (!mark || typeof mark !== 'object') {
+        return false;
+    }
+
+    if (mark.type === 'image') {
+        return Boolean(mark.file || mark.url);
+    }
+
+    if (mark.type === 'emoji' || mark.type === 'icon') {
+        return Boolean(mark.value);
+    }
+
+    return false;
+}
+
 const canContinue = computed(() => {
     switch (activeKey.value) {
         case 'business':
@@ -85,7 +106,7 @@ const canContinue = computed(() => {
                 business.industry
                 && business.name.trim().length >= 2
                 && business.bio.trim()
-                && (logoFile.value || logoPreview.value),
+                && hasBrandMark(brandMark.value),
             );
         case 'contact':
             return Boolean(
@@ -107,6 +128,38 @@ const canContinue = computed(() => {
     }
 });
 
+function brandMarkFromPayload(data) {
+    const mark = data?.brand_mark;
+
+    if (mark && typeof mark === 'object' && mark.type) {
+        return {
+            type: mark.type,
+            value: mark.value ?? '',
+            color: mark.color ?? '',
+            url: mark.type === 'image' ? (mark.url || data?.logo || null) : null,
+            file: null,
+        };
+    }
+
+    if (data?.logo) {
+        return {
+            type: 'image',
+            value: '',
+            color: '',
+            url: data.logo,
+            file: null,
+        };
+    }
+
+    return {
+        type: null,
+        value: '',
+        color: '',
+        url: null,
+        file: null,
+    };
+}
+
 watch(
     () => props.initialStep,
     (key) => {
@@ -123,8 +176,8 @@ watch(
         business.name = value.business?.name ?? '';
         business.bio = value.business?.bio ?? '';
 
-        if (!logoFile.value) {
-            logoPreview.value = value.business?.logo || null;
+        if (!brandMark.value?.file) {
+            brandMark.value = brandMarkFromPayload(value.business);
         }
 
         contact.phone = value.contact?.phone ?? '';
@@ -167,6 +220,12 @@ function clearErrors() {
     Object.keys(errors).forEach((key) => {
         delete errors[key];
     });
+}
+
+function onBrandMarkChange() {
+    errors.logo = null;
+    errors.brand_mark_type = null;
+    errors.brand_mark_value = null;
 }
 
 function selectStep(step) {
@@ -265,8 +324,20 @@ async function continueStep() {
         body.append('name', business.name.trim());
         body.append('bio', business.bio.trim());
 
-        if (logoFile.value) {
-            body.append('logo', logoFile.value);
+        const mark = brandMark.value ?? {};
+
+        if (mark.type === 'image' && mark.file) {
+            body.append('logo', mark.file);
+            body.append('brand_mark_type', 'image');
+        } else if (mark.type === 'emoji' || mark.type === 'icon') {
+            body.append('brand_mark_type', mark.type);
+            body.append('brand_mark_value', mark.value ?? '');
+            if (mark.type === 'icon') {
+                body.append('brand_mark_color', mark.color ?? '');
+            }
+        } else if (mark.type === 'none') {
+            body.append('brand_mark_type', 'none');
+            body.append('remove_logo', '1');
         }
 
         const result = await store.saveBusiness(body);
@@ -278,13 +349,21 @@ async function continueStep() {
         }
 
         notifySuccess('تم حفظ بيانات النشاط');
-        logoFile.value = null;
+        brandMark.value = brandMarkFromPayload(store.forms.business);
 
         if (tenant.value) {
+            const savedMark = brandMarkFromPayload(store.forms.business);
+
             updateTenant({
                 ...tenant.value,
                 name: business.name.trim(),
                 logo: store.forms.business.logo || tenant.value.logo,
+                brand_mark: {
+                    type: savedMark.type,
+                    value: savedMark.value,
+                    color: savedMark.color,
+                    url: savedMark.url,
+                },
             });
         }
 
@@ -474,15 +553,12 @@ async function continueStep() {
                     :rows="3"
                     :error="errors.bio"
                 />
-                <FileCrop
-                    v-model="logoFile"
-                    v-model:preview="logoPreview"
+                <BrandMarkField
+                    v-model="brandMark"
                     name="logo"
                     label="الشعار"
-                    upload-label="رفع شعار"
-                    crop-title="قص الشعار"
-                    shape="square"
-                    :error="errors.logo"
+                    :error="errors.logo || errors.brand_mark_value || errors.brand_mark_type"
+                    @change="onBrandMarkChange"
                 />
             </div>
 
