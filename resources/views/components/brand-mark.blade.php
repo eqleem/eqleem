@@ -23,13 +23,14 @@
     $color = (string) ($resolved['color'] ?? '');
     $imageUrl = (string) ($resolved['url'] ?? $url ?? '');
     $iconSize = filled($iconSize) ? (string) $iconSize : '2.25rem';
+    $iconFontSize = 'var(--brand-mark-icon-size, '.$iconSize.')';
     $iconStyle = filled($color)
-        ? 'color: '.$color.'; font-size: '.$iconSize.';'
-        : 'font-size: '.$iconSize.';';
+        ? 'color: '.$color.'; font-size: '.$iconFontSize.';'
+        : 'font-size: '.$iconFontSize.';';
 @endphp
 
 @if ($type === 'emoji' && filled($value))
-    <span {{ $attributes->class([$class, 'inline-flex items-center justify-center leading-none select-none']) }} style="font-size: {{ $iconSize }};" role="img" aria-label="{{ $alt }}">
+    <span {{ $attributes->class([$class, 'inline-flex items-center justify-center leading-none select-none']) }} style="font-size: {{ $iconFontSize }};" role="img" aria-label="{{ $alt }}">
         {{ $value }}
     </span>
 @elseif ($type === 'icon' && filled($value))

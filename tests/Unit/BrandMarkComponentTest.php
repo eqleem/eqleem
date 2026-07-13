@@ -16,7 +16,7 @@ it('renders icon brand marks with the default icon size', function () {
     ]);
 
     expect($html)
-        ->toContain('font-size: 2.25rem')
+        ->toContain('font-size: var(--brand-mark-icon-size, 2.25rem)')
         ->toContain('tabler:home')
         ->toContain('#dc2626');
 });
@@ -32,7 +32,7 @@ it('renders icon brand marks with a custom icon size', function () {
     ]);
 
     expect($html)
-        ->toContain('font-size: 4.5rem')
+        ->toContain('font-size: var(--brand-mark-icon-size, 4.5rem)')
         ->toContain('tabler:star');
 });
 
@@ -46,5 +46,5 @@ it('applies icon size to emoji brand marks', function () {
         ],
     ]);
 
-    expect($html)->toContain('font-size: 3rem');
+    expect($html)->toContain('font-size: var(--brand-mark-icon-size, 3rem)');
 });

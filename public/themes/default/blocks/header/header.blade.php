@@ -64,8 +64,8 @@
             :mark="$brandMark ?? null"
             :url="tenant('logo')"
             :alt="tenant('name')"
-            icon-size="4.5rem"
-            class="size-24 {{ $logoRadiusClass }} flex items-center justify-center object-cover"
+            icon-size="3rem"
+            class="size-24 {{ $logoRadiusClass }} flex items-center justify-center object-cover [--brand-mark-icon-size:3.5rem] md:[--brand-mark-icon-size:4.5rem]"
         />
         
         <!-- Name and Title -->

@@ -8,6 +8,10 @@
                     <div class="brand-icon size-14 shrink-0 overflow-hidden rounded-xl">
                         <x-brand-mark :mark="$brandMark" :alt="$title" class="size-full object-cover" />
                     </div>
+                @elseif (($brandMark['type'] ?? '') === 'emoji')
+                    <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl text-4xl">
+                        <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
+                    </div>
                 @else
                     <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary-500 text-white">
                         <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
