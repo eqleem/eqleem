@@ -1,6 +1,6 @@
 @props(['link' => '#', 'title' => 'رابط', 'desc' => '...', 'icon' => 'hugeicons:store-02', 'brandMark' => null])
 
- <div class="bg-white rounded-2xl group border-1 border-black/5 hover:border-primary-400 focus-within:border-primary-400 transition">
+ <div class="bg-white rounded-2xl group border-2 border-secondary-900/5 hover:border-primary-500 focus-within:border-primary-500 transition">
     <a href="{{$link}}" wire:navigate class="flex items-center justify-between p-3 ">
         <div class="flex items-center gap-3 truncate">
             @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
@@ -27,12 +27,12 @@
 
             <div>
                 <p class="text-lg font-geist font-bold" style=""> {{$title}} </p>
-                <p class="text-sm md:text-base text-stone-400 flex items-center gap-1" style="">
+                <p class="text-sm md:text-base text-stone-500 flex items-center gap-1" style="">
                     {{$desc}}
                 </p>
             </div>
         </div>
-        <div class="pe-2 text-primary-300 group-hover:text-primary-500 transition-colors">
+        <div class="pe-2 text-primary-400 group-hover:text-primary-500 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right size-6 rotate-180"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
         </div>
     </a>

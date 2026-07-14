@@ -6,8 +6,10 @@
                     type="button"
                     class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-black/50"
                     x-on:click="$dispatch('open-modal', { name: 'share-page-modal' })"
+                    aria-label="مشاركة الصفحة"
                 >
-                    <iconify-icon icon="solar:screen-share-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
+                    <span class="sr-only">مشاركة الصفحة</span>
+                    <iconify-icon icon="solar:screen-share-bold-duotone" class="inline text-2xl" stroke-width="1.5" aria-hidden="true"></iconify-icon>
                 </button>
             @endif
 
@@ -52,8 +54,11 @@
                             type="button"
                             class="bg-black/10  hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                             x-on:click="open = !open"
+                            aria-label="{{ authClient()->displayName() }}"
+                            aria-haspopup="true"
+                            x-bind:aria-expanded="open"
                         >
-                            <img src="{{ authClient()->avatar }}" alt="{{ authClient()->displayName() }}" class="h-7 w-7 rounded-full object-cover">
+                            <img src="{{ authClient()->avatar }}" alt="" class="h-7 w-7 rounded-full object-cover" aria-hidden="true">
                             <span class="hidden md:inline">{{ authClient()->displayName() }}</span>
                         </button>
 
@@ -76,9 +81,11 @@
                         type="button"
                         class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                         x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
+                        aria-label="{{ $clientLoginLabel }}"
                     >
-                        <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
-                        <span class="hidden md:inline">{{ $clientLoginLabel }}</span>
+                        <span class="sr-only">{{ $clientLoginLabel }}</span>
+                        <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5" aria-hidden="true"></iconify-icon>
+                        <span class="hidden md:inline" aria-hidden="true">{{ $clientLoginLabel }}</span>
                     </button>
                 @endif
             @endif

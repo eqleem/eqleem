@@ -5,6 +5,7 @@ namespace App\Livewire\Tenant\Blocks;
 use App\Livewire\Concerns\ResolvesTenantBlockView;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
+use App\Support\SocialNetworkUrl;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -56,7 +57,7 @@ class Header extends Component
     }
 
     /**
-     * @return Collection<int, array{id: string, url: string, icon: string}>
+     * @return Collection<int, array{id: string, url: string, icon: string, label: string}>
      */
     protected function socialLinks(?Tenant $tenant): Collection
     {
@@ -69,7 +70,8 @@ class Header extends Component
         return app(TenantProfileService::class)
             ->socialLinks($tenant)
             ->map(function (array $link) use ($networks): ?array {
-                $network = $networks[$link['network'] ?? ''] ?? null;
+                $networkKey = (string) ($link['network'] ?? '');
+                $network = $networks[$networkKey] ?? null;
                 $url = (string) ($link['url'] ?? '');
 
                 if (! $network || $url === '') {
@@ -78,8 +80,9 @@ class Header extends Component
 
                 return [
                     'id' => $link['id'],
-                    'url' => $url,
+                    'url' => SocialNetworkUrl::resolve($networkKey, $url),
                     'icon' => $network['icon'],
+                    'label' => (string) ($network['label'] ?? $link['network']),
                 ];
             })
             ->filter()

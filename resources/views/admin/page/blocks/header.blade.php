@@ -208,7 +208,7 @@ new class extends \Livewire\Component
     {
         $this->validate([
             'newNetwork' => 'required|string|in:'.implode(',', array_keys($this->networks())),
-            'newUrl' => 'required|url|max:500',
+            'newUrl' => 'required|string|max:500',
         ]);
 
         $tenant = currentTenant();

@@ -16,8 +16,10 @@ new class extends Component
             type="button"
             class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-stone-500"
             x-on:click="$dispatch('open-modal', { name: 'share-page-modal' })"
+            aria-label="مشاركة الصفحة"
         >
-            <iconify-icon icon="solar:screen-share-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
+            <span class="sr-only">مشاركة الصفحة</span>
+            <iconify-icon icon="solar:screen-share-bold-duotone" class="inline text-2xl" stroke-width="1.5" aria-hidden="true"></iconify-icon>
         </button>
     
         <button class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-stone-500">
@@ -42,9 +44,11 @@ new class extends Component
             type="button"
             class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
             x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
+            aria-label="دخول العملاء"
         >
-            <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>    
-            <span class="hidden md:inline">دخول العملاء</span>
+            <span class="sr-only">دخول العملاء</span>
+            <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5" aria-hidden="true"></iconify-icon>    
+            <span class="hidden md:inline" aria-hidden="true">دخول العملاء</span>
         </button>
        
     </div>

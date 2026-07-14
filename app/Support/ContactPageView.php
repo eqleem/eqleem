@@ -145,7 +145,7 @@ class ContactPageView
                 return [
                     'name' => (string) ($network['label'] ?? $networkKey),
                     'icon' => (string) ($network['icon'] ?? 'ri:global-line'),
-                    'url' => $url,
+                    'url' => SocialNetworkUrl::resolve($networkKey, $url),
                 ];
             })
             ->filter()

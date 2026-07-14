@@ -11,8 +11,10 @@ import BlockEditor from './editors/BlockEditor.vue';
 import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
 import BlockLinksPanel from './editors/BlockLinksPanel.vue';
 import FloatLinksPanel from './editors/FloatLinksPanel.vue';
+import HeaderSocialLinksPanel from './editors/HeaderSocialLinksPanel.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
 
 function openCatalogSections() {
@@ -39,6 +41,8 @@ const busyId = ref(null);
 const editTitle = ref('إعدادات البلوك');
 const ctaLinksPanel = ref(null);
 const floatLinksPanel = ref(null);
+const headerSocialBlockId = ref(null);
+const socialModalOpen = ref(false);
 
 function onEditModalClosed(event) {
     if (event.detail?.modal === 'edit-block') {
@@ -53,6 +57,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('closemodal', onEditModalClosed);
+    closeHeaderSocialLinks();
 });
 
 function openAddCtaLink() {
@@ -61,6 +66,22 @@ function openAddCtaLink() {
 
 function openFloatLinksPosition() {
     floatLinksPanel.value?.openPosition?.();
+}
+
+function openHeaderSocialLinks(block) {
+    headerSocialBlockId.value = Number(block.id);
+    socialModalOpen.value = true;
+    lockBodyScroll();
+}
+
+function closeHeaderSocialLinks() {
+    if (!socialModalOpen.value) {
+        return;
+    }
+
+    socialModalOpen.value = false;
+    headerSocialBlockId.value = null;
+    unlockBodyScroll();
 }
 
 function onCtaUpdated(payload) {
@@ -244,6 +265,15 @@ function contentManageLabel(block) {
                             <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
                             <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
                         </div>
+
+                        <button
+                            v-if="block.type === 'header'"
+                            type="button"
+                            class="shrink-0 cursor-pointer rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+                            @click.stop="openHeaderSocialLinks(block)"
+                        >
+                            روابط الشبكات الإجتماعية
+                        </button>
 
                         <button
                             v-if="block.editable"
@@ -452,5 +482,36 @@ function contentManageLabel(block) {
                 @close="onCloseEdit"
             />
         </Modal>
+
+        <Teleport to="body">
+            <div
+                v-if="socialModalOpen && headerSocialBlockId"
+                class="relative z-50"
+                role="dialog"
+                aria-modal="true"
+            >
+                <div class="fixed inset-0 bg-stone-800/75" @click="closeHeaderSocialLinks" />
+
+                <div class="fixed inset-0 overflow-y-auto overscroll-contain">
+                    <div class="flex min-h-full items-center justify-center p-4" @click.self="closeHeaderSocialLinks">
+                        <div class="relative w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-xl">
+                            <div class="flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                                <p class="text-sm font-semibold text-stone-600">روابط الشبكات الإجتماعية</p>
+                                <button
+                                    type="button"
+                                    class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400 transition hover:bg-stone-200 hover:text-stone-600"
+                                    aria-label="إغلاق"
+                                    @click="closeHeaderSocialLinks"
+                                >
+                                    <Icon name="x" class="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <HeaderSocialLinksPanel :block-id="headerSocialBlockId" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </MainBox>
 </template>

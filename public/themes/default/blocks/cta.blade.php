@@ -6,7 +6,7 @@
     @endphp
     @if($visibleCtaLinks->isNotEmpty())
     <div @class([
-        'grid w-full gap-4 mb-6 animate-fade-in-up delay-300',
+        'grid w-full gap-3 mb-6X animate-fade-in-up delay-300',
         'grid-cols-1' => $ctaLinksCount === 1,
         'grid-cols-2' => $ctaLinksCount >= 2,
         'lg:grid-cols-3' => $ctaLinksCount >= 3,
@@ -74,15 +74,15 @@
                 <span class="relative z-10 flex items-center gap-2 truncate">
                     @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
                         @if (($brandMark['type'] ?? '') === 'image')
-                            <span class="size-9 shrink-0 overflow-hidden rounded-lg bg-white/15">
+                            <span class="size-9x shrink-0 overflow-hidden rounded-lg bg-white/15">
                                 <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-full object-cover" icon-size="1.35rem" />
                             </span>
                         @elseif (($brandMark['type'] ?? '') === 'emoji')
-                            <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg text-xl leading-none">
-                                <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.5rem" />
+                            <span class="flex size-9x shrink-0 items-center justify-center overflow-hidden rounded-lg text-xl leading-none">
+                                <x-brand-mark :mark="$brandMark" :alt="$link['label']" class=" object-cover" icon-size="1.5rem" />
                             </span>
                         @else
-                            <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden">
+                            <span class="flex size-9x shrink-0 items-center justify-center overflow-hidden">
                                 <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.35rem" />
                             </span>
                         @endif

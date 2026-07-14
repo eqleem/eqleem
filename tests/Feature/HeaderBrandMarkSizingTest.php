@@ -70,3 +70,16 @@ it('keeps the larger container size for icon brand marks', function () {
         ->assertSee('size-24', false)
         ->assertDontSee('size-14 md:size-[4.5rem]', false);
 });
+
+it('gives header social links accessible names', function () {
+    $tenant = createTenantForHeaderBrandMarkSizing();
+    $profile = app(TenantProfileService::class);
+
+    $profile->addSocialLink($tenant, 'twitter', 'https://x.com/eqleem');
+    setCurrentTenant($tenant->fresh());
+
+    Livewire::test(Header::class)
+        ->assertSuccessful()
+        ->assertSeeHtml('aria-label="X (تويتر)"')
+        ->assertSee('https://x.com/eqleem', false);
+});

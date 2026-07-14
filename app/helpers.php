@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 if (! function_exists('theme_option')) {
     /**
@@ -142,6 +143,20 @@ if (! function_exists('tenantView')) {
         return view()
             ->first(['tenant-theme::'.$view, 'default-tenant-theme::'.$view, $view], $data)
             ->layout('layouts.tenant');
+    }
+}
+
+if (! function_exists('tenantMetaDescription')) {
+    /**
+     * Build a concise meta description for tenant storefront pages.
+     */
+    function tenantMetaDescription(?string $override = null): string
+    {
+        $value = filled($override)
+            ? $override
+            : (string) (tenant('name') ?? config('app.name'));
+
+        return Str::limit(trim(strip_tags($value)), 160);
     }
 }
 

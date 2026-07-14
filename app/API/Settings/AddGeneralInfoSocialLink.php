@@ -27,7 +27,7 @@ class AddGeneralInfoSocialLink
     {
         return [
             'network' => ['required', 'string', Rule::in(array_keys(config('social-networks', [])))],
-            'url' => ['required', 'url', 'max:500'],
+            'url' => ['required', 'string', 'max:500'],
         ];
     }
 

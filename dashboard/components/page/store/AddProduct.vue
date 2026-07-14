@@ -50,7 +50,8 @@ async function submit() {
             v-model="form.title"
             name="title"
             label="اسم المنتج"
-            placeholder="اكتب اسم المنتج"
+            placeholder="مثال : تيشيرت النصر، عود كمبودي فاخر، ساعة Poma .. الخ"
+            info="اكتب اسم المنتج، يمكن إكمال البيانات ورفع الصور بعد إضافة المنتج"
             :error="errors.title"
         />
 

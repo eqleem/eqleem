@@ -1,6 +1,8 @@
 <?php
 
+use App\Livewire\Tenant\Blocks\PagesMenu;
 use App\Livewire\Tenant\Blocks\TopNav;
+use App\Livewire\Tenant\Cart\Badge;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Models\User;
@@ -87,7 +89,7 @@ it('maps page menu icons by template', function () {
 it('renders published pages with template icons and end-aligned dropdown', function () {
     [, $contact, $faq, $custom] = createTenantWithPublishedPagesForTopNav();
 
-    Livewire::test(TopNav::class)
+    Livewire::test(PagesMenu::class)
         ->assertSuccessful()
         ->assertSee('اتصل بنا', false)
         ->assertSee('الأسئلة المتكررة', false)
@@ -101,4 +103,24 @@ it('renders published pages with template icons and end-aligned dropdown', funct
         ->assertSee(route('tenant.page.detail', $contact->slug), false)
         ->assertSee(route('tenant.page.detail', $faq->slug), false)
         ->assertSee(route('tenant.page.detail', $custom->slug), false);
+});
+
+it('gives icon-only top-nav controls accessible names', function () {
+    createTenantWithPublishedPagesForTopNav();
+
+    Livewire::test(TopNav::class)
+        ->assertSuccessful()
+        ->assertSeeHtml('aria-label="مشاركة الصفحة"')
+        ->assertSeeHtml('<span class="sr-only">مشاركة الصفحة</span>')
+        ->assertSeeHtml('aria-label="دخول العملاء"');
+
+    Livewire::test(PagesMenu::class)
+        ->assertSuccessful()
+        ->assertSeeHtml('aria-label="الصفحات"')
+        ->assertSeeHtml('<span class="sr-only">الصفحات</span>');
+
+    Livewire::test(Badge::class)
+        ->assertSuccessful()
+        ->assertSeeHtml('aria-label="سلة المشتريات"')
+        ->assertSeeHtml('<span class="sr-only">سلة المشتريات</span>');
 });

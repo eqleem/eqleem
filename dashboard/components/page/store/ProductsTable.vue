@@ -101,7 +101,7 @@ async function removeSelected() {
                 </template>
             </Button>
 
-            <Modal title="إضافة منتج جديد" size="2xl" name="add-store-product">
+            <Modal title="إضافة منتج جديد" size="md" name="add-store-product">
                 <AddProduct />
             </Modal>
         </div>

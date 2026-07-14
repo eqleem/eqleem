@@ -56,6 +56,15 @@
     font-style: normal;
 }
 
+.ck[dir="rtl"], .ck[dir="rtl"] .ck {
+    --ck-color-text: #1c1917;
+}
+
+.ck.ck-editor__editable,
+.ck.ck-content {
+    color: #1c1917; /* stone-900 — darker than stone-500 */
+}
+
 .icon-saudi_riyal::before {
     content: "\e900";
     font-family: "saudi_riyal" !important;

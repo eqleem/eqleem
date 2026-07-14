@@ -49,6 +49,8 @@ const ready = ref(false);
 let editorInstance = null;
 let creating = null;
 let destroyed = false;
+/** Queued HTML when setData runs before the instance exists. */
+let pendingData = null;
 
 function csrfToken() {
     const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
@@ -69,11 +71,15 @@ function getData() {
 }
 
 function setData(html) {
+    const next = html ?? '';
+
     if (!editorInstance || destroyed) {
+        pendingData = next;
+
         return;
     }
 
-    const next = html ?? '';
+    pendingData = null;
 
     try {
         if (editorInstance.getData() === next) {
@@ -180,6 +186,11 @@ async function createEditor(initialHtml = '') {
 
         editorInstance = instance;
         ready.value = true;
+
+        // Parent may have updated modelValue (or called setData) while create() was in flight.
+        const latest = pendingData !== null ? pendingData : (props.modelValue || '');
+        pendingData = null;
+        setData(latest);
     } catch {
         editorInstance = null;
         ready.value = false;
@@ -191,6 +202,7 @@ async function createEditor(initialHtml = '') {
 async function destroyEditor() {
     destroyed = true;
     ready.value = false;
+    pendingData = null;
 
     const instance = editorInstance;
     editorInstance = null;
@@ -254,6 +266,11 @@ defineExpose({
 <style>
 .ck-vue-host .ck-editor__editable {
     min-height: 220px;
-    color: #313842;
+    color: #1c1917; /* stone-900 */
+}
+
+/* GPL build shows a "Powered by CKEditor" badge without a commercial license key. */
+.ck.ck-balloon-panel.ck-powered-by-balloon {
+    display: none !important;
 }
 </style>

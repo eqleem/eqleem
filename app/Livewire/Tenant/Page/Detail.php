@@ -42,7 +42,13 @@ class Detail extends Component
             ],
         };
 
-        return tenantView($view, $data)->title($this->page->title);
+        return tenantView($view, $data)
+            ->title($this->page->title)
+            ->layoutData([
+                'metaDescription' => filled($subtitle = (string) data_get($this->page->data, 'subtitle', ''))
+                    ? $subtitle
+                    : $this->page->title,
+            ]);
     }
 
     /**

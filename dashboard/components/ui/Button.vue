@@ -11,6 +11,8 @@ defineProps({
     iconPosition: { type: String, default: 'start' }, // 'start' | 'end'
 });
 
+const emit = defineEmits(['click']);
+
 const variants = {
     primary: 'bg-primary-600 text-white hover:bg-primary-700',
     secondary: 'bg-black/10 text-black/70 hover:bg-black/20 shadow-none',
@@ -34,6 +36,7 @@ const variants = {
         :disabled="!href && (disabled || loading) ? true : null"
         class="inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
         :class="variants[variant] ?? 'bg-stone-300 text-black/50'"
+        @click="!(disabled || loading) && emit('click', $event)"
     >
         <svg
             v-if="loading"

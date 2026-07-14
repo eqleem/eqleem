@@ -8,7 +8,7 @@ import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
 import Toggle from '../../../components/ui/Toggle.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
-import PageBlocksPanel from '../../../components/page/pages/PageBlocksPanel.vue';
+// import PageBlocksPanel from '../../../components/page/pages/PageBlocksPanel.vue'; // temporarily hidden
 import NotFound from '../../NotFound.vue';
 import { usePagesStore } from '../../../stores/pages.js';
 import { ApiError } from '../../../lib/api.js';
@@ -18,10 +18,11 @@ const route = useRoute();
 const router = useRouter();
 const store = usePagesStore();
 const formTab = ref('edit');
-const contentTab = ref('text');
+// const contentTab = ref('text'); // temporarily unused (text/blocks tabs hidden)
 const notFound = ref(false);
 const bodyEditor = ref(null);
 const bodySeed = ref('');
+const editorSeeded = ref(false);
 
 const form = reactive({
     title: '',
@@ -44,9 +45,9 @@ function switchFormTab(tab) {
     formTab.value = tab;
 }
 
-function switchContentTab(tab) {
-    contentTab.value = tab;
-}
+// function switchContentTab(tab) {
+//     contentTab.value = tab;
+// }
 
 function loadForm(page, { syncEditor = true } = {}) {
     if (!page) {
@@ -63,6 +64,7 @@ function loadForm(page, { syncEditor = true } = {}) {
 
     if (syncEditor) {
         bodySeed.value = page.body ?? '';
+        editorSeeded.value = true;
         nextTick(() => {
             bodyEditor.value?.setData?.(bodySeed.value);
         });
@@ -96,7 +98,7 @@ watch(() => route.params.id, async (id) => {
 
     notFound.value = false;
     formTab.value = 'edit';
-    contentTab.value = 'text';
+    editorSeeded.value = false;
 
     try {
         const page = await store.fetchPage(String(id));
@@ -253,43 +255,15 @@ function saveAndClose() {
                     </div>
 
                     <div class="space-y-3">
-                        <nav class="flex items-center gap-1 border-b border-stone-200">
-                            <button
-                                type="button"
-                                class="flex items-center gap-1.5 px-3 py-2 text-sm transition"
-                                :class="contentTab === 'text'
-                                    ? '-mb-px border-b-2 border-primary-500 font-semibold text-stone-900'
-                                    : 'text-stone-500 hover:text-stone-800'"
-                                @click.prevent="switchContentTab('text')"
-                            >
-                                نص
-                            </button>
-                            <button
-                                type="button"
-                                class="flex items-center gap-1.5 px-3 py-2 text-sm transition"
-                                :class="contentTab === 'blocks'
-                                    ? '-mb-px border-b-2 border-primary-500 font-semibold text-stone-900'
-                                    : 'text-stone-500 hover:text-stone-800'"
-                                @click.prevent="switchContentTab('blocks')"
-                            >
-                                البلوكات
-                            </button>
-                        </nav>
-
-                        <div :class="contentTab === 'text' ? 'block' : 'hidden'">
-                            <CkEditor
-                                v-if="editorUploadUrl"
-                                ref="bodyEditor"
-                                :key="uuid"
-                                :model-value="bodySeed"
-                                name="body"
-                                :upload-url="editorUploadUrl"
-                            />
-                        </div>
-
-                        <div :class="contentTab === 'blocks' ? 'block' : 'hidden'">
-                            <PageBlocksPanel :page-uuid="uuid" />
-                        </div>
+                        <!-- Temporarily hide text/blocks tabs; editor only -->
+                        <CkEditor
+                            v-if="editorUploadUrl && editorSeeded"
+                            ref="bodyEditor"
+                            :key="uuid"
+                            :model-value="bodySeed"
+                            name="body"
+                            :upload-url="editorUploadUrl"
+                        />
                     </div>
                 </div>
 

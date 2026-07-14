@@ -43,7 +43,7 @@ new class extends Livewire\Component
     {
         return [
             'network' => 'required|string|in:'.implode(',', array_keys($this->networks())),
-            'url' => 'required|url|max:500',
+            'url' => 'required|string|max:500',
         ];
     }
 

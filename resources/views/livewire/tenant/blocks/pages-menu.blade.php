@@ -5,15 +5,18 @@
                 type="button"
                 class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                 x-on:click="open = !open"
+                aria-label="الصفحات"
                 aria-haspopup="true"
                 x-bind:aria-expanded="open"
             >
-                <iconify-icon icon="solar:documents-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
-                <span class="hidden md:inline">الصفحات</span>
+                <span class="sr-only">الصفحات</span>
+                <iconify-icon icon="solar:documents-bold-duotone" class="inline text-2xl" stroke-width="1.5" aria-hidden="true"></iconify-icon>
+                <span class="hidden md:inline" aria-hidden="true">الصفحات</span>
                 <iconify-icon
                     icon="solar:alt-arrow-down-bold"
                     class="hidden md:inline text-base transition-transform duration-200"
                     x-bind:class="open ? 'rotate-180' : ''"
+                    aria-hidden="true"
                 ></iconify-icon>
             </button>
 
