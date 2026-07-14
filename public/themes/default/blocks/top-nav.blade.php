@@ -158,8 +158,7 @@
                     }
                 }"
             >
-                <p class="text-sm text-stone-600">انسخ الرابط وشاركه مع عملائك مباشرة.</p>
-
+           
                 <div class="flex items-center gap-2">
                     <input
                         x-ref="shareInput"
