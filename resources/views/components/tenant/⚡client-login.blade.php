@@ -30,18 +30,11 @@
     @else
         <a
             href="{{ route('tenant.client.auth.social', ['tenant' => tenant('handle'), 'provider' => 'google']) }}"
+            x-on:click.prevent="window.location.assign($el.href)"
             class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
         >
-            <iconify-icon icon="flat-color-icons:google" class="text-xl"></iconify-icon>
-            المتابعة باستخدام Google
-        </a>
-
-        <a
-            href="{{ route('tenant.client.auth.social', ['tenant' => tenant('handle'), 'provider' => 'github']) }}"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-black/80"
-        >
-            <iconify-icon icon="mdi:github" class="text-xl"></iconify-icon>
-            المتابعة باستخدام GitHub
+            <iconify-icon icon="flat-color-icons:google" class="text-xl" aria-hidden="true"></iconify-icon>
+            الدخول بواسطة Gmail
         </a>
 
         <div class="relative py-1">
@@ -49,20 +42,21 @@
                 <span class="w-full border-t border-stone-200"></span>
             </div>
             <div class="relative flex justify-center">
-                <span class="bg-white px-3 text-xs text-stone-400">أو</span>
+                <span class="bg-white px-3 text-xs text-stone-400">أو عبر البريد الإلكتروني</span>
             </div>
         </div>
 
-        <form wire:submit="sendCode" class="space-y-4">
+        <form wire:submit="{{ $otpStep ? 'verifyCode' : 'sendCode' }}" class="space-y-4">
             <div class="space-y-1">
                 <label for="client-login-email" class="text-sm font-medium text-stone-700">البريد الإلكتروني</label>
                 <input
                     id="client-login-email"
                     type="email"
                     wire:model="email"
-                    placeholder="you@email.com"
+                    placeholder="you@gmail.com"
                     dir="ltr"
-                    class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none @error('email') border-red-400 @enderror"
+                    @disabled($otpStep)
+                    class="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 focus:border-primary-300 focus:outline-none disabled:bg-stone-50 @error('email') border-red-400 @enderror"
                 >
                 @error('email')
                     <p class="text-xs text-red-600">{{ $message }}</p>
@@ -94,14 +88,13 @@
                     wire:loading.attr="disabled"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
                 >
-                    <iconify-icon icon="hugeicons:message-lock-01" class="text-xl"></iconify-icon>
-                    <span wire:loading.remove wire:target="sendCode">إرسال كود التحقق</span>
+                    <iconify-icon icon="hugeicons:mail-send-01" class="text-xl"></iconify-icon>
+                    <span wire:loading.remove wire:target="sendCode">إرسال رابط الدخول</span>
                     <span wire:loading wire:target="sendCode">جاري الإرسال...</span>
                 </button>
             @else
                 <button
-                    type="button"
-                    wire:click="verifyCode"
+                    type="submit"
                     wire:loading.attr="disabled"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
                 >
@@ -112,7 +105,7 @@
 
                 <button
                     type="button"
-                    wire:click="$set('otpStep', false)"
+                    wire:click="resetEmailStep"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
                 >
                     تغيير البريد الإلكتروني
@@ -121,7 +114,9 @@
         </form>
 
         @if ($codeSent)
-            <p class="text-center text-xs font-medium text-green-600">تم إرسال كود التحقق إلى بريدك الإلكتروني.</p>
+            <p class="text-center text-xs font-medium text-green-600">
+                تم إرسال رابط الدخول وكود التحقق إلى بريدك. يمكنك فتح الرابط مباشرة أو إدخال الكود هنا.
+            </p>
         @endif
     @endif
 </div>
@@ -181,6 +176,14 @@ new class extends Component
         $this->dispatch('close-modal', name: 'customer-login-modal');
         $this->dispatch('client-authenticated');
         $this->dispatch('cart-updated');
+    }
+
+    public function resetEmailStep(): void
+    {
+        $this->otpStep = false;
+        $this->codeSent = false;
+        $this->code = '';
+        $this->resetErrorBag();
     }
 
     public function with(): array

@@ -348,8 +348,12 @@ class CtaLink
      */
     public static function iconFromData(array $data): string
     {
+        if (filled($data['icon'] ?? null)) {
+            return (string) $data['icon'];
+        }
+
         if (($data['link_type'] ?? '') === 'external') {
-            return (string) ($data['icon'] ?? config('cta-link-types.icons.external'));
+            return (string) config('cta-link-types.icons.external');
         }
 
         $contentType = $data['content_type'] ?? '';
@@ -409,10 +413,15 @@ class CtaLink
     public static function icon(Content $link): string
     {
         $data = $link->data ?? [];
+
+        if (filled($data['icon'] ?? null)) {
+            return (string) $data['icon'];
+        }
+
         $linkType = $data['link_type'] ?? 'external';
 
         if ($linkType === 'external') {
-            return (string) ($data['icon'] ?? config('cta-link-types.icons.external'));
+            return (string) config('cta-link-types.icons.external');
         }
 
         if ($linkType === 'form') {

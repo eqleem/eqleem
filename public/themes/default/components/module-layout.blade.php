@@ -26,7 +26,7 @@
     </div> 
  
 
-    <div class="w-full mb-3 px-2 lg:px-4">
+    <div class="w-full mb-3 px-2 lg:px-3">
         {{ $slot }}
     </div>
 </x-tenant-theme::layout>

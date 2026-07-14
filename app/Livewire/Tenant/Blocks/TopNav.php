@@ -35,6 +35,7 @@ class TopNav extends Component
             'showBackButtonLink' => $showBackButton && ! request()->routeIs('tenant.home'),
             'homeUrl' => route('tenant.home'),
             'publishedPages' => $showPagesMenu ? $this->publishedPages() : new Collection,
+            'pageMenuIcon' => fn (?string $template): string => self::pageMenuIcon($template),
         ]);
     }
 
@@ -49,6 +50,17 @@ class TopNav extends Component
             ->where('active', true)
             ->orderBy('sort_order')
             ->orderBy('title')
-            ->get(['id', 'title', 'slug']);
+            ->get(['id', 'title', 'slug', 'template']);
+    }
+
+    public static function pageMenuIcon(?string $template): string
+    {
+        return match ($template) {
+            'contact' => 'hugeicons:call',
+            'faq' => 'hugeicons:help-circle',
+            'features' => 'hugeicons:magic-wand-02',
+            'pricing' => 'hugeicons:credit-card-change',
+            default => 'hugeicons:file-01',
+        };
     }
 }

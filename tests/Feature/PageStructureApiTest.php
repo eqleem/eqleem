@@ -90,6 +90,7 @@ test('owner can list page structure with system and user blocks', function () {
                         'type',
                         'links',
                         'link_type_options',
+                        'link_type_picker_options',
                     ],
                 ],
                 'float_links_block' => [

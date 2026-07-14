@@ -23,6 +23,7 @@
             config.theme.extend.colors = {
                 ...(config.theme.extend.colors || {}),
                 primary: @js($themePrimaryPalette ?? config('twind.theme.extend.colors.primary')),
+                secondary: @js($themeSecondaryPalette ?? config('twind.theme.extend.colors.secondary')),
             };
             twind.install(config);
         </script>

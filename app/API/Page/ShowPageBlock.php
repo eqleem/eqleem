@@ -146,6 +146,7 @@ class ShowPageBlock
                 ->all(),
             'links' => $this->mapBlockLinks($block, 'footer-link'),
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];
     }
 }

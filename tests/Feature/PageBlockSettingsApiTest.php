@@ -153,6 +153,83 @@ test('owner can manage cta links', function () {
     expect(Content::query()->whereKey($linkId)->exists())->toBeFalse();
 });
 
+test('cta block editor exposes link type picker options', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('cta');
+
+    $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$block->id)
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.type', 'cta')
+        ->assertJsonStructure([
+            'data' => [
+                'editor' => [
+                    'link_type_picker_options',
+                ],
+            ],
+        ]);
+});
+
+test('owner can create cta link to a specific content item', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('cta');
+
+    $post = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'uuid' => (string) Str::uuid(),
+        'type' => contentTypeModel('blog'),
+        'title' => 'تدوينة CTA',
+        'slug' => 'cta-post-'.Str::lower(Str::random(6)),
+        'status' => 'published',
+        'published_at' => now(),
+        'active' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'item:blog',
+            'label' => 'اقرأ المقال',
+            'content_id' => $post->id,
+            'icon' => 'hugeicons:news-01',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.label', 'اقرأ المقال')
+        ->assertJsonPath('data.data.link_type', 'item')
+        ->assertJsonPath('data.data.content_type', 'blog')
+        ->assertJsonPath('data.data.content_id', $post->id)
+        ->assertJsonPath('data.icon', 'hugeicons:news-01');
+});
+
+test('owner can save emoji brand mark on a cta link', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('cta');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'external',
+            'label' => 'تواصل',
+            'url' => 'https://example.com/contact',
+            'brand_mark_type' => 'emoji',
+            'brand_mark_value' => '👋',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.label', 'تواصل')
+        ->assertJsonPath('data.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.brand_mark.value', '👋');
+
+    setCurrentTenant($tenant);
+    $link = Content::query()->where('block_id', $block->id)->type('cta-link')->latest('id')->first();
+
+    expect(data_get($link?->data, 'brand_mark.type'))->toBe('emoji')
+        ->and(data_get($link?->data, 'brand_mark.value'))->toBe('👋');
+});
+
 test('owner can update block-link settings', function () {
     [$user, $tenant] = createUserWithTenantForPageBlockSettings();
 

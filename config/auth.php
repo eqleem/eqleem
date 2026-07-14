@@ -74,7 +74,7 @@ return [
         ],
 
         'clients' => [
-            'driver' => 'eloquent',
+            'driver' => 'clients',
             'model' => Client::class,
         ],
     ],

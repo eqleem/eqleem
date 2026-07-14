@@ -1,10 +1,10 @@
 <div>
     <nav class="">
-        <div class="absolute md:top-4 top-3 md:start-0 start-1 flex items-center gap-2">
+        <div class="absolute md:top-4 top-2 md:start-0 start-1 flex items-center gap-2">
             @if ($showShareButton)
                 <button
                     type="button"
-                    class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-stone-500"
+                    class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-black/50"
                     x-on:click="$dispatch('open-modal', { name: 'share-page-modal' })"
                 >
                     <iconify-icon icon="solar:screen-share-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
@@ -12,13 +12,13 @@
             @endif
 
             {{-- @if ($showThemeToggle)
-                <button class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-stone-500">
+                <button class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-black/50">
                     <iconify-icon icon="solar:moon-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
                 </button>
             @endif --}}
 
             {{-- @if ($showLanguageSwitcher)
-                <button class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base">
+                <button class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base">
                     <span class="hidden md:inline">English</span>
                     <iconify-icon icon="ri:translate" class="inline text-2xl" stroke-width="1.5"></iconify-icon>
                 </button>
@@ -43,7 +43,7 @@
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button
                         type="button"
-                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
+                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                         x-on:click="open = !open"
                         aria-haspopup="true"
                         x-bind:aria-expanded="open"
@@ -61,17 +61,21 @@
                         x-show="open"
                         x-transition
                         x-cloak
-                        class="absolute end-0 top-full z-50 mt-2 min-w-44 overflow-hidden rounded-xl border border-stone-200/80 bg-white/95 py-1 shadow-lg backdrop-blur-md"
+                        class="absolute end-0 top-full z-50 mt-2 w-56 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-stone-200/80 bg-white/95 py-1 shadow-lg backdrop-blur-md"
                     >
                         @foreach ($publishedPages as $publishedPage)
                             <a
                                 href="{{ route('tenant.page.detail', $publishedPage->slug) }}"
                                 wire:navigate
                                 wire:key="top-nav-page-{{ $publishedPage->id }}"
-                                class="block px-4 py-2.5 text-sm text-stone-700 transition hover:bg-stone-100"
+                                class="flex items-center gap-x-2.5 px-3 py-2.5 text-sm text-stone-700 transition hover:bg-stone-100"
                                 x-on:click="open = false"
                             >
-                                {{ $publishedPage->title }}
+                                <iconify-icon
+                                    icon="{{ $pageMenuIcon($publishedPage->template) }}"
+                                    class="shrink-0 text-lg text-black/50"
+                                ></iconify-icon>
+                                <span class="min-w-0 truncate">{{ $publishedPage->title }}</span>
                             </a>
                         @endforeach
                     </div>
@@ -85,7 +89,7 @@
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
                         <button
                             type="button"
-                            class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
+                            class="bg-black/10  hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                             x-on:click="open = !open"
                         >
                             <img src="{{ authClient()->avatar }}" alt="{{ authClient()->displayName() }}" class="h-7 w-7 rounded-full object-cover">
@@ -96,7 +100,7 @@
                             x-show="open"
                             x-transition
                             x-cloak
-                            class="absolute end-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-xl border border-stone-200/80 bg-white/95 py-1 shadow-lg backdrop-blur-md"
+                            class="absolute w-56 max-w-[calc(100vw-1.5rem)] overflow-hidden end-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-xl border border-stone-200/80 bg-white/95 py-1 shadow-lg backdrop-blur-md"
                         >
                             <form method="POST" action="{{ route('tenant.client.logout', ['tenant' => tenant('handle')]) }}">
                                 @csrf
@@ -109,7 +113,7 @@
                 @else
                     <button
                         type="button"
-                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-stone-500 flex items-center gap-x-2 text-base"
+                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
                         x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
                     >
                         <iconify-icon icon="solar:lock-keyhole-minimalistic-unlocked-bold-duotone" class="inline text-2xl" stroke-width="1.5"></iconify-icon>

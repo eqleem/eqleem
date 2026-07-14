@@ -14,7 +14,7 @@ class HandleClientSocialCallback
 
     public function handle(string $provider, SocialiteUser $socialUser, Tenant $tenant): void
     {
-        if (! in_array($provider, ['google', 'github'], true)) {
+        if ($provider !== 'google') {
             throw ValidationException::withMessages([
                 'social' => 'مزود تسجيل الدخول غير مدعوم.',
             ]);

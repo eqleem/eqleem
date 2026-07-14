@@ -115,7 +115,11 @@ class ClientAuthService
             ->where('provider_id', $providerId)
             ->first();
 
-        return $account?->client;
+        if (! $account) {
+            return null;
+        }
+
+        return Client::withoutGlobalScope('tenantable')->find($account->client_id);
     }
 
     public function logout(): void

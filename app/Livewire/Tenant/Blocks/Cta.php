@@ -5,6 +5,7 @@ namespace App\Livewire\Tenant\Blocks;
 use App\Livewire\Concerns\ResolvesTenantBlockView;
 use App\Models\Block;
 use App\Models\Content;
+use App\Support\BlockBrandMark;
 use App\Support\CtaLink;
 use App\Support\FormField;
 use Illuminate\Contracts\View\View;
@@ -44,7 +45,7 @@ class Cta extends Component
 
     /**
      * @param  Collection<int, Content>  $ctaLinks
-     * @return Collection<int, array{id: int, label: string, icon: string, url: ?string, isForm: bool, formContentId: ?int, opensInNewTab: bool, formDescription: string, formFields: list<array<string, mixed>>}>
+     * @return Collection<int, array{id: int, label: string, icon: string, brand_mark: array{type: string, value: string, color: string, url: string|null}|null, url: ?string, isForm: bool, formContentId: ?int, opensInNewTab: bool, formDescription: string, formFields: list<array<string, mixed>>}>
      */
     protected function preparedLinks(Collection $ctaLinks): Collection
     {
@@ -65,11 +66,15 @@ class Cta extends Component
             $formContentId = CtaLink::formContentId($link);
             $form = $formContentId ? $forms->get($formContentId) : null;
             $isForm = CtaLink::isForm($link) && $form !== null;
+            $data = is_array($link->data) ? $link->data : [];
 
             return [
                 'id' => $link->id,
                 'label' => CtaLink::label($link),
                 'icon' => CtaLink::icon($link),
+                'brand_mark' => BlockBrandMark::forDisplay(
+                    is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+                ),
                 'url' => $isForm ? null : CtaLink::url($link),
                 'isForm' => $isForm,
                 'formContentId' => $isForm ? $formContentId : null,

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Auth\ClientUserProvider;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
@@ -12,6 +13,7 @@ use App\Support\BlockVariants;
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
 use App\Support\TenantThemeOptions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -39,8 +41,12 @@ class AppServiceProvider extends ServiceProvider
         // $appUrl = config('app.url');
 
         // if (is_string($appUrl) && str_starts_with($appUrl, 'https://')) {
-            URL::forceScheme('https');
+        URL::forceScheme('https');
         // }
+
+        Auth::provider('clients', function ($app, array $config) {
+            return new ClientUserProvider($app['hash'], $config['model']);
+        });
 
         Livewire::addPersistentMiddleware([
             AdminMiddleware::class,

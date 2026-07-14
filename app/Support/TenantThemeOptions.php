@@ -69,8 +69,30 @@ class TenantThemeOptions
      */
     public function primaryPalette(array $options): array
     {
-        $color = (string) ($options['primaryColor'] ?? 'blue');
+        return $this->colorPalette(
+            (string) ($options['primaryColor'] ?? 'blue'),
+            'blue',
+        );
+    }
+
+    /**
+     * @return array<int|string, string>
+     */
+    public function secondaryPalette(array $options): array
+    {
+        return $this->colorPalette(
+            (string) ($options['bgColor'] ?? 'gray'),
+            'gray',
+        );
+    }
+
+    /**
+     * @return array<int|string, string>
+     */
+    public function colorPalette(string $color, string $fallback = 'blue'): array
+    {
         $palettes = $this->palettes();
+        $color = $this->normalizeColorToken($color);
 
         if (isset($palettes[$color])) {
             return $palettes[$color];
@@ -80,7 +102,27 @@ class TenantThemeOptions
             return $this->paletteFromHex($color);
         }
 
-        return $palettes['blue'] ?? [];
+        return $palettes[$fallback] ?? $palettes['blue'] ?? [];
+    }
+
+    /**
+     * Normalize theme option color tokens such as "gray-300", "bg-stone-200", or "#0d9488".
+     */
+    public function normalizeColorToken(string $color): string
+    {
+        $color = trim($color);
+
+        if ($color === '' || in_array($color, ['transparent', 'bg-tranparent', 'white'], true)) {
+            return 'gray';
+        }
+
+        $color = (string) preg_replace('/^(bg|text)-/', '', $color);
+
+        if (preg_match('/^([a-z]+)-(\d{2,3})$/i', $color, $matches) === 1) {
+            return strtolower($matches[1]);
+        }
+
+        return $color;
     }
 
     /**

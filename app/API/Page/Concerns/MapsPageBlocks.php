@@ -77,7 +77,12 @@ trait MapsPageBlocks
             $ctaModel = $blocks->firstWhere('id', $cta['id']);
             $cta['editor'] = $ctaModel instanceof Block
                 ? $this->ctaEditorPayload($ctaModel)
-                : ['type' => 'cta', 'links' => [], 'link_type_options' => CtaLink::linkTypeOptions('nav')];
+                : [
+                    'type' => 'cta',
+                    'links' => [],
+                    'link_type_options' => CtaLink::linkTypeOptions('nav'),
+                    'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+                ];
         }
 
         if ($floatLinks !== null) {
@@ -105,6 +110,7 @@ trait MapsPageBlocks
             'type' => 'cta',
             'links' => $this->mapBlockLinks($block, 'cta-link'),
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];
     }
 
@@ -146,19 +152,30 @@ trait MapsPageBlocks
             ->type($contentType)
             ->orderBy('sort_order')
             ->get()
-            ->map(function (Content $link): array {
-                return [
-                    'id' => $link->id,
-                    'title' => $link->title,
-                    'label' => CtaLink::label($link),
-                    'type_label' => CtaLink::typeLabel($link),
-                    'summary' => CtaLink::summary($link),
-                    'icon' => CtaLink::icon($link),
-                    'data' => $link->data ?? [],
-                    'sort_order' => $link->sort_order,
-                ];
-            })
+            ->map(fn (Content $link): array => $this->mapBlockLink($link))
             ->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function mapBlockLink(Content $link): array
+    {
+        $data = is_array($link->data) ? $link->data : [];
+
+        return [
+            'id' => $link->id,
+            'title' => $link->title,
+            'label' => CtaLink::label($link),
+            'type_label' => CtaLink::typeLabel($link),
+            'summary' => CtaLink::summary($link),
+            'icon' => CtaLink::icon($link),
+            'brand_mark' => BlockBrandMark::forEditor(
+                is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+            ),
+            'data' => $data,
+            'sort_order' => $link->sort_order,
+        ];
     }
 
     /**

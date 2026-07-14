@@ -2,15 +2,26 @@
     <x-tenant-theme::breadcrumb :links="[['url' => route('tenant.store.index'), 'title' => 'المتجر'], ['url' => null, 'title' => 'السلة']]" />
     <section class="space-y-5 p-2" dir="rtl">
         @if ($items->isEmpty())
-            <div class="rounded-2xl border border-stone-200 bg-white p-8 text-center">
-                <p class="text-base font-semibold text-stone-700">السلة فارغة</p>
-                <p class="mt-2 text-sm text-stone-500">أضف منتجات أو خدمات أو دورات لبدء التسوق.</p>
+            <div class="flex flex-col items-center rounded-2xl border border-dashed border-stone-200 bg-gradient-to-b from-stone-50 to-white px-6 py-14 text-center sm:px-10">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 scale-125 rounded-full bg-primary-100/60 blur-xl" aria-hidden="true"></div>
+                    <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary-50 ring-8 ring-primary-50/50">
+                        <iconify-icon icon="hugeicons:shopping-cart-01" class="text-5xl text-primary-600" aria-hidden="true"></iconify-icon>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-stone-900">سلتك فارغة حالياً</h3>
+                <p class="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
+                    ابدأ بتصفح المنتجات والخدمات والدورات، ثم أضف ما يعجبك إلى السلة.
+                </p>
+
                 <a
-                    href="{{ route('tenant.store.index') }}"
+                    href="{{ route('tenant.home') }}"
                     wire:navigate
-                    class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700"
+                    class="mt-7 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-700"
                 >
-                    تصفح المتجر
+                    <iconify-icon icon="hugeicons:home-01" class="text-xl" aria-hidden="true"></iconify-icon>
+                    تصفح المنتجات والخدمات
                 </a>
             </div>
         @else

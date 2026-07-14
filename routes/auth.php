@@ -1,6 +1,8 @@
 <?php
 
+use App\Actions\HandleClientSocialCallback;
 use App\Actions\HandleSocialCallback;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -37,13 +39,39 @@ Route::get('/auth/{social}', function ($social) {
         return redirect()->route('home');
     }
 
+    // User (web guard) OAuth must not be treated as client login.
+    session()->forget('client_auth_tenant_id');
+
     return Socialite::driver($social)->redirect();
 })->name('auth.social');
 
 Route::get('/auth/{social}/callback', function ($social) {
-
     if (! in_array($social, ['github', 'facebook', 'google'])) {
         return redirect()->route('auth.register-login');
+    }
+
+    // Client Google login reuses this same Google redirect URI so it does not
+    // conflict with the user (web) guard OAuth app configuration.
+    if ($social === 'google' && session()->has('client_auth_tenant_id')) {
+        $tenantId = (int) session('client_auth_tenant_id');
+        $tenant = Tenant::query()->find($tenantId);
+
+        session()->forget('client_auth_tenant_id');
+
+        if (! $tenant) {
+            return redirect()->route('home');
+        }
+
+        try {
+            $socialUser = Socialite::driver($social)->user();
+
+            HandleClientSocialCallback::run($social, $socialUser, $tenant);
+        } catch (Throwable $exception) {
+            report($exception);
+            session()->flash('client_auth_error', 'تعذر إكمال تسجيل الدخول. يرجى المحاولة مرة أخرى.');
+        }
+
+        return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
     }
 
     $socialUser = Socialite::driver($social)->user();
@@ -52,4 +80,4 @@ Route::get('/auth/{social}/callback', function ($social) {
     auth()->login($user);
 
     return redirect(route('dashboard'));
-});
+})->name('auth.social.callback');

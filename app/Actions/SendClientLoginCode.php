@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
@@ -34,7 +35,7 @@ class SendClientLoginCode
             $seconds = RateLimiter::availableIn($throttleKey);
 
             throw ValidationException::withMessages([
-                'email' => "يرجى الانتظار {$seconds} ثانية قبل إعادة إرسال الكود.",
+                'email' => "يرجى الانتظار {$seconds} ثانية قبل إعادة إرسال رابط الدخول.",
             ]);
         }
 
@@ -42,10 +43,11 @@ class SendClientLoginCode
 
         $code = (string) random_int(100000, 999999);
         $tenant = Tenant::query()->findOrFail($tenantId);
+        $normalizedEmail = strtolower($email);
 
         DB::table('client_login_codes')->updateOrInsert(
             [
-                'email' => strtolower($email),
+                'email' => $normalizedEmail,
                 'tenant_id' => $tenant->id,
             ],
             [
@@ -55,6 +57,16 @@ class SendClientLoginCode
             ],
         );
 
-        Mail::to($email)->queue(new ClientLoginCode($code, $tenant));
+        $loginUrl = URL::temporarySignedRoute(
+            'tenant.client.auth.email',
+            now()->addMinutes(10),
+            [
+                'tenant' => $tenant->handle,
+                'email' => $normalizedEmail,
+                'code' => $code,
+            ],
+        );
+
+        Mail::to($email)->queue(new ClientLoginCode($code, $tenant, $loginUrl));
     }
 }

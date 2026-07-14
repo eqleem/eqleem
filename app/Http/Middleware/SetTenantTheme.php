@@ -32,12 +32,15 @@ class SetTenantTheme
 
         $options = $this->themeOptions->resolve($tenant);
         $primaryPalette = $this->themeOptions->primaryPalette($options);
+        $secondaryPalette = $this->themeOptions->secondaryPalette($options);
 
         view()->share('themeOptions', $options);
         view()->share('themePrimaryPalette', $primaryPalette);
+        view()->share('themeSecondaryPalette', $secondaryPalette);
 
         Context::add('theme_options', $options);
         Context::add('theme_primary_palette', $primaryPalette);
+        Context::add('theme_secondary_palette', $secondaryPalette);
 
         return $next($request);
     }

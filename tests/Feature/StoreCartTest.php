@@ -124,6 +124,18 @@ it('stores different content types using productable morph', function () {
         ->and($items[1]->itemType())->toBe('course');
 });
 
+it('shows an empty cart state that links to the home page', function () {
+    ['tenant' => $tenant] = createStoreCartContext();
+
+    setCurrentTenant($tenant);
+
+    Livewire::test(App\Livewire\Tenant\Pages\Cart::class)
+        ->assertSee('سلتك فارغة حالياً')
+        ->assertSee('تصفح المنتجات والخدمات')
+        ->assertSee(route('tenant.home'), false)
+        ->assertSee('hugeicons:shopping-cart-01', false);
+});
+
 it('shows cart items and updates quantity', function () {
     ['tenant' => $tenant, 'product' => $product] = createStoreCartContext();
 

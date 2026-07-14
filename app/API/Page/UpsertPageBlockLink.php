@@ -7,6 +7,7 @@ use App\API\Page\Concerns\MapsPageBlocks;
 use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
+use App\Support\BlockBrandMark;
 use App\Support\CtaLink;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
@@ -31,11 +32,23 @@ class UpsertPageBlockLink
     public function rules(): array
     {
         return [
-            'link_type' => ['required', 'string', Rule::in(array_keys(CtaLink::linkTypeOptions('nav')))],
+            'link_type' => [
+                'required',
+                'string',
+                Rule::in(array_values(array_filter(
+                    CtaLink::allowedBlockLinkTypeKeys(),
+                    fn (string $key): bool => $key !== '',
+                ))),
+            ],
             'label' => ['nullable', 'string', 'max:100'],
             'url' => ['nullable', 'url', 'max:500'],
             'icon' => ['nullable', 'string', 'max:100'],
             'content_id' => ['nullable', 'integer'],
+            'logo' => ['nullable', 'image', 'max:15024'],
+            'brand_mark_type' => ['nullable', 'string', Rule::in(['image', 'emoji', 'icon', 'none'])],
+            'brand_mark_value' => ['nullable', 'string', 'max:64'],
+            'brand_mark_color' => ['nullable', 'string', 'max:20'],
+            'remove_logo' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -75,34 +88,57 @@ class UpsertPageBlockLink
             }
         }
 
+        $existing = null;
+
+        if ($linkId) {
+            $existing = Content::query()
+                ->where('block_id', $block->id)
+                ->type($contentType)
+                ->whereKey($linkId)
+                ->first();
+
+            if (! $existing) {
+                throw new NotFoundHttpException;
+            }
+        }
+
+        $existingData = is_array($existing?->data) ? $existing->data : [];
+        $existingMark = is_array($existingData['brand_mark'] ?? null)
+            ? $existingData['brand_mark']
+            : null;
+
+        $brandMark = BlockBrandMark::resolveStored($tenant, $block->id, $data, $existingMark);
+
+        $icon = null;
+
+        if (($brandMark['type'] ?? '') === 'icon' && filled($brandMark['value'] ?? null)) {
+            $icon = (string) $brandMark['value'];
+        } elseif (filled($data['icon'] ?? null) && $brandMark === null) {
+            $icon = (string) $data['icon'];
+        } elseif ($isExternal && $brandMark === null) {
+            $icon = (string) ($existingData['icon'] ?? 'hugeicons:link-04');
+        }
+
         $payload = [
             'link_type' => $parsed['link_type'],
             'content_type' => $parsed['content_type'],
             'content_id' => $contentId,
             'label' => (string) ($data['label'] ?? ''),
             'url' => $isExternal ? (string) ($data['url'] ?? '') : null,
-            'icon' => $isExternal ? (string) ($data['icon'] ?? 'hugeicons:link-04') : null,
+            'icon' => $icon,
+            'brand_mark' => $brandMark,
         ];
 
         $title = filled($payload['label'])
             ? $payload['label']
             : $this->defaultTitle($parsed, $contentId);
 
-        if ($linkId) {
-            $link = Content::query()
-                ->where('block_id', $block->id)
-                ->type($contentType)
-                ->whereKey($linkId)
-                ->first();
-
-            if (! $link) {
-                throw new NotFoundHttpException;
-            }
-
-            $link->update([
+        if ($existing) {
+            $existing->update([
                 'title' => $title,
                 'data' => $payload,
             ]);
+            $link = $existing->fresh();
         } else {
             $maxOrder = Content::query()
                 ->where('block_id', $block->id)
@@ -122,16 +158,7 @@ class UpsertPageBlockLink
             ]);
         }
 
-        return [
-            'id' => $link->id,
-            'title' => $link->title,
-            'label' => CtaLink::label($link),
-            'type_label' => CtaLink::typeLabel($link),
-            'summary' => CtaLink::summary($link),
-            'icon' => CtaLink::icon($link),
-            'data' => $link->data ?? [],
-            'sort_order' => $link->sort_order,
-        ];
+        return $this->mapBlockLink($link);
     }
 
     /**
@@ -143,6 +170,14 @@ class UpsertPageBlockLink
 
         /** @var array<string, mixed> $validated */
         $validated = $request->validated();
+
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo');
+        }
+
+        if ($request->boolean('remove_logo')) {
+            $validated['remove_logo'] = true;
+        }
 
         return $this->handle($tenant, $id, $validated, $linkId);
     }

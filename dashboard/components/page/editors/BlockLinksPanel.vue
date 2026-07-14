@@ -1,12 +1,12 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue';
 import Input from '../../ui/Input.vue';
-import Select from '../../ui/Select.vue';
 import Toggle from '../../ui/Toggle.vue';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
+import BlockLinkEditor from './BlockLinkEditor.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
-import { api, ApiError } from '../../../lib/api.js';
+import { api } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
@@ -21,7 +21,6 @@ const emit = defineEmits(['saved', 'close', 'updated']);
 
 const store = usePageStructureStore();
 const links = ref([...(props.editor.links ?? [])]);
-const linkTypeOptions = computed(() => props.editor.link_type_options ?? {});
 
 const form = reactive({
     show_documents_warranties: Boolean(props.editor.show_documents_warranties ?? true),
@@ -30,19 +29,8 @@ const form = reactive({
 
 const linkModal = ref(false);
 const editingLinkId = ref(null);
-const linkForm = reactive({
-    link_type: Object.keys(linkTypeOptions.value)[0] ?? 'external',
-    label: '',
-    url: '',
-    icon: 'hugeicons:link-04',
-    content_id: null,
-    content_search: '',
-    selected_content_title: '',
-});
-const contentResults = ref([]);
-const showContentResults = ref(false);
-const linkError = ref(null);
-const linkSaving = ref(false);
+const linkEditor = ref(null);
+const linkEditorKey = ref(0);
 const saving = ref(false);
 const dragId = ref(null);
 
@@ -52,72 +40,62 @@ watch(() => props.editor, (value) => {
     form.document_numbers = { ...(value.document_numbers ?? {}) };
 }, { deep: true });
 
-const needsContentPicker = computed(() => String(linkForm.link_type).startsWith('item:'));
-const isExternal = computed(() => linkForm.link_type === 'external');
-
-async function searchContent() {
-    if (!needsContentPicker.value) {
-        contentResults.value = [];
-        return;
+function linkTypeFromData(data = {}) {
+    if (data.link_type === 'external') {
+        return 'external';
     }
 
-    const params = new URLSearchParams();
-    params.set('link_type', linkForm.link_type);
-    if (linkForm.content_search.trim().length >= 2) {
-        params.set('search', linkForm.content_search.trim());
+    if (data.link_type && data.content_type) {
+        return `${data.link_type}:${data.content_type}`;
     }
 
-    try {
-        const payload = await api(`/page/link-content?${params.toString()}`);
-        contentResults.value = Array.isArray(payload?.data) ? payload.data : [];
-        showContentResults.value = true;
-    } catch {
-        contentResults.value = [];
-    }
+    return '';
+}
+
+function buildLinkEditor(link = null) {
+    const data = link?.data ?? {};
+    const brandMark = link?.brand_mark
+        ?? (isObjectMark(data.brand_mark) ? data.brand_mark : null);
+    const icon = data.icon || link?.icon || '';
+
+    return {
+        type: 'block-link',
+        title: data.label ?? link?.label ?? '',
+        description: '',
+        url: data.url ?? '',
+        link_type: link ? linkTypeFromData(data) : '',
+        content_id: data.content_id ?? null,
+        selected_content_title: link?.title ?? '',
+        icon,
+        brand_mark: brandMark ?? (icon
+            ? { type: 'icon', value: icon, color: '', url: null }
+            : null),
+        link_type_picker_options: props.editor.link_type_picker_options ?? [],
+    };
+}
+
+function isObjectMark(value) {
+    return Boolean(value && typeof value === 'object' && value.type);
 }
 
 function openAdd() {
     editingLinkId.value = null;
-    Object.assign(linkForm, {
-        link_type: Object.keys(linkTypeOptions.value).includes('external')
-            ? 'external'
-            : (Object.keys(linkTypeOptions.value)[0] ?? 'external'),
-        label: '',
-        url: '',
-        icon: 'hugeicons:link-04',
-        content_id: null,
-        content_search: '',
-        selected_content_title: '',
-    });
-    linkError.value = null;
+    linkEditor.value = buildLinkEditor();
+    linkEditorKey.value += 1;
     linkModal.value = true;
 }
 
 function openEdit(link) {
     editingLinkId.value = link.id;
-    const data = link.data ?? {};
-    const typeKey = data.link_type === 'external'
-        ? 'external'
-        : (data.link_type && data.content_type ? `${data.link_type}:${data.content_type}` : 'external');
-
-    Object.assign(linkForm, {
-        link_type: typeKey,
-        label: data.label ?? link.label ?? '',
-        url: data.url ?? '',
-        icon: data.icon ?? 'hugeicons:link-04',
-        content_id: data.content_id ?? null,
-        content_search: link.title ?? '',
-        selected_content_title: link.title ?? '',
-    });
-    linkError.value = null;
+    linkEditor.value = buildLinkEditor(link);
+    linkEditorKey.value += 1;
     linkModal.value = true;
 }
 
-function selectContent(item) {
-    linkForm.content_id = item.id;
-    linkForm.selected_content_title = item.title;
-    linkForm.content_search = item.title;
-    showContentResults.value = false;
+function closeLinkModal() {
+    linkModal.value = false;
+    editingLinkId.value = null;
+    linkEditor.value = null;
 }
 
 async function refreshLinks() {
@@ -128,37 +106,14 @@ async function refreshLinks() {
     return editor;
 }
 
-async function saveLink() {
-    linkError.value = null;
-    linkSaving.value = true;
-
+async function onLinkSaved() {
     try {
-        const body = {
-            link_type: linkForm.link_type,
-            label: linkForm.label,
-            url: linkForm.url || null,
-            icon: linkForm.icon,
-            content_id: linkForm.content_id,
-        };
-
-        const path = editingLinkId.value
-            ? `/page/blocks/${props.blockId}/links/${editingLinkId.value}`
-            : `/page/blocks/${props.blockId}/links`;
-
-        await api(path, {
-            method: editingLinkId.value ? 'PUT' : 'POST',
-            body,
-        });
-
         const editor = await refreshLinks();
         emit('updated', { editor });
         notifySuccess('Saved');
-        linkModal.value = false;
+        closeLinkModal();
     } catch (error) {
-        linkError.value = error instanceof ApiError ? error.message : 'تعذر حفظ الرابط.';
-        notifyApiError(error, 'تعذر حفظ الرابط.');
-    } finally {
-        linkSaving.value = false;
+        notifyApiError(error, 'تعذر تحديث الروابط.');
     }
 }
 
@@ -226,6 +181,8 @@ async function saveSettings() {
         saving.value = false;
     }
 }
+
+const modalTitle = computed(() => (editingLinkId.value ? 'تعديل رابط' : 'إضافة رابط'));
 
 defineExpose({ openAdd });
 </script>
@@ -301,41 +258,26 @@ defineExpose({ openAdd });
         </div>
     </div>
 
-    <div v-if="linkModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-stone-800/75" @click="linkModal = false"></div>
-        <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
-                <p class="text-sm font-semibold text-stone-600">{{ editingLinkId ? 'تعديل رابط' : 'إضافة رابط' }}</p>
-                <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400" @click="linkModal = false">
-                    <Icon name="x" class="h-4 w-4" />
-                </button>
-            </div>
-            <div class="space-y-3 p-4">
-                <Select v-model="linkForm.link_type" name="link_type" label="نوع الرابط" :options="linkTypeOptions" @update:model-value="searchContent" />
-                <Input v-if="isExternal || !needsContentPicker" v-model="linkForm.label" name="label" label="الاسم" />
-                <Input v-if="isExternal" v-model="linkForm.url" name="url" label="الرابط" placeholder="https://..." dir="ltr" />
-                <div v-if="needsContentPicker" class="space-y-2">
-                    <Input
-                        v-model="linkForm.content_search"
-                        name="content_search"
-                        label="بحث المحتوى"
-                        @focus="searchContent"
-                        @input="searchContent"
-                    />
-                    <ul v-if="showContentResults && contentResults.length" class="max-h-40 overflow-y-auto rounded-lg border border-stone-100">
-                        <li v-for="item in contentResults" :key="item.id">
-                            <button type="button" class="w-full px-3 py-2 text-start text-sm hover:bg-stone-50" @click="selectContent(item)">
-                                {{ item.title }}
-                            </button>
-                        </li>
-                    </ul>
-                    <p v-if="linkForm.selected_content_title" class="text-xs text-stone-400">المحدد: {{ linkForm.selected_content_title }}</p>
+    <div v-if="linkModal && linkEditor" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-stone-800/75" @click="closeLinkModal"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-lg rounded-xl bg-white shadow-xl">
+                <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                    <p class="text-sm font-semibold text-stone-600">{{ modalTitle }}</p>
+                    <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400" @click="closeLinkModal">
+                        <Icon name="x" class="h-4 w-4" />
+                    </button>
                 </div>
-                <p v-if="linkError" class="text-sm text-red-500">{{ linkError }}</p>
-            </div>
-            <div class="sticky bottom-0 flex justify-end gap-2 border-t border-stone-100 bg-white p-3 px-4">
-                <Button type="button" variant="ghost" label="إلغاء" @click="linkModal = false" />
-                <Button type="button" :label="editingLinkId ? 'حفظ' : 'إضافة'" :loading="linkSaving" @click="saveLink" />
+                <BlockLinkEditor
+                    :key="linkEditorKey"
+                    :block-id="blockId"
+                    :link-id="editingLinkId"
+                    :editor="linkEditor"
+                    mode="nested-link"
+                    :show-description="false"
+                    @saved="onLinkSaved"
+                    @close="closeLinkModal"
+                />
             </div>
         </div>
     </div>

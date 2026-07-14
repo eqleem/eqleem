@@ -3,18 +3,19 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ContactMessage extends Mailable
+class ContactMessage extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     /**
-     * @param  array{name: string, email: string, subject: string, message: string}  $contact
+     * @param  array{name: string, email: string, phone?: string, address?: string, subject: string, message: string}  $contact
      */
     public function __construct(public array $contact) {}
 
@@ -23,10 +24,17 @@ class ContactMessage extends Mailable
      */
     public function envelope(): Envelope
     {
+        $replyTo = [];
+
+        if (filled($this->contact['email'] ?? null)) {
+            $replyTo[] = new Address(
+                $this->contact['email'],
+                filled($this->contact['name'] ?? null) ? $this->contact['name'] : null,
+            );
+        }
+
         return new Envelope(
-            replyTo: [
-                new Address($this->contact['email'], $this->contact['name']),
-            ],
+            replyTo: $replyTo,
             subject: '[اتصل بنا] '.$this->contact['subject'],
         );
     }

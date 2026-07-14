@@ -1,56 +1,45 @@
 <?php
 
-use App\Actions\HandleClientSocialCallback;
+use App\Actions\VerifyClientLoginCode;
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
-use App\Models\Tenant;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
-
-Route::middleware('web')->group(function () {
-    Route::get('/client/auth/{provider}/callback', function (string $provider) {
-        if (! in_array($provider, ['google', 'github'], true)) {
-            return redirect()->route('home');
-        }
-
-        $tenantId = session('client_auth_tenant_id');
-
-        if (! $tenantId) {
-            return redirect()->route('home');
-        }
-
-        $tenant = Tenant::query()->find($tenantId);
-
-        if (! $tenant) {
-            return redirect()->route('home');
-        }
-
-        try {
-            $socialUser = Socialite::driver($provider)
-                ->redirectUrl(route('client.auth.callback', ['provider' => $provider]))
-                ->user();
-
-            HandleClientSocialCallback::run($provider, $socialUser, $tenant);
-        } catch (Throwable $exception) {
-            report($exception);
-            session()->flash('client_auth_error', 'تعذر إكمال تسجيل الدخول. يرجى المحاولة مرة أخرى.');
-        }
-
-        session()->forget('client_auth_tenant_id');
-
-        return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
-    })->name('client.auth.callback');
-});
 
 Route::prefix('{tenant}')
     ->middleware([ResolveTenantFromPath::class, SetTenantTheme::class])
     ->as('tenant.')
     ->group(function () {
+        Route::get('/client/auth/email', function (Request $request) {
+            $tenant = currentTenant();
+
+            abort_unless($tenant, 404);
+
+            $email = (string) $request->query('email', '');
+            $code = (string) $request->query('code', '');
+
+            try {
+                VerifyClientLoginCode::run($email, $code, (int) $tenant->id);
+            } catch (ValidationException $exception) {
+                session()->flash(
+                    'client_auth_error',
+                    $exception->errors()['code'][0]
+                        ?? $exception->errors()['email'][0]
+                        ?? 'رابط الدخول غير صالح أو منتهٍ. يرجى طلب رابط جديد.'
+                );
+
+                return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
+            }
+
+            return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
+        })->middleware('signed')->name('client.auth.email');
+
         Route::get('/client/auth/{provider}', function (string $provider) {
-            if (! in_array($provider, ['google', 'github'], true)) {
+            if ($provider !== 'google') {
                 return redirect()->route('tenant.home', ['tenant' => tenant('handle')]);
             }
 
@@ -58,10 +47,10 @@ Route::prefix('{tenant}')
 
             app(CartService::class)->stashGuestCartReference((int) tenant('id'));
 
-            return Socialite::driver($provider)
-                ->redirectUrl(route('client.auth.callback', ['provider' => $provider]))
-                ->redirect();
-        })->name('client.auth.social');
+            // Same Google redirect URI as web-user OAuth (services.google.redirect)
+            // so one Google Cloud authorized URI works for both guards.
+            return Socialite::driver($provider)->redirect();
+        })->name('client.auth.social')->whereIn('provider', ['google']);
 
         Route::post('/client/logout', function (Request $request) {
             Auth::guard('client')->logout();

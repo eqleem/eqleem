@@ -44,7 +44,6 @@
                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 scale-95"
                 class="relative z-10 w-full {{ $maxWidthClasses }} rounded-3xl bg-white shadow-2xl ring-1 ring-black/5"
-                x-on:click.outside="open = false"
             >
                 <div class="flex items-center justify-between border-b border-stone-100 px-6 py-4">
                     <div class="text-lg font-semibold text-stone-900">

@@ -23,7 +23,7 @@ it('sends a contact message', function () {
         ->assertHasNoErrors()
         ->assertSet('sent', true);
 
-    Mail::assertSent(ContactMessage::class, function (ContactMessage $mail): bool {
+    Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail): bool {
         return $mail->contact['email'] === 'ahmad@example.com'
             && $mail->contact['subject'] === 'استفسار عن الباقات';
     });

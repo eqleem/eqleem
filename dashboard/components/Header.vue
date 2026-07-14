@@ -124,7 +124,7 @@ onBeforeUnmount(() => {
                 <RouterLink
                     to="/settings"
                     title="الإعدادات"
-                    class="flex items-center gap-x-2 rounded-full p-1 px-2 text-sm text-white hover:bg-black/30 md:hidden"
+                    class="flex items-center gap-x-2 rounded-full p-1 px-2 text-sm text-white hover:bg-black/30"
                     :class="{ 'bg-black/30': route.name === 'settings' }"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-6 md:size-5" viewBox="0 0 24 24" fill="none">

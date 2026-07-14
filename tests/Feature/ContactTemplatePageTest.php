@@ -2,13 +2,16 @@
 
 use App\Livewire\Tenant\Page\Detail as PageDetail;
 use App\Livewire\Tenant\Pages\Contact;
+use App\Mail\ContactMessage;
 use App\Models\Content;
+use App\Models\FormSubmission;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\TenantProfileService;
 use App\Support\ContactPageView;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 
@@ -152,4 +155,138 @@ it('hides the faq link when the faq page is inactive', function () {
 
     expect($payload['showFaqLink'])->toBeFalse()
         ->and($payload['faqUrl'])->toBeNull();
+});
+
+it('submits the contact page form and shows the configured success message', function () {
+    Mail::fake();
+
+    [$tenant, $page] = createTenantWithContactPage([
+        'success_message' => 'تم استلام رسالتك بنجاح، شكراً لك.',
+    ]);
+
+    $tenant->update(['email' => 'tenant-inbox@example.com']);
+
+    Livewire::test('tenant.pages.contact-form', [
+        'pageId' => $page->id,
+        'formFields' => Content::defaultContactPageData()['form_fields'],
+        'successMessage' => 'تم استلام رسالتك بنجاح، شكراً لك.',
+    ])
+        ->set('name', 'أحمد')
+        ->set('email', 'ahmad@example.com')
+        ->set('phone', '0501234567')
+        ->set('subject', 'استفسار عام')
+        ->set('message', 'أريد معرفة المزيد عن خدماتكم.')
+        ->call('submit')
+        ->assertHasNoErrors()
+        ->assertSet('submitted', true)
+        ->assertSet('name', 'أحمد')
+        ->assertSet('email', 'ahmad@example.com')
+        ->assertSet('phone', '0501234567')
+        ->assertSet('subject', 'استفسار عام')
+        ->assertSet('message', '')
+        ->assertSee('تم استلام رسالتك بنجاح، شكراً لك.', false)
+        ->assertSee('إرسال الرسالة', false);
+
+    $submission = FormSubmission::query()->first();
+
+    expect($submission)->not->toBeNull()
+        ->and($submission->content_id)->toBe($page->id)
+        ->and($submission->status)->toBe('new')
+        ->and(collect($submission->fields())->pluck('value', 'name')->all())->toMatchArray([
+            'name' => 'أحمد',
+            'email' => 'ahmad@example.com',
+            'phone' => '0501234567',
+            'subject' => 'استفسار عام',
+            'message' => 'أريد معرفة المزيد عن خدماتكم.',
+        ]);
+
+    Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail): bool {
+        return $mail->hasTo('tenant-inbox@example.com')
+            && $mail->contact['email'] === 'ahmad@example.com'
+            && $mail->contact['subject'] === 'استفسار عام'
+            && $mail->contact['message'] === 'أريد معرفة المزيد عن خدماتكم.';
+    });
+});
+
+it('emails the tenant contact profile address when tenant.email is empty', function () {
+    Mail::fake();
+
+    [$tenant, $page] = createTenantWithContactPage();
+
+    $tenant->update(['email' => null]);
+
+    Livewire::test('tenant.pages.contact-form', [
+        'pageId' => $page->id,
+        'formFields' => [
+            'name' => true,
+            'email' => true,
+            'phone' => false,
+            'message' => true,
+            'address' => false,
+            'subject' => false,
+        ],
+        'successMessage' => Content::defaultContactPageData()['success_message'],
+    ])
+        ->set('name', 'سارة')
+        ->set('email', 'sara@example.com')
+        ->set('message', 'مرحباً')
+        ->call('submit')
+        ->assertHasNoErrors()
+        ->assertSet('submitted', true);
+
+    Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail): bool {
+        return $mail->hasTo('hello@example.com')
+            && $mail->contact['subject'] === 'رسالة من نموذج اتصل بنا'
+            && $mail->contact['name'] === 'سارة';
+    });
+});
+
+it('validates enabled contact form fields before submit', function () {
+    [, $page] = createTenantWithContactPage();
+
+    Livewire::test('tenant.pages.contact-form', [
+        'pageId' => $page->id,
+        'formFields' => Content::defaultContactPageData()['form_fields'],
+        'successMessage' => Content::defaultContactPageData()['success_message'],
+    ])
+        ->set('name', '')
+        ->set('email', 'not-an-email')
+        ->set('phone', '')
+        ->set('subject', '')
+        ->set('message', '')
+        ->call('submit')
+        ->assertHasErrors(['name', 'email', 'phone', 'subject', 'message'])
+        ->assertSet('submitted', false);
+
+    expect(FormSubmission::query()->count())->toBe(0);
+});
+
+it('uses the default success message when the page message is empty', function () {
+    Mail::fake();
+
+    [, $page] = createTenantWithContactPage();
+
+    Livewire::test('tenant.pages.contact-form', [
+        'pageId' => $page->id,
+        'formFields' => [
+            'name' => true,
+            'email' => false,
+            'phone' => false,
+            'message' => true,
+            'address' => false,
+            'subject' => false,
+        ],
+        'successMessage' => '',
+    ])
+        ->set('name', 'سارة')
+        ->set('message', 'مرحباً')
+        ->call('submit')
+        ->assertHasNoErrors()
+        ->assertSet('submitted', true)
+        ->assertSet('name', 'سارة')
+        ->assertSet('message', '')
+        ->assertSee(Content::defaultContactPageData()['success_message'], false)
+        ->assertSee('إرسال الرسالة', false);
+
+    Mail::assertQueued(ContactMessage::class);
 });

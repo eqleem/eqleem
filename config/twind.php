@@ -5,7 +5,7 @@
  * size-adjust normalizes visual size at the @font-face level so views keep standard text-* classes.
  */
 $sarmadyMetrics = [
-    'sizeAdjust' => '160%',
+    'sizeAdjust' => '150%',
 ];
 
 /*
@@ -36,6 +36,19 @@ return [
                     800 => '#162455',
                     900 => '#0B1128',
                     950 => '#050914',
+                ],
+                'secondary' => [
+                    50 => '#F3FAF9',
+                    100 => '#E7F4F3',
+                    200 => '#C3E4E1',
+                    300 => '#9ED4CF',
+                    400 => '#56B4AC',
+                    500 => '#0D9488',
+                    600 => '#0B7E74',
+                    700 => '#09685F',
+                    800 => '#07514B',
+                    900 => '#053B36',
+                    950 => '#032522',
                 ],
                 'gray' => [
                     50 => '#fafaf9',

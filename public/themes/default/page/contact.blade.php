@@ -13,62 +13,12 @@
                         <h2 class="text-lg font-black text-stone-900">نموذج التواصل</h2>
                         <p class="mt-1 text-sm text-stone-500">اكتب تفاصيل طلبك وسنعود لك في أقرب وقت ممكن.</p>
 
-                        <form class="mt-5 space-y-4">
-                            @if (($formFields['name'] ?? false) || ($formFields['phone'] ?? false))
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    @if ($formFields['name'] ?? false)
-                                        <div>
-                                            <label class="mb-1.5 block text-xs font-semibold text-stone-500">الاسم الكامل</label>
-                                            <input type="text" class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white" placeholder="اكتب اسمك" />
-                                        </div>
-                                    @endif
-                                    @if ($formFields['phone'] ?? false)
-                                        <div>
-                                            <label class="mb-1.5 block text-xs font-semibold text-stone-500">رقم الجوال</label>
-                                            <input type="tel" dir="ltr" class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white" placeholder="+9665XXXXXXXX" />
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-
-                            @if ($formFields['email'] ?? false)
-                                <div>
-                                    <label class="mb-1.5 block text-xs font-semibold text-stone-500">البريد الإلكتروني</label>
-                                    <input type="email" dir="ltr" class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white" placeholder="name@email.com" />
-                                </div>
-                            @endif
-
-                            @if ($formFields['address'] ?? false)
-                                <div>
-                                    <label class="mb-1.5 block text-xs font-semibold text-stone-500">العنوان</label>
-                                    <input type="text" class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white" placeholder="اكتب عنوانك" />
-                                </div>
-                            @endif
-
-                            @if ($formFields['subject'] ?? false)
-                                <div>
-                                    <label class="mb-1.5 block text-xs font-semibold text-stone-500">نوع الرسالة</label>
-                                    <select class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white">
-                                        <option>استفسار عام</option>
-                                        <option>طلب خدمة</option>
-                                        <option>استشارة</option>
-                                        <option>شكوى أو ملاحظة</option>
-                                    </select>
-                                </div>
-                            @endif
-
-                            @if ($formFields['message'] ?? false)
-                                <div>
-                                    <label class="mb-1.5 block text-xs font-semibold text-stone-500">رسالتك</label>
-                                    <textarea rows="5" class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-                                </div>
-                            @endif
-
-                            <button type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-primary-700">
-                                <iconify-icon icon="hugeicons:sent-02" class="text-lg"></iconify-icon>
-                                إرسال الرسالة
-                            </button>
-                        </form>
+                        <livewire:tenant.pages.contact-form
+                            :page-id="$page->id"
+                            :form-fields="$formFields"
+                            :success-message="$successMessage"
+                            :key="'contact-page-form-'.$page->id"
+                        />
                     </article>
                 </div>
             @endif

@@ -14,13 +14,17 @@ import { notifyApiError } from '../../../lib/notify.js';
 
 const props = defineProps({
     blockId: { type: Number, default: null },
+    linkId: { type: Number, default: null },
     editor: { type: Object, required: true },
+    mode: { type: String, default: 'block' },
+    showDescription: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(['saved', 'close']);
 const store = usePageStructureStore();
 const blockActions = inject('blockActions', null);
-const isNew = computed(() => !props.blockId);
+const isNestedLink = computed(() => props.mode === 'nested-link');
+const isNew = computed(() => (isNestedLink.value ? !props.linkId : !props.blockId));
 
 const pickerOptions = computed(() => props.editor.link_type_picker_options ?? []);
 
@@ -63,6 +67,17 @@ function brandMarkFromEditor(editor) {
         };
     }
 
+    const icon = editor?.icon;
+    if (typeof icon === 'string' && icon.trim()) {
+        return {
+            type: 'icon',
+            value: icon,
+            color: '',
+            url: null,
+            file: null,
+        };
+    }
+
     return {
         type: null,
         value: '',
@@ -82,18 +97,19 @@ const form = reactive({
     description: props.editor.description ?? '',
     url: props.editor.url ?? '',
     content_id: props.editor.content_id ?? null,
-    content_search: props.editor.selected_content_title ?? '',
     selected_content_title: props.editor.selected_content_title ?? '',
 });
 
 const brandMark = ref(brandMarkFromEditor(props.editor));
+const useCustomCopy = ref(initialPickerKey === 'external');
 
 const pickerOpen = ref(false);
 const pickerQuery = ref('');
 const pickerRoot = ref(null);
+const contentPickerOpen = ref(false);
+const contentQuery = ref('');
 const contentSearchRoot = ref(null);
 const contentResults = ref([]);
-const showContentResults = ref(false);
 const contentSearching = ref(false);
 const errors = reactive({});
 const saving = ref(false);
@@ -151,36 +167,63 @@ const filteredContentOptions = computed(() => {
 
 const selectedLabel = computed(() => selectedOption.value?.label ?? 'اختر نوع الرابط...');
 
+const contentSelectedLabel = computed(() => (
+    form.selected_content_title || 'اختر مادة...'
+));
+
+function applyDefaultCopy() {
+    if (isExternal.value) {
+        return;
+    }
+
+    if (!selectedOption.value) {
+        return;
+    }
+
+    if (form.specific_item && form.selected_content_title) {
+        form.title = form.selected_content_title;
+        if (props.showDescription) {
+            form.description = selectedOption.value.item_description || '';
+        }
+        return;
+    }
+
+    form.title = selectedOption.value.section_title || selectedOption.value.label.replace(/^رابط\s+/, '');
+    if (props.showDescription) {
+        form.description = form.specific_item
+            ? (selectedOption.value.item_description || '')
+            : (selectedOption.value.section_description || '');
+    }
+}
+
 watch(() => form.specific_item, async (enabled) => {
     form.content_id = null;
-    form.content_search = '';
     form.selected_content_title = '';
-    showContentResults.value = false;
+    contentQuery.value = '';
+    contentPickerOpen.value = false;
     contentResults.value = [];
 
-    if (enabled && selectedOption.value) {
+    if (!useCustomCopy.value) {
+        applyDefaultCopy();
+    } else if (props.showDescription && enabled && selectedOption.value) {
         if (!form.description || form.description === selectedOption.value.section_description) {
             form.description = selectedOption.value.item_description || form.description;
         }
-
-        await nextTick();
-        await searchContent();
-    } else if (selectedOption.value) {
+    } else if (props.showDescription && selectedOption.value) {
         if (!form.description || form.description === selectedOption.value.item_description) {
             form.description = selectedOption.value.section_description || '';
         }
     }
+
+    if (enabled && selectedOption.value) {
+        await nextTick();
+        await searchContent();
+    }
 });
 
-watch(() => form.content_search, (value) => {
-    if (!needsContentPicker.value) {
+watch(contentQuery, () => {
+    if (!needsContentPicker.value || !contentPickerOpen.value) {
         return;
-    }
-
-    // Keep selection if the field still matches the chosen title.
-    if (form.content_id && value !== form.selected_content_title) {
-        form.content_id = null;
-        form.selected_content_title = '';
     }
 
     clearTimeout(contentSearchTimer);
@@ -192,6 +235,12 @@ watch(() => form.content_search, (value) => {
 watch(mustPickSpecificItem, (required) => {
     if (required) {
         form.specific_item = true;
+    }
+});
+
+watch(useCustomCopy, (enabled) => {
+    if (!enabled && !isExternal.value) {
+        applyDefaultCopy();
     }
 });
 
@@ -214,7 +263,7 @@ function onDocumentClick(event) {
     }
 
     if (contentSearchRoot.value && !contentSearchRoot.value.contains(event.target)) {
-        showContentResults.value = false;
+        contentPickerOpen.value = false;
     }
 }
 
@@ -226,28 +275,39 @@ function openPicker() {
     });
 }
 
+function openContentPicker() {
+    contentPickerOpen.value = true;
+    contentQuery.value = '';
+    nextTick(() => {
+        contentSearchRoot.value?.querySelector('input[data-content-search]')?.focus();
+        searchContent();
+    });
+}
+
 function selectPickerOption(option) {
     form.picker_key = option.key;
     form.specific_item = !option.supports_section && option.supports_item;
     form.content_id = null;
-    form.content_search = '';
     form.selected_content_title = '';
     form.url = '';
-    showContentResults.value = false;
+    contentQuery.value = '';
+    contentPickerOpen.value = false;
     contentResults.value = [];
     pickerOpen.value = false;
     pickerQuery.value = '';
 
     if (option.key === 'external') {
-        form.title = form.title || '';
-        form.description = form.description || '';
+        useCustomCopy.value = true;
         return;
     }
 
+    useCustomCopy.value = false;
     form.title = option.section_title || option.label.replace(/^رابط\s+/, '');
-    form.description = form.specific_item
-        ? (option.item_description || '')
-        : (option.section_description || '');
+    if (props.showDescription) {
+        form.description = form.specific_item
+            ? (option.item_description || '')
+            : (option.section_description || '');
+    }
 }
 
 async function searchContent() {
@@ -258,7 +318,7 @@ async function searchContent() {
     const params = new URLSearchParams();
     params.set('link_type', linkType.value);
 
-    const query = form.content_search.trim();
+    const query = contentQuery.value.trim();
     if (query.length >= 1) {
         params.set('search', query);
     }
@@ -268,10 +328,8 @@ async function searchContent() {
     try {
         const payload = await api(`/page/link-content?${params.toString()}`);
         contentResults.value = Array.isArray(payload?.data) ? payload.data : [];
-        showContentResults.value = true;
     } catch {
         contentResults.value = [];
-        showContentResults.value = true;
     } finally {
         contentSearching.value = false;
     }
@@ -280,12 +338,23 @@ async function searchContent() {
 function selectContent(item) {
     form.content_id = item.id;
     form.selected_content_title = item.title;
-    form.content_search = item.title;
-    showContentResults.value = false;
+    contentQuery.value = '';
+    contentPickerOpen.value = false;
     delete errors.content_id;
 
-    if (!form.title || form.title === selectedOption.value?.section_title) {
+    if (!useCustomCopy.value || !form.title || form.title === selectedOption.value?.section_title) {
         form.title = item.title;
+    }
+}
+
+function clearContent(event) {
+    event?.stopPropagation();
+    form.content_id = null;
+    form.selected_content_title = '';
+    contentQuery.value = '';
+
+    if (!useCustomCopy.value) {
+        applyDefaultCopy();
     }
 }
 
@@ -293,6 +362,11 @@ function onSearchKeydown(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         event.stopPropagation();
+    }
+
+    if (event.key === 'Escape') {
+        contentPickerOpen.value = false;
+        pickerOpen.value = false;
     }
 }
 
@@ -310,60 +384,105 @@ async function submit() {
 
     if (needsContentPicker.value && !form.content_id) {
         errors.content_id = 'اختر مادة من نتائج البحث.';
-        showContentResults.value = true;
+        contentPickerOpen.value = true;
         await searchContent();
         return;
     }
 
     saving.value = true;
 
-    const body = new FormData();
-    body.append('link_type', linkType.value);
-    body.append('title', form.title ?? '');
-    body.append('description', form.description ?? '');
-
-    if (isExternal.value) {
-        body.append('url', form.url ?? '');
-    }
-
-    if (needsContentPicker.value && form.content_id) {
-        body.append('content_id', String(form.content_id));
-    }
-
-    const mark = brandMark.value ?? {};
-
-    if (mark.type === 'image' && mark.file) {
-        body.append('logo', mark.file);
-        body.append('brand_mark_type', 'image');
-    } else if (mark.type === 'emoji' || mark.type === 'icon') {
-        body.append('brand_mark_type', mark.type);
-        body.append('brand_mark_value', mark.value ?? '');
-        if (mark.type === 'icon') {
-            body.append('brand_mark_color', mark.color ?? '');
-        }
-    } else if (mark.type === 'none') {
-        body.append('brand_mark_type', 'none');
-        body.append('remove_logo', '1');
-    }
-
     try {
         let payload;
 
-        if (isNew.value) {
-            payload = await store.createBlock('block-link', body);
+        if (isNestedLink.value) {
+            const body = new FormData();
+            body.append('link_type', linkType.value);
+            body.append('label', form.title ?? '');
+
+            if (isExternal.value) {
+                body.append('url', form.url ?? '');
+            }
+
+            if (needsContentPicker.value && form.content_id) {
+                body.append('content_id', String(form.content_id));
+            }
+
+            const mark = brandMark.value ?? {};
+
+            if (mark.type === 'image' && mark.file) {
+                body.append('logo', mark.file);
+                body.append('brand_mark_type', 'image');
+            } else if (mark.type === 'emoji' || mark.type === 'icon') {
+                body.append('brand_mark_type', mark.type);
+                body.append('brand_mark_value', mark.value ?? '');
+                if (mark.type === 'icon') {
+                    body.append('brand_mark_color', mark.color ?? '');
+                }
+            } else if (mark.type === 'none') {
+                body.append('brand_mark_type', 'none');
+                body.append('remove_logo', '1');
+            }
+
+            const path = props.linkId
+                ? `/page/blocks/${props.blockId}/links/${props.linkId}`
+                : `/page/blocks/${props.blockId}/links`;
+
+            payload = await api(path, {
+                method: 'POST',
+                body,
+            });
         } else {
-            const updater = blockActions?.updateBlock
-                ?? ((id, fields) => store.updateBlock(id, fields));
-            payload = await updater(props.blockId, body);
+            const body = new FormData();
+            body.append('link_type', linkType.value);
+            body.append('title', form.title ?? '');
+            if (props.showDescription) {
+                body.append('description', form.description ?? '');
+            }
+
+            if (isExternal.value) {
+                body.append('url', form.url ?? '');
+            }
+
+            if (needsContentPicker.value && form.content_id) {
+                body.append('content_id', String(form.content_id));
+            }
+
+            const mark = brandMark.value ?? {};
+
+            if (mark.type === 'image' && mark.file) {
+                body.append('logo', mark.file);
+                body.append('brand_mark_type', 'image');
+            } else if (mark.type === 'emoji' || mark.type === 'icon') {
+                body.append('brand_mark_type', mark.type);
+                body.append('brand_mark_value', mark.value ?? '');
+                if (mark.type === 'icon') {
+                    body.append('brand_mark_color', mark.color ?? '');
+                }
+            } else if (mark.type === 'none') {
+                body.append('brand_mark_type', 'none');
+                body.append('remove_logo', '1');
+            }
+
+            if (isNew.value) {
+                payload = await store.createBlock('block-link', body);
+            } else {
+                const updater = blockActions?.updateBlock
+                    ?? ((id, fields) => store.updateBlock(id, fields));
+                payload = await updater(props.blockId, body);
+            }
+
+            brandMark.value = brandMarkFromEditor(payload?.editor ?? props.editor);
         }
 
-        brandMark.value = brandMarkFromEditor(payload?.editor ?? props.editor);
         emit('saved', payload);
     } catch (error) {
         if (error instanceof ApiError) {
             Object.assign(errors, Object.fromEntries(
                 Object.entries(error.errors || {}).map(([key, value]) => [key, value?.[0] ?? null]),
             ));
+            if (errors.label && !errors.title) {
+                errors.title = errors.label;
+            }
         }
         notifyApiError(error, 'تعذر الحفظ.');
     } finally {
@@ -466,52 +585,123 @@ async function submit() {
                     :disabled="mustPickSpecificItem"
                 />
 
-                <div v-if="needsContentPicker" ref="contentSearchRoot" class="space-y-2">
-                    <Field name="content_search" label="بحث المحتوى" :error="errors.content_id">
-                        <div class="relative w-full">
-                            <input
-                                v-model="form.content_search"
-                                type="search"
-                                autocomplete="off"
-                                placeholder="اكتب حرفاً أو أكثر للبحث..."
-                                class="block w-full rounded-md border-2 bg-white px-3 py-1.5 text-sm text-stone-600 placeholder:text-sm focus:border-primary-500 focus:bg-stone-100/50 focus:text-stone-700 focus:outline-none"
-                                :class="errors.content_id ? 'border-red-300' : 'border-transparent'"
-                                @focus="searchContent"
-                                @keydown="onSearchKeydown"
+                <Field
+                    v-if="needsContentPicker"
+                    name="content_id"
+                    label="المادة"
+                    :error="errors.content_id"
+                >
+                    <div ref="contentSearchRoot" class="relative w-full">
+                        <button
+                            type="button"
+                            class="flex w-full items-center gap-2 rounded-md border bg-white px-3 py-2 text-start text-sm transition hover:border-stone-200 focus:border-primary-400 focus:outline-none"
+                            :class="errors.content_id ? 'border-red-300' : 'border-transparent'"
+                            :aria-expanded="contentPickerOpen"
+                            aria-haspopup="listbox"
+                            @click="contentPickerOpen ? (contentPickerOpen = false) : openContentPicker()"
+                        >
+                            <span
+                                v-if="form.content_id && form.selected_content_title"
+                                class="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-primary-50 px-2 py-0.5 text-sm text-primary-800"
                             >
-                            <p v-if="contentSearching" class="mt-1 text-xs text-stone-400">جاري البحث...</p>
+                                <span class="min-w-0 truncate">{{ form.selected_content_title }}</span>
+                                <button
+                                    type="button"
+                                    class="shrink-0 rounded text-primary-500 transition hover:text-primary-700"
+                                    aria-label="إزالة المادة"
+                                    @click="clearContent"
+                                >
+                                    <Icon name="x" class="h-3.5 w-3.5" />
+                                </button>
+                            </span>
+                            <span
+                                v-else
+                                class="min-w-0 flex-1 truncate text-stone-400"
+                            >
+                                {{ contentSelectedLabel }}
+                            </span>
+                            <Icon name="chevron-down" class="ms-auto h-4 w-4 shrink-0 text-stone-400" />
+                        </button>
+
+                        <div
+                            v-if="contentPickerOpen"
+                            class="absolute inset-x-0 z-50 mt-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg"
+                        >
+                            <div
+                                v-if="form.content_id && form.selected_content_title"
+                                class="flex items-center gap-2 border-b border-stone-100 px-3 py-2"
+                            >
+                                <span class="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-primary-50 px-2 py-0.5 text-sm text-primary-800">
+                                    <span class="min-w-0 truncate">{{ form.selected_content_title }}</span>
+                                    <button
+                                        type="button"
+                                        class="shrink-0 rounded text-primary-500 transition hover:text-primary-700"
+                                        aria-label="إزالة المادة"
+                                        @click="clearContent"
+                                    >
+                                        <Icon name="x" class="h-3.5 w-3.5" />
+                                    </button>
+                                </span>
+                            </div>
+
+                            <div class="border-b border-stone-100 p-2">
+                                <input
+                                    v-model="contentQuery"
+                                    data-content-search
+                                    type="search"
+                                    autocomplete="off"
+                                    placeholder="ابحث عن مادة..."
+                                    class="w-full rounded-md border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-primary-400 focus:outline-none"
+                                    @keydown="onSearchKeydown"
+                                    @click.stop
+                                >
+                            </div>
+
+                            <ul class="max-h-48 overflow-y-auto p-1" role="listbox">
+                                <li v-if="contentSearching" class="px-3 py-3 text-center text-xs text-stone-400">
+                                    جاري البحث...
+                                </li>
+                                <template v-else>
+                                    <li v-for="item in contentResults" :key="item.id">
+                                        <button
+                                            type="button"
+                                            class="w-full rounded-md px-3 py-2 text-start text-sm transition hover:bg-stone-50"
+                                            :class="{ 'bg-primary-50 text-primary-700': form.content_id === item.id }"
+                                            @click="selectContent(item)"
+                                        >
+                                            {{ item.title }}
+                                        </button>
+                                    </li>
+                                    <li
+                                        v-if="!contentResults.length"
+                                        class="px-3 py-4 text-center text-xs text-stone-400"
+                                    >
+                                        {{ contentQuery.trim() ? 'لا توجد نتائج.' : 'أحدث المواد — أو اكتب للبحث.' }}
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
-                    </Field>
+                    </div>
+                </Field>
 
-                    <ul
-                        v-if="showContentResults && contentResults.length"
-                        class="max-h-40 overflow-y-auto rounded-lg border border-stone-100 bg-white"
-                    >
-                        <li v-for="item in contentResults" :key="item.id">
-                            <button
-                                type="button"
-                                class="w-full px-3 py-2 text-start text-sm transition hover:bg-stone-50"
-                                :class="{ 'bg-primary-50 text-primary-700': form.content_id === item.id }"
-                                @click="selectContent(item)"
-                            >
-                                {{ item.title }}
-                            </button>
-                        </li>
-                    </ul>
-                    <p
-                        v-else-if="showContentResults && !contentSearching && form.content_search.trim().length >= 1"
-                        class="text-xs text-stone-400"
-                    >
-                        لا توجد نتائج.
-                    </p>
-                    <p v-else-if="showContentResults && !contentSearching && !form.content_search.trim()" class="text-xs text-stone-400">
-                        أحدث المواد — أو اكتب للبحث.
-                    </p>
-                    <p v-if="form.selected_content_title" class="text-xs text-stone-400">المحدد: {{ form.selected_content_title }}</p>
-                </div>
+                <Toggle
+                    v-model="useCustomCopy"
+                    name="use_custom_copy"
+                    :label="showDescription ? 'عنوان ووصف مخصص' : 'عنوان مخصص'"
+                    :info="showDescription ? 'فعّل لتعديل العنوان والوصف يدوياً' : 'فعّل لتعديل العنوان يدوياً'"
+                />
 
-                <Input v-model="form.title" name="title" label="العنوان" :error="errors.title" />
-                <Textarea v-model="form.description" name="description" label="الوصف" :rows="3" :error="errors.description" />
+                <template v-if="useCustomCopy">
+                    <Input v-model="form.title" name="title" label="العنوان" :error="errors.title" />
+                    <Textarea
+                        v-if="showDescription"
+                        v-model="form.description"
+                        name="description"
+                        label="الوصف"
+                        :rows="3"
+                        :error="errors.description"
+                    />
+                </template>
 
                 <BrandMarkField
                     v-model="brandMark"

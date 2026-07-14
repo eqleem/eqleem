@@ -17,12 +17,13 @@ class ClientLoginCode extends Mailable
     public function __construct(
         public string $code,
         public Tenant $tenant,
+        public string $loginUrl,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'كود تسجيل الدخول - '.$this->tenant->name,
+            subject: 'رابط وكود تسجيل الدخول - '.$this->tenant->name,
         );
     }
 

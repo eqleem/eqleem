@@ -560,7 +560,7 @@ Route::put('/page/blocks/{id}/links/reorder', ReorderPageBlockLinks::class)
     ->name('api.page.blocks.links.reorder')
     ->whereNumber('id');
 
-Route::put('/page/blocks/{id}/links/{linkId}', UpsertPageBlockLink::class)
+Route::match(['put', 'post'], '/page/blocks/{id}/links/{linkId}', UpsertPageBlockLink::class)
     ->name('api.page.blocks.links.update')
     ->whereNumber('id')
     ->whereNumber('linkId');
