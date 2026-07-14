@@ -18,7 +18,7 @@
             colors: ['gray', 'stone', 'slate','zinc', 'red', 'pink', 'fuchsia', 'violet', 'blue', 'indigo', 'purple', 'yellow', 'orange',
                 'amber', 'cyan', 'green', 'teal', 'sky',  'emerald', 'lime', 'rose',
             ],
-            variants: [50, 100, 200, 300],
+            variants: [50, 100, 200, 300, 400, 500],
             currentColor: @entangle($name),
             currentBgColor: '',
             iconColor: '',

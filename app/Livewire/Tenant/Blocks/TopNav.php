@@ -3,9 +3,7 @@
 namespace App\Livewire\Tenant\Blocks;
 
 use App\Livewire\Concerns\ResolvesTenantBlockView;
-use App\Models\Content;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
 class TopNav extends Component
@@ -34,23 +32,7 @@ class TopNav extends Component
             'clientLoginLabel' => (string) ($blockData['client_login_label'] ?? 'دخول العملاء'),
             'showBackButtonLink' => $showBackButton && ! request()->routeIs('tenant.home'),
             'homeUrl' => route('tenant.home'),
-            'publishedPages' => $showPagesMenu ? $this->publishedPages() : new Collection,
-            'pageMenuIcon' => fn (?string $template): string => self::pageMenuIcon($template),
         ]);
-    }
-
-    /**
-     * @return Collection<int, Content>
-     */
-    protected function publishedPages(): Collection
-    {
-        return Content::query()
-            ->type(contentTypeModel('pages'))
-            ->published()
-            ->where('active', true)
-            ->orderBy('sort_order')
-            ->orderBy('title')
-            ->get(['id', 'title', 'slug', 'template']);
     }
 
     public static function pageMenuIcon(?string $template): string

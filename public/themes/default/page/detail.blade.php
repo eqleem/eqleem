@@ -30,15 +30,7 @@
         @if ($pageBlocks->isNotEmpty())
             <section @class(['space-y-6', 'mt-10' => $body !== ''])>
                 @foreach ($pageBlocks as $block)
-                    @if (in_array($block->type, ['block-link', 'link'], true))
-                        <livewire:tenant.blocks.block-link :block-id="$block->id" :key="'page-block-'.$block->id" />
-                    @else
-                        @includeFirst([
-                            $block->variant,
-                            "tenant-theme::blocks.{$block->type}",
-                            "default-tenant-theme::blocks.{$block->type}",
-                        ], ['block' => $block])
-                    @endif
+                    <x-tenant-page-block :block="$block" />
                 @endforeach
             </section>
         @endif

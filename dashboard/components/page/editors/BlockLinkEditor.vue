@@ -106,9 +106,13 @@ const useCustomCopy = ref(initialPickerKey === 'external');
 const pickerOpen = ref(false);
 const pickerQuery = ref('');
 const pickerRoot = ref(null);
+const pickerPanel = ref(null);
+const pickerStyle = ref({});
 const contentPickerOpen = ref(false);
 const contentQuery = ref('');
 const contentSearchRoot = ref(null);
+const contentPickerPanel = ref(null);
+const contentPickerStyle = ref({});
 const contentResults = ref([]);
 const contentSearching = ref(false);
 const errors = reactive({});
@@ -135,6 +139,18 @@ const needsContentPicker = computed(() => (
     && form.specific_item
     && canPickSpecificItem.value
 ));
+
+const canSaveLink = computed(() => {
+    if (!hasLinkType.value) {
+        return false;
+    }
+
+    if (mustPickSpecificItem.value && !form.content_id) {
+        return false;
+    }
+
+    return true;
+});
 
 const linkType = computed(() => {
     if (!form.picker_key) {
@@ -245,7 +261,9 @@ watch(useCustomCopy, (enabled) => {
 });
 
 onMounted(() => {
-    document.addEventListener('click', onDocumentClick);
+    document.addEventListener('mousedown', onDocumentClick);
+    window.addEventListener('resize', updateOpenPickerPositions);
+    window.addEventListener('scroll', updateOpenPickerPositions, true);
 
     if (needsContentPicker.value) {
         searchContent();
@@ -253,40 +271,80 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    document.removeEventListener('click', onDocumentClick);
+    document.removeEventListener('mousedown', onDocumentClick);
+    window.removeEventListener('resize', updateOpenPickerPositions);
+    window.removeEventListener('scroll', updateOpenPickerPositions, true);
     clearTimeout(contentSearchTimer);
 });
 
+function updateFloatingStyle(triggerEl) {
+    if (!triggerEl) {
+        return {};
+    }
+
+    const rect = triggerEl.getBoundingClientRect();
+
+    return {
+        top: `${Math.round(rect.bottom + 4)}px`,
+        left: `${Math.round(rect.left)}px`,
+        width: `${Math.round(rect.width)}px`,
+    };
+}
+
+function updateOpenPickerPositions() {
+    if (pickerOpen.value) {
+        pickerStyle.value = updateFloatingStyle(pickerRoot.value);
+    }
+
+    if (contentPickerOpen.value) {
+        contentPickerStyle.value = updateFloatingStyle(contentSearchRoot.value);
+    }
+}
+
 function onDocumentClick(event) {
-    if (pickerRoot.value && !pickerRoot.value.contains(event.target)) {
+    const target = event.target;
+
+    if (
+        pickerOpen.value
+        && !pickerRoot.value?.contains(target)
+        && !pickerPanel.value?.contains(target)
+    ) {
         pickerOpen.value = false;
     }
 
-    if (contentSearchRoot.value && !contentSearchRoot.value.contains(event.target)) {
+    if (
+        contentPickerOpen.value
+        && !contentSearchRoot.value?.contains(target)
+        && !contentPickerPanel.value?.contains(target)
+    ) {
         contentPickerOpen.value = false;
     }
 }
 
 function openPicker() {
+    contentPickerOpen.value = false;
     pickerOpen.value = true;
     pickerQuery.value = '';
     nextTick(() => {
-        pickerRoot.value?.querySelector('input[data-picker-search]')?.focus();
+        updateOpenPickerPositions();
+        pickerPanel.value?.querySelector('input[data-picker-search]')?.focus();
     });
 }
 
 function openContentPicker() {
+    pickerOpen.value = false;
     contentPickerOpen.value = true;
     contentQuery.value = '';
     nextTick(() => {
-        contentSearchRoot.value?.querySelector('input[data-content-search]')?.focus();
+        updateOpenPickerPositions();
+        contentPickerPanel.value?.querySelector('input[data-content-search]')?.focus();
         searchContent();
     });
 }
 
 function selectPickerOption(option) {
     form.picker_key = option.key;
-    form.specific_item = !option.supports_section && option.supports_item;
+    form.specific_item = Boolean(option.supports_item) && !option.supports_section;
     form.content_id = null;
     form.selected_content_title = '';
     form.url = '';
@@ -295,6 +353,8 @@ function selectPickerOption(option) {
     contentResults.value = [];
     pickerOpen.value = false;
     pickerQuery.value = '';
+    delete errors.content_id;
+    delete errors.link_type;
 
     if (option.key === 'external') {
         useCustomCopy.value = true;
@@ -302,11 +362,19 @@ function selectPickerOption(option) {
     }
 
     useCustomCopy.value = false;
-    form.title = option.section_title || option.label.replace(/^رابط\s+/, '');
+    form.title = form.specific_item
+        ? ''
+        : (option.section_title || option.label.replace(/^رابط\s+/, ''));
     if (props.showDescription) {
         form.description = form.specific_item
             ? (option.item_description || '')
             : (option.section_description || '');
+    }
+
+    if (form.specific_item) {
+        nextTick(() => {
+            openContentPicker();
+        });
     }
 }
 
@@ -328,6 +396,17 @@ async function searchContent() {
     try {
         const payload = await api(`/page/link-content?${params.toString()}`);
         contentResults.value = Array.isArray(payload?.data) ? payload.data : [];
+
+        if (
+            mustPickSpecificItem.value
+            && !form.content_id
+            && !query
+            && !contentResults.value.length
+        ) {
+            errors.content_id = 'لا توجد مواد في هذا القسم. أنشئ محتوى أولاً ثم أعد المحاولة.';
+        } else if (errors.content_id?.includes?.('لا توجد مواد')) {
+            delete errors.content_id;
+        }
     } catch {
         contentResults.value = [];
     } finally {
@@ -379,6 +458,15 @@ async function submit() {
 
     if (isExternal.value && !form.url.trim()) {
         errors.url = 'أدخل الرابط الكامل.';
+        return;
+    }
+
+    if (mustPickSpecificItem.value && !form.content_id) {
+        errors.content_id = contentResults.value.length
+            ? 'اختر مادة من نتائج البحث.'
+            : 'لا توجد مواد في هذا القسم. أنشئ محتوى أولاً ثم أعد المحاولة.';
+        contentPickerOpen.value = true;
+        await searchContent();
         return;
     }
 
@@ -498,7 +586,7 @@ async function submit() {
                 <div ref="pickerRoot" class="relative w-full">
                     <button
                         type="button"
-                        class="flex w-full items-center gap-2 rounded-md border border-transparent bg-white px-3 py-2 text-start text-sm text-stone-700 transition hover:border-stone-200 focus:border-primary-400 focus:outline-none"
+                        class="flex w-full cursor-pointer items-center gap-2 rounded-md border border-transparent bg-white px-3 py-2 text-start text-sm text-stone-700 transition hover:border-stone-200 focus:border-primary-400 focus:outline-none"
                         @click="pickerOpen ? (pickerOpen = false) : openPicker()"
                     >
                         <img
@@ -514,54 +602,58 @@ async function submit() {
                         <Icon name="chevron-down" class="h-4 w-4 shrink-0 text-stone-400" />
                     </button>
 
-                    <div
-                        v-if="pickerOpen"
-                        class="absolute inset-x-0 z-50 mt-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg"
-                    >
-                        <div class="border-b border-stone-100 p-2">
-                            <input
-                                v-model="pickerQuery"
-                                data-picker-search
-                                type="search"
-                                placeholder="ابحث عن نوع المحتوى..."
-                                class="w-full rounded-md border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-primary-400 focus:outline-none"
-                                @keydown="onSearchKeydown"
-                            >
-                        </div>
-
-                        <ul class="max-h-56 overflow-y-auto p-1">
-                            <li v-for="option in filteredContentOptions" :key="option.key">
-                                <button
-                                    type="button"
-                                    class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
-                                    :class="{ 'bg-primary-50 text-primary-700': form.picker_key === option.key }"
-                                    @click="selectPickerOption(option)"
+                    <Teleport to="body">
+                        <div
+                            v-if="pickerOpen"
+                            ref="pickerPanel"
+                            class="fixed z-[100] overflow-hidden overscroll-contain rounded-lg border border-stone-200 bg-white shadow-lg"
+                            :style="pickerStyle"
+                        >
+                            <div class="border-b border-stone-100 p-2">
+                                <input
+                                    v-model="pickerQuery"
+                                    data-picker-search
+                                    type="search"
+                                    placeholder="ابحث عن نوع المحتوى..."
+                                    class="w-full rounded-md border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-primary-400 focus:outline-none"
+                                    @keydown="onSearchKeydown"
                                 >
-                                    <img :src="option.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                                    <span class="truncate font-medium">{{ option.label }}</span>
-                                </button>
-                            </li>
-
-                            <li v-if="!filteredContentOptions.length" class="px-3 py-4 text-center text-xs text-stone-400">
-                                لا توجد نتائج مطابقة
-                            </li>
-                        </ul>
-
-                        <template v-if="externalOption && !pickerQuery.trim()">
-                            <div class="mx-2 border-t border-dotted border-stone-200" />
-                            <div class="p-1">
-                                <button
-                                    type="button"
-                                    class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
-                                    :class="{ 'bg-primary-50 text-primary-700': form.picker_key === 'external' }"
-                                    @click="selectPickerOption(externalOption)"
-                                >
-                                    <img :src="externalOption.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                                    <span class="truncate font-medium">{{ externalOption.label }}</span>
-                                </button>
                             </div>
-                        </template>
-                    </div>
+
+                            <ul class="max-h-56 overflow-y-auto overscroll-contain p-1">
+                                <li v-for="option in filteredContentOptions" :key="option.key">
+                                    <button
+                                        type="button"
+                                        class="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
+                                        :class="{ 'bg-primary-50 text-primary-700': form.picker_key === option.key }"
+                                        @click="selectPickerOption(option)"
+                                    >
+                                        <img :src="option.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                        <span class="truncate font-medium">{{ option.label }}</span>
+                                    </button>
+                                </li>
+
+                                <li v-if="!filteredContentOptions.length" class="px-3 py-4 text-center text-xs text-stone-400">
+                                    لا توجد نتائج مطابقة
+                                </li>
+                            </ul>
+
+                            <template v-if="externalOption && !pickerQuery.trim()">
+                                <div class="mx-2 border-t border-dotted border-stone-200" />
+                                <div class="p-1">
+                                    <button
+                                        type="button"
+                                        class="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
+                                        :class="{ 'bg-primary-50 text-primary-700': form.picker_key === 'external' }"
+                                        @click="selectPickerOption(externalOption)"
+                                    >
+                                        <img :src="externalOption.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                        <span class="truncate font-medium">{{ externalOption.label }}</span>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </Teleport>
                 </div>
             </Field>
 
@@ -577,24 +669,23 @@ async function submit() {
                 />
 
                 <Toggle
-                    v-if="canPickSpecificItem && !isExternal"
+                    v-if="canPickSpecificItem && !isExternal && !mustPickSpecificItem"
                     v-model="form.specific_item"
                     name="specific_item"
                     label="مادة محددة"
-                    :info="mustPickSpecificItem ? 'هذا النوع يتطلب اختيار مادة محددة' : 'فعّل لاختيار مادة داخل القسم بدل رابط القسم نفسه'"
-                    :disabled="mustPickSpecificItem"
+                    info="فعّل لاختيار مادة داخل القسم بدل رابط القسم نفسه"
                 />
 
                 <Field
                     v-if="needsContentPicker"
                     name="content_id"
-                    label="المادة"
+                    :label="mustPickSpecificItem ? 'اختر المادة' : 'المادة'"
                     :error="errors.content_id"
                 >
                     <div ref="contentSearchRoot" class="relative w-full">
                         <button
                             type="button"
-                            class="flex w-full items-center gap-2 rounded-md border bg-white px-3 py-2 text-start text-sm transition hover:border-stone-200 focus:border-primary-400 focus:outline-none"
+                            class="flex w-full cursor-pointer items-center gap-2 rounded-md border bg-white px-3 py-2 text-start text-sm transition hover:border-stone-200 focus:border-primary-400 focus:outline-none"
                             :class="errors.content_id ? 'border-red-300' : 'border-transparent'"
                             :aria-expanded="contentPickerOpen"
                             aria-haspopup="listbox"
@@ -607,7 +698,7 @@ async function submit() {
                                 <span class="min-w-0 truncate">{{ form.selected_content_title }}</span>
                                 <button
                                     type="button"
-                                    class="shrink-0 rounded text-primary-500 transition hover:text-primary-700"
+                                    class="shrink-0 cursor-pointer rounded text-primary-500 transition hover:text-primary-700"
                                     aria-label="إزالة المادة"
                                     @click="clearContent"
                                 >
@@ -623,64 +714,72 @@ async function submit() {
                             <Icon name="chevron-down" class="ms-auto h-4 w-4 shrink-0 text-stone-400" />
                         </button>
 
-                        <div
-                            v-if="contentPickerOpen"
-                            class="absolute inset-x-0 z-50 mt-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg"
-                        >
+                        <Teleport to="body">
                             <div
-                                v-if="form.content_id && form.selected_content_title"
-                                class="flex items-center gap-2 border-b border-stone-100 px-3 py-2"
+                                v-if="contentPickerOpen"
+                                ref="contentPickerPanel"
+                                class="fixed z-[100] overflow-hidden overscroll-contain rounded-lg border border-stone-200 bg-white shadow-lg"
+                                :style="contentPickerStyle"
                             >
-                                <span class="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-primary-50 px-2 py-0.5 text-sm text-primary-800">
-                                    <span class="min-w-0 truncate">{{ form.selected_content_title }}</span>
-                                    <button
-                                        type="button"
-                                        class="shrink-0 rounded text-primary-500 transition hover:text-primary-700"
-                                        aria-label="إزالة المادة"
-                                        @click="clearContent"
-                                    >
-                                        <Icon name="x" class="h-3.5 w-3.5" />
-                                    </button>
-                                </span>
-                            </div>
-
-                            <div class="border-b border-stone-100 p-2">
-                                <input
-                                    v-model="contentQuery"
-                                    data-content-search
-                                    type="search"
-                                    autocomplete="off"
-                                    placeholder="ابحث عن مادة..."
-                                    class="w-full rounded-md border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-primary-400 focus:outline-none"
-                                    @keydown="onSearchKeydown"
-                                    @click.stop
+                                <div
+                                    v-if="form.content_id && form.selected_content_title"
+                                    class="flex items-center gap-2 border-b border-stone-100 px-3 py-2"
                                 >
-                            </div>
-
-                            <ul class="max-h-48 overflow-y-auto p-1" role="listbox">
-                                <li v-if="contentSearching" class="px-3 py-3 text-center text-xs text-stone-400">
-                                    جاري البحث...
-                                </li>
-                                <template v-else>
-                                    <li v-for="item in contentResults" :key="item.id">
+                                    <span class="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-primary-50 px-2 py-0.5 text-sm text-primary-800">
+                                        <span class="min-w-0 truncate">{{ form.selected_content_title }}</span>
                                         <button
                                             type="button"
-                                            class="w-full rounded-md px-3 py-2 text-start text-sm transition hover:bg-stone-50"
-                                            :class="{ 'bg-primary-50 text-primary-700': form.content_id === item.id }"
-                                            @click="selectContent(item)"
+                                            class="shrink-0 cursor-pointer rounded text-primary-500 transition hover:text-primary-700"
+                                            aria-label="إزالة المادة"
+                                            @click="clearContent"
                                         >
-                                            {{ item.title }}
+                                            <Icon name="x" class="h-3.5 w-3.5" />
                                         </button>
-                                    </li>
-                                    <li
-                                        v-if="!contentResults.length"
-                                        class="px-3 py-4 text-center text-xs text-stone-400"
+                                    </span>
+                                </div>
+
+                                <div class="border-b border-stone-100 p-2">
+                                    <input
+                                        v-model="contentQuery"
+                                        data-content-search
+                                        type="search"
+                                        autocomplete="off"
+                                        placeholder="ابحث عن مادة..."
+                                        class="w-full rounded-md border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-primary-400 focus:outline-none"
+                                        @keydown="onSearchKeydown"
+                                        @click.stop
                                     >
-                                        {{ contentQuery.trim() ? 'لا توجد نتائج.' : 'أحدث المواد — أو اكتب للبحث.' }}
+                                </div>
+
+                                <ul class="max-h-48 overflow-y-auto overscroll-contain p-1" role="listbox">
+                                    <li v-if="contentSearching" class="px-3 py-3 text-center text-xs text-stone-400">
+                                        جاري البحث...
                                     </li>
-                                </template>
-                            </ul>
-                        </div>
+                                    <template v-else>
+                                        <li v-for="item in contentResults" :key="item.id">
+                                            <button
+                                                type="button"
+                                                class="w-full cursor-pointer rounded-md px-3 py-2 text-start text-sm transition hover:bg-stone-50"
+                                                :class="{ 'bg-primary-50 text-primary-700': form.content_id === item.id }"
+                                                @click="selectContent(item)"
+                                            >
+                                                {{ item.title }}
+                                            </button>
+                                        </li>
+                                        <li
+                                            v-if="!contentResults.length"
+                                            class="px-3 py-4 text-center text-xs text-stone-400"
+                                        >
+                                            {{ contentQuery.trim()
+                                                ? 'لا توجد نتائج.'
+                                                : (mustPickSpecificItem
+                                                    ? 'لا توجد مواد في هذا القسم. أنشئ محتوى أولاً.'
+                                                    : 'أحدث المواد — أو اكتب للبحث.') }}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </Teleport>
                     </div>
                 </Field>
 
@@ -716,7 +815,7 @@ async function submit() {
         <template #footer>
             <div class="flex items-center gap-2">
                 <Button type="button" variant="ghost" label="إلغاء" :disabled="saving" @click="emit('close')" />
-                <Button type="submit" label="حفظ" :loading="saving" :disabled="!hasLinkType" />
+                <Button type="submit" label="حفظ" :loading="saving" :disabled="!canSaveLink" />
             </div>
         </template>
     </Form>

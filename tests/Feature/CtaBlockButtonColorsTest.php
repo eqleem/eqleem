@@ -88,7 +88,8 @@ it('uses primary color for the first cta button and secondary for the rest', fun
         ->html();
 
     expect(substr_count($html, 'bg-primary-600'))->toBe(1)
-        ->and(substr_count($html, 'bg-secondary-600'))->toBe(2);
+        ->and(substr_count($html, 'bg-secondary-900/10'))->toBe(2)
+        ->and(substr_count($html, 'text-secondary-900'))->toBe(2);
 
     $firstPos = strpos($html, 'الزر الأول');
     $secondPos = strpos($html, 'الزر الثاني');
@@ -101,8 +102,8 @@ it('uses primary color for the first cta button and secondary for the rest', fun
         ->and($secondPos)->toBeLessThan($thirdPos);
 
     $primaryBeforeFirst = strrpos(substr($html, 0, $firstPos), 'bg-primary-600');
-    $secondaryBeforeSecond = strrpos(substr($html, 0, $secondPos), 'bg-secondary-600');
-    $secondaryBeforeThird = strrpos(substr($html, 0, $thirdPos), 'bg-secondary-600');
+    $secondaryBeforeSecond = strrpos(substr($html, 0, $secondPos), 'bg-secondary-900/10');
+    $secondaryBeforeThird = strrpos(substr($html, 0, $thirdPos), 'bg-secondary-900/10');
 
     expect($primaryBeforeFirst)->not->toBeFalse()
         ->and($secondaryBeforeSecond)->not->toBeFalse()

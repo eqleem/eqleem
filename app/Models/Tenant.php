@@ -58,14 +58,21 @@ class Tenant extends Model implements HasMedia
             ->withTimestamps();
     }
 
+    /** @var array<int, array<string, mixed>> */
+    private array $themeSettingsCache = [];
+
     /**
      * @return array<string, mixed>
      */
     public function themeSettingsFor(int $themeId): array
     {
+        if (array_key_exists($themeId, $this->themeSettingsCache)) {
+            return $this->themeSettingsCache[$themeId];
+        }
+
         $meta = $this->themes()->where('themes.id', $themeId)->first()?->pivot?->meta;
 
-        return is_array($meta) ? $meta : [];
+        return $this->themeSettingsCache[$themeId] = is_array($meta) ? $meta : [];
     }
 
     /**
@@ -79,6 +86,8 @@ class Tenant extends Model implements HasMedia
                 'active' => true,
             ],
         ]);
+
+        $this->themeSettingsCache[$themeId] = $options;
     }
 
     public function uploadThemeOptionMedia(int $themeId, string $optionKey, UploadedFile $file): string

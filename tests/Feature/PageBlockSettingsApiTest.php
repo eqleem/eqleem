@@ -172,6 +172,63 @@ test('cta block editor exposes link type picker options', function () {
         ]);
 });
 
+test('cta link rejects section links for pages and forms', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('cta');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'section:pages',
+            'label' => 'الصفحات',
+        ])
+        ->assertUnprocessable();
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'section:forms',
+            'label' => 'النماذج',
+        ])
+        ->assertUnprocessable();
+});
+
+test('cta link to pages requires an existing page item', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('cta');
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'item:pages',
+            'label' => 'صفحة',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonFragment(['message' => 'يرجى اختيار عنصر صالح من القائمة.']);
+
+    $page = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('pages'),
+        'title' => 'من نحن',
+        'slug' => 'about-us',
+        'status' => 'published',
+        'active' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'item:pages',
+            'label' => 'من نحن',
+            'content_id' => $page->id,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.label', 'من نحن')
+        ->assertJsonPath('data.data.link_type', 'item')
+        ->assertJsonPath('data.data.content_type', 'pages')
+        ->assertJsonPath('data.data.content_id', $page->id);
+});
+
 test('owner can create cta link to a specific content item', function () {
     [$user, $tenant] = createUserWithTenantForPageBlockSettings();
 

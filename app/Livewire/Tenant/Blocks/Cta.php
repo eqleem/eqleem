@@ -55,18 +55,21 @@ class Cta extends Component
             ->unique()
             ->values();
 
-        $forms = Content::query()
-            ->type(contentTypeModel('forms'))
-            ->whereIn('id', $formContentIds)
-            ->where('active', true)
-            ->get(['id', 'data'])
-            ->keyBy('id');
+        $forms = $formContentIds->isEmpty()
+            ? collect()
+            : Content::query()
+                ->type(contentTypeModel('forms'))
+                ->whereIn('id', $formContentIds)
+                ->where('active', true)
+                ->get(['id', 'data'])
+                ->keyBy('id');
 
         return $ctaLinks->map(function (Content $link) use ($forms): array {
             $formContentId = CtaLink::formContentId($link);
             $form = $formContentId ? $forms->get($formContentId) : null;
             $isForm = CtaLink::isForm($link) && $form !== null;
             $data = is_array($link->data) ? $link->data : [];
+            $formFields = $isForm ? FormField::normalize(data_get($form?->data, 'fields')) : [];
 
             return [
                 'id' => $link->id,
@@ -79,8 +82,10 @@ class Cta extends Component
                 'isForm' => $isForm,
                 'formContentId' => $isForm ? $formContentId : null,
                 'opensInNewTab' => CtaLink::opensInNewTab($link),
-                'formDescription' => (string) data_get($form?->data, 'description', 'املأ النموذج وسنتواصل معك في أقرب وقت.'),
-                'formFields' => FormField::normalize(data_get($form?->data, 'fields')),
+                'formDescription' => $isForm
+                    ? (string) data_get($form?->data, 'description', 'املأ النموذج وسنتواصل معك في أقرب وقت.')
+                    : '',
+                'formFields' => $formFields,
             ];
         });
     }

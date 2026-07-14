@@ -3,6 +3,7 @@ import { onMounted, onBeforeUnmount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import MainBox from '../ui/MainBox.vue';
 import Button from '../ui/Button.vue';
+import BrandMark from '../ui/BrandMark.vue';
 import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
 import Switch from '../settings/Switch.vue';
@@ -263,7 +264,7 @@ function contentManageLabel(block) {
                         <p class="text-sm font-medium text-stone-700">أزرار الإجراء</p>
                         <p class="text-xs text-stone-400">هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين</p>
                     </div>
-                    <Button label="إضافة رابط" variant="secondary" class="shrink-0" @click="openAddCtaLink">
+                    <Button label="إضافة رابط" class="shrink-0" @click="openAddCtaLink">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
                     </Button>
                 </div>
@@ -283,7 +284,7 @@ function contentManageLabel(block) {
                         <p class="text-sm font-medium text-stone-700">بلوكات الصفحة</p>
                         <p class="text-xs text-stone-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
                     </div>
-                    <Button label="إضافة رابط" variant="secondary" class="shrink-0" :disabled="saving" @click="addLinkBlock">
+                    <Button label="إضافة رابط" class="shrink-0" :disabled="saving" @click="addLinkBlock">
                         <template #icon><Icon name="plus" class="h-4 w-4" /></template>
                     </Button>
                 </div>
@@ -310,26 +311,30 @@ function contentManageLabel(block) {
                                 <Icon name="grip-vertical" class="h-4 w-4" />
                             </div>
 
-                            <div class="flex min-w-0 flex-1 items-center gap-2">
-                                <img :src="block.icon_url" alt="" class="hidden h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1 sm:block">
-                                <RouterLink
-                                    v-if="contentManageTo(block)"
-                                    :to="contentManageTo(block)"
-                                    class="truncate text-sm font-medium text-stone-800 transition hover:text-primary-600 sm:hidden"
-                                >
-                                    {{ block.title }}
-                                </RouterLink>
-                                <span
-                                    class="truncate text-sm font-medium text-stone-800"
-                                    :class="contentManageTo(block) ? 'hidden sm:inline' : ''"
-                                >
+                            <button
+                                type="button"
+                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
+                                @click.stop="openEdit(block.id, block.title)"
+                            >
+                                <div class="hidden shrink-0 sm:block">
+                                    <BrandMark
+                                        :mark="block.brand_mark"
+                                        :url="block.icon_url"
+                                        :fallback="block.icon_url"
+                                        :alt="block.title"
+                                        size-class="h-6 w-6 rounded-md bg-stone-100 p-1"
+                                        icon-class="text-base leading-none"
+                                        img-class="object-contain"
+                                    />
+                                </div>
+                                <span class="min-w-0 truncate text-sm font-medium text-stone-800">
                                     {{ block.title }}
                                 </span>
-                            </div>
+                            </button>
 
                             <button
                                 type="button"
-                                class="pointer-events-none shrink-0 rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
+                                class="pointer-events-none shrink-0 cursor-pointer rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
                                 aria-label="حذف البلوك"
                                 :disabled="busyId === block.id"
                                 @click.stop="removeBlock(block)"
@@ -340,7 +345,8 @@ function contentManageLabel(block) {
                             <RouterLink
                                 v-if="contentManageTo(block)"
                                 :to="contentManageTo(block)"
-                                class="hidden shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50 sm:inline-flex"
+                                class="hidden shrink-0 cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50 sm:inline-flex"
+                                @click.stop
                             >
                                 {{ contentManageLabel(block) }}
                             </RouterLink>
@@ -348,7 +354,7 @@ function contentManageLabel(block) {
                             <button
                                 v-if="block.editable"
                                 type="button"
-                                class="rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
+                                class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
                                 aria-label="خيارات البلوك"
                                 @click="openEdit(block.id, block.title)"
                             >
@@ -417,9 +423,14 @@ function contentManageLabel(block) {
                         <p class="text-sm font-medium text-stone-700">الأزرار الطافية</p>
                         <p class="text-xs text-stone-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
                     </div>
-                    <Button label="الموضع" variant="secondary" class="shrink-0" @click="openFloatLinksPosition">
-                        <template #icon><Icon name="settings" class="h-4 w-4" /></template>
-                    </Button>
+                    <button
+                        type="button"
+                        class="shrink-0 cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
+                        aria-label="خيارات الأزرار الطافية"
+                        @click="openFloatLinksPosition"
+                    >
+                        <Icon name="settings" class="h-5 w-5" />
+                    </button>
                 </div>
 
                 <FloatLinksPanel

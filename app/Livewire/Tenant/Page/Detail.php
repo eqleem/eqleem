@@ -54,6 +54,6 @@ class Detail extends Component
             ->userBlocks()
             ->where('active', true)
             ->orderBy('sort_order')
-            ->get(['id', 'type', 'variant']);
+            ->get(['id', 'type', 'variant', 'data']);
     }
 }

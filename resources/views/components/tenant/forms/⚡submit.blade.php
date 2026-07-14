@@ -160,23 +160,44 @@ new class extends Component
 
     public bool $submitted = false;
 
-    public function mount(int $formContentId, ?int $blockId = null): void
-    {
+    public function mount(
+        int $formContentId,
+        ?int $blockId = null,
+        ?string $description = null,
+        ?array $fields = null,
+    ): void {
         $this->formContentId = $formContentId;
         $this->blockId = $blockId;
+
+        if (is_array($fields)) {
+            $this->hydrateFromPrepared($description ?? '', $fields);
+
+            return;
+        }
 
         $form = Content::query()
             ->type(contentTypeModel('forms'))
             ->whereKey($formContentId)
             ->where('active', true)
-            ->first();
+            ->first(['id', 'data']);
 
         if (! $form) {
             return;
         }
 
-        $this->description = (string) data_get($form->data, 'description', '');
-        $this->fields = FormField::normalize(data_get($form->data, 'fields'));
+        $this->hydrateFromPrepared(
+            (string) data_get($form->data, 'description', ''),
+            FormField::normalize(data_get($form->data, 'fields')),
+        );
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $fields
+     */
+    protected function hydrateFromPrepared(string $description, array $fields): void
+    {
+        $this->description = $description;
+        $this->fields = FormField::normalize($fields);
 
         foreach ($this->fields as $field) {
             $this->values[(string) $field['name']] = $field['type'] === 'checkbox' ? false : null;

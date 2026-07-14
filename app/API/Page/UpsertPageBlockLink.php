@@ -72,6 +72,11 @@ class UpsertPageBlockLink
         $isExternal = CtaLink::isExternalLink($linkType);
         $needsPicker = CtaLink::needsContentPicker($linkType);
 
+        if ($parsed['link_type'] === 'section' && filled($parsed['content_type'])
+            && CtaLink::contentTypeRequiresItem((string) $parsed['content_type'])) {
+            throw new UnprocessableEntityHttpException('يجب اختيار مادة محددة لهذا النوع من الروابط.');
+        }
+
         if ($isExternal && (! filled($data['label'] ?? null) || ! filled($data['url'] ?? null))) {
             throw new UnprocessableEntityHttpException('الرابط الخارجي يتطلب اسماً وعنواناً.');
         }

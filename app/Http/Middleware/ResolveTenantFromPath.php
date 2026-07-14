@@ -23,6 +23,7 @@ class ResolveTenantFromPath
         $handle = $request->route('tenant');
 
         $tenant = Tenant::query()
+            ->with('theme')
             ->where('handle', $handle)
             ->where('active', true)
             ->first();

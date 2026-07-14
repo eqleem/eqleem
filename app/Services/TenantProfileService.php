@@ -21,27 +21,15 @@ class TenantProfileService
     {
         $this->ensureImported($tenant);
 
-        $contact = [
+        // Public reads use tenant meta only — never load the owner User here.
+        // Owner defaults are copied once via seedContactFromUser() / import.
+        return [
             'phone' => (string) data_get($tenant->meta, 'contact.phone', ''),
             'email' => (string) data_get($tenant->meta, 'contact.email', ''),
             'whatsapp' => (string) data_get($tenant->meta, 'contact.whatsapp', ''),
             'country' => (string) data_get($tenant->meta, 'contact.country', ''),
             'city' => (string) data_get($tenant->meta, 'contact.city', ''),
         ];
-
-        if (! (bool) data_get($tenant->meta, 'contact_saved')) {
-            $defaults = $this->userContactDefaults($tenant->loadMissing('user')->user);
-
-            if (! filled($contact['phone']) && filled($defaults['phone'])) {
-                $contact['phone'] = $defaults['phone'];
-            }
-
-            if (! filled($contact['email']) && filled($defaults['email'])) {
-                $contact['email'] = $defaults['email'];
-            }
-        }
-
-        return $contact;
     }
 
     public function seedContactFromUser(Tenant $tenant): void
@@ -126,14 +114,6 @@ class TenantProfileService
             return Storage::url((string) $path);
         }
 
-        if (! (bool) data_get($tenant->meta, 'logo_saved')) {
-            $default = $this->userLogoDefault($tenant->loadMissing('user')->user);
-
-            if (filled($default)) {
-                return $default;
-            }
-        }
-
         return 'https://api.dicebear.com/9.x/shapes/svg?seed='.$tenant->uuid;
     }
 
@@ -179,19 +159,6 @@ class TenantProfileService
             ];
         }
 
-        if (! (bool) data_get($tenant->meta, 'logo_saved')) {
-            $default = $this->userLogoDefault($tenant->loadMissing('user')->user);
-
-            if (filled($default)) {
-                return [
-                    'type' => 'image',
-                    'value' => '',
-                    'color' => '',
-                    'url' => $default,
-                ];
-            }
-        }
-
         return [
             'type' => 'image',
             'value' => '',
@@ -210,15 +177,7 @@ class TenantProfileService
 
         $stored = data_get($tenant->meta, 'logo') ?? data_get($tenant->data, 'logo');
 
-        if (filled($stored)) {
-            return true;
-        }
-
-        if (! (bool) data_get($tenant->meta, 'logo_saved')) {
-            return filled($this->userLogoDefault($tenant->loadMissing('user')->user));
-        }
-
-        return false;
+        return filled($stored);
     }
 
     public function saveLogo(Tenant $tenant, string $path): void

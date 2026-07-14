@@ -23,16 +23,20 @@ class SendContactMessageEmail
             return;
         }
 
-        Mail::to($recipient)->queue(new ContactMessage([
-            'name' => (string) ($contact['name'] ?? ''),
-            'email' => (string) ($contact['email'] ?? ''),
-            'phone' => (string) ($contact['phone'] ?? ''),
-            'address' => (string) ($contact['address'] ?? ''),
-            'subject' => filled($contact['subject'] ?? null)
-                ? (string) $contact['subject']
-                : 'رسالة من نموذج اتصل بنا',
-            'message' => (string) ($contact['message'] ?? ''),
-        ]));
+        Mail::to($recipient)->queue(new ContactMessage(
+            contact: [
+                'name' => (string) ($contact['name'] ?? ''),
+                'email' => (string) ($contact['email'] ?? ''),
+                'phone' => (string) ($contact['phone'] ?? ''),
+                'address' => (string) ($contact['address'] ?? ''),
+                'subject' => filled($contact['subject'] ?? null)
+                    ? (string) $contact['subject']
+                    : 'رسالة من نموذج اتصل بنا',
+                'message' => (string) ($contact['message'] ?? ''),
+            ],
+            tenant: $tenant,
+            managePageUrl: route('admin.page.home'),
+        ));
     }
 
     protected function recipientEmail(Tenant $tenant): ?string

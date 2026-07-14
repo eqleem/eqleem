@@ -156,7 +156,10 @@ class extends \Livewire\Component {
     {
         $validated = $this->validate();
 
-        Mail::to(config('mail.from.address'))->send(new ContactMessage($validated));
+        Mail::to(config('mail.from.address'))->send(new ContactMessage(
+            contact: $validated,
+            managePageUrl: route('admin.home'),
+        ));
 
         $this->reset(['name', 'email', 'subject', 'message']);
         $this->sent = true;

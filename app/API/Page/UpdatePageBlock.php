@@ -275,6 +275,11 @@ class UpdatePageBlock
         $needsPicker = CtaLink::needsContentPicker($linkType);
         $contentId = $needsPicker ? (int) ($data['content_id'] ?? 0) : null;
 
+        if ($parsed['link_type'] === 'section' && filled($parsed['content_type'])
+            && CtaLink::contentTypeRequiresItem((string) $parsed['content_type'])) {
+            throw new UnprocessableEntityHttpException('يجب اختيار مادة محددة لهذا النوع من الروابط.');
+        }
+
         if ($isExternal && ! filled($data['url'] ?? null)) {
             throw new UnprocessableEntityHttpException('الرابط الخارجي يتطلب عنوان URL كاملاً.');
         }

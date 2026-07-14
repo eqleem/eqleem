@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
                 <button
                     v-if="section.id === 'catalog'"
                     type="button"
-                    class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600"
+                    class="min-w-0 cursor-pointer truncate text-xs text-stone-400 transition hover:text-primary-600"
                     @click="openCatalogSections"
                 >
                     {{ section.label }}
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
                 <button
                     v-if="section.id === 'catalog'"
                     type="button"
-                    class="shrink-0 rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
+                    class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
                     aria-label="إعدادات الكتالوج"
                     @click="openCatalogSections"
                 >
@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
                         <button
                             v-if="section.id === 'catalog'"
                             type="button"
-                            class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600"
+                            class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600 cursor-pointer"
                             @click="openCatalogSections"
                         >
                             {{ section.label }}
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
                         <button
                             v-if="section.id === 'catalog'"
                             type="button"
-                            class="shrink-0 rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
+                            class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
                             aria-label="إعدادات الكتالوج"
                             @click="openCatalogSections"
                         >

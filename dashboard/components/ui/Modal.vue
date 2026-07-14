@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 
 // Port of resources/views/ui/modal.blade.php — x-teleport -> <Teleport>, Alpine open/close
 // via the same 'openmodal'/'closemodal' window events (see dashboard/lib/modal.js).
@@ -25,34 +26,41 @@ const sizeClasses = {
     '5xl': 'sm:max-w-5xl',
 };
 
-function hide() {
+function releaseScrollLock() {
     if (!show.value) {
         return;
     }
 
     show.value = false;
-    document.body.classList.remove('overflow-hidden');
+    unlockBodyScroll();
+}
+
+function hide() {
+    if (!show.value) {
+        return;
+    }
+
+    releaseScrollLock();
     window.dispatchEvent(new CustomEvent('closemodal', { detail: { modal: props.name } }));
 }
 
 function onOpen(event) {
-    if (event.detail?.modal === props.name) {
-        show.value = true;
-        document.body.classList.add('overflow-hidden');
+    if (event.detail?.modal !== props.name || show.value) {
+        return;
     }
+
+    show.value = true;
+    lockBodyScroll();
 }
 
 function onClose(event) {
     if (!event.detail?.modal || event.detail.modal === props.name) {
-        if (show.value) {
-            show.value = false;
-            document.body.classList.remove('overflow-hidden');
-        }
+        releaseScrollLock();
     }
 }
 
 function onKeydown(event) {
-    if (props.escape && event.key === 'Escape') {
+    if (props.escape && event.key === 'Escape' && show.value) {
         hide();
     }
 }
@@ -67,7 +75,7 @@ onBeforeUnmount(() => {
     window.removeEventListener('openmodal', onOpen);
     window.removeEventListener('closemodal', onClose);
     window.removeEventListener('keydown', onKeydown);
-    document.body.classList.remove('overflow-hidden');
+    releaseScrollLock();
 });
 </script>
 
@@ -76,7 +84,7 @@ onBeforeUnmount(() => {
         <div v-if="show" class="relative z-40" role="dialog" aria-modal="true">
             <div class="fixed inset-0 bg-stone-800/75 transition-opacity"></div>
 
-            <div class="fixed inset-0 overflow-y-auto">
+            <div class="fixed inset-0 overflow-y-auto overscroll-contain">
                 <div
                     class="flex min-h-full w-full items-center justify-center"
                     @click.self="escape && hide()"
@@ -94,7 +102,7 @@ onBeforeUnmount(() => {
                             <button
                                 v-if="close"
                                 type="button"
-                                class="rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                 @click.prevent="hide"
                             >
                                 <span class="sr-only">Close</span>

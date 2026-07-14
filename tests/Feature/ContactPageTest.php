@@ -25,7 +25,8 @@ it('sends a contact message', function () {
 
     Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail): bool {
         return $mail->contact['email'] === 'ahmad@example.com'
-            && $mail->contact['subject'] === 'استفسار عن الباقات';
+            && $mail->contact['subject'] === 'استفسار عن الباقات'
+            && $mail->managePageUrl === route('admin.home');
     });
 });
 

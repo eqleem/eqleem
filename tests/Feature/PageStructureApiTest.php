@@ -4,6 +4,7 @@ use App\Actions\CreateDefaultBlocks;
 use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\BlockTypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -206,7 +207,7 @@ test('cannot delete system blocks', function () {
         ->assertNotFound();
 });
 
-test('block-link section blocks expose content manage url and label', function () {
+test('block-link section blocks expose content manage url and brand mark', function () {
     [$user, $tenant] = createUserWithTenantForPageStructure();
 
     setCurrentTenant($tenant);
@@ -224,17 +225,69 @@ test('block-link section blocks expose content manage url and label', function (
         'data' => [
             'link_type' => 'section',
             'content_type' => 'blog',
+            'brand_mark' => [
+                'type' => 'icon',
+                'value' => 'tabler:book',
+                'color' => '#ea580c',
+            ],
         ],
     ]);
 
-    $this->actingAs($user)
+    $response = $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful();
+
+    $userBlock = collect($response->json('data.user_blocks'))->firstWhere('id', $block->id);
+
+    expect($userBlock)->not->toBeNull()
+        ->and($userBlock['content_manage_url'])->toBe('/dashboard/manage/blog')
+        ->and($userBlock['content_manage_label'])->toBe('إدارة المدونة')
+        ->and($userBlock['icon'])->toBe('assets/icons/stationery/002-book.svg')
+        ->and($userBlock['icon_url'])->toBe(asset('assets/icons/stationery/002-book.svg'))
+        ->and($userBlock['brand_mark'])->toMatchArray([
+            'type' => 'icon',
+            'value' => 'tabler:book',
+            'color' => '#ea580c',
+        ]);
+});
+
+test('block-link external blocks keep the block-type icon', function () {
+    [$user, $tenant] = createUserWithTenantForPageStructure();
+
+    setCurrentTenant($tenant);
+
+    $blockTypeIcon = app(BlockTypeRegistry::class)->iconPaths()['block-link']
+        ?? 'assets/icons/tabler/Blockquote.svg';
+
+    $block = Block::query()->create([
+        'tenant_id' => $tenant->id,
+        'component' => 'tenant::components.block-link',
+        'type' => 'block-link',
+        'title' => 'رابط خارجي',
+        'sort_order' => 99,
+        'is_default' => false,
+        'status' => 'draft',
+        'active' => true,
+        'position' => 'home',
+        'data' => [
+            'link_type' => 'external',
+            'url' => 'https://example.com',
+            'title' => 'رابط خارجي',
+        ],
+    ]);
+
+    $response = $this->actingAs($user)
         ->getJson('/api/page/structure')
         ->assertSuccessful()
         ->assertJsonFragment([
             'id' => $block->id,
-            'content_manage_url' => '/dashboard/manage/blog',
-            'content_manage_label' => 'إدارة المدونة',
+            'icon' => $blockTypeIcon,
+            'icon_url' => asset($blockTypeIcon),
         ]);
+
+    $userBlock = collect($response->json('data.user_blocks'))->firstWhere('id', $block->id);
+
+    expect($userBlock['brand_mark'] ?? null)->toBeNull();
 });
 
 test('users without a tenant cannot access page structure', function () {

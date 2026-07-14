@@ -15,8 +15,13 @@ class CtaLink
         $options = [];
 
         foreach (self::activeContentTypes() as $type) {
-            $options['section:'.$type->slug] = 'رابط '.$type->name;
-            $options['item:'.$type->slug] = config('cta-link-types.item_labels.'.$type->slug, 'محتوى محدد من '.$type->name);
+            if (self::contentTypeHasSectionRoute($type->slug)) {
+                $options['section:'.$type->slug] = 'رابط '.$type->name;
+            }
+
+            if (self::contentTypeHasItemRoute($type->slug)) {
+                $options['item:'.$type->slug] = config('cta-link-types.item_labels.'.$type->slug, 'محتوى محدد من '.$type->name);
+            }
         }
 
         return $options;
@@ -30,7 +35,14 @@ class CtaLink
         $options = [];
 
         foreach (self::activeContentTypes() as $type) {
-            $options['section:'.$type->slug] = 'رابط '.$type->name;
+            if (self::contentTypeHasSectionRoute($type->slug)) {
+                $options['section:'.$type->slug] = 'رابط '.$type->name;
+            } elseif (self::contentTypeHasItemRoute($type->slug)) {
+                $options['item:'.$type->slug] = config(
+                    'cta-link-types.item_labels.'.$type->slug,
+                    'رابط '.$type->name
+                );
+            }
         }
 
         $options['external'] = 'رابط خارجي';
@@ -48,8 +60,13 @@ class CtaLink
         $keys = [''];
 
         foreach (self::activeContentTypes() as $type) {
-            $keys[] = 'section:'.$type->slug;
-            $keys[] = 'item:'.$type->slug;
+            if (self::contentTypeHasSectionRoute($type->slug)) {
+                $keys[] = 'section:'.$type->slug;
+            }
+
+            if (self::contentTypeHasItemRoute($type->slug)) {
+                $keys[] = 'item:'.$type->slug;
+            }
         }
 
         $keys[] = 'external';
@@ -122,8 +139,19 @@ class CtaLink
         return app(ContentTypeRegistry::class)->all();
     }
 
+    public static function contentTypeRequiresItem(string $contentType): bool
+    {
+        $types = config('cta-link-types.requires_item', []);
+
+        return is_array($types) && in_array($contentType, $types, true);
+    }
+
     public static function contentTypeHasSectionRoute(string $contentType): bool
     {
+        if (self::contentTypeRequiresItem($contentType)) {
+            return false;
+        }
+
         $routeName = config('cta-link-types.routes.'.$contentType.'.index');
 
         return is_string($routeName) && filled($routeName);
@@ -131,6 +159,10 @@ class CtaLink
 
     public static function contentTypeHasItemRoute(string $contentType): bool
     {
+        if (self::contentTypeRequiresItem($contentType)) {
+            return true;
+        }
+
         $routeName = config('cta-link-types.routes.'.$contentType.'.detail');
 
         return is_string($routeName) && filled($routeName);

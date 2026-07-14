@@ -12,6 +12,7 @@ use App\Support\BlockTypeRegistry;
 use App\Support\BlockVariants;
 use App\Support\ContentTypeRegistry;
 use App\Support\PageTabRegistry;
+use App\Support\TenantPageBlocks;
 use App\Support\TenantThemeOptions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
@@ -30,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(BlockVariants::class);
         $this->app->singleton(ContentTypeRegistry::class);
         $this->app->singleton(PageTabRegistry::class);
+        $this->app->singleton(TenantPageBlocks::class);
         $this->app->singleton(TenantThemeOptions::class);
     }
 

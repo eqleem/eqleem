@@ -12,7 +12,7 @@ defineEmits(['update:modelValue']);
 <template>
     <button
         type="button"
-        class="shrink-0 rounded-lg p-1 transition hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
+        class="shrink-0 cursor-pointer rounded-lg p-1 transition hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
         role="switch"
         :aria-checked="modelValue ? 'true' : 'false'"
         :aria-label="label"

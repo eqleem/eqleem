@@ -172,7 +172,7 @@ it('imports contact and social links from the header block when profile is empty
         ->and($links->first()['url'])->toBe('https://twitter.com/imported');
 });
 
-it('falls back to user contact details before contact is saved', function () {
+it('does not fall back to owner user contact on public reads', function () {
     $user = User::factory()->create([
         'uuid' => (string) Str::uuid(),
         'email' => 'member@example.com',
@@ -200,8 +200,9 @@ it('falls back to user contact details before contact is saved', function () {
 
     $contact = app(TenantProfileService::class)->contact($tenant->fresh());
 
-    expect($contact['phone'])->toBe('0509876543')
-        ->and($contact['email'])->toBe('member@example.com');
+    expect($contact['phone'])->toBe('')
+        ->and($contact['email'])->toBe('')
+        ->and($tenant->fresh()->relationLoaded('user'))->toBeFalse();
 });
 
 it('keeps tenant contact separate from user after saving', function () {
@@ -272,7 +273,7 @@ it('seeds tenant contact from user on registration', function () {
         ->and($contact['phone'])->toBe('0505555555');
 });
 
-it('falls back to user avatar as tenant logo before logo is saved', function () {
+it('does not fall back to owner avatar on public logo reads', function () {
     $user = User::factory()->create([
         'uuid' => (string) Str::uuid(),
         'image' => 'https://example.com/avatar.jpg',
@@ -287,10 +288,22 @@ it('falls back to user avatar as tenant logo before logo is saved', function () 
         'status' => 'active',
     ]);
 
-    $service = app(TenantProfileService::class);
+    $tenant->meta->set('contact', [
+        'phone' => '',
+        'email' => '',
+        'whatsapp' => '',
+        'country' => '',
+        'city' => '',
+    ]);
+    $tenant->meta->set('social_links', []);
+    $tenant->save();
 
-    expect($service->logo($tenant))->toBe('https://example.com/avatar.jpg')
-        ->and($service->hasLogo($tenant))->toBeTrue();
+    $service = app(TenantProfileService::class);
+    $fresh = $tenant->fresh();
+
+    expect($service->logo($fresh))->toBe('https://api.dicebear.com/9.x/shapes/svg?seed='.$fresh->uuid)
+        ->and($service->hasLogo($fresh))->toBeFalse()
+        ->and($fresh->relationLoaded('user'))->toBeFalse();
 });
 
 it('seeds tenant logo from user avatar on registration', function () {

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import Input from '../../ui/Input.vue';
 import Toggle from '../../ui/Toggle.vue';
 import Button from '../../ui/Button.vue';
@@ -8,6 +8,7 @@ import BlockLinkEditor from './BlockLinkEditor.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
+import { lockBodyScroll, unlockBodyScroll } from '../../../lib/bodyScrollLock.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -83,6 +84,7 @@ function openAdd() {
     linkEditor.value = buildLinkEditor();
     linkEditorKey.value += 1;
     linkModal.value = true;
+    lockBodyScroll();
 }
 
 function openEdit(link) {
@@ -90,12 +92,18 @@ function openEdit(link) {
     linkEditor.value = buildLinkEditor(link);
     linkEditorKey.value += 1;
     linkModal.value = true;
+    lockBodyScroll();
 }
 
 function closeLinkModal() {
+    if (!linkModal.value) {
+        return;
+    }
+
     linkModal.value = false;
     editingLinkId.value = null;
     linkEditor.value = null;
+    unlockBodyScroll();
 }
 
 async function refreshLinks() {
@@ -184,6 +192,13 @@ async function saveSettings() {
 
 const modalTitle = computed(() => (editingLinkId.value ? 'تعديل رابط' : 'إضافة رابط'));
 
+onBeforeUnmount(() => {
+    if (linkModal.value) {
+        linkModal.value = false;
+        unlockBodyScroll();
+    }
+});
+
 defineExpose({ openAdd });
 </script>
 
@@ -238,7 +253,7 @@ defineExpose({ openAdd });
                 </button>
                 <button
                     type="button"
-                    class="pointer-events-none shrink-0 rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
+                    class="pointer-events-none shrink-0 cursor-pointer rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
                     @click="deleteLink(link.id)"
                 >
                     <Icon name="trash" class="h-4 w-4" />
@@ -258,27 +273,43 @@ defineExpose({ openAdd });
         </div>
     </div>
 
-    <div v-if="linkModal && linkEditor" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="fixed inset-0 bg-stone-800/75" @click="closeLinkModal"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative w-full max-w-lg rounded-xl bg-white shadow-xl">
-                <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
-                    <p class="text-sm font-semibold text-stone-600">{{ modalTitle }}</p>
-                    <button type="button" class="rounded-md bg-stone-100 p-1 text-stone-400" @click="closeLinkModal">
-                        <Icon name="x" class="h-4 w-4" />
-                    </button>
+    <Teleport to="body">
+        <div
+            v-if="linkModal && linkEditor"
+            class="relative z-50"
+            role="dialog"
+            aria-modal="true"
+        >
+            <div class="fixed inset-0 bg-stone-800/75" @click="closeLinkModal" />
+
+            <div class="fixed inset-0 overflow-y-auto overscroll-contain">
+                <div class="flex min-h-full items-center justify-center p-4" @click.self="closeLinkModal">
+                    <div class="relative w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-xl">
+                        <div class="flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                            <p class="text-sm font-semibold text-stone-600">{{ modalTitle }}</p>
+                            <button
+                                type="button"
+                                class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400 transition hover:bg-stone-200 hover:text-stone-600"
+                                aria-label="إغلاق"
+                                @click="closeLinkModal"
+                            >
+                                <Icon name="x" class="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <BlockLinkEditor
+                            :key="linkEditorKey"
+                            :block-id="blockId"
+                            :link-id="editingLinkId"
+                            :editor="linkEditor"
+                            mode="nested-link"
+                            :show-description="false"
+                            @saved="onLinkSaved"
+                            @close="closeLinkModal"
+                        />
+                    </div>
                 </div>
-                <BlockLinkEditor
-                    :key="linkEditorKey"
-                    :block-id="blockId"
-                    :link-id="editingLinkId"
-                    :editor="linkEditor"
-                    mode="nested-link"
-                    :show-description="false"
-                    @saved="onLinkSaved"
-                    @close="closeLinkModal"
-                />
             </div>
         </div>
-    </div>
+    </Teleport>
 </template>

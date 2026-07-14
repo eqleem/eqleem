@@ -1,6 +1,15 @@
 <?php
 
 return [
+    /*
+    | Content types that must link to a specific item (no section/index URL).
+    | Example: pages and forms have no tenant index route worth linking to.
+    */
+    'requires_item' => [
+        'pages',
+        'forms',
+    ],
+
     'routes' => [
         'store' => [
             'index' => 'tenant.store.index',
@@ -46,6 +55,11 @@ return [
             'index' => null,
             'detail' => 'tenant.page.detail',
         ],
+        'forms' => [
+            'index' => null,
+            // Forms open in a modal on the tenant site (no dedicated detail route).
+            'detail' => null,
+        ],
     ],
 
     'icons' => [
@@ -76,6 +90,7 @@ return [
         'digital-products' => 'منتج رقمي محدد',
         'digital-services' => 'خدمة رقمية محددة',
         'pages' => 'صفحة داخلية',
+        'forms' => 'نموذج محدد',
     ],
 
     'block_link' => [
@@ -165,6 +180,10 @@ return [
             'pages' => [
                 'title' => '',
                 'description' => 'انتقل إلى صفحة داخلية من صفحات الموقع.',
+            ],
+            'forms' => [
+                'title' => '',
+                'description' => 'افتح نموذجاً محدداً لجمع البيانات أو التواصل.',
             ],
         ],
     ],

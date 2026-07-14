@@ -18,8 +18,8 @@
                 $brandMark = $link['brand_mark'] ?? null;
                 $isPrimaryCta = $loop->first;
                 $ctaBgClasses = $isPrimaryCta
-                    ? 'bg-primary-600 hover:bg-primary-700'
-                    : 'bg-secondary-200 hover:bg-secondary-300 text-secondary-700';
+                    ? 'bg-primary-600 hover:bg-primary-700 text-white'
+                    : 'bg-secondary-900/10 hover:bg-secondary-900/20 text-secondary-900';
             @endphp
 
             @if($ctaLinksCount >= 3 && $ctaLinksRemainder === 2 && $loop->iteration === $ctaLinksCount - 1)
@@ -31,7 +31,7 @@
                 type="button"
                 wire:key="cta-link-{{ $link['id'] }}"
                 @class([
-                    'flex w-full items-center justify-center gap-2 text-white text-base rounded-2xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
+                    'flex w-full items-center justify-center gap-2 text-base rounded-2xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
                     $ctaBgClasses,
                     'col-span-2 lg:col-span-1' => $isLonelyMobileLast && ! $isLonelyLgLast,
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,
@@ -64,7 +64,7 @@
                 wire:key="cta-link-{{ $link['id'] }}"
                 @if($link['opensInNewTab']) target="_blank" rel="noopener noreferrer" @else wire:navigate @endif
                 @class([
-                    'flex w-full items-center text-white justify-center transition-all duration-200 text-base font-medium font-geist rounded-2xl px-4 py-3 group relative overflow-hidden',
+                    'flex w-full items-center justify-center transition-all duration-200 text-base font-medium font-geist rounded-2xl px-4 py-3 group relative overflow-hidden',
                     $ctaBgClasses,
                     'col-span-2 lg:col-span-1' => $isLonelyMobileLast && ! $isLonelyLgLast,
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,
@@ -109,6 +109,8 @@
                 <livewire:tenant.forms.submit
                     :form-content-id="$link['formContentId']"
                     :block-id="$block?->id"
+                    :description="$link['formDescription']"
+                    :fields="$link['formFields']"
                     :key="'cta-form-submit-'.$link['id']"
                 />
 

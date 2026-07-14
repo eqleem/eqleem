@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import Input from '../../ui/Input.vue';
 import Select from '../../ui/Select.vue';
 import Button from '../../ui/Button.vue';
@@ -8,6 +8,7 @@ import Switch from '../../settings/Switch.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifyApiError, notifySuccess } from '../../../lib/notify.js';
+import { lockBodyScroll, unlockBodyScroll } from '../../../lib/bodyScrollLock.js';
 
 const props = defineProps({
     blockId: { type: Number, required: true },
@@ -123,6 +124,7 @@ function openEdit(item) {
     editValue.value = item.key === 'whatsapp' ? form.whatsapp_number : form.phone_number;
     editError.value = null;
     editModal.value = true;
+    lockBodyScroll();
 }
 
 function openPosition() {
@@ -130,9 +132,26 @@ function openPosition() {
     editValue.value = form.position;
     editError.value = null;
     editModal.value = true;
+    lockBodyScroll();
+}
+
+function closeEditModal() {
+    if (!editModal.value) {
+        return;
+    }
+
+    editModal.value = false;
+    unlockBodyScroll();
 }
 
 defineExpose({ openPosition });
+
+onBeforeUnmount(() => {
+    if (editModal.value) {
+        editModal.value = false;
+        unlockBodyScroll();
+    }
+});
 
 async function saveEdit() {
     editError.value = null;
@@ -154,7 +173,7 @@ async function saveEdit() {
         }
 
         notifySuccess('Saved');
-        editModal.value = false;
+        closeEditModal();
     } catch (error) {
         editError.value = error instanceof ApiError ? error.message : 'تعذر الحفظ.';
     } finally {
@@ -197,16 +216,16 @@ async function saveEdit() {
         </ul>
     </div>
 
-    <div v-if="editModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-stone-800/75" @click="editModal = false"></div>
-        <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
+    <div v-if="editModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 overscroll-contain">
+        <div class="absolute inset-0 bg-stone-800/75" @click="closeEditModal"></div>
+        <div class="relative max-h-[90vh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-xl bg-white shadow-xl">
             <div class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
                 <p class="text-sm font-semibold text-stone-600">
                     <template v-if="editingKey === 'position'">موضع الأزرار</template>
                     <template v-else-if="editingKey === 'whatsapp'">رقم واتساب</template>
                     <template v-else>رقم الاتصال</template>
                 </p>
-                <button type="button" class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400" @click="editModal = false">
+                <button type="button" class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400" @click="closeEditModal">
                     <Icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -238,7 +257,7 @@ async function saveEdit() {
                 <p v-if="editError" class="text-sm text-red-500">{{ editError }}</p>
             </div>
             <div class="sticky bottom-0 flex justify-end gap-2 border-t border-stone-100 bg-white p-3 px-4">
-                <Button type="button" variant="ghost" label="إلغاء" @click="editModal = false" />
+                <Button type="button" variant="ghost" label="إلغاء" @click="closeEditModal" />
                 <Button type="button" label="حفظ" :loading="editSaving" @click="saveEdit" />
             </div>
         </div>

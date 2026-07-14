@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use App\PageBuilder\BlockRegistry;
+use App\Support\TenantPageBlocks;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -153,13 +154,13 @@ class Block extends Model implements HasMedia
 
     public static function queryForTenantRoots(): Builder
     {
-        return static::query()->forCurrentTenant()->roots()->whereNull('content_id');
+        // Tenant scoping comes from BelongsToTenant global scope.
+        return static::query()->roots()->whereNull('content_id');
     }
 
     public static function queryForContent(int $contentId): Builder
     {
         return static::query()
-            ->forCurrentTenant()
             ->roots()
             ->where('content_id', $contentId);
     }
@@ -174,6 +175,12 @@ class Block extends Model implements HasMedia
      */
     public static function findPageBlock(int $id, array $types): ?self
     {
+        $cached = app(TenantPageBlocks::class)->pageBlock($id, $types);
+
+        if ($cached) {
+            return $cached;
+        }
+
         return static::queryForTenantRoots()
             ->whereKey($id)
             ->whereIn('type', $types)
@@ -181,10 +188,28 @@ class Block extends Model implements HasMedia
     }
 
     /**
+     * Active home-page blocks for the current tenant (from the request cache).
+     *
+     * @return Collection<int, Block>
+     */
+    public static function homePageBlocks(): Collection
+    {
+        return app(TenantPageBlocks::class)->homeBlocks();
+    }
+
+    /**
      * @return Collection<int, Content>
      */
     public function activeContents(string $type): Collection
     {
+        if ($this->relationLoaded('contents')) {
+            return $this->contents
+                ->where('type', $type)
+                ->where('active', true)
+                ->sortBy('sort_order')
+                ->values();
+        }
+
         return $this->contents()
             ->type($type)
             ->where('active', true)

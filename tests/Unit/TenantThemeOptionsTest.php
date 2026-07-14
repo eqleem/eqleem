@@ -98,3 +98,26 @@ test('secondary palette defaults to gray when option is missing', function () {
 
     expect($default)->toBe($gray);
 });
+
+test('forTwind rewrites bare oklch colors so slash opacity works', function () {
+    $options = app(TenantThemeOptions::class);
+
+    $palette = $options->forTwind([
+        '900' => 'oklch(21% 0.034 264.665)',
+        '500' => '#0d9488',
+        '400' => 'oklch(70% 0.1 180 / <alpha-value>)',
+    ]);
+
+    expect($palette['900'])->toBe('oklch(21% 0.034 264.665 / <alpha-value>)')
+        ->and($palette['500'])->toBe('#0d9488')
+        ->and($palette['400'])->toBe('oklch(70% 0.1 180 / <alpha-value>)');
+});
+
+test('forTwind keeps named secondary palette shades alpha-aware for twind', function () {
+    $options = app(TenantThemeOptions::class);
+
+    $palette = $options->forTwind($options->secondaryPalette(['bgColor' => 'gray']));
+
+    expect($palette['900'])->toStartWith('oklch(')
+        ->and($palette['900'])->toContain('/ <alpha-value>)');
+});

@@ -3,6 +3,7 @@
 namespace App\Livewire\Concerns;
 
 use App\Models\Block;
+use App\Support\TenantPageBlocks;
 use Illuminate\Contracts\View\View;
 
 trait ResolvesTenantBlockView
@@ -19,7 +20,8 @@ trait ResolvesTenantBlockView
 
     protected function resolveSingletonBlock(): ?Block
     {
-        return Block::findSingleton($this->blockType());
+        return app(TenantPageBlocks::class)->singleton($this->blockType())
+            ?? Block::findSingleton($this->blockType());
     }
 
     protected function resolvePageBlock(int $blockId): ?Block

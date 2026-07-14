@@ -10,6 +10,9 @@ class TenantThemeOptions
     /** @var array<string, array<string, string>>|null */
     private static ?array $palettes = null;
 
+    /** @var array<string, array<string, mixed>> */
+    private array $resolvedCache = [];
+
     /**
      * Mix ratios for generating Tailwind-like shades from a custom base (~500) hex.
      *
@@ -48,10 +51,16 @@ class TenantThemeOptions
             return [];
         }
 
+        $cacheKey = $tenant->id.':'.$theme->id;
+
+        if (array_key_exists($cacheKey, $this->resolvedCache)) {
+            return $this->resolvedCache[$cacheKey];
+        }
+
         $schema = $this->schemaForTheme($theme->slug);
 
         if ($schema === []) {
-            return [];
+            return $this->resolvedCache[$cacheKey] = [];
         }
 
         $saved = $tenant->themeSettingsFor($theme->id);
@@ -61,7 +70,7 @@ class TenantThemeOptions
             $resolved[$key] = data_get($saved, $key, $field['default'] ?? null);
         }
 
-        return $resolved;
+        return $this->resolvedCache[$cacheKey] = $resolved;
     }
 
     /**
@@ -84,6 +93,56 @@ class TenantThemeOptions
             (string) ($options['bgColor'] ?? 'gray'),
             'gray',
         );
+    }
+
+    /**
+     * Twind can only apply slash-opacity (e.g. bg-secondary-900/10) to hex colors
+     * or values that include an `<alpha-value>` placeholder. Named Tailwind palettes
+     * ship as bare `oklch(...)`, so opacity modifiers are silently ignored unless
+     * rewritten for Twind.
+     *
+     * @param  array<int|string, string>  $palette
+     * @return array<int|string, string>
+     */
+    public function forTwind(array $palette): array
+    {
+        $converted = [];
+
+        foreach ($palette as $shade => $color) {
+            $converted[$shade] = $this->toTwindColor((string) $color);
+        }
+
+        return $converted;
+    }
+
+    /**
+     * Rewrite a CSS color so Twind opacity modifiers can inject alpha.
+     */
+    public function toTwindColor(string $color): string
+    {
+        $color = trim($color);
+
+        if ($color === '' || str_contains($color, '<alpha-value>')) {
+            return $color;
+        }
+
+        if ($this->isHexColor($color)) {
+            return $this->normalizeHex($color);
+        }
+
+        if (preg_match('/^oklch\(\s*([^\/)]+?)\s*\)$/i', $color, $matches) === 1) {
+            return 'oklch('.trim($matches[1]).' / <alpha-value>)';
+        }
+
+        if (preg_match('/^rgba?\(\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*\)$/i', $color, $matches) === 1) {
+            return "rgb({$matches[1]} {$matches[2]} {$matches[3]} / <alpha-value>)";
+        }
+
+        if (preg_match('/^hsla?\(\s*([\d.]+)\s*[, ]\s*([\d.]+%?)\s*[, ]\s*([\d.]+%?)\s*\)$/i', $color, $matches) === 1) {
+            return "hsl({$matches[1]} {$matches[2]} {$matches[3]} / <alpha-value>)";
+        }
+
+        return $color;
     }
 
     /**
@@ -147,6 +206,38 @@ class TenantThemeOptions
     }
 
     /**
+     * Whether a CSS color reads as a light background (dark text recommended).
+     */
+    public function isLightColor(string $color): bool
+    {
+        $lightness = $this->perceptualLightness($color);
+
+        if ($lightness === null) {
+            return false;
+        }
+
+        return $lightness >= 0.62;
+    }
+
+    /**
+     * Tailwind text class for readable text on the given background color.
+     */
+    public function contrastTextClass(string $color): string
+    {
+        return $this->isLightColor($color) ? 'text-stone-900' : 'text-white';
+    }
+
+    /**
+     * Icon / brand-mark chrome classes that match contrast text on a background.
+     */
+    public function contrastIconChromeClass(string $color): string
+    {
+        return $this->isLightColor($color)
+            ? 'bg-black/10 text-stone-900'
+            : 'bg-white/15 text-white';
+    }
+
+    /**
      * @return array<string, string>
      */
     public function paletteFromHex(string $hex): array
@@ -161,6 +252,40 @@ class TenantThemeOptions
         }
 
         return $palette;
+    }
+
+    /**
+     * Approximate perceptual lightness in 0–1 from hex or oklch() colors.
+     */
+    public function perceptualLightness(string $color): ?float
+    {
+        $color = trim($color);
+
+        if ($color === '' || $color === 'transparent') {
+            return null;
+        }
+
+        if (preg_match('/^oklch\(\s*([\d.]+)(%?)/i', $color, $matches) === 1) {
+            $value = (float) $matches[1];
+
+            return $matches[2] === '%' ? ($value / 100) : $value;
+        }
+
+        if (! $this->isHexColor($color)) {
+            return null;
+        }
+
+        [$r, $g, $b] = $this->hexToRgb($color);
+
+        $channels = array_map(function (int $channel): float {
+            $normalized = $channel / 255;
+
+            return $normalized <= 0.03928
+                ? $normalized / 12.92
+                : (($normalized + 0.055) / 1.055) ** 2.4;
+        }, [$r, $g, $b]);
+
+        return (0.2126 * $channels[0]) + (0.7152 * $channels[1]) + (0.0722 * $channels[2]);
     }
 
     /**

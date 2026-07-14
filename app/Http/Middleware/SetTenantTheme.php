@@ -31,8 +31,8 @@ class SetTenantTheme
         view()->prependNamespace('default-tenant-theme', public_path('themes/default'));
 
         $options = $this->themeOptions->resolve($tenant);
-        $primaryPalette = $this->themeOptions->primaryPalette($options);
-        $secondaryPalette = $this->themeOptions->secondaryPalette($options);
+        $primaryPalette = $this->themeOptions->forTwind($this->themeOptions->primaryPalette($options));
+        $secondaryPalette = $this->themeOptions->forTwind($this->themeOptions->secondaryPalette($options));
 
         view()->share('themeOptions', $options);
         view()->share('themePrimaryPalette', $primaryPalette);

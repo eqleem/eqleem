@@ -6,6 +6,7 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Support\BlockBrandMark;
 use App\Support\BlockTypeRegistry;
+use App\Support\ContentTypeRegistry;
 use App\Support\CtaLink;
 use Illuminate\Support\Collection;
 
@@ -18,12 +19,23 @@ trait MapsPageBlocks
     {
         $typeIcons = $blockTypes->iconPaths();
         $editors = $blockTypes->editors();
+        $contentTypes = app(ContentTypeRegistry::class);
 
-        return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
+        return $blocks->map(function (Block $block) use ($typeIcons, $editors, $contentTypes): array {
             $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
-            $contentManage = $block->type === 'block-link' && is_array($block->data)
-                ? $this->dashboardManageMetaFromData($block->data)
+            $data = is_array($block->data) ? $block->data : [];
+            $contentManage = $block->type === 'block-link'
+                ? $this->dashboardManageMetaFromData($data)
                 : null;
+
+            $brandMark = null;
+
+            if ($block->type === 'block-link') {
+                $icon = $this->displayIconForBlockLink($data, $icon, $contentTypes);
+                $brandMark = BlockBrandMark::forEditor(
+                    is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
+                );
+            }
 
             return [
                 'id' => $block->id,
@@ -36,10 +48,35 @@ trait MapsPageBlocks
                 'active' => (bool) $block->active,
                 'icon' => $icon,
                 'icon_url' => asset($icon),
+                'brand_mark' => $brandMark,
                 'content_manage_url' => $contentManage['url'] ?? null,
                 'content_manage_label' => $contentManage['label'] ?? null,
             ];
         });
+    }
+
+    /**
+     * Prefer the selected section/item content-type icon; keep the block-type icon for external links.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function displayIconForBlockLink(array $data, string $blockTypeIcon, ContentTypeRegistry $contentTypes): string
+    {
+        $linkType = (string) ($data['link_type'] ?? '');
+
+        if ($linkType === 'external' || $linkType === '') {
+            return $blockTypeIcon;
+        }
+
+        $contentTypeSlug = (string) ($data['content_type'] ?? '');
+
+        if ($contentTypeSlug === '') {
+            return $blockTypeIcon;
+        }
+
+        $contentType = $contentTypes->find($contentTypeSlug);
+
+        return filled($contentType?->icon) ? $contentType->icon : $blockTypeIcon;
     }
 
     /**

@@ -29,6 +29,7 @@ class PageBlockResource extends JsonResource
             'active' => (bool) ($block['active'] ?? true),
             'icon' => $block['icon'] ?? null,
             'icon_url' => $block['icon_url'] ?? null,
+            'brand_mark' => $block['brand_mark'] ?? null,
             'content_manage_url' => $block['content_manage_url'] ?? null,
             'content_manage_label' => $block['content_manage_label'] ?? null,
         ];

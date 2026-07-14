@@ -12,7 +12,7 @@
 
                 <h3 class="text-lg font-bold text-stone-900">سلتك فارغة حالياً</h3>
                 <p class="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
-                    ابدأ بتصفح المنتجات والخدمات والدورات، ثم أضف ما يعجبك إلى السلة.
+                    ابدأ بتصفح المنتجات والخدمات  ثم أضف ما يعجبك إلى السلة.
                 </p>
 
                 <a

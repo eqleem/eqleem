@@ -200,8 +200,10 @@ it('submits the contact page form and shows the configured success message', fun
             'message' => 'أريد معرفة المزيد عن خدماتكم.',
         ]);
 
-    Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail): bool {
+    Mail::assertQueued(ContactMessage::class, function (ContactMessage $mail) use ($tenant): bool {
         return $mail->hasTo('tenant-inbox@example.com')
+            && $mail->tenant?->is($tenant)
+            && $mail->managePageUrl === route('admin.page.home')
             && $mail->contact['email'] === 'ahmad@example.com'
             && $mail->contact['subject'] === 'استفسار عام'
             && $mail->contact['message'] === 'أريد معرفة المزيد عن خدماتكم.';
