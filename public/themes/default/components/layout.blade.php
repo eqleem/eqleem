@@ -30,5 +30,5 @@
 
     @livewire('tenant.blocks.footer')
 
-    @livewire('tenant.blocks.float-links')
+    @livewire('tenant.blocks.float-links' , ['width' => $width])
 </div>

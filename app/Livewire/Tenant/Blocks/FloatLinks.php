@@ -10,6 +10,8 @@ class FloatLinks extends Component
 {
     use ResolvesTenantBlockView;
 
+    public $width;
+
     protected function blockType(): string
     {
         return 'float-links';

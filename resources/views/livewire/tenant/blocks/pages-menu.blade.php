@@ -1,6 +1,11 @@
 <div>
     @if ($publishedPages->isNotEmpty())
-        <div class="relative" x-data="{ open: false }" @click.away="open = false">
+        <div
+            class="relative"
+            x-data="{ open: false, loadingId: null }"
+            x-on:click.away="if (! loadingId) open = false"
+            x-on:livewire:navigated.window="loadingId = null; open = false"
+        >
             <button
                 type="button"
                 class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
@@ -32,11 +37,21 @@
                         wire:navigate
                         wire:key="top-nav-page-{{ $publishedPage->id }}"
                         class="flex items-center gap-x-2.5 px-3 py-2.5 text-sm text-stone-700 transition hover:bg-stone-100"
-                        x-on:click="open = false"
+                        x-on:click="loadingId = {{ $publishedPage->id }}"
+                        x-bind:aria-busy="loadingId === {{ $publishedPage->id }}"
                     >
                         <iconify-icon
+                            x-show="loadingId !== {{ $publishedPage->id }}"
                             icon="{{ $pageMenuIcon($publishedPage->template) }}"
                             class="shrink-0 text-lg text-black/50"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                        <iconify-icon
+                            x-cloak
+                            x-show="loadingId === {{ $publishedPage->id }}"
+                            icon="solar:refresh-bold-duotone"
+                            class="shrink-0 text-lg text-black/50 animate-spin"
+                            aria-hidden="true"
                         ></iconify-icon>
                         <span class="min-w-0 truncate">{{ $publishedPage->title }}</span>
                     </a>

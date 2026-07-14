@@ -31,7 +31,7 @@
                 type="button"
                 wire:key="cta-link-{{ $link['id'] }}"
                 @class([
-                    'flex w-full items-center justify-center gap-2 text-base rounded-2xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
+                    'flex w-full items-center justify-center gap-2 text-base rounded-xl px-4 py-3 font-medium transition-all duration-300 hover-lift',
                     $ctaBgClasses,
                     'col-span-2 lg:col-span-1' => $isLonelyMobileLast && ! $isLonelyLgLast,
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,
@@ -64,7 +64,7 @@
                 wire:key="cta-link-{{ $link['id'] }}"
                 @if($link['opensInNewTab']) target="_blank" rel="noopener noreferrer" @else wire:navigate.hover @endif
                 @class([
-                    'flex w-full items-center justify-center transition-all duration-200 text-base font-medium font-geist rounded-2xl px-4 py-3 group relative overflow-hidden',
+                    'flex w-full items-center justify-center transition-all duration-200 text-base font-medium font-geist rounded-xl px-4 py-3 group relative overflow-hidden',
                     $ctaBgClasses,
                     'col-span-2 lg:col-span-1' => $isLonelyMobileLast && ! $isLonelyLgLast,
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,

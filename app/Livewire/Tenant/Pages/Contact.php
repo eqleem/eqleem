@@ -12,6 +12,7 @@ class Contact extends Component
 
     public function mount(): void
     {
+
         $this->page = Content::query()
             ->type(contentTypeModel('pages'))
             ->template('contact')

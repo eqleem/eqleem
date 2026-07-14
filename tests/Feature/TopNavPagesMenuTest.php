@@ -112,7 +112,9 @@ it('gives icon-only top-nav controls accessible names', function () {
         ->assertSuccessful()
         ->assertSeeHtml('aria-label="مشاركة الصفحة"')
         ->assertSeeHtml('<span class="sr-only">مشاركة الصفحة</span>')
-        ->assertSeeHtml('aria-label="دخول العملاء"');
+        ->assertSeeHtml('aria-label="دخول العملاء"')
+        ->assertSeeHtml('aria-label="الصفحة الرئيسية"')
+        ->assertSeeHtml('<span class="sr-only">الصفحة الرئيسية</span>');
 
     Livewire::test(PagesMenu::class)
         ->assertSuccessful()
@@ -123,4 +125,27 @@ it('gives icon-only top-nav controls accessible names', function () {
         ->assertSuccessful()
         ->assertSeeHtml('aria-label="سلة المشتريات"')
         ->assertSeeHtml('<span class="sr-only">سلة المشتريات</span>');
+});
+
+it('shows a loading indicator on the home back button', function () {
+    createTenantWithPublishedPagesForTopNav();
+
+    Livewire::test(TopNav::class)
+        ->assertSuccessful()
+        ->assertSee('id="backBtn"', false)
+        ->assertSee('x-on:click="loading = true"', false)
+        ->assertSee('animate-spin', false)
+        ->assertSee('solar:refresh-bold-duotone', false)
+        ->assertSee(route('tenant.home'), false);
+});
+
+it('shows a loading indicator on page menu links', function () {
+    [, $contact] = createTenantWithPublishedPagesForTopNav();
+
+    Livewire::test(PagesMenu::class)
+        ->assertSuccessful()
+        ->assertSee("x-on:click=\"loadingId = {$contact->id}\"", false)
+        ->assertSee('animate-spin', false)
+        ->assertSee('solar:refresh-bold-duotone', false)
+        ->assertSee("x-bind:aria-busy=\"loadingId === {$contact->id}\"", false);
 });

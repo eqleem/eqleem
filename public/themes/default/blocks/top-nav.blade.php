@@ -29,13 +29,34 @@
 
         <div class="flex items-center justify-center w-full h-14">
             @if ($showBackButtonLink)
-                <a href="{{ $homeUrl }}" wire:navigate.hover id="backBtn" class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden">
-                    <x-brand-mark
-                        :mark="app(\App\Services\TenantProfileService::class)->brandMark(tenant())"
-                        :url="tenant('logo')"
-                        alt="{{ tenant('name') }}"
-                        class="w-full h-full object-cover rounded-full transition-transform duration-500"
-                    />
+                <a
+                    href="{{ $homeUrl }}"
+                    wire:navigate.hover
+                    id="backBtn"
+                    x-data="{ loading: false }"
+                    x-on:click="loading = true"
+                    x-on:livewire:navigated.window="loading = false"
+                    x-bind:aria-busy="loading"
+                    class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden"
+                    aria-label="الصفحة الرئيسية"
+                >
+                    <span class="sr-only">الصفحة الرئيسية</span>
+                    <span x-show="! loading" class="block size-full">
+                        <x-brand-mark
+                            :mark="app(\App\Services\TenantProfileService::class)->brandMark(tenant())"
+                            :url="tenant('logo')"
+                            alt="{{ tenant('name') }}"
+                            class="w-full h-full object-cover rounded-full transition-transform duration-500"
+                        />
+                    </span>
+                    <iconify-icon
+                        x-cloak
+                        x-show="loading"
+                        icon="solar:refresh-bold-duotone"
+                        class="inline text-2xl animate-spin text-black/50"
+                        stroke-width="2"
+                        aria-hidden="true"
+                    ></iconify-icon>
                 </a>
             @endif
         </div>

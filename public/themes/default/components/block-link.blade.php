@@ -1,34 +1,57 @@
 @props(['link' => '#', 'title' => 'رابط', 'desc' => '...', 'icon' => 'hugeicons:store-02', 'brandMark' => null])
 
  <div class="bg-white rounded-2xl group border-2 border-secondary-900/5 hover:border-primary-500 focus-within:border-primary-500 transition">
-    <a href="{{$link}}" wire:navigate.hover class="flex items-center justify-between p-3 ">
+    <a
+        href="{{ $link }}"
+        wire:navigate.hover
+        x-data="{ loading: false }"
+        x-on:click="loading = true"
+        x-on:livewire:navigated.window="loading = false"
+        x-bind:aria-busy="loading"
+        class="flex items-center justify-between p-3"
+    >
         <div class="flex items-center gap-3 truncate">
-            @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
-                @if (($brandMark['type'] ?? '') === 'image')
-                    <div class="brand-icon size-14 shrink-0 overflow-hidden rounded-xl">
-                        <x-brand-mark :mark="$brandMark" :alt="$title" class="size-full object-cover" />
-                    </div>
-                @elseif (($brandMark['type'] ?? '') === 'emoji')
-                    <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl text-4xl">
-                        <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
+            <div x-show="! loading" class="contents">
+                @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
+                    @if (($brandMark['type'] ?? '') === 'image')
+                        <div class="brand-icon size-14 shrink-0 overflow-hidden rounded-xl">
+                            <x-brand-mark :mark="$brandMark" :alt="$title" class="size-full object-cover" />
+                        </div>
+                    @elseif (($brandMark['type'] ?? '') === 'emoji')
+                        <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl text-4xl">
+                            <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
+                        </div>
+                    @else
+                        <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary-500 text-white">
+                            <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
+                        </div>
+                    @endif
+                @elseif ($icon && is_string($icon))
+                    <div class="brand-icon flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary-500 p-2 text-white">
+                        <iconify-icon icon="{{ $icon }}" class="text-4xl block" stroke-width="1.5"></iconify-icon>
                     </div>
                 @else
-                    <div class="brand-icon flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary-500 text-white">
-                        <x-brand-mark :mark="$brandMark" :alt="$title" class="size-10 object-cover" />
-                    </div>
+                    {{ $icon }}
                 @endif
-            @elseif ($icon && is_string($icon))
-                <div class="brand-icon flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary-500 p-2 text-white">
-                    <iconify-icon icon="{{$icon}}" class="text-4xl block" stroke-width="1.5"></iconify-icon>
-                </div>
-            @else
-                {{$icon}}
-            @endif
+            </div>
+
+            <div
+                x-cloak
+                x-show="loading"
+                class="brand-icon flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary-500 p-2 text-white"
+                aria-hidden="true"
+            >
+                <iconify-icon
+                    icon="solar:refresh-bold-duotone"
+                    class="text-4xl block animate-spin"
+                    stroke-width="1.5"
+                ></iconify-icon>
+            </div>
 
             <div>
-                <p class="text-lg font-semibold" style=""> {{$title}} </p>
-                <p class="text-sm md:text-base text-stone-500 flex items-center gap-1" style="">
-                    {{$desc}}
+                <p class="text-lg font-semibold">{{ $title }}</p>
+                <p class="text-sm md:text-base text-stone-500 flex items-center gap-1">
+                    {{ $desc }}
                 </p>
             </div>
         </div>
@@ -39,7 +62,7 @@
 
     @if ($slot->isNotEmpty())
         <div class="animate-content delay-400 pt-6 border-t border-stone-100 mt-4">
-            {{$slot}}
+            {{ $slot }}
         </div>
     @endif
 </div>
