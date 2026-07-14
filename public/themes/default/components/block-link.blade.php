@@ -1,7 +1,7 @@
 @props(['link' => '#', 'title' => 'رابط', 'desc' => '...', 'icon' => 'hugeicons:store-02', 'brandMark' => null])
 
  <div class="bg-white rounded-2xl group border-2 border-secondary-900/5 hover:border-primary-500 focus-within:border-primary-500 transition">
-    <a href="{{$link}}" wire:navigate class="flex items-center justify-between p-3 ">
+    <a href="{{$link}}" wire:navigate.hover class="flex items-center justify-between p-3 ">
         <div class="flex items-center gap-3 truncate">
             @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
                 @if (($brandMark['type'] ?? '') === 'image')

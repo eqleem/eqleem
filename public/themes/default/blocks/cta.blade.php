@@ -62,7 +62,7 @@
             <a
                 href="{{ $link['url'] }}"
                 wire:key="cta-link-{{ $link['id'] }}"
-                @if($link['opensInNewTab']) target="_blank" rel="noopener noreferrer" @else wire:navigate @endif
+                @if($link['opensInNewTab']) target="_blank" rel="noopener noreferrer" @else wire:navigate.hover @endif
                 @class([
                     'flex w-full items-center justify-center transition-all duration-200 text-base font-medium font-geist rounded-2xl px-4 py-3 group relative overflow-hidden',
                     $ctaBgClasses,
