@@ -92,20 +92,29 @@ return [
     ],
     'preflight' => [
         '@font-face' => [
-            $arabicOnlyFace(array_merge([
-                'fontFamily' => 'sarmady',
-                'src' => 'url(/assets/fonts/sarmady/sarmady-compressed-black.otf)',
-                'fontStyle' => 'normal',
-                'fontWeight' => 900,
-                'fontDisplay' => 'auto',
-            ], $sarmadyMetrics)),
+            // $arabicOnlyFace(array_merge([
+            //     'fontFamily' => 'sarmady',
+            //     'src' => 'url(/assets/fonts/sarmady/sarmady-compressed-black.otf)',
+            //     'fontStyle' => 'normal',
+            //     'fontWeight' => 900,
+            //     'fontDisplay' => 'auto',
+            // ], $sarmadyMetrics)),
             $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-bold.otf)',
                 'fontStyle' => 'normal',
-                'fontWeight' => 700,
+                'fontWeight' => 600,
+                'fontDisplay' => 'auto',
+            ], $sarmadyMetrics)),  
+
+            $arabicOnlyFace(array_merge([
+                'fontFamily' => 'sarmady',
+                'src' => 'url(/assets/fonts/sarmady/arfonts-sarmady-semibold.otf)',
+                'fontStyle' => 'normal',
+                'fontWeight' => 500,
                 'fontDisplay' => 'auto',
             ], $sarmadyMetrics)),
+            
             $arabicOnlyFace(array_merge([
                 'fontFamily' => 'sarmady',
                 'src' => 'url(/assets/fonts/sarmady/sarmady-regular.otf)',

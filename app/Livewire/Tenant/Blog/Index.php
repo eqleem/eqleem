@@ -28,7 +28,10 @@ class Index extends Component
             ->type(contentTypeModel('blog'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'blog_category')])
+            ->with([
+                'user:id,name',
+                'taxonomies' => fn ($query) => $query->where('type', 'blog_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('blog_category', $categoryIds),

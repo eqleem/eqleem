@@ -59,29 +59,35 @@
 
             <div class="flex flex-wrap items-end justify-between gap-4 text-sm text-stone-500 md:text-base">
                 <div class="flex flex-wrap items-center gap-6">
-                    <div class="space-y-1">
-                        <p class="text-xs font-semibold tracking-wide text-stone-400 md:text-sm">الكاتب</p>
-                        <p class="font-semibold text-stone-800">{{ tenant('name') }}</p>
-                    </div>
+                    <div class="flex items-center gap-3">
+                        @if ($post->user)
+                            <img
+                                src="{{ $post->user->image }}"
+                                alt="{{ $post->user->name }}"
+                                class="size-8 lg:size-11 shrink-0 rounded-lg object-cover"
+                            >
+                        @endif
 
-                    @if ($post->published_at)
-                        <div class="space-y-1">
-                            <p class="text-xs font-semibold tracking-wide text-stone-400 md:text-sm">تاريخ النشر</p>
-                            <p class="font-semibold text-stone-800">{{ $post->published_at->translatedFormat('j F Y') }}</p>
+                        <div class="space-y-px">
+                            <p class="text-xs font-semibold tracking-wide text-stone-700 md:text-sm"> {{ $post->user?->name }} </p>
+                            @if ($post->published_at)
+                            <p class="text-sm text-stone-500">{{ $post->published_at->translatedFormat('j F Y') }}</p>
+                            @endif
                         </div>
-                    @endif
+                    </div>
+ 
                 </div>
 
-                <button class="inline-flex items-center gap-2 text-stone-400 transition hover:text-stone-600" aria-label="الإعجابات">
+                {{-- <button class="inline-flex items-center gap-2 text-stone-400 transition hover:text-stone-600" aria-label="الإعجابات">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
                     </svg>
                     <span>0</span>
-                </button>
+                </button> --}}
             </div>
         </header>
 
-        <div class="my-8 h-px w-full bg-stone-200"></div>
+        <div class="my-8 h-px w-full bg-stone-100"></div>
 
         @if ($imageUrl)
             <figure class="overflow-hidden rounded-3xl border border-stone-200/80 bg-stone-50">

@@ -26,7 +26,7 @@
             @endif
 
             <div>
-                <p class="text-lg font-geist font-bold" style=""> {{$title}} </p>
+                <p class="text-lg font-semibold" style=""> {{$title}} </p>
                 <p class="text-sm md:text-base text-stone-500 flex items-center gap-1" style="">
                     {{$desc}}
                 </p>

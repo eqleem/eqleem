@@ -82,15 +82,15 @@
                                     <p class="mb-3 text-sm text-stone-500 md:text-base">{{ $subtitle }}</p>
                                 @endif
 
-                                <p class="flex flex-wrap items-center gap-2 text-sm text-stone-400 md:text-base">
-                                    <span class="text-base font-extrabold text-orange-600 md:text-lg">{{ tenant('name') }}</span>
+                                <p class="flex flex-wrap items-center gap-2 text-sm text-stone-400  ">
+                                    <span class="text-sm font-extrabold text-orange-600 md:text-base">{{ $post->user?->name }}</span>
 
                                     @if ($postCategories->isNotEmpty())
                                         <span>في {{ $postCategories->pluck('name')->join('، ') }}</span>
                                     @endif
 
                                     @if ($post->published_at)
-                                        <span>· {{ $post->published_at->translatedFormat('j F Y') }}</span>
+                                        <span class="">· {{ $post->published_at->translatedFormat('j F Y') }}</span>
                                     @endif
                                 </p>
                             </div>

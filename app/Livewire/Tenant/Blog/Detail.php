@@ -14,6 +14,7 @@ class Detail extends Component
         if ($this->isPreviewRequest()) {
             $post = Content::query()
                 ->type(contentTypeModel('blog'))
+                ->with('user:id,name,email,image')
                 ->where('slug', $slug)
                 ->firstOrFail();
 
@@ -26,6 +27,7 @@ class Detail extends Component
 
         $this->post = Content::query()
             ->type(contentTypeModel('blog'))
+            ->with('user:id,name,email,image')
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
