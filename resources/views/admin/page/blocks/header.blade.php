@@ -164,7 +164,9 @@ new class extends \Livewire\Component
         $this->currentLogo = (string) ($tenant?->logo ?? '');
         $this->showAvatar = (bool) ($data['show_avatar'] ?? true);
         $this->showVerifiedBadge = (bool) ($data['show_verified_badge'] ?? true);
-        $this->bio = (string) ($data['bio'] ?? '');
+        $this->bio = $tenant
+            ? app(TenantProfileService::class)->bio($tenant)
+            : '';
 
         $contact = app(TenantProfileService::class)->contact($tenant);
         $this->country = $contact['country'];
@@ -252,20 +254,20 @@ new class extends \Livewire\Component
 
         if ($tenant) {
             $tenant->name = $this->name;
+            $tenant->save();
+
+            $profile = app(TenantProfileService::class);
+            $profile->saveBio($tenant, $this->bio);
 
             if ($this->logo) {
                 $path = $this->logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
-                app(TenantProfileService::class)->saveLogo($tenant, $path);
-            } else {
-                $tenant->save();
+                $profile->saveLogo($tenant, $path);
             }
 
-            $this->currentLogo = $tenant->logo;
+            $this->currentLogo = $tenant->fresh()->logo;
             $this->reset('logo');
-        }
 
-        if ($tenant) {
-            app(TenantProfileService::class)->saveContact($tenant, [
+            $profile->saveContact($tenant, [
                 'country' => $this->country,
                 'city' => $this->city,
             ]);
@@ -275,7 +277,6 @@ new class extends \Livewire\Component
             'data' => [
                 'show_avatar' => $this->showAvatar,
                 'show_verified_badge' => $this->showVerifiedBadge,
-                'bio' => $this->bio,
             ],
         ];
 

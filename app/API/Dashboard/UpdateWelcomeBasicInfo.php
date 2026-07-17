@@ -4,7 +4,6 @@ namespace App\API\Dashboard;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\WelcomeWidgetResource;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\TenantProfileService;
@@ -40,24 +39,16 @@ class UpdateWelcomeBasicInfo
     public function handle(User $user, Tenant $tenant, array $data, PageCompletion $pageCompletion): array
     {
         $tenant->name = $data['name'];
+        $tenant->save();
+
+        $profile = app(TenantProfileService::class);
+        $profile->saveBio($tenant, (string) ($data['bio'] ?? ''));
 
         $logo = $data['logo'] ?? null;
 
         if ($logo instanceof UploadedFile) {
             $path = $logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
-            app(TenantProfileService::class)->saveLogo($tenant, $path);
-        } else {
-            $tenant->save();
-        }
-
-        $headerBlock = Block::findSingleton('header');
-
-        if ($headerBlock) {
-            $headerBlock->update([
-                'data' => array_merge($headerBlock->data ?? [], [
-                    'bio' => (string) ($data['bio'] ?? ''),
-                ]),
-            ]);
+            $profile->saveLogo($tenant, $path);
         }
 
         return GetWelcomeWidget::make()->handle($user, $tenant->fresh(), $pageCompletion);

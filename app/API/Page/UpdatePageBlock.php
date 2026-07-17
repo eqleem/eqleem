@@ -110,7 +110,7 @@ class UpdatePageBlock
 
         match ($block->type) {
             'top-nav' => $this->updateTopNav($block, $data),
-            'float-links' => $this->updateFloatLinks($block, $data),
+            'float-links' => $this->updateFloatLinks($block, $tenant, $data),
             'header' => $this->updateHeader($block, $tenant, $data),
             'footer' => $this->updateFooter($block, $data),
             'block-link' => $this->updateBlockLink($block, $tenant, $data),
@@ -194,15 +194,18 @@ class UpdatePageBlock
     /**
      * @param  array<string, mixed>  $data
      */
-    protected function updateFloatLinks(Block $block, array $data): void
+    protected function updateFloatLinks(Block $block, Tenant $tenant, array $data): void
     {
+        app(TenantProfileService::class)->saveContact($tenant, [
+            'whatsapp' => (string) ($data['whatsapp_number'] ?? ''),
+            'phone' => (string) ($data['phone_number'] ?? ''),
+        ]);
+
         $block->update([
             'data' => [
                 'position' => $data['position'],
                 'show_whatsapp' => (bool) $data['show_whatsapp'],
-                'whatsapp_number' => (string) ($data['whatsapp_number'] ?? ''),
                 'show_phone' => (bool) $data['show_phone'],
-                'phone_number' => (string) ($data['phone_number'] ?? ''),
             ],
         ]);
     }
@@ -216,6 +219,8 @@ class UpdatePageBlock
         $tenant->save();
 
         $profile = app(TenantProfileService::class);
+        $profile->saveBio($tenant, (string) ($data['bio'] ?? ''));
+
         $logo = $data['logo'] ?? null;
         $markType = (string) ($data['brand_mark_type'] ?? '');
 
@@ -241,7 +246,6 @@ class UpdatePageBlock
             'data' => [
                 'show_avatar' => (bool) ($data['show_avatar'] ?? true),
                 'show_verified_badge' => (bool) ($data['show_verified_badge'] ?? true),
-                'bio' => (string) ($data['bio'] ?? ''),
             ],
         ]);
     }

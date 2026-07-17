@@ -61,7 +61,8 @@ it('seeds a complete contact form with uuid when registering a tenant', function
         ->and(data_get($form->data, 'fields'))->toHaveCount(4)
         ->and(data_get($form->data, 'description'))->not->toBeEmpty()
         ->and(data_get($form->data, 'submit_label'))->toBe('إرسال')
-        ->and(data_get($form->data, 'success_message'))->not->toBeEmpty();
+        ->and(data_get($form->data, 'success_message'))->not->toBeEmpty()
+        ->and(data_get($tenant->fresh()->meta, 'bio'))->toBe('صفحة إقليم جديدة');
 });
 
 it('seeds default contact and faq pages when registering a tenant', function () {

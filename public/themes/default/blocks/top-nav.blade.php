@@ -42,10 +42,14 @@
                 >
                     <span class="sr-only">الصفحة الرئيسية</span>
                     <span x-show="! loading" class="block size-full">
+                        @php
+                            $topNavBrandMark = app(\App\Services\TenantProfileService::class)->brandMark(tenant());
+                        @endphp
                         <x-brand-mark
-                            :mark="app(\App\Services\TenantProfileService::class)->brandMark(tenant())"
+                            :mark="$topNavBrandMark"
                             :url="tenant('logo')"
                             alt="{{ tenant('name') }}"
+                            :icon-size="($topNavBrandMark['type'] ?? '') === 'emoji' ? '1.35rem' : '1.75rem'"
                             class="w-full h-full object-cover rounded-full transition-transform duration-500"
                         />
                     </span>
@@ -66,7 +70,7 @@
                 <livewire:tenant.blocks.pages-menu lazy.bundle />
             @endif
 
-            <livewire:tenant.cart.badge lazy.bundle />
+            
             
             @if ($showClientLogin)
                 @if (authClient())

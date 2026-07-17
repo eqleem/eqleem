@@ -6,6 +6,7 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Models\SocialAccount;
 use App\Models\Tenant;
+use App\Services\TenantProfileService;
 use App\Support\BlockTypeRegistry;
 use App\Support\FormField;
 use Illuminate\Support\Str;
@@ -59,11 +60,12 @@ class SeedTenantDefaults
             return;
         }
 
+        app(TenantProfileService::class)->saveBio($tenant, 'صفحة إقليم جديدة');
+
         $headerBlock->update([
             'data' => array_merge($headerBlock->data ?? [], [
                 'show_avatar' => true,
                 'show_verified_badge' => true,
-                'bio' => 'صفحة إقليم جديدة',
             ]),
         ]);
 

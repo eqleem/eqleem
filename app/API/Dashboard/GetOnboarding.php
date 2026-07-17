@@ -4,7 +4,6 @@ namespace App\API\Dashboard;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\OnboardingResource;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\ContentTypeRegistry;
@@ -28,8 +27,6 @@ class GetOnboarding
     {
         $progress = $onboarding->forTenant($tenant);
         $profile = app(TenantProfileService::class);
-        $headerBlock = Block::findSingleton('header');
-        $headerData = $headerBlock?->data ?? [];
 
         $tenant->loadMissing('theme');
         $themeId = (int) ($tenant->theme_id ?? 0);
@@ -69,7 +66,7 @@ class GetOnboarding
                 'business' => [
                     'industry' => (string) data_get($tenant->meta, 'industry', ''),
                     'name' => (string) ($tenant->name ?? ''),
-                    'bio' => (string) ($headerData['bio'] ?? ''),
+                    'bio' => $profile->bio($tenant),
                     'logo' => $profile->hasLogo($tenant) ? $profile->logo($tenant) : '',
                     'brand_mark' => $profile->hasLogo($tenant) ? $profile->brandMark($tenant) : null,
                 ],

@@ -86,6 +86,8 @@ test('owner can update float-links settings', function () {
         ->assertJsonPath('data.editor.show_whatsapp', true)
         ->assertJsonPath('data.editor.whatsapp_number', '966500000000')
         ->assertJsonMissingPath('data.editor.show_scroll_top');
+
+    expect(data_get($tenant->fresh()->meta, 'contact.whatsapp'))->toBe('966500000000');
 });
 
 test('owner can update header settings', function () {
@@ -105,6 +107,9 @@ test('owner can update header settings', function () {
         ->assertJsonPath('data.editor.name', 'صفحة محدثة')
         ->assertJsonPath('data.editor.bio', 'نبذة جديدة')
         ->assertJsonPath('data.editor.city', 'جدة');
+
+    expect(data_get($tenant->fresh()->meta, 'bio'))->toBe('نبذة جديدة')
+        ->and(data_get($tenant->fresh()->meta, 'contact.city'))->toBe('جدة');
 });
 
 test('owner can manage cta links', function () {

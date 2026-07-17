@@ -112,7 +112,6 @@ it('builds contact view data from tenant profile and page settings', function ()
             'phone' => true,
             'message' => true,
             'address' => true,
-            'subject' => false,
         ],
         'show_form' => true,
     ]);
@@ -174,7 +173,6 @@ it('submits the contact page form and shows the configured success message', fun
         ->set('name', 'أحمد')
         ->set('email', 'ahmad@example.com')
         ->set('phone', '0501234567')
-        ->set('subject', 'استفسار عام')
         ->set('message', 'أريد معرفة المزيد عن خدماتكم.')
         ->call('submit')
         ->assertHasNoErrors()
@@ -182,7 +180,6 @@ it('submits the contact page form and shows the configured success message', fun
         ->assertSet('name', 'أحمد')
         ->assertSet('email', 'ahmad@example.com')
         ->assertSet('phone', '0501234567')
-        ->assertSet('subject', 'استفسار عام')
         ->assertSet('message', '')
         ->assertSee('تم استلام رسالتك بنجاح، شكراً لك.', false)
         ->assertSee('إرسال الرسالة', false);
@@ -196,7 +193,6 @@ it('submits the contact page form and shows the configured success message', fun
             'name' => 'أحمد',
             'email' => 'ahmad@example.com',
             'phone' => '0501234567',
-            'subject' => 'استفسار عام',
             'message' => 'أريد معرفة المزيد عن خدماتكم.',
         ]);
 
@@ -205,7 +201,7 @@ it('submits the contact page form and shows the configured success message', fun
             && $mail->tenant?->is($tenant)
             && $mail->managePageUrl === route('admin.page.home')
             && $mail->contact['email'] === 'ahmad@example.com'
-            && $mail->contact['subject'] === 'استفسار عام'
+            && $mail->contact['subject'] === 'رسالة من نموذج اتصل بنا'
             && $mail->contact['message'] === 'أريد معرفة المزيد عن خدماتكم.';
     });
 });
@@ -225,7 +221,6 @@ it('emails the tenant contact profile address when tenant.email is empty', funct
             'phone' => false,
             'message' => true,
             'address' => false,
-            'subject' => false,
         ],
         'successMessage' => Content::defaultContactPageData()['success_message'],
     ])
@@ -254,10 +249,9 @@ it('validates enabled contact form fields before submit', function () {
         ->set('name', '')
         ->set('email', 'not-an-email')
         ->set('phone', '')
-        ->set('subject', '')
         ->set('message', '')
         ->call('submit')
-        ->assertHasErrors(['name', 'email', 'phone', 'subject', 'message'])
+        ->assertHasErrors(['name', 'email', 'phone', 'message'])
         ->assertSet('submitted', false);
 
     expect(FormSubmission::query()->count())->toBe(0);
@@ -276,7 +270,6 @@ it('uses the default success message when the page message is empty', function (
             'phone' => false,
             'message' => true,
             'address' => false,
-            'subject' => false,
         ],
         'successMessage' => '',
     ])

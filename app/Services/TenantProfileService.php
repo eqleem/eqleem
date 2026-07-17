@@ -14,6 +14,20 @@ use Illuminate\Support\Str;
 
 class TenantProfileService
 {
+    public function bio(Tenant $tenant): string
+    {
+        $this->ensureBioImported($tenant);
+
+        return (string) data_get($tenant->meta, 'bio', '');
+    }
+
+    public function saveBio(Tenant $tenant, string $bio): void
+    {
+        $tenant->meta->set('bio', $bio);
+        $tenant->meta->set('bio_saved', true);
+        $tenant->save();
+    }
+
     /**
      * @return array{phone: string, email: string, whatsapp: string, country: string, city: string}
      */
@@ -24,8 +38,8 @@ class TenantProfileService
         // Public reads use tenant meta only — never load the owner User here.
         // Owner defaults are copied once via seedContactFromUser() / import.
         return [
-            'phone' => (string) data_get($tenant->meta, 'contact.phone', ''),
-            'email' => (string) data_get($tenant->meta, 'contact.email', ''),
+            'phone' => (string) data_get($tenant->meta, 'contact.phone', $tenant->phone ?? ''),
+            'email' => (string) data_get($tenant->meta, 'contact.email', $tenant->email ?? ''),
             'whatsapp' => (string) data_get($tenant->meta, 'contact.whatsapp', ''),
             'country' => (string) data_get($tenant->meta, 'contact.country', ''),
             'city' => (string) data_get($tenant->meta, 'contact.city', ''),
@@ -295,14 +309,21 @@ class TenantProfileService
     {
         $existing = $this->contact($tenant);
 
-        $tenant->meta->set('contact', [
+        $merged = [
             'phone' => (string) ($contact['phone'] ?? $existing['phone']),
             'email' => (string) ($contact['email'] ?? $existing['email']),
             'whatsapp' => (string) ($contact['whatsapp'] ?? $existing['whatsapp']),
             'country' => (string) ($contact['country'] ?? $existing['country']),
             'city' => (string) ($contact['city'] ?? $existing['city']),
-        ]);
+        ];
+
+        $tenant->meta->set('contact', $merged);
         $tenant->meta->set('contact_saved', true);
+
+        // Keep tenants.phone / tenants.email columns in sync with meta.contact.
+        $tenant->phone = $merged['phone'] !== '' ? $merged['phone'] : $tenant->phone;
+        $tenant->email = $merged['email'] !== '' ? $merged['email'] : $tenant->email;
+
         $tenant->save();
     }
 
@@ -366,11 +387,70 @@ class TenantProfileService
 
     protected function ensureImported(Tenant $tenant): void
     {
-        if (filled(data_get($tenant->meta, 'contact')) || filled(data_get($tenant->meta, 'social_links'))) {
+        $this->ensureBioImported($tenant);
+
+        if (! filled(data_get($tenant->meta, 'contact')) && ! filled(data_get($tenant->meta, 'social_links'))) {
+            $this->importFromHeaderBlock($tenant);
+        }
+
+        $this->ensureFloatLinksContactImported($tenant);
+    }
+
+    protected function ensureBioImported(Tenant $tenant): void
+    {
+        if ((bool) data_get($tenant->meta, 'bio_saved')) {
             return;
         }
 
-        $this->importFromHeaderBlock($tenant);
+        $headerBlock = Block::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('type', 'header')
+            ->first();
+
+        $headerBio = (string) data_get($headerBlock?->data ?? [], 'bio', '');
+
+        $tenant->meta->set('bio', $headerBio);
+        $tenant->meta->set('bio_saved', true);
+        $tenant->save();
+    }
+
+    /**
+     * Migrate legacy float-links phone/whatsapp into tenants.meta.contact once.
+     */
+    protected function ensureFloatLinksContactImported(Tenant $tenant): void
+    {
+        if ((bool) data_get($tenant->meta, 'float_links_contact_imported')) {
+            return;
+        }
+
+        $floatLinks = Block::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('type', 'float-links')
+            ->first();
+
+        $data = $floatLinks?->data ?? [];
+        $legacyPhone = trim((string) ($data['phone_number'] ?? ''));
+        $legacyWhatsapp = trim((string) ($data['whatsapp_number'] ?? ''));
+
+        if ($legacyPhone !== '' || $legacyWhatsapp !== '') {
+            $existing = data_get($tenant->meta, 'contact', []);
+            $existing = is_array($existing) ? $existing : [];
+
+            $tenant->meta->set('contact', [
+                'phone' => filled($existing['phone'] ?? null) ? (string) $existing['phone'] : $legacyPhone,
+                'email' => (string) ($existing['email'] ?? ''),
+                'whatsapp' => filled($existing['whatsapp'] ?? null) ? (string) $existing['whatsapp'] : $legacyWhatsapp,
+                'country' => (string) ($existing['country'] ?? ''),
+                'city' => (string) ($existing['city'] ?? ''),
+            ]);
+
+            if ($legacyPhone !== '' && ! filled($tenant->phone)) {
+                $tenant->phone = $legacyPhone;
+            }
+        }
+
+        $tenant->meta->set('float_links_contact_imported', true);
+        $tenant->save();
     }
 
     protected function importFromHeaderBlock(Tenant $tenant): void
@@ -385,6 +465,11 @@ class TenantProfileService
         }
 
         $data = $headerBlock->data ?? [];
+
+        if (! (bool) data_get($tenant->meta, 'bio_saved')) {
+            $tenant->meta->set('bio', (string) ($data['bio'] ?? ''));
+            $tenant->meta->set('bio_saved', true);
+        }
 
         $tenant->meta->set('contact', [
             'phone' => '',

@@ -8,6 +8,7 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -130,5 +131,15 @@ class Tenant extends Model implements HasMedia
     public function getLogoAttribute(): string
     {
         return app(TenantProfileService::class)->logo($this);
+    }
+
+    /**
+     * Bio lives on tenants.meta — exposed so tenant('bio') and $tenant->bio work.
+     */
+    protected function bio(): Attribute
+    {
+        return Attribute::get(
+            fn (): string => app(TenantProfileService::class)->bio($this)
+        );
     }
 }

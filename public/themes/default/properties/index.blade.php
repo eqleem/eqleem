@@ -1,5 +1,5 @@
 <x-tenant-theme::properties.layout>
-    <section class="mb-5 flex gap-3 px-1  flex-row  items-stretch">
+    <section class="flex gap-3 px-1  flex-row  items-stretch">
         <div class="no-scrollbar flex min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap rounded-2xl bg-stone-200/40 p-1">
             @foreach ($propertyTypes as $type)
                 <button @class([
@@ -25,7 +25,7 @@
         </div>
     </section>
 
-    <section class="p-1">
+    <section class="p-1 mt-5">
         <div class="grid grid-cols-2 gap-4 md:gap-6 xl:grid-cols-3">
             @foreach ($properties as $property)
                 <a

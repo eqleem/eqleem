@@ -30,7 +30,6 @@
 
 <?php
 
-use App\Models\Block;
 use App\Services\TenantProfileService;
 use Livewire\WithFileUploads;
 
@@ -53,12 +52,12 @@ new class extends Livewire\Component
         $this->headerBlockId = $headerBlockId;
 
         $tenant = currentTenant();
-        $headerBlock = Block::queryForTenantRoots()->find($headerBlockId);
-        $data = $headerBlock?->data ?? [];
 
         $this->name = (string) ($tenant?->name ?? '');
         $this->currentLogo = (string) ($tenant?->logo ?? '');
-        $this->bio = (string) ($data['bio'] ?? '');
+        $this->bio = $tenant
+            ? app(TenantProfileService::class)->bio($tenant)
+            : '';
     }
 
     /**
@@ -78,28 +77,21 @@ new class extends Livewire\Component
         $this->validate();
 
         $tenant = currentTenant();
-        $headerBlock = Block::queryForTenantRoots()->find($this->headerBlockId);
 
         if ($tenant) {
             $tenant->name = $this->name;
+            $tenant->save();
+
+            $profile = app(TenantProfileService::class);
+            $profile->saveBio($tenant, $this->bio);
 
             if ($this->logo) {
                 $path = $this->logo->storePublicly('tenant-media/'.$tenant->uuid.'/logo', 'spaces');
-                app(TenantProfileService::class)->saveLogo($tenant, $path);
-            } else {
-                $tenant->save();
+                $profile->saveLogo($tenant, $path);
             }
 
-            $this->currentLogo = $tenant->logo;
+            $this->currentLogo = $tenant->fresh()->logo;
             $this->reset('logo');
-        }
-
-        if ($headerBlock) {
-            $headerBlock->update([
-                'data' => array_merge($headerBlock->data ?? [], [
-                    'bio' => $this->bio,
-                ]),
-            ]);
         }
 
         $this->dispatch('page-completion-updated');

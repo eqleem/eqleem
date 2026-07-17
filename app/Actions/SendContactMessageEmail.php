@@ -13,7 +13,7 @@ class SendContactMessageEmail
     use AsAction;
 
     /**
-     * @param  array{name?: string, email?: string, phone?: string, address?: string, subject?: string, message?: string}  $contact
+     * @param  array{name?: string, email?: string, phone?: string, address?: string, message?: string}  $contact
      */
     public function handle(Tenant $tenant, array $contact): void
     {
@@ -29,9 +29,7 @@ class SendContactMessageEmail
                 'email' => (string) ($contact['email'] ?? ''),
                 'phone' => (string) ($contact['phone'] ?? ''),
                 'address' => (string) ($contact['address'] ?? ''),
-                'subject' => filled($contact['subject'] ?? null)
-                    ? (string) $contact['subject']
-                    : 'رسالة من نموذج اتصل بنا',
+                'subject' => 'رسالة من نموذج اتصل بنا',
                 'message' => (string) ($contact['message'] ?? ''),
             ],
             tenant: $tenant,

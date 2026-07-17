@@ -45,51 +45,53 @@
             </div>
         @endif
 
-        <section class="mb-2 flex w-full items-center justify-between gap-3">
-            <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 rounded-2xl p-1 whitespace-nowrap w-full">
-                <a
-                    href="{{ route('tenant.menu.index') }}"
-                    wire:click.prevent="$set('categorySlug', null)"
-                    @class([
-                        'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                        'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
-                        'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
-                    ])
-                >
-                    الكل
-                </a>
-
-                @foreach ($categories as $category)
+        @if ($categories->isNotEmpty())
+            <section class="mb-2 flex w-full items-center justify-between gap-3">
+                <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 rounded-2xl p-1 whitespace-nowrap w-full">
                     <a
-                        href="{{ route('tenant.menu.index', ['category' => $category->slug]) }}"
-                        wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
-                        wire:key="menu-category-filter-{{ $category->id }}"
+                        href="{{ route('tenant.menu.index') }}"
+                        wire:click.prevent="$set('categorySlug', null)"
                         @class([
                             'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                            'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
-                            'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                            'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
+                            'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
                         ])
                     >
-                        {{ $category->name }}
+                        الكل
                     </a>
-                @endforeach
-            </div>
 
-            <div class="flex items-center gap-3" x-data="{ open: false }">
-                <div x-show="open" x-transition class="hidden sm:block">
-                    <input
-                        wire:model.live.debounce.300ms="search"
-                        type="search"
-                        placeholder="ابحث في القائمة..."
-                        class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400"
-                    >
+                    @foreach ($categories as $category)
+                        <a
+                            href="{{ route('tenant.menu.index', ['category' => $category->slug]) }}"
+                            wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
+                            wire:key="menu-category-filter-{{ $category->id }}"
+                            @class([
+                                'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
+                                'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
+                                'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                            ])
+                        >
+                            {{ $category->name }}
+                        </a>
+                    @endforeach
                 </div>
 
-                <button type="button" @click="open = !open" class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition" aria-label="البحث">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
-                </button>
-            </div>
-        </section>
+                <div class="flex items-center gap-3" x-data="{ open: false }">
+                    <div x-show="open" x-transition class="hidden sm:block">
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="search"
+                            placeholder="ابحث في القائمة..."
+                            class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400"
+                        >
+                    </div>
+
+                    <button type="button" @click="open = !open" class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition" aria-label="البحث">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+                    </button>
+                </div>
+            </section>
+        @endif
 
         @if ($meals->isEmpty())
             <div class="rounded-2xl bg-stone-100/80 p-8 text-center">
@@ -97,7 +99,7 @@
                 <p class="mt-2 text-sm text-stone-500">ستظهر عناصر القائمة هنا عند إضافتها من لوحة التحكم.</p>
             </div>
         @else
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-5 mt-5">
                 @foreach ($meals as $meal)
                     @php
                         $imageUrl = $meal->getFirstMediaUrl('menu-media') ?: $meal->avatar;

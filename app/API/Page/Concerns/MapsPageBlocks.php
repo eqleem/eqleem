@@ -4,6 +4,7 @@ namespace App\API\Page\Concerns;
 
 use App\Models\Block;
 use App\Models\Content;
+use App\Services\TenantProfileService;
 use App\Support\BlockBrandMark;
 use App\Support\BlockTypeRegistry;
 use App\Support\ContentTypeRegistry;
@@ -165,13 +166,18 @@ trait MapsPageBlocks
      */
     protected function floatLinksEditorPayloadFromData(array $data): array
     {
+        $tenant = currentTenant();
+        $contact = $tenant
+            ? app(TenantProfileService::class)->contact($tenant)
+            : ['phone' => '', 'whatsapp' => ''];
+
         return [
             'type' => 'float-links',
             'position' => (string) ($data['position'] ?? 'bottom-end'),
             'show_whatsapp' => (bool) ($data['show_whatsapp'] ?? true),
-            'whatsapp_number' => (string) ($data['whatsapp_number'] ?? ''),
+            'whatsapp_number' => (string) ($contact['whatsapp'] ?? ''),
             'show_phone' => (bool) ($data['show_phone'] ?? false),
-            'phone_number' => (string) ($data['phone_number'] ?? ''),
+            'phone_number' => (string) ($contact['phone'] ?? ''),
             'position_options' => [
                 'bottom-start' => 'أسفل اليسار',
                 'bottom-end' => 'أسفل اليمين',

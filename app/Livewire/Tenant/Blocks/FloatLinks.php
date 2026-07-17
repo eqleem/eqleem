@@ -3,6 +3,7 @@
 namespace App\Livewire\Tenant\Blocks;
 
 use App\Livewire\Concerns\ResolvesTenantBlockView;
+use App\Services\TenantProfileService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -22,14 +23,20 @@ class FloatLinks extends Component
         $block = $this->resolveSingletonBlock();
         $blockData = $block?->data ?? [];
         $showWhatsapp = (bool) ($blockData['show_whatsapp'] ?? true);
-        $whatsappNumber = trim((string) ($blockData['whatsapp_number'] ?? ''));
         $showPhone = (bool) ($blockData['show_phone'] ?? false);
-        $phoneNumber = trim((string) ($blockData['phone_number'] ?? ''));
+
+        $tenant = tenant();
+        $contact = $tenant
+            ? app(TenantProfileService::class)->contact($tenant)
+            : ['phone' => '', 'whatsapp' => ''];
+
+        $whatsappNumber = trim((string) ($contact['whatsapp'] ?? ''));
+        $phoneNumber = trim((string) ($contact['phone'] ?? ''));
 
         return $this->renderTenantBlockView($block, [
             'positionClass' => ($blockData['position'] ?? 'bottom-end') === 'bottom-start' ? 'start-4' : 'end-4',
             'showWhatsappButton' => $showWhatsapp && $whatsappNumber !== '',
-            'whatsappUrl' => $whatsappNumber !== '' ? 'https://wa.me/'.$whatsappNumber : null,
+            'whatsappUrl' => $whatsappNumber !== '' ? 'https://wa.me/'.preg_replace('/\D+/', '', $whatsappNumber) : null,
             'showPhoneButton' => $showPhone && $phoneNumber !== '',
             'phoneNumber' => $phoneNumber,
         ]);

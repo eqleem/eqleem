@@ -18,7 +18,6 @@ const FORM_FIELD_OPTIONS = [
     { key: 'phone', label: 'رقم الجوال' },
     { key: 'message', label: 'الرسالة' },
     { key: 'address', label: 'العنوان' },
-    { key: 'subject', label: 'نوع الرسالة' },
 ];
 
 const route = useRoute();
@@ -39,7 +38,6 @@ const form = reactive({
         phone: true,
         message: true,
         address: false,
-        subject: true,
     },
     showSocialLinks: true,
     showContactInfo: true,
@@ -76,7 +74,6 @@ function loadForm(page) {
         phone: page.form_fields?.phone !== false,
         message: page.form_fields?.message !== false,
         address: Boolean(page.form_fields?.address),
-        subject: page.form_fields?.subject !== false,
     };
     form.showSocialLinks = page.show_social_links !== false;
     form.showContactInfo = page.show_contact_info !== false;

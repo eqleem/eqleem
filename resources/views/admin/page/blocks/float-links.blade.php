@@ -35,6 +35,7 @@
 <?php
 
 use App\Livewire\Concerns\EditsBlock;
+use App\Services\TenantProfileService;
 
 new class extends \Livewire\Component
 {
@@ -60,12 +61,16 @@ new class extends \Livewire\Component
         $this->blockId = $blockId;
 
         $data = $this->block()->data ?? [];
+        $tenant = currentTenant();
+        $contact = $tenant
+            ? app(TenantProfileService::class)->contact($tenant)
+            : ['phone' => '', 'whatsapp' => ''];
 
         $this->position = (string) ($data['position'] ?? 'bottom-end');
         $this->showWhatsapp = (bool) ($data['show_whatsapp'] ?? true);
-        $this->whatsappNumber = (string) ($data['whatsapp_number'] ?? '');
+        $this->whatsappNumber = (string) ($contact['whatsapp'] ?? '');
         $this->showPhone = (bool) ($data['show_phone'] ?? false);
-        $this->phoneNumber = (string) ($data['phone_number'] ?? '');
+        $this->phoneNumber = (string) ($contact['phone'] ?? '');
     }
 
     /**
@@ -84,12 +89,19 @@ new class extends \Livewire\Component
     {
         $this->validate();
 
+        $tenant = currentTenant();
+
+        if ($tenant) {
+            app(TenantProfileService::class)->saveContact($tenant, [
+                'whatsapp' => $this->whatsappNumber,
+                'phone' => $this->phoneNumber,
+            ]);
+        }
+
         $this->saveData([
             'position' => $this->position,
             'show_whatsapp' => $this->showWhatsapp,
-            'whatsapp_number' => $this->whatsappNumber,
             'show_phone' => $this->showPhone,
-            'phone_number' => $this->phoneNumber,
         ]);
     }
 }; ?>

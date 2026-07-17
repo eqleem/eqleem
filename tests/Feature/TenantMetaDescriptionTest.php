@@ -1,11 +1,10 @@
 <?php
 
 use App\Actions\CreateDefaultBlocks;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\Theme;
 use App\Models\User;
-use App\Support\TenantPageBlocks;
+use App\Services\TenantProfileService;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -45,17 +44,12 @@ function createTenantForMetaDescription(): array
 
     $bio = 'نقدم تشطيبات وديكور منزل بمعايير عالية الجودة.';
 
-    $header = Block::findSingleton('header');
-    $header?->update([
-        'data' => array_merge($header->data ?? [], [
-            'bio' => $bio,
-        ]),
-    ]);
+    app(TenantProfileService::class)->saveBio($tenant, $bio);
 
     return [$tenant->fresh(), $bio];
 }
 
-it('includes a meta description on the tenant home page from header bio', function () {
+it('includes a meta description on the tenant home page from tenant bio', function () {
     [$tenant, $bio] = createTenantForMetaDescription();
 
     $this->get(route('tenant.home', ['tenant' => $tenant->handle]))
@@ -63,16 +57,10 @@ it('includes a meta description on the tenant home page from header bio', functi
         ->assertSee('<meta name="description" content="'.$bio.'">', false);
 });
 
-it('falls back to the tenant name when header bio is empty', function () {
+it('falls back to the tenant name when bio is empty', function () {
     [$tenant] = createTenantForMetaDescription();
 
-    Block::findSingleton('header')?->update([
-        'data' => array_merge(Block::findSingleton('header')?->data ?? [], [
-            'bio' => '',
-        ]),
-    ]);
-
-    app(TenantPageBlocks::class)->flush();
+    app(TenantProfileService::class)->saveBio($tenant, '');
 
     $this->get(route('tenant.home', ['tenant' => $tenant->handle]))
         ->assertSuccessful()

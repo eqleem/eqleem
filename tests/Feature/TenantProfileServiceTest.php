@@ -60,7 +60,44 @@ it('saves and retrieves contact information', function () {
         ->and($contact['email'])->toBe('hello@example.com')
         ->and($contact['whatsapp'])->toBe('966501234567')
         ->and($contact['country'])->toBe('السعودية')
-        ->and($contact['city'])->toBe('الرياض');
+        ->and($contact['city'])->toBe('الرياض')
+        ->and($tenant->fresh()->phone)->toBe('0501234567')
+        ->and($tenant->fresh()->email)->toBe('hello@example.com');
+});
+
+it('saves and retrieves bio on tenants.meta', function () {
+    $tenant = createTenantForProfile();
+    $service = app(TenantProfileService::class);
+
+    $service->saveBio($tenant, 'صفحة إقليم جديدة');
+
+    expect($service->bio($tenant->fresh()))->toBe('صفحة إقليم جديدة')
+        ->and(data_get($tenant->fresh()->meta, 'bio'))->toBe('صفحة إقليم جديدة')
+        ->and($tenant->fresh()->bio)->toBe('صفحة إقليم جديدة');
+});
+
+it('imports legacy header bio into tenants.meta once', function () {
+    $tenant = createTenantForProfile();
+
+    $headerBlock = Block::query()
+        ->where('tenant_id', $tenant->id)
+        ->where('type', 'header')
+        ->firstOrFail();
+
+    $headerBlock->update([
+        'data' => array_merge($headerBlock->data ?? [], [
+            'bio' => 'نبذة من الهيدر',
+        ]),
+    ]);
+
+    $tenant->meta->forget('bio');
+    $tenant->meta->forget('bio_saved');
+    $tenant->save();
+
+    $service = app(TenantProfileService::class);
+
+    expect($service->bio($tenant->fresh()))->toBe('نبذة من الهيدر')
+        ->and((bool) data_get($tenant->fresh()->meta, 'bio_saved'))->toBeTrue();
 });
 
 it('merges partial contact updates without clearing other fields', function () {

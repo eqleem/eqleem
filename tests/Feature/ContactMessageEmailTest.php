@@ -15,7 +15,7 @@ it('renders an arabic rtl contact message email with manage page button', functi
             'email' => 'sara@example.com',
             'phone' => '0501234567',
             'address' => 'الرياض',
-            'subject' => 'استفسار عن الخدمات',
+            'subject' => 'رسالة من نموذج اتصل بنا',
             'message' => "مرحباً،\nأرغب بمعرفة المزيد عن خدماتكم.",
         ],
         tenant: $tenant,
@@ -29,7 +29,7 @@ it('renders an arabic rtl contact message email with manage page button', functi
         ->toContain('lang="ar"')
         ->toContain('متجر أحمد')
         ->toContain('وصلتكم رسالة جديدة من نموذج اتصل بنا')
-        ->toContain('استفسار عن الخدمات')
+        ->toContain('رسالة من نموذج اتصل بنا')
         ->toContain('سارة علي')
         ->toContain('sara@example.com')
         ->toContain('0501234567')
@@ -49,12 +49,12 @@ it('uses tenant name in the email subject', function () {
         contact: [
             'name' => 'أحمد',
             'email' => 'ahmad@example.com',
-            'subject' => 'طلب عرض سعر',
+            'subject' => 'رسالة من نموذج اتصل بنا',
             'message' => 'مرحباً',
         ],
         tenant: $tenant,
         managePageUrl: 'https://example.test/admin/manage-page',
     );
 
-    expect($mail->envelope()->subject)->toBe('رسالة جديدة — صفحة سارة — طلب عرض سعر');
+    expect($mail->envelope()->subject)->toBe('رسالة جديدة — صفحة سارة — رسالة من نموذج اتصل بنا');
 });

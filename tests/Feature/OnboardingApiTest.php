@@ -100,7 +100,8 @@ it('saves business step with industry name bio and logo', function () {
         ->assertJsonPath('data.steps.0.done', true);
 
     expect($tenant->fresh()->meta->get('industry'))->toBe('retail')
-        ->and($tenant->fresh()->name)->toBe('متجر أحمد');
+        ->and($tenant->fresh()->name)->toBe('متجر أحمد')
+        ->and(data_get($tenant->fresh()->meta, 'bio'))->toBe('نبيع منتجات مميزة');
 });
 
 it('saves business step with an emoji brand mark', function () {

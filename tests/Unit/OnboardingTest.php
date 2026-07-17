@@ -1,7 +1,6 @@
 <?php
 
 use App\Actions\CreateDefaultBlocks;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\Theme;
 use App\Models\User;
@@ -50,11 +49,7 @@ it('unlocks steps sequentially and reports current step', function () {
     $tenant->meta->set('industry', 'retail');
     $tenant->save();
 
-    $header = Block::findSingleton('header');
-    $header?->update([
-        'data' => array_merge($header->data ?? [], ['bio' => 'نبذة']),
-    ]);
-
+    app(TenantProfileService::class)->saveBio($tenant, 'نبذة');
     app(TenantProfileService::class)->saveLogo($tenant, 'tenant-media/logo.png');
 
     $progress = app(Onboarding::class)->forTenant($tenant->fresh());

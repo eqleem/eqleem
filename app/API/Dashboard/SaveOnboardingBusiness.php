@@ -4,7 +4,6 @@ namespace App\API\Dashboard;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\OnboardingResource;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\Onboarding;
@@ -58,6 +57,8 @@ class SaveOnboardingBusiness
         $tenant->save();
 
         $profile = app(TenantProfileService::class);
+        $profile->saveBio($tenant, (string) $data['bio']);
+
         $logo = $data['logo'] ?? null;
         $markType = (string) ($data['brand_mark_type'] ?? '');
 
@@ -71,16 +72,6 @@ class SaveOnboardingBusiness
                 'type' => $markType,
                 'value' => (string) ($data['brand_mark_value'] ?? ''),
                 'color' => (string) ($data['brand_mark_color'] ?? ''),
-            ]);
-        }
-
-        $headerBlock = Block::findSingleton('header');
-
-        if ($headerBlock) {
-            $headerBlock->update([
-                'data' => array_merge($headerBlock->data ?? [], [
-                    'bio' => (string) $data['bio'],
-                ]),
             ]);
         }
 

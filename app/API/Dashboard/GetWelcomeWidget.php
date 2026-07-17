@@ -4,7 +4,6 @@ namespace App\API\Dashboard;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\WelcomeWidgetResource;
-use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\TenantProfileService;
@@ -26,8 +25,6 @@ class GetWelcomeWidget
     public function handle(User $user, Tenant $tenant, PageCompletion $pageCompletion): array
     {
         $completion = $pageCompletion->forTenant($tenant);
-        $headerBlock = Block::findSingleton('header');
-        $headerData = $headerBlock?->data ?? [];
         $profile = app(TenantProfileService::class);
 
         $nextStep = $completion['steps']->firstWhere('done', false);
@@ -45,7 +42,7 @@ class GetWelcomeWidget
             'forms' => [
                 'basic_info' => [
                     'name' => (string) ($tenant->name ?? ''),
-                    'bio' => (string) ($headerData['bio'] ?? ''),
+                    'bio' => $profile->bio($tenant),
                     'logo' => (string) ($tenant->logo ?? ''),
                 ],
                 'contact' => $profile->contact($tenant),

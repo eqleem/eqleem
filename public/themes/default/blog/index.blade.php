@@ -1,56 +1,58 @@
 <x-tenant-theme::blog.layout>
-    <section class="px-2 mb-8 w-full flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 w-full rounded-2xl p-1 whitespace-nowrap">
-            <a
-                href="{{ route('tenant.blog.index') }}"
-                wire:click.prevent="$set('categorySlug', null)"
-                @class([
-                    'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                    'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
-                    'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
-                ])
-            >
-                الكل
-            </a>
-
-            @foreach ($categories as $category)
+    @if ($categories->isNotEmpty())
+        <section class="px-2 w-full flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 overflow-x-auto no-scrollbar bg-stone-200/40 w-full rounded-2xl p-1 whitespace-nowrap">
                 <a
-                    href="{{ route('tenant.blog.index', ['category' => $category->slug]) }}"
-                    wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
-                    wire:key="blog-category-filter-{{ $category->id }}"
+                    href="{{ route('tenant.blog.index') }}"
+                    wire:click.prevent="$set('categorySlug', null)"
                     @class([
                         'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                        'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
-                        'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                        'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
+                        'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
                     ])
                 >
-                    {{ $category->name }}
+                    الكل
                 </a>
-            @endforeach
-        </div>
 
-        <div class="flex items-center gap-3" x-data="{ open: false }">
-            <div x-show="open" x-transition class="hidden sm:block">
-                <input
-                    wire:model.live.debounce.300ms="search"
-                    type="search"
-                    placeholder="ابحث في التدوينات..."
-                    class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400 md:w-56"
-                >
+                @foreach ($categories as $category)
+                    <a
+                        href="{{ route('tenant.blog.index', ['category' => $category->slug]) }}"
+                        wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
+                        wire:key="blog-category-filter-{{ $category->id }}"
+                        @class([
+                            'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
+                            'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
+                            'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                        ])
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
             </div>
 
-            <button
-                type="button"
-                @click="open = !open"
-                class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition-all duration-200 hover:scale-105"
-                aria-label="البحث"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
-            </button>
-        </div>
-    </section>
+            <div class="flex items-center gap-3" x-data="{ open: false }">
+                <div x-show="open" x-transition class="hidden sm:block">
+                    <input
+                        wire:model.live.debounce.300ms="search"
+                        type="search"
+                        placeholder="ابحث في التدوينات..."
+                        class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400 md:w-56"
+                    >
+                </div>
 
-    <section>
+                <button
+                    type="button"
+                    @click="open = !open"
+                    class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition-all duration-200 hover:scale-105"
+                    aria-label="البحث"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+                </button>
+            </div>
+        </section>
+    @endif
+
+    <section class="mt-5">
         @if ($posts->isEmpty())
             <div class="rounded-2xl bg-stone-100/80 p-8 text-center">
                 <p class="text-base font-semibold text-stone-700">لا توجد تدوينات حالياً</p>

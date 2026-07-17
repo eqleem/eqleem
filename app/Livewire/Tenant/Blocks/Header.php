@@ -37,7 +37,7 @@ class Header extends Component
             'avatarUrl' => (string) ($brandMark['url'] ?? ''),
             'brandMark' => $brandMark,
             'showVerifiedBadge' => (bool) ($data['show_verified_badge'] ?? true),
-            'bio' => (string) ($data['bio'] ?? ''),
+            'bio' => $tenant ? $profile->bio($tenant) : '',
             'location' => $this->locationLabel($contact),
             'socialLinks' => $this->socialLinks($tenant),
         ]);

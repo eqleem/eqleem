@@ -96,7 +96,7 @@ it('updates welcome basic info and refreshes completion', function () {
         ->assertJsonPath('message', __('Settings updated successfully.'));
 
     expect($user->currentTenant->fresh()->name)->toBe('صفحة محدثة');
-    expect($headerBlock->fresh()->data['bio'])->toBe('نبذة قصيرة');
+    expect(data_get($user->currentTenant->fresh()->meta, 'bio'))->toBe('نبذة قصيرة');
     expect(app(TenantProfileService::class)->hasLogo($user->currentTenant->fresh()))->toBeTrue();
 
     $after = $this->actingAs($user)

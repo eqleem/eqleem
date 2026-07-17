@@ -62,8 +62,9 @@ it('saves basic info and preserves show avatar setting', function () {
         ->assertDispatched('closemodal', modal: 'home-step-basic-info');
 
     $headerBlock->refresh();
+    $tenant = currentTenant()->fresh();
 
     expect($headerBlock->data['show_avatar'])->toBeFalse();
-    expect($headerBlock->data['bio'])->toBe('نبذة محدثة');
-    expect(currentTenant()->fresh()->name)->toBe('Updated Tenant Name');
+    expect(data_get($tenant->meta, 'bio'))->toBe('نبذة محدثة');
+    expect($tenant->name)->toBe('Updated Tenant Name');
 });

@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Models\Block;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
@@ -80,12 +79,9 @@ class Onboarding
 
     public function businessDone(Tenant $tenant): bool
     {
-        $headerBlock = Block::findSingleton('header');
-        $bio = (string) data_get($headerBlock?->data ?? [], 'bio', '');
-
         return filled($tenant->name)
             && filled(data_get($tenant->meta, 'industry'))
-            && filled($bio)
+            && filled(app(TenantProfileService::class)->bio($tenant))
             && app(TenantProfileService::class)->hasLogo($tenant);
     }
 

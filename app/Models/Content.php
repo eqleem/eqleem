@@ -176,7 +176,7 @@ class Content extends Model implements HasMedia
      */
     public static function contactFormFieldKeys(): array
     {
-        return ['name', 'email', 'phone', 'message', 'address', 'subject'];
+        return ['name', 'email', 'phone', 'message', 'address'];
     }
 
     /**
@@ -193,7 +193,6 @@ class Content extends Model implements HasMedia
                 'phone' => true,
                 'message' => true,
                 'address' => false,
-                'subject' => true,
             ],
             'show_social_links' => true,
             'show_contact_info' => true,

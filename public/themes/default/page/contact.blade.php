@@ -10,8 +10,8 @@
             @if ($showForm)
                 <div class="space-y-4 md:col-span-7">
                     <article class="rounded-2xl bg-white p-5">
-                        <h2 class="text-lg font-black text-stone-900">نموذج التواصل</h2>
-                        <p class="mt-1 text-sm text-stone-500">اكتب تفاصيل طلبك وسنعود لك في أقرب وقت ممكن.</p>
+                        {{-- <h2 class="text-lg font-black text-stone-900">نموذج التواصل</h2> --}}
+                        <p class="mb-10 text-xs text-stone-500 bg-gray-50 p-4 rounded-xl"> تواصل معنا من خلال نموذج الاتصال التالي أو من خلال أي من وسائل الاتصال الأخرى المتاحة بالأسفل.</p>
 
                         <livewire:tenant.pages.contact-form
                             :page-id="$page->id"

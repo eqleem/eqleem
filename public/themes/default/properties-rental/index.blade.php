@@ -1,51 +1,53 @@
 <x-tenant-theme::properties-rental.layout>
-    <section class="mb-5 flex w-full items-center justify-between gap-3 px-1">
-        <div class="no-scrollbar flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap rounded-2xl bg-stone-200/40 p-1">
-            <a
-                href="{{ route('tenant.properties-rental.index') }}"
-                wire:click.prevent="$set('categorySlug', null)"
-                @class([
-                    'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                    'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
-                    'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
-                ])
-            >
-                الكل
-            </a>
-
-            @foreach ($categories as $category)
+    @if ($categories->isNotEmpty())
+        <section class="flex w-full items-center justify-between gap-3 px-1">
+            <div class="no-scrollbar flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap rounded-2xl bg-stone-200/40 p-1">
                 <a
-                    href="{{ route('tenant.properties-rental.index', ['category' => $category->slug]) }}"
-                    wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
-                    wire:key="unit-category-filter-{{ $category->id }}"
+                    href="{{ route('tenant.properties-rental.index') }}"
+                    wire:click.prevent="$set('categorySlug', null)"
                     @class([
                         'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
-                        'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
-                        'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                        'bg-white text-stone-900 shadow-sm' => blank($categorySlug),
+                        'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => filled($categorySlug),
                     ])
                 >
-                    {{ $category->name }}
+                    الكل
                 </a>
-            @endforeach
-        </div>
 
-        <div class="flex items-center gap-3" x-data="{ open: false }">
-            <div x-show="open" x-transition class="hidden sm:block">
-                <input
-                    wire:model.live.debounce.300ms="search"
-                    type="search"
-                    placeholder="ابحث في الوحدات..."
-                    class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400"
-                >
+                @foreach ($categories as $category)
+                    <a
+                        href="{{ route('tenant.properties-rental.index', ['category' => $category->slug]) }}"
+                        wire:click.prevent="$set('categorySlug', '{{ $category->slug }}')"
+                        wire:key="unit-category-filter-{{ $category->id }}"
+                        @class([
+                            'p-3 text-center py-2.5 rounded-xl text-sm font-medium transition',
+                            'bg-white text-stone-900 shadow-sm' => $categorySlug === $category->slug,
+                            'hover:bg-stone-50 text-stone-600 hover:text-stone-900' => $categorySlug !== $category->slug,
+                        ])
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
             </div>
 
-            <button type="button" @click="open = !open" class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition" aria-label="البحث">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
-            </button>
-        </div>
-    </section>
+            <div class="flex items-center gap-3" x-data="{ open: false }">
+                <div x-show="open" x-transition class="hidden sm:block">
+                    <input
+                        wire:model.live.debounce.300ms="search"
+                        type="search"
+                        placeholder="ابحث في الوحدات..."
+                        class="w-44 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-400"
+                    >
+                </div>
 
-    <section class="p-1">
+                <button type="button" @click="open = !open" class="p-3 rounded-xl bg-stone-200/40 hover:bg-stone-200 flex items-center justify-center transition" aria-label="البحث">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-6 text-stone-700"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+                </button>
+            </div>
+        </section>
+    @endif
+
+    <section class="p-1 mt-5">
         @if ($units->isEmpty())
             <div class="rounded-2xl bg-stone-100/80 p-8 text-center">
                 <p class="text-base font-semibold text-stone-700">لا توجد وحدات حالياً</p>

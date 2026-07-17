@@ -6,10 +6,7 @@
     :desc="$storeSettings['section_description']"
     backLink="{{ route('tenant.store.index') }}"
     backLinkText="العودة للمتجر"
+    :cart="true"
 >
-    <x-slot:actions>
-        
-    </x-slot:actions>
-
     {{ $slot }}
 </x-tenant-theme::module-layout>

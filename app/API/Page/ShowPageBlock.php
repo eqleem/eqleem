@@ -108,7 +108,7 @@ class ShowPageBlock
             'name' => (string) ($tenant->name ?? ''),
             'logo' => (string) ($tenant->logo ?? ''),
             'brand_mark' => $brandMark,
-            'bio' => (string) ($data['bio'] ?? ''),
+            'bio' => $profile->bio($tenant),
             'show_avatar' => (bool) ($data['show_avatar'] ?? true),
             'show_verified_badge' => (bool) ($data['show_verified_badge'] ?? true),
             'country' => (string) ($contact['country'] ?? ''),

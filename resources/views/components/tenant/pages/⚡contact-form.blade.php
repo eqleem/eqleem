@@ -36,7 +36,7 @@
                             dir="ltr"
                             wire:model="phone"
                             class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white"
-                            placeholder="+9665XXXXXXXX"
+                            placeholder="0541234567"
                         />
                         @error('phone') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
@@ -73,23 +73,6 @@
             </div>
         @endif
 
-        @if ($formFields['subject'] ?? false)
-            <div>
-                <label for="contact-subject" class="mb-1.5 block text-xs font-semibold text-stone-500">نوع الرسالة</label>
-                <select
-                    id="contact-subject"
-                    wire:model="subject"
-                    class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 outline-none focus:border-primary-300 focus:bg-white"
-                >
-                    <option value="">اختر نوع الرسالة</option>
-                    @foreach ($subjectOptions as $option)
-                        <option value="{{ $option }}">{{ $option }}</option>
-                    @endforeach
-                </select>
-                @error('subject') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
-        @endif
-
         @if ($formFields['message'] ?? false)
             <div>
                 <label for="contact-message" class="mb-1.5 block text-xs font-semibold text-stone-500">رسالتك</label>
@@ -123,7 +106,6 @@ use App\Actions\SendContactMessageEmail;
 use App\Models\Content;
 use App\Models\FormSubmission;
 use App\Models\Tenant;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 new class extends Component
@@ -143,19 +125,9 @@ new class extends Component
 
     public string $address = '';
 
-    public string $subject = '';
-
     public string $message = '';
 
     public bool $submitted = false;
-
-    /** @var list<string> */
-    public array $subjectOptions = [
-        'استفسار عام',
-        'طلب خدمة',
-        'استشارة',
-        'شكوى أو ملاحظة',
-    ];
 
     /**
      * @param  array<string, bool>  $formFields
@@ -192,10 +164,6 @@ new class extends Component
             $rules['address'] = ['required', 'string', 'max:255'];
         }
 
-        if ($this->formFields['subject'] ?? false) {
-            $rules['subject'] = ['required', 'string', Rule::in($this->subjectOptions)];
-        }
-
         if ($this->formFields['message'] ?? false) {
             $rules['message'] = ['required', 'string', 'max:5000'];
         }
@@ -214,8 +182,6 @@ new class extends Component
             'email.email' => 'يرجى إدخال بريد إلكتروني صالح.',
             'phone.required' => 'يرجى إدخال رقم الجوال.',
             'address.required' => 'يرجى إدخال العنوان.',
-            'subject.required' => 'يرجى اختيار نوع الرسالة.',
-            'subject.in' => 'يرجى اختيار نوع رسالة صالح.',
             'message.required' => 'يرجى كتابة الرسالة.',
         ];
     }
@@ -230,7 +196,6 @@ new class extends Component
             'email' => 'البريد الإلكتروني',
             'phone' => 'رقم الجوال',
             'address' => 'العنوان',
-            'subject' => 'نوع الرسالة',
             'message' => 'الرسالة',
         ];
     }
@@ -281,7 +246,6 @@ new class extends Component
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'address' => $this->address,
-                'subject' => $this->subject,
                 'message' => $this->message,
             ]);
         }
@@ -312,7 +276,6 @@ new class extends Component
             'email' => ['label' => 'البريد الإلكتروني', 'type' => 'email'],
             'phone' => ['label' => 'رقم الجوال', 'type' => 'tel'],
             'address' => ['label' => 'العنوان', 'type' => 'text'],
-            'subject' => ['label' => 'نوع الرسالة', 'type' => 'select'],
             'message' => ['label' => 'الرسالة', 'type' => 'textarea'],
         ];
 

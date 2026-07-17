@@ -235,7 +235,6 @@ test('owner can update contact and faq template pages', function () {
                 'phone' => true,
                 'message' => true,
                 'address' => true,
-                'subject' => false,
             ],
             'show_social_links' => false,
             'show_contact_info' => true,

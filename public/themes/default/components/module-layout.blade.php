@@ -1,5 +1,5 @@
  
-@props(['width' => 'max-w-5xl', 'icon' => 'hugeicons:store-02', 'title' =>  tenant('name'), 'desc' => tenant('bio'), 'backLink' => route('tenant.home'), 'backLinkText' => 'العودة للصفحة الرئيسية'])
+@props(['width' => 'max-w-5xl', 'icon' => 'hugeicons:store-02', 'title' =>  tenant('name'), 'desc' => tenant('bio'), 'backLink' => route('tenant.home'), 'backLinkText' => 'العودة للصفحة الرئيسية', 'cart' => false  , 'actions' => null  ])
 <x-tenant-theme::layout width="{{$width}}">
 
     <div class="w-full mb-3 border-b-2 border-stone-100 pb-3 pt-1">
@@ -17,6 +17,10 @@
                 </a>
             </div>
            
+            @if ($cart)
+                <livewire:tenant.cart.badge lazy.bundle />
+            @endif
+
             @if (isset($actions) && !empty($actions))
                 <div>
                     {{$actions}}
@@ -26,7 +30,7 @@
     </div> 
  
 
-    <div class="w-full mb-3 px-2 lg:px-3">
+    <div class="w-full mb-3 px-2 lg:px-3 min-h-[50vh]">
         {{ $slot }}
     </div>
 </x-tenant-theme::layout>

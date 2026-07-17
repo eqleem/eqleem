@@ -2,18 +2,17 @@
 
 namespace App\Livewire\Tenant;
 
-use App\Support\TenantPageBlocks;
+use App\Services\TenantProfileService;
 use Livewire\Component;
 
 class Home extends Component
 {
     public function render()
     {
-        $bio = (string) data_get(
-            app(TenantPageBlocks::class)->singleton('header')?->data,
-            'bio',
-            ''
-        );
+        $tenant = tenant();
+        $bio = $tenant
+            ? app(TenantProfileService::class)->bio($tenant)
+            : '';
 
         return tenantView('home')
             ->title('الرئيسية')

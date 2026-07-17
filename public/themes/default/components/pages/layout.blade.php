@@ -1,7 +1,7 @@
 <x-tenant-theme::module-layout
     icon="hugeicons:home-08"
-    title="أبعاد البيت"
-    desc="نحوّل أفكارك إلى مساحات أنيقة وعملية."
+    :title="tenant('name')"
+    :desc="tenant('bio')"
     backLink="{{ route('tenant.home') }}"
     backLinkText="العودة للرئيسية"
 >

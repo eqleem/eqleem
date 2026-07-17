@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
@@ -29,10 +28,9 @@ class PageCompletion
             ];
         }
 
-        $headerBlock = Block::findSingleton('header');
-        $headerData = $headerBlock?->data ?? [];
-        $contact = app(TenantProfileService::class)->contact($tenant);
-        $socialLinks = app(TenantProfileService::class)->socialLinks($tenant);
+        $profile = app(TenantProfileService::class);
+        $contact = $profile->contact($tenant);
+        $socialLinks = $profile->socialLinks($tenant);
 
         $steps = collect([
             $this->step(
@@ -40,8 +38,8 @@ class PageCompletion
                 label: 'البيانات الأساسية',
                 hint: 'أضف اسم الصفحة وشعارها ونبذة تعريفية.',
                 done: filled($tenant->name)
-                    && app(TenantProfileService::class)->hasLogo($tenant)
-                    && filled(data_get($headerData, 'bio')),
+                    && $profile->hasLogo($tenant)
+                    && filled($profile->bio($tenant)),
                 modal: 'home-step-basic-info',
             ),
             $this->step(
