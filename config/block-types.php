@@ -14,7 +14,7 @@ return [
     'header' => [
         'order' => 2,
         'slug' => 'header',
-        'name' => 'رأس الصفحة',
+        'name' => 'معلومات النشاط',
         'description' => 'العنوان الرئيسي والمقدمة في أعلى المحتوى.',
         'icon' => 'assets/icons/tabler/Heading.svg',
         'component' => 'tenant::components.header',
@@ -24,8 +24,8 @@ return [
     'cta' => [
         'order' => 3,
         'slug' => 'cta',
-        'name' => 'أزرار الإجراء',
-        'description' => 'هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين',
+        'name' => 'الأزرار السريعة (هدف الصفحة)',
+        'description' => 'أضف زر رئيسي وأزرار ثانوية لدفع العميل لإتخاذ الإجراء المطلوب.',
         'icon' => 'assets/icons/tabler/Click.svg',
         'component' => 'tenant::components.cta',
         'editor' => 'admin::page.blocks.cta',

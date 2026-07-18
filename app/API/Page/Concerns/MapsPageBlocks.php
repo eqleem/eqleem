@@ -6,6 +6,7 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Services\TenantProfileService;
 use App\Support\BlockBrandMark;
+use App\Support\BlockType;
 use App\Support\BlockTypeRegistry;
 use App\Support\ContentTypeRegistry;
 use App\Support\CtaLink;
@@ -20,9 +21,11 @@ trait MapsPageBlocks
     {
         $typeIcons = $blockTypes->iconPaths();
         $editors = $blockTypes->editors();
+        $typeNames = $blockTypes->all()
+            ->mapWithKeys(fn (BlockType $blockType): array => [$blockType->slug => $blockType->name]);
         $contentTypes = app(ContentTypeRegistry::class);
 
-        return $blocks->map(function (Block $block) use ($typeIcons, $editors, $contentTypes): array {
+        return $blocks->map(function (Block $block) use ($typeIcons, $editors, $typeNames, $contentTypes): array {
             $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
             $data = is_array($block->data) ? $block->data : [];
             $contentManage = $block->type === 'block-link'
@@ -41,7 +44,9 @@ trait MapsPageBlocks
             return [
                 'id' => $block->id,
                 'uuid' => $block->uuid,
-                'title' => $block->title,
+                'title' => $block->is_default
+                    ? ($typeNames[$block->type] ?? $block->title)
+                    : $block->title,
                 'type' => $block->type,
                 'sort_order' => $block->sort_order,
                 'is_default' => (bool) $block->is_default,

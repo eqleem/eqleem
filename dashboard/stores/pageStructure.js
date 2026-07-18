@@ -136,7 +136,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
             try {
                 this.applyStructure(await api('/page/structure'));
             } catch (error) {
-                this.error = error instanceof ApiError ? error.message : 'تعذر تحميل هيكل الصفحة.';
+                this.error = error instanceof ApiError ? error.message : 'تعذر تحميل أقسام الصفحة.';
 
                 if (error instanceof ApiError && error.status === 401) {
                     window.location.href = '/login';

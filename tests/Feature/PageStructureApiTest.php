@@ -47,6 +47,8 @@ test('owner can list page structure with system and user blocks', function () {
 
     setCurrentTenant($tenant);
 
+    Block::findSingleton('header')?->update(['title' => 'رأس الصفحة']);
+
     $block = Block::query()->create([
         'tenant_id' => $tenant->id,
         'component' => 'tenant::components.block-link',
@@ -77,7 +79,9 @@ test('owner can list page structure with system and user blocks', function () {
         ->assertJsonPath('data.block_types.0.slug', 'block-link')
         ->assertJsonPath('data.block_link_editor.type', 'block-link')
         ->assertJsonPath('data.top_blocks.0.type', 'top-nav')
+        ->assertJsonPath('data.top_blocks.1.title', 'معلومات النشاط')
         ->assertJsonPath('data.cta_block.type', 'cta')
+        ->assertJsonPath('data.cta_block.title', 'الأزرار السريعة (هدف الصفحة)')
         ->assertJsonPath('data.float_links_block.type', 'float-links')
         ->assertJsonStructure([
             'data' => [

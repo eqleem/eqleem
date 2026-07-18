@@ -4,8 +4,8 @@ return [
     'structure' => [
         'order' => 1,
         'slug' => 'structure',
-        'name' => 'هيكل الصفحة',
-        'description' => 'إدارة ترتيب الأقسام وإضافة أو إزالة الكتل من الصفحة الرئيسية.',
+        'name' => 'أقسام الصفحة',
+        'description' => 'قم بترتيب وتنظيف أقسام صفحتك',
         'icon' => 'assets/icons/tabler/puzzle-2.svg',
         'component' => 'admin::page.tabs.structure',
     ],

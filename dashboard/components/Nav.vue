@@ -85,8 +85,8 @@ function activeClass(base) {
                     <path fill="currentColor" d="m5.766 14l-.787.315C2.993 15.109 2 15.507 2 16s.993.89 2.979 1.685l2.808 1.124C9.773 19.603 10.767 20 12 20s2.227-.397 4.213-1.192l2.808-1.123C21.007 16.891 22 16.494 22 16c0-.493-.993-.89-2.979-1.685L18.234 14l-2.021.809C14.227 15.603 13.233 16 12 16s-2.227-.397-4.213-1.191z" opacity=".4" />
                 </svg>
 
-                <span class="hidden md:block">إدارة الصفحة</span>
-                <span class="md:hidden">الصفحة</span>
+                <span class="">صفحتي</span>
+                <!-- <span class="md:hidden">الصفحة</span> -->
             </RouterLink>
 
             <!-- <RouterLink to="/settings" :class="[linkClass, 'hidden md:flex', activeClass('/settings')]">

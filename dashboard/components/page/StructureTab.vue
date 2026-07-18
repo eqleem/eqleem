@@ -43,6 +43,9 @@ const ctaLinksPanel = ref(null);
 const floatLinksPanel = ref(null);
 const headerSocialBlockId = ref(null);
 const socialModalOpen = ref(false);
+const quickButtonsExpanded = ref(true);
+const pageSectionsExpanded = ref(true);
+const floatingButtonsExpanded = ref(true);
 
 function onEditModalClosed(event) {
     if (event.detail?.modal === 'edit-block') {
@@ -97,7 +100,7 @@ function onFloatLinksUpdated(payload) {
 }
 
 function addLinkBlock() {
-    editTitle.value = 'إضافة رابط';
+    editTitle.value = 'إضافة قسم';
     store.beginCreateBlockLink();
     openModal('edit-block');
 }
@@ -213,7 +216,7 @@ function contentManageLabel(block) {
 </script>
 
 <template>
-    <MainBox title="هيكل الصفحة" subtitle="إدارة وترتيب بلوكات الصفحة الرئيسية.">
+    <MainBox title="أقسام الصفحة" subtitle="قم بترتيب وتنظيف أقسام صفحتك">
         <template #icon>
             <img :src="'/assets/icons/tabler/puzzle-2.svg'" class="h-7 w-7" alt="">
         </template>
@@ -241,85 +244,127 @@ function contentManageLabel(block) {
                 </button>
             </div> -->
 
-            <div v-if="topBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
-                <ul class="space-y-1.5 p-2">
-                    <li
-                        v-for="block in topBlocks"
-                        :key="block.id"
-                        class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
-                    >
-                        <div class="rounded-md p-1 text-stone-200">
-                            <Icon name="lock" class="h-4 w-4" />
-                        </div>
-
-                        <button
-                            v-if="block.editable"
-                            type="button"
-                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
-                            @click="openEdit(block.id, block.title)"
+            <template v-if="topBlocks.length">
+                <div
+                    v-for="block in topBlocks"
+                    :key="block.id"
+                    class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80"
+                >
+                    <ul class="p-2">
+                        <li
+                            class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
                         >
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
-                        </button>
-                        <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
-                        </div>
+                            <div class="hidden rounded-md p-1 text-stone-200 sm:block">
+                                <Icon name="lock" class="h-4 w-4" />
+                            </div>
 
-                        <button
-                            v-if="block.type === 'header'"
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
-                            @click.stop="openHeaderSocialLinks(block)"
-                        >
-                            روابط الشبكات الإجتماعية
-                        </button>
+                            <button
+                                v-if="block.editable"
+                                type="button"
+                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
+                                @click="openEdit(block.id, block.title)"
+                            >
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
+                            </button>
+                            <div v-else class="flex min-w-0 flex-1 items-center gap-2">
+                                <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
+                            </div>
 
-                        <button
-                            v-if="block.editable"
-                            type="button"
-                            class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
-                            aria-label="خيارات البلوك"
-                            @click="openEdit(block.id, block.title)"
-                        >
-                            <Icon name="settings" class="h-5 w-5" />
-                        </button>
-                    </li>
-                </ul>
-            </div>
+                            <button
+                                v-if="block.type === 'header'"
+                                type="button"
+                                class="shrink-0 cursor-pointer rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+                                @click.stop="openHeaderSocialLinks(block)"
+                            >
+                                <span class="sm:hidden">السوشال ميديا</span>
+                                <span class="hidden sm:inline">روابط الشبكات الإجتماعية</span>
+                            </button>
+
+                            <button
+                                v-if="block.editable"
+                                type="button"
+                                class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
+                                aria-label="خيارات البلوك"
+                                @click="openEdit(block.id, block.title)"
+                            >
+                                <Icon name="settings" class="h-5 w-5" />
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </template>
 
             <div v-if="ctaBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-stone-700">أزرار الإجراء</p>
-                        <p class="text-xs text-stone-400">هدف الصفحة، مالذي تريد أن يقوم العميل به، أنشئ اهم رابط أو رابطين</p>
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button
+                            type="button"
+                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
+                            aria-controls="quick-buttons-section"
+                            :aria-expanded="quickButtonsExpanded"
+                            :aria-label="quickButtonsExpanded ? 'طي الأزرار السريعة' : 'توسيع الأزرار السريعة'"
+                            @click="quickButtonsExpanded = !quickButtonsExpanded"
+                        >
+                            <Icon
+                                name="chevron-down"
+                                class="h-5 w-5 transition-transform"
+                                :class="{ 'rotate-180': quickButtonsExpanded }"
+                            />
+                        </button>
+                        <img :src="'/assets/icons/tabler/hand-click.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-stone-700">الأزرار السريعة (هدف الصفحة)</p>
+                            <p class="text-xs text-stone-400">أضف زر رئيسي وأزرار ثانوية لدفع العميل لإتخاذ الإجراء المطلوب.</p>
+                        </div>
                     </div>
-                    <Button label="إضافة رابط" class="shrink-0" @click="openAddCtaLink">
-                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                    <Button label="أضف زر" class="shrink-0" @click="openAddCtaLink">
+                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
                     </Button>
                 </div>
 
-                <BlockLinksPanel
-                    ref="ctaLinksPanel"
-                    embedded
-                    :block-id="ctaBlock.id"
-                    :editor="ctaBlock.editor"
-                    @updated="onCtaUpdated"
-                />
+                <div id="quick-buttons-section" v-show="quickButtonsExpanded">
+                    <BlockLinksPanel
+                        ref="ctaLinksPanel"
+                        embedded
+                        show-primary-badge
+                        :block-id="ctaBlock.id"
+                        :editor="ctaBlock.editor"
+                        @updated="onCtaUpdated"
+                    />
+                </div>
             </div>
 
             <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-stone-700">بلوكات الصفحة</p>
-                        <p class="text-xs text-stone-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button
+                            type="button"
+                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
+                            aria-controls="page-sections-list"
+                            :aria-expanded="pageSectionsExpanded"
+                            :aria-label="pageSectionsExpanded ? 'طي أقسام الصفحة' : 'توسيع أقسام الصفحة'"
+                            @click="pageSectionsExpanded = !pageSectionsExpanded"
+                        >
+                            <Icon
+                                name="chevron-down"
+                                class="h-5 w-5 transition-transform"
+                                :class="{ 'rotate-180': pageSectionsExpanded }"
+                            />
+                        </button>
+                        <img :src="'/assets/icons/tabler/layout-list.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-stone-700">أقسام الصفحة</p>
+                            <p class="text-xs text-stone-400">قم بإضافة وترتيب أقسام وروابط الصفحة</p>
+                        </div>
                     </div>
-                    <Button label="إضافة رابط" class="shrink-0" :disabled="saving" @click="addLinkBlock">
-                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                    <Button label="أضف قسم" class="shrink-0" :disabled="saving" @click="addLinkBlock">
+                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
                     </Button>
                 </div>
 
-                <div class="relative min-h-20">
+                <div id="page-sections-list" v-show="pageSectionsExpanded" class="relative min-h-20">
                     <ul class="space-y-1.5 p-2">
                         <li
                             v-for="block in userBlocks"
@@ -404,7 +449,7 @@ function contentManageLabel(block) {
                         v-if="!userBlocks.length"
                         class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
-                        لا توجد روابط بعد. اضغط «إضافة رابط» لإضافة أول رابط في هذا القسم.
+                        لا توجد أقسام بعد. اضغط «أضف قسم» لإضافة أول قسم في الصفحة.
                     </p>
                 </div>
             </div>
@@ -416,7 +461,7 @@ function contentManageLabel(block) {
                         :key="block.id"
                         class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
                     >
-                        <div class="rounded-md p-1 text-stone-200">
+                        <div class="hidden rounded-md p-1 text-stone-200 sm:block">
                             <Icon name="lock" class="h-4 w-4" />
                         </div>
 
@@ -449,26 +494,46 @@ function contentManageLabel(block) {
 
             <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-stone-700">الأزرار الطافية</p>
-                        <p class="text-xs text-stone-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button
+                            type="button"
+                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
+                            aria-controls="floating-buttons-section"
+                            :aria-expanded="floatingButtonsExpanded"
+                            :aria-label="floatingButtonsExpanded ? 'طي الأزرار الطافية' : 'توسيع الأزرار الطافية'"
+                            @click="floatingButtonsExpanded = !floatingButtonsExpanded"
+                        >
+                            <Icon
+                                name="chevron-down"
+                                class="h-5 w-5 transition-transform"
+                                :class="{ 'rotate-180': floatingButtonsExpanded }"
+                            />
+                        </button>
+                        <img :src="'/assets/icons/tabler/float-right.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-stone-700">الأزرار الطافية</p>
+                            <p class="text-xs text-stone-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
+                        </div>
                     </div>
                     <button
                         type="button"
-                        class="shrink-0 cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
+                        class="shrink-0 cursor-pointer rounded-lg p-1 text-xs text-stone-500 transition hover:bg-stone-100 hover:text-primary-600"
                         aria-label="خيارات الأزرار الطافية"
                         @click="openFloatLinksPosition"
                     >
-                        <Icon name="settings" class="h-5 w-5" />
+                        <span class="sm:hidden">الموضع</span>
+                        <Icon name="settings" class="hidden h-5 w-5 sm:block" />
                     </button>
                 </div>
 
-                <FloatLinksPanel
-                    ref="floatLinksPanel"
-                    :block-id="floatLinksBlock.id"
-                    :editor="floatLinksBlock.editor"
-                    @updated="onFloatLinksUpdated"
-                />
+                <div id="floating-buttons-section" v-show="floatingButtonsExpanded">
+                    <FloatLinksPanel
+                        ref="floatLinksPanel"
+                        :block-id="floatLinksBlock.id"
+                        :editor="floatLinksBlock.editor"
+                        @updated="onFloatLinksUpdated"
+                    />
+                </div>
             </div>
         </div>
 

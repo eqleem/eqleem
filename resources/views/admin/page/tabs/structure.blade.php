@@ -1,5 +1,5 @@
 <div>
-    <ui:mainbox title="هيكل الصفحة" subtitle="إدارة وترتيب بلوكات الصفحة الرئيسية.">
+    <ui:mainbox title="أقسام الصفحة" subtitle="قم بترتيب وتنظيف أقسام صفحتك">
         <x-slot:icon>
             <img src="{{ asset($tab['icon']) }}" class="w-7 h-7" alt="">
         </x-slot:icon>
@@ -18,12 +18,12 @@
             <div class="rounded-xl border border-gray-200 bg-gray-50/80 overflow-hidden">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-gray-200 px-3 py-2.5">
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-700">بلوكات الصفحة</p>
-                        <p class="text-xs text-gray-400">البلوكات التي تضيفها تظهر هنا بين الهيدر والفوتر</p>
+                        <p class="text-sm font-medium text-gray-700">أقسام الصفحة</p>
+                        <p class="text-xs text-gray-400">قم بإضافة وترتيب أقسام وروابط الصفحة</p>
                     </div>
                     <ui:button
                         icon="square-rounded-plus"
-                        label="إضافة بلوك"
+                        label="أضف قسم"
                         variant="secondary"
                         class="shrink-0"
                         @click.prevent="$wire.openAddBlockModal()"
@@ -146,7 +146,7 @@
 
                     @if ($userBlocks->isEmpty())
                         <p class="pointer-events-none absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-gray-400 select-none">
-                            لا توجد بلوكات بعد. اضغط «إضافة بلوك» لإضافة أول بلوك في هذا القسم.
+                            لا توجد أقسام بعد. اضغط «أضف قسم» لإضافة أول قسم في الصفحة.
                         </p>
                     @endif
                 </div>
@@ -330,8 +330,10 @@ new class extends \Livewire\Component
     {
         $typeIcons = $blockTypes->iconPaths();
         $editors = $blockTypes->editors();
+        $typeNames = $blockTypes->all()
+            ->mapWithKeys(fn (\App\Support\BlockType $blockType): array => [$blockType->slug => $blockType->name]);
 
-        return $blocks->map(function (Block $block) use ($typeIcons, $editors): array {
+        return $blocks->map(function (Block $block) use ($typeIcons, $editors, $typeNames): array {
             $icon = $typeIcons[$block->type] ?? 'assets/icons/tabler/Blockquote.svg';
             $contentManageUrl = $block->type === 'block-link' && is_array($block->data)
                 ? CtaLink::adminManageUrlFromData($block->data)
@@ -339,7 +341,9 @@ new class extends \Livewire\Component
 
             return [
                 'id' => $block->id,
-                'title' => $block->title,
+                'title' => $block->is_default
+                    ? ($typeNames[$block->type] ?? $block->title)
+                    : $block->title,
                 'type' => $block->type,
                 'sort_order' => $block->sort_order,
                 'is_default' => $block->is_default,

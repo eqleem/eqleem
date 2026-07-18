@@ -16,6 +16,7 @@ const props = defineProps({
     contentType: { type: String, default: 'cta-link' },
     showSettings: { type: Boolean, default: false },
     embedded: { type: Boolean, default: false },
+    showPrimaryBadge: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['saved', 'close', 'updated']);
@@ -231,24 +232,37 @@ defineExpose({ openAdd });
                 : 'py-2 text-xs text-stone-400'"
         >
             {{ embedded
-                ? 'لا توجد روابط بعد. اضغط «إضافة رابط» لإضافة أول زر إجراء.'
+                ? 'لا توجد أزرار بعد. اضغط «أضف زر» لإضافة أول زر إجراء.'
                 : 'لا توجد روابط بعد. أضف أول زر إجراء.' }}
         </p>
         <ul v-else :class="embedded ? 'space-y-1.5 p-2' : 'space-y-1.5'">
             <li
-                v-for="link in links"
+                v-for="(link, index) in links"
                 :key="link.id"
                 class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
-                draggable="true"
-                @dragstart="dragId = link.id"
                 @dragover.prevent
                 @drop="onDrop($event, link.id)"
             >
-                <button type="button" class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing">
+                <button
+                    type="button"
+                    draggable="true"
+                    class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
+                    aria-label="سحب لإعادة الترتيب"
+                    @dragstart="dragId = link.id"
+                    @dragend="dragId = null"
+                >
                     <Icon name="grip-vertical" class="h-4 w-4" />
                 </button>
                 <button type="button" class="flex min-w-0 flex-1 cursor-pointer flex-col items-start text-start hover:text-primary-600" @click="openEdit(link)">
-                    <span class="truncate text-sm font-medium text-stone-800">{{ link.label }}</span>
+                    <span class="flex min-w-0 max-w-full items-center gap-2">
+                        <span class="truncate text-sm font-medium text-stone-800">{{ link.label }}</span>
+                        <span
+                            v-if="showPrimaryBadge && index === 0"
+                            class="shrink-0 rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-semibold text-primary-700"
+                        >
+                            الزر الرئيسي
+                        </span>
+                    </span>
                     <span class="truncate text-xs text-stone-400">{{ link.type_label }} · {{ link.summary }}</span>
                 </button>
                 <button

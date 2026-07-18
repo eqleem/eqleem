@@ -18,7 +18,7 @@ const { contentTabs, sellableTabs } = storeToRefs(contentTypesStore);
 
 /** Shared section order for desktop sidebar + mobile slideout. Catalog always shown. */
 const contentSections = computed(() => [
-    { id: 'catalog', label: 'الكتالوج', tabs: sellableTabs.value, alwaysShow: true },
+    { id: 'catalog', label: 'البيع', tabs: sellableTabs.value, alwaysShow: true },
     { id: 'content', label: 'المحتوى والنشر', tabs: contentTabs.value, alwaysShow: false },
 ].filter((section) => section.alwaysShow || section.tabs.length > 0));
 
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
                     v-if="section.id === 'catalog'"
                     type="button"
                     class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
-                    aria-label="إعدادات الكتالوج"
+                    aria-label="إعدادات البيع"
                     @click="openCatalogSections"
                 >
                     <Icon name="settings" class="size-3.5" />
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
                             v-if="section.id === 'catalog'"
                             type="button"
                             class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
-                            aria-label="إعدادات الكتالوج"
+                            aria-label="إعدادات البيع"
                             @click="openCatalogSections"
                         >
                             <Icon name="settings" class="size-3.5" />
