@@ -62,7 +62,7 @@
         $isGlyphMark = in_array($brandMarkType, ['icon', 'emoji'], true);
         $logoSizeClass = $isGlyphMark ? 'size-[4rem] md:size-[5.5rem]' : 'size-12 ms-2 md:ms-3 me-2 md:me-3 md:size-[3.8rem]';
     @endphp
-    <div class="flex items-center gap-1 p-2 mt-3 md:mt-5 lg:px-1">
+    <div class="flex items-center gap-2 p-2 mt-3 md:mt-5 lg:px-1">
         <!-- Logo -->
         <x-brand-mark
             :mark="$brandMark ?? null"
@@ -74,7 +74,7 @@
         
         <!-- Name and Title -->
         <div class="flex-1">
-            <h1 class="md:text-xl text-lg font-bold text-gray-900 Xmb-1 flex items-center gap-x-1 tracking-wide" >
+            <h1 class="md:text-xl text-base font-bold text-gray-900 Xmb-1 flex items-center gap-x-1 tracking-wide" >
                 <span class="truncate">{{ tenant('name') }} </span>
 
                 <iconify-icon icon="solar:verified-check-bold" class="text-2xl text-blue-800 ms-1" />
