@@ -8,7 +8,9 @@ use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\ContentTypeRegistry;
 use App\Support\Onboarding;
+use App\Support\SocialNetworkUrl;
 use App\Support\TenantThemeOptions;
+use Illuminate\Support\Facades\Storage;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -54,6 +56,44 @@ class GetOnboarding
 
         $contact = $profile->contact($tenant);
         $country = (string) ($contact['country'] ?? '');
+        $headerImage = (string) data_get($themeOptions, 'headerImage', data_get($schema, 'headerImage.default', ''));
+        $headerImageUrl = $this->resolveHeaderImageUrl($tenant, $headerImage);
+        $primaryColor = (string) data_get($themeOptions, 'primaryColor', data_get($schema, 'primaryColor.default', 'blue'));
+        $primaryPalette = app(TenantThemeOptions::class)->primaryPalette(['primaryColor' => $primaryColor]);
+
+        $socialLinks = $profile->socialLinks($tenant)
+            ->map(function (array $link): array {
+                $url = (string) ($link['url'] ?? '');
+                $network = (string) ($link['network'] ?? '');
+
+                return [
+                    ...$link,
+                    'username' => $this->extractSocialUsername($network, $url),
+                    'url' => SocialNetworkUrl::resolve($network, $url),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $industryOptions = collect(config('industries', []))
+            ->map(fn (array|string $industry, string $slug): array => [
+                'slug' => $slug,
+                'label' => is_array($industry) ? (string) ($industry['label'] ?? $slug) : $industry,
+                'emoji' => is_array($industry) ? (string) ($industry['emoji'] ?? '✨') : '✨',
+                'description' => is_array($industry) ? (string) ($industry['description'] ?? '') : '',
+            ])
+            ->values()
+            ->all();
+
+        $actionOptions = collect(config('onboarding-actions', []))
+            ->map(fn (array $action, string $type): array => [
+                'type' => $type,
+                'label' => (string) ($action['label'] ?? $type),
+                'description' => (string) ($action['description'] ?? ''),
+                'icon' => (string) ($action['icon'] ?? 'hugeicons:link-04'),
+            ])
+            ->values()
+            ->all();
 
         return [
             'percentage' => $progress['percentage'],
@@ -61,6 +101,8 @@ class GetOnboarding
             'total_steps' => $progress['total'],
             'current_step' => $progress['current_step'],
             'completed' => $progress['percentage'] >= 100,
+            'dismissed' => $progress['dismissed'],
+            'page_url' => $tenant->url,
             'steps' => $progress['steps']->values()->all(),
             'forms' => [
                 'business' => [
@@ -75,13 +117,22 @@ class GetOnboarding
                     'country' => preg_match('/^[A-Za-z]{2}$/', $country) === 1
                         ? strtoupper($country)
                         : 'SA',
-                    'social_links' => $profile->socialLinks($tenant)->values()->all(),
+                    'social_links' => $socialLinks,
                 ],
                 'identity' => [
                     'theme_id' => $themeId > 0 ? $themeId : null,
-                    'primary_color' => (string) data_get($themeOptions, 'primaryColor', data_get($schema, 'primaryColor.default', 'blue')),
+                    'handle' => (string) ($tenant->handle ?? ''),
+                    'primary_color' => $primaryColor,
+                    'primary_color_hex' => (string) (data_get($primaryPalette, 500) ?? data_get($primaryPalette, '500') ?? '#3d5ccc'),
                     'logo_radius' => (string) data_get($themeOptions, 'logoRadius', data_get($schema, 'logoRadius.default', 'rounded-full')),
                     'font_family' => (string) data_get($themeOptions, 'fontFamily', data_get($schema, 'fontFamily.default', 'sarmady')),
+                    'header_image' => $headerImage,
+                    'header_image_url' => $headerImageUrl,
+                    'header_image_position' => (int) data_get($themeOptions, 'headerImagePosition', 50),
+                ],
+                'goal' => [
+                    'primary_action_type' => (string) data_get($tenant->meta, 'primary_action_type', ''),
+                    'secondary_action_type' => (string) data_get($tenant->meta, 'secondary_action_type', ''),
                 ],
                 'catalog' => [
                     'enabled' => $enabledContentTypes,
@@ -92,7 +143,11 @@ class GetOnboarding
                     'verification_done' => $onboarding->verificationDone($tenant),
                 ],
             ],
-            'industries' => config('industries', []),
+            'industries' => collect($industryOptions)
+                ->mapWithKeys(fn (array $option): array => [$option['slug'] => $option['label']])
+                ->all(),
+            'industry_options' => $industryOptions,
+            'action_options' => $actionOptions,
             'social_networks' => collect(config('social-networks', []))
                 ->map(fn (array $network): string => $network['label'])
                 ->all(),
@@ -121,5 +176,45 @@ class GetOnboarding
     public function jsonResponse(array $payload): OnboardingResource
     {
         return new OnboardingResource($payload);
+    }
+
+    private function resolveHeaderImageUrl(Tenant $tenant, string $headerImage): string
+    {
+        if ($headerImage === '' || str_starts_with($headerImage, 'color:') || str_starts_with($headerImage, 'gradient:')) {
+            return $headerImage;
+        }
+
+        if (str_starts_with($headerImage, 'http://') || str_starts_with($headerImage, 'https://')) {
+            return $headerImage;
+        }
+
+        return (string) Storage::url($headerImage);
+    }
+
+    private function extractSocialUsername(string $network, string $url): string
+    {
+        $url = trim($url);
+
+        if ($url === '') {
+            return '';
+        }
+
+        if (preg_match('#^https?://#i', $url) !== 1) {
+            return ltrim($url, '@');
+        }
+
+        $path = trim((string) parse_url($url, PHP_URL_PATH), '/');
+
+        if ($path === '') {
+            return '';
+        }
+
+        $segment = basename($path);
+
+        if ($network === 'youtube' || $network === 'tiktok') {
+            $segment = ltrim($segment, '@');
+        }
+
+        return ltrim($segment, '@');
     }
 }

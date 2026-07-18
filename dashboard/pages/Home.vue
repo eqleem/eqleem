@@ -1,5 +1,6 @@
 <script setup>
 import Container from '../components/ui/Container.vue';
+import NewUserOnboardingWidget from '../components/home/NewUserOnboardingWidget.vue';
 import WelcomeWidget from '../components/home/WelcomeWidget.vue';
 import OrdersCount from '../components/home/OrdersCount.vue';
 import SalesTotalCount from '../components/home/SalesTotalCount.vue';
@@ -15,6 +16,7 @@ const monthLabel = new Intl.DateTimeFormat('ar', { month: 'long', year: 'numeric
 
 <template>
     <Container>
+        <NewUserOnboardingWidget />
         <WelcomeWidget />
 
         <div class="mb-2 rounded-lg bg-stone-300/30 p-2 px-3 text-sm text-stone-700">

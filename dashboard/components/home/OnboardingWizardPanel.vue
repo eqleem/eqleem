@@ -37,6 +37,7 @@ const {
     fonts,
     colorOptions,
     catalogOptions,
+    actionOptions,
     saving,
     completed,
 } = storeToRefs(store);
@@ -65,6 +66,10 @@ const socialLinks = ref([]);
 const identity = reactive({
     primary_color: 'blue',
     font_family: 'sarmady',
+});
+const goal = reactive({
+    primary_action_type: '',
+    secondary_action_type: '',
 });
 const enabledCatalog = ref([]);
 const errors = reactive({});
@@ -119,6 +124,8 @@ const canContinue = computed(() => {
             );
         case 'identity':
             return Boolean(identity.primary_color && identity.font_family);
+        case 'goal':
+            return Boolean(goal.primary_action_type);
         case 'catalog':
             return enabledCatalog.value.length > 0;
         case 'orders':
@@ -203,6 +210,9 @@ watch(
 
         identity.primary_color = value.identity?.primary_color ?? 'blue';
         identity.font_family = value.identity?.font_family ?? 'sarmady';
+
+        goal.primary_action_type = value.goal?.primary_action_type ?? '';
+        goal.secondary_action_type = value.goal?.secondary_action_type ?? '';
 
         const enabled = value.catalog?.enabled ?? [];
         enabledCatalog.value = enabled.length
@@ -415,6 +425,27 @@ async function continueStep() {
         }
 
         notifySuccess('تم حفظ الهوية');
+
+        if (!isLastStep.value) {
+            advanceToNext();
+        }
+
+        return;
+    }
+
+    if (activeKey.value === 'goal') {
+        const result = await store.saveGoal({
+            primary_action_type: goal.primary_action_type,
+            secondary_action_type: goal.secondary_action_type || null,
+        });
+
+        if (!result.ok) {
+            Object.assign(errors, flattenErrors(result.errors));
+            notifyError(result.message ?? 'تعذر الحفظ');
+            return;
+        }
+
+        notifySuccess('تم حفظ هدف الصفحة');
 
         if (!isLastStep.value) {
             advanceToNext();
@@ -642,6 +673,32 @@ async function continueStep() {
                     :options="fonts"
                     :error="errors.font_family"
                 />
+            </div>
+
+            <div v-else-if="activeKey === 'goal'" class="space-y-3">
+                <Select
+                    v-model="goal.primary_action_type"
+                    name="primary_action_type"
+                    label="الزر الرئيسي"
+                    :options="actionOptions.map((item) => ({ id: item.type, label: item.label }))"
+                    placeholder="اختر الإجراء الرئيسي"
+                    :error="errors.primary_action_type"
+                />
+                <Select
+                    v-model="goal.secondary_action_type"
+                    name="secondary_action_type"
+                    label="الزر الثانوي"
+                    :options="[
+                        { id: '', label: 'بدون زر ثانوي' },
+                        ...actionOptions
+                            .filter((item) => item.type !== goal.primary_action_type)
+                            .map((item) => ({ id: item.type, label: item.label })),
+                    ]"
+                    :error="errors.secondary_action_type"
+                />
+                <p class="text-xs text-stone-400">
+                    اختر أهم زر هنا، يمكنك إضافة باقي الأزرار لاحقاً كأزرار ثانوية أو أزرار للصفحة.
+                </p>
             </div>
 
             <div v-else-if="activeKey === 'catalog'" class="grid grid-cols-1 gap-2 sm:grid-cols-2">

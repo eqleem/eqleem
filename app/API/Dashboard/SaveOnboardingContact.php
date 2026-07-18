@@ -7,12 +7,13 @@ use App\Http\Resources\OnboardingResource;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\Onboarding;
+use App\Support\SocialNetworkUrl;
 use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Saves onboarding step 2: contact details and social links.
+ * Saves onboarding step 2: contact details and optional social link.
  */
 class SaveOnboardingContact
 {
@@ -24,57 +25,91 @@ class SaveOnboardingContact
      */
     public function rules(): array
     {
+        $partial = request()->boolean('partial');
+        $required = $partial ? 'sometimes' : 'required';
         $networks = array_keys(config('social-networks', []));
 
         return [
-            'phone' => ['required', 'string', 'max:30'],
-            'email' => ['required', 'email', 'max:255'],
-            'whatsapp' => ['required', 'string', 'max:30'],
-            'country' => ['required', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/'],
-            'city' => ['required', 'string', 'max:100'],
-            'social_links' => ['required', 'array', 'min:1'],
-            'social_links.*.network' => ['required', 'string', Rule::in($networks)],
-            'social_links.*.url' => ['required', 'string', 'max:500'],
+            'partial' => ['sometimes', 'boolean'],
+            'phone' => [$required, 'string', 'max:30'],
+            'email' => [$required, 'email', 'max:255'],
+            'whatsapp' => ['nullable', 'string', 'max:30'],
+            'whatsapp_same_as_phone' => ['sometimes', 'boolean'],
+            'country' => ['nullable', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'social_links' => ['nullable', 'array', 'max:1'],
+            'social_links.*.network' => ['required_with:social_links', 'string', Rule::in($networks)],
+            'social_links.*.url' => ['nullable', 'string', 'max:500'],
+            'social_links.*.username' => ['nullable', 'string', 'max:100'],
         ];
     }
 
     /**
-     * @param  array{
-     *     phone: string,
-     *     email: string,
-     *     whatsapp: string,
-     *     country: string,
-     *     city: string,
-     *     social_links: list<array{network: string, url: string}>
-     * }  $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     public function handle(Tenant $tenant, array $data, Onboarding $onboarding): array
     {
         $profile = app(TenantProfileService::class);
+        $existing = $profile->contact($tenant);
+        $sameAsPhone = (bool) ($data['whatsapp_same_as_phone'] ?? false);
 
-        $profile->saveContact($tenant, [
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-            'whatsapp' => $data['whatsapp'],
-            'country' => strtoupper($data['country']),
-            'city' => $data['city'],
-        ]);
+        $phone = array_key_exists('phone', $data)
+            ? (string) $data['phone']
+            : (string) ($existing['phone'] ?? '');
 
-        $links = [];
-        $order = 1;
-
-        foreach ($data['social_links'] as $link) {
-            $links[] = [
-                'id' => (string) str()->uuid(),
-                'network' => $link['network'],
-                'url' => $link['url'],
-                'sort_order' => $order++,
-            ];
+        if ($sameAsPhone) {
+            $whatsapp = $phone;
+        } elseif (array_key_exists('whatsapp', $data)) {
+            $whatsapp = (string) ($data['whatsapp'] ?? '');
+        } else {
+            $whatsapp = (string) ($existing['whatsapp'] ?? '');
         }
 
-        $tenant->meta->set('social_links', $links);
-        $tenant->save();
+        $profile->saveContact($tenant, [
+            'phone' => $phone,
+            'email' => array_key_exists('email', $data)
+                ? (string) $data['email']
+                : (string) ($existing['email'] ?? ''),
+            'whatsapp' => $whatsapp,
+            'country' => array_key_exists('country', $data) && filled($data['country'])
+                ? strtoupper((string) $data['country'])
+                : (string) ($existing['country'] ?? 'SA'),
+            'city' => array_key_exists('city', $data)
+                ? (string) ($data['city'] ?? '')
+                : (string) ($existing['city'] ?? ''),
+        ]);
+
+        if (array_key_exists('social_links', $data)) {
+            $links = [];
+            $order = 1;
+
+            foreach ($data['social_links'] ?? [] as $link) {
+                $network = (string) ($link['network'] ?? '');
+                $username = trim((string) ($link['username'] ?? ''));
+                $url = trim((string) ($link['url'] ?? ''));
+
+                if ($username !== '') {
+                    $url = SocialNetworkUrl::resolve($network, $username);
+                } elseif ($url !== '') {
+                    $url = SocialNetworkUrl::resolve($network, $url);
+                }
+
+                if ($network === '' || $url === '') {
+                    continue;
+                }
+
+                $links[] = [
+                    'id' => (string) str()->uuid(),
+                    'network' => $network,
+                    'url' => $url,
+                    'sort_order' => $order++,
+                ];
+            }
+
+            $tenant->meta->set('social_links', $links);
+            $tenant->save();
+        }
 
         return GetOnboarding::make()->handle($tenant->fresh(), $onboarding);
     }
@@ -86,15 +121,7 @@ class SaveOnboardingContact
     {
         $tenant = $this->currentDashboardTenant($request);
 
-        /** @var array{
-         *     phone: string,
-         *     email: string,
-         *     whatsapp: string,
-         *     country: string,
-         *     city: string,
-         *     social_links: list<array{network: string, url: string}>
-         * } $validated
-         */
+        /** @var array<string, mixed> $validated */
         $validated = $request->validated();
 
         return $this->handle($tenant, $validated, $onboarding);

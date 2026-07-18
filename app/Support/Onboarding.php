@@ -15,7 +15,8 @@ class Onboarding
      *     completed: int,
      *     total: int,
      *     current_step: string|null,
-     *     steps: Collection<int, array{key: string, title: string, description: string, done: bool, unlocked: bool}>
+     *     steps: Collection<int, array{key: string, title: string, description: string, icon: string, done: bool, unlocked: bool}>,
+     *     dismissed: bool
      * }
      */
     public function forTenant(?Tenant $tenant): array
@@ -27,6 +28,7 @@ class Onboarding
                 'total' => 0,
                 'current_step' => null,
                 'steps' => collect(),
+                'dismissed' => false,
             ];
         }
 
@@ -34,26 +36,29 @@ class Onboarding
             'business' => $this->businessDone($tenant),
             'contact' => $this->contactDone($tenant),
             'identity' => $this->identityDone($tenant),
+            'goal' => $this->goalDone($tenant),
             'catalog' => $this->catalogDone($tenant),
             'orders' => $this->ordersDone($tenant),
         ];
 
         $definitions = [
-            'business' => ['بيانات النشاط', 'مين أنت؟'],
-            'contact' => ['بيانات الاتصال', 'كيف يوصل لك عميلك؟'],
-            'identity' => ['الهوية والألوان', 'ايش يميزك؟'],
-            'catalog' => ['الكتالوج', 'ايش تبيع؟'],
-            'orders' => ['استقبل الطلبات', 'إعداد مرة واحدة، أتمتها وانساها.'],
+            'business' => ['معلومات النشاط', 'عرّف بنشاطك', 'hugeicons:store-02'],
+            'contact' => ['معلومات الاتصال', 'كيف يوصلك عميلك؟', 'hugeicons:call'],
+            'identity' => ['الهوية والألوان', 'إيش يميزك؟', 'hugeicons:paint-board'],
+            'goal' => ['هدف الصفحة', 'إيش تبي من العميل؟', 'hugeicons:cursor-magic-selection-02'],
+            'catalog' => ['جهّز كتالوجك', 'إيش تبيع؟', 'hugeicons:package'],
+            'orders' => ['استقبل الطلبات', 'إعداد مرة واحدة، أتمتها وانساها.', 'hugeicons:invoice-03'],
         ];
 
         $unlocked = true;
         $steps = collect();
 
-        foreach ($definitions as $key => [$title, $description]) {
+        foreach ($definitions as $key => [$title, $description, $icon]) {
             $steps->push([
                 'key' => $key,
                 'title' => $title,
                 'description' => $description,
+                'icon' => $icon,
                 'done' => $done[$key],
                 'unlocked' => $unlocked,
             ]);
@@ -74,7 +79,19 @@ class Onboarding
             'total' => $total,
             'current_step' => $current['key'] ?? null,
             'steps' => $steps,
+            'dismissed' => $this->isDismissed($tenant),
         ];
+    }
+
+    public function isDismissed(Tenant $tenant): bool
+    {
+        return filled(data_get($tenant->meta, 'onboarding_wizard_dismissed_at'));
+    }
+
+    public function dismiss(Tenant $tenant): void
+    {
+        $tenant->meta->set('onboarding_wizard_dismissed_at', now()->toIso8601String());
+        $tenant->save();
     }
 
     public function businessDone(Tenant $tenant): bool
@@ -88,14 +105,9 @@ class Onboarding
     public function contactDone(Tenant $tenant): bool
     {
         $contact = app(TenantProfileService::class)->contact($tenant);
-        $socialLinks = app(TenantProfileService::class)->socialLinks($tenant);
 
         return filled($contact['phone'])
-            && filled($contact['email'])
-            && filled($contact['whatsapp'])
-            && filled($contact['country'])
-            && filled($contact['city'])
-            && $socialLinks->contains(fn (array $link): bool => filled($link['url'] ?? null));
+            && filled($contact['email']);
     }
 
     public function identityDone(Tenant $tenant): bool
@@ -103,15 +115,18 @@ class Onboarding
         $tenant->loadMissing('theme');
         $themeId = $tenant->theme_id;
 
-        if (! $themeId) {
+        if (! $themeId || blank($tenant->handle)) {
             return false;
         }
 
         $saved = $tenant->themeSettingsFor((int) $themeId);
 
-        return filled(data_get($saved, 'primaryColor'))
-            && filled(data_get($saved, 'logoRadius'))
-            && filled(data_get($saved, 'fontFamily'));
+        return filled(data_get($saved, 'primaryColor'));
+    }
+
+    public function goalDone(Tenant $tenant): bool
+    {
+        return filled(data_get($tenant->meta, 'primary_action_type'));
     }
 
     public function catalogDone(Tenant $tenant): bool

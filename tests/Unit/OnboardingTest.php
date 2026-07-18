@@ -42,6 +42,7 @@ it('unlocks steps sequentially and reports current step', function () {
     $progress = app(Onboarding::class)->forTenant($tenant);
 
     expect($progress['current_step'])->toBe('business')
+        ->and($progress['total'])->toBe(6)
         ->and($progress['steps']->firstWhere('key', 'business')['unlocked'])->toBeTrue()
         ->and($progress['steps']->firstWhere('key', 'contact')['unlocked'])->toBeFalse();
 
@@ -57,4 +58,39 @@ it('unlocks steps sequentially and reports current step', function () {
     expect($progress['steps']->firstWhere('key', 'business')['done'])->toBeTrue()
         ->and($progress['steps']->firstWhere('key', 'contact')['unlocked'])->toBeTrue()
         ->and($progress['current_step'])->toBe('contact');
+});
+
+it('marks identity done when primary color is saved', function () {
+    $user = User::factory()->create(['uuid' => (string) Str::uuid()]);
+
+    $theme = Theme::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'إفتراضي',
+        'slug' => 'default',
+        'type' => 'all',
+        'app' => 'all',
+        'active' => true,
+        'public' => true,
+        'sort' => 1,
+    ]);
+
+    $tenant = Tenant::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'متجري',
+        'handle' => 'onboard-color-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'theme_id' => $theme->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    $onboarding = app(Onboarding::class);
+
+    expect($onboarding->identityDone($tenant))->toBeFalse();
+
+    $tenant->saveThemeSettingsFor((int) $theme->id, [
+        'primaryColor' => 'violet',
+    ]);
+
+    expect($onboarding->identityDone($tenant->fresh()))->toBeTrue();
 });

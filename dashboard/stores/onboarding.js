@@ -13,9 +13,18 @@ const emptyForms = () => ({
     },
     identity: {
         theme_id: null,
+        handle: '',
         primary_color: 'blue',
+        primary_color_hex: '#3b82f6',
         logo_radius: 'rounded-full',
         font_family: 'sarmady',
+        header_image: '',
+        header_image_url: '',
+        header_image_position: 50,
+    },
+    goal: {
+        primary_action_type: '',
+        secondary_action_type: '',
     },
     catalog: { enabled: [] },
     orders: {
@@ -29,12 +38,16 @@ export const useOnboardingStore = defineStore('onboarding', {
     state: () => ({
         percentage: 0,
         completedSteps: 0,
-        totalSteps: 5,
+        totalSteps: 6,
         currentStep: 'business',
         completed: false,
+        dismissed: false,
+        pageUrl: '',
         steps: [],
         forms: emptyForms(),
         industries: {},
+        industryOptions: [],
+        actionOptions: [],
         socialNetworks: {},
         fonts: {},
         colorOptions: [],
@@ -45,11 +58,10 @@ export const useOnboardingStore = defineStore('onboarding', {
         saving: false,
         error: null,
         message: null,
-        dismissed: false,
     }),
 
     getters: {
-        shouldShow: (state) => state.loaded,
+        shouldShow: (state) => state.loaded && !state.dismissed,
         showCompletedBadge: (state) => state.loaded && state.completed,
     },
 
@@ -59,9 +71,11 @@ export const useOnboardingStore = defineStore('onboarding', {
 
             this.percentage = Number(data.percentage ?? 0);
             this.completedSteps = Number(data.completed_steps ?? 0);
-            this.totalSteps = Number(data.total_steps ?? 5);
+            this.totalSteps = Number(data.total_steps ?? 6);
             this.currentStep = data.current_step ?? 'business';
             this.completed = Boolean(data.completed);
+            this.dismissed = Boolean(data.dismissed);
+            this.pageUrl = data.page_url ?? '';
             this.steps = Array.isArray(data.steps) ? data.steps : [];
             this.forms = {
                 business: {
@@ -83,9 +97,18 @@ export const useOnboardingStore = defineStore('onboarding', {
                 },
                 identity: {
                     theme_id: data.forms?.identity?.theme_id ?? null,
+                    handle: data.forms?.identity?.handle ?? '',
                     primary_color: data.forms?.identity?.primary_color ?? 'blue',
+                    primary_color_hex: data.forms?.identity?.primary_color_hex ?? '#3b82f6',
                     logo_radius: data.forms?.identity?.logo_radius ?? 'rounded-full',
                     font_family: data.forms?.identity?.font_family ?? 'sarmady',
+                    header_image: data.forms?.identity?.header_image ?? '',
+                    header_image_url: data.forms?.identity?.header_image_url ?? '',
+                    header_image_position: Number(data.forms?.identity?.header_image_position ?? 50),
+                },
+                goal: {
+                    primary_action_type: data.forms?.goal?.primary_action_type ?? '',
+                    secondary_action_type: data.forms?.goal?.secondary_action_type ?? '',
                 },
                 catalog: {
                     enabled: Array.isArray(data.forms?.catalog?.enabled)
@@ -99,6 +122,8 @@ export const useOnboardingStore = defineStore('onboarding', {
                 },
             };
             this.industries = data.industries ?? {};
+            this.industryOptions = Array.isArray(data.industry_options) ? data.industry_options : [];
+            this.actionOptions = Array.isArray(data.action_options) ? data.action_options : [];
             this.socialNetworks = data.social_networks ?? {};
             this.fonts = data.fonts ?? {};
             this.colorOptions = Array.isArray(data.color_options) ? data.color_options : [];
@@ -144,16 +169,20 @@ export const useOnboardingStore = defineStore('onboarding', {
             return this.save('/dashboard/onboarding/identity', 'PUT', body);
         },
 
+        async saveGoal(body) {
+            return this.save('/dashboard/onboarding/goal', 'PUT', body);
+        },
+
         async saveCatalog(body) {
             return this.save('/dashboard/onboarding/catalog', 'PUT', body);
         },
 
-        async refreshQuiet() {
-            return this.fetchOnboarding({ force: true, quiet: true });
+        async dismissWizard() {
+            return this.save('/dashboard/onboarding/dismiss', 'POST', {});
         },
 
-        dismiss() {
-            this.dismissed = true;
+        async refreshQuiet() {
+            return this.fetchOnboarding({ force: true, quiet: true });
         },
 
         async save(path, method, body) {

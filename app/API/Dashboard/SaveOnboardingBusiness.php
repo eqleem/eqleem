@@ -25,10 +25,14 @@ class SaveOnboardingBusiness
      */
     public function rules(): array
     {
+        $partial = request()->boolean('partial');
+        $required = $partial ? 'sometimes' : 'required';
+
         return [
-            'industry' => ['required', 'string', Rule::in(array_keys(config('industries', [])))],
-            'name' => ['required', 'string', 'min:2', 'max:255'],
-            'bio' => ['required', 'string', 'max:250'],
+            'partial' => ['sometimes', 'boolean'],
+            'industry' => [$required, 'string', Rule::in(array_keys(config('industries', [])))],
+            'name' => [$required, 'string', 'min:2', 'max:255'],
+            'bio' => [$required, 'string', 'max:250'],
             'logo' => ['nullable', 'image', 'max:15024'],
             'brand_mark_type' => ['nullable', 'string', Rule::in(['image', 'emoji', 'icon', 'none'])],
             'brand_mark_value' => ['nullable', 'string', 'max:64'],
@@ -38,26 +42,26 @@ class SaveOnboardingBusiness
     }
 
     /**
-     * @param  array{
-     *     industry: string,
-     *     name: string,
-     *     bio: string,
-     *     logo?: UploadedFile|null,
-     *     brand_mark_type?: string|null,
-     *     brand_mark_value?: string|null,
-     *     brand_mark_color?: string|null,
-     *     remove_logo?: bool
-     * }  $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     public function handle(Tenant $tenant, array $data, Onboarding $onboarding): array
     {
-        $tenant->name = $data['name'];
-        $tenant->meta->set('industry', $data['industry']);
+        $profile = app(TenantProfileService::class);
+
+        if (array_key_exists('name', $data) && filled($data['name'])) {
+            $tenant->name = (string) $data['name'];
+        }
+
+        if (array_key_exists('industry', $data) && filled($data['industry'])) {
+            $tenant->meta->set('industry', $data['industry']);
+        }
+
         $tenant->save();
 
-        $profile = app(TenantProfileService::class);
-        $profile->saveBio($tenant, (string) $data['bio']);
+        if (array_key_exists('bio', $data) && filled($data['bio'])) {
+            $profile->saveBio($tenant, (string) $data['bio']);
+        }
 
         $logo = $data['logo'] ?? null;
         $markType = (string) ($data['brand_mark_type'] ?? '');

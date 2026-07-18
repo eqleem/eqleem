@@ -56,8 +56,9 @@ it('returns onboarding payload for the current tenant', function () {
     $this->actingAs($user)
         ->getJson('/api/dashboard/onboarding')
         ->assertSuccessful()
-        ->assertJsonPath('data.total_steps', 5)
+        ->assertJsonPath('data.total_steps', 6)
         ->assertJsonPath('data.completed', false)
+        ->assertJsonPath('data.dismissed', false)
         ->assertJsonPath('data.current_step', 'business')
         ->assertJsonStructure([
             'data' => [
@@ -66,15 +67,20 @@ it('returns onboarding payload for the current tenant', function () {
                 'total_steps',
                 'current_step',
                 'completed',
+                'dismissed',
+                'page_url',
                 'steps',
                 'forms' => [
                     'business' => ['industry', 'name', 'bio', 'logo', 'brand_mark'],
                     'contact' => ['phone', 'email', 'whatsapp', 'country', 'city', 'social_links'],
-                    'identity' => ['theme_id', 'primary_color', 'logo_radius', 'font_family'],
+                    'identity' => ['theme_id', 'handle', 'primary_color', 'header_image'],
+                    'goal' => ['primary_action_type', 'secondary_action_type'],
                     'catalog' => ['enabled'],
                     'orders' => ['payment_active', 'shipping_active', 'verification_done'],
                 ],
                 'industries',
+                'industry_options',
+                'action_options',
                 'catalog_options',
             ],
         ]);
@@ -102,6 +108,21 @@ it('saves business step with industry name bio and logo', function () {
     expect($tenant->fresh()->meta->get('industry'))->toBe('retail')
         ->and($tenant->fresh()->name)->toBe('متجر أحمد')
         ->and(data_get($tenant->fresh()->meta, 'bio'))->toBe('نبيع منتجات مميزة');
+});
+
+it('autosaves business fields partially', function () {
+    [$user, $tenant] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->postJson('/api/dashboard/onboarding/business', [
+            'partial' => true,
+            'name' => 'اسم مؤقت',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.forms.business.name', 'اسم مؤقت');
+
+    expect($tenant->fresh()->name)->toBe('اسم مؤقت')
+        ->and(data_get($tenant->fresh()->meta, 'industry'))->toBeNull();
 });
 
 it('saves business step with an emoji brand mark', function () {
@@ -146,42 +167,77 @@ it('saves business step with an icon brand mark', function () {
         ->and(data_get($tenant->fresh()->meta, 'brand_mark.value'))->toBe('tabler:chart-line');
 });
 
-it('saves contact step with whatsapp and social links', function () {
+it('saves contact step with optional social username', function () {
     [$user] = createOnboardingUserWithTenant();
 
     $this->actingAs($user)
         ->putJson('/api/dashboard/onboarding/contact', [
             'phone' => '0501234567',
             'email' => 'hello@example.com',
-            'whatsapp' => '966501234567',
+            'whatsapp_same_as_phone' => true,
             'country' => 'SA',
             'city' => 'الرياض',
             'social_links' => [
-                ['network' => 'twitter', 'url' => 'https://x.com/eqleem'],
+                ['network' => 'twitter', 'username' => 'eqleem'],
             ],
         ])
         ->assertSuccessful()
-        ->assertJsonPath('data.forms.contact.whatsapp', '966501234567')
+        ->assertJsonPath('data.forms.contact.whatsapp', '0501234567')
         ->assertJsonPath('data.forms.contact.social_links.0.url', 'https://x.com/eqleem');
 });
 
-it('saves identity theme options including font', function () {
+it('marks contact done with only phone and email', function () {
+    [$user] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->putJson('/api/dashboard/onboarding/contact', [
+            'phone' => '0501234567',
+            'email' => 'hello@example.com',
+            'whatsapp_same_as_phone' => true,
+            'social_links' => [],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.steps.1.done', true);
+});
+
+it('saves identity theme options including handle', function () {
     [$user, $tenant] = createOnboardingUserWithTenant();
+    $handle = 'brand-'.Str::lower(Str::random(5));
 
     $this->actingAs($user)
         ->putJson('/api/dashboard/onboarding/identity', [
+            'handle' => $handle,
             'primary_color' => 'teal',
             'font_family' => 'effra',
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.forms.identity.primary_color', 'teal')
+        ->assertJsonPath('data.forms.identity.handle', $handle)
         ->assertJsonPath('data.forms.identity.font_family', 'effra');
 
     $saved = $tenant->fresh()->themeSettingsFor((int) $tenant->theme_id);
 
-    expect($saved['primaryColor'])->toBe('teal')
+    expect($tenant->fresh()->handle)->toBe($handle)
+        ->and($saved['primaryColor'])->toBe('teal')
         ->and($saved['fontFamily'])->toBe('effra')
         ->and($saved['logoRadius'])->not->toBeEmpty();
+});
+
+it('saves goal action types', function () {
+    [$user, $tenant] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->putJson('/api/dashboard/onboarding/goal', [
+            'primary_action_type' => 'whatsapp-chat',
+            'secondary_action_type' => 'store-link',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.forms.goal.primary_action_type', 'whatsapp-chat')
+        ->assertJsonPath('data.forms.goal.secondary_action_type', 'store-link')
+        ->assertJsonPath('data.steps.3.done', true);
+
+    expect(data_get($tenant->fresh()->meta, 'primary_action_type'))->toBe('whatsapp-chat')
+        ->and(data_get($tenant->fresh()->meta, 'secondary_action_type'))->toBe('store-link');
 });
 
 it('exposes onboarding fonts without milligram or eqleem and includes effra', function () {
@@ -217,6 +273,14 @@ it('rejects empty catalog selection', function () {
         ->putJson('/api/dashboard/onboarding/catalog', [
             'enabled' => [],
         ])
+        ->assertUnprocessable();
+});
+
+it('rejects dismissing incomplete onboarding', function () {
+    [$user] = createOnboardingUserWithTenant();
+
+    $this->actingAs($user)
+        ->postJson('/api/dashboard/onboarding/dismiss')
         ->assertUnprocessable();
 });
 

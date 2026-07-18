@@ -5,16 +5,15 @@ namespace App\API\Dashboard;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\OnboardingResource;
 use App\Models\Tenant;
-use App\Support\ContentTypeRegistry;
 use App\Support\Onboarding;
 use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Saves onboarding catalog step: enabled sellable content types.
+ * Saves onboarding step 4: primary and secondary page action types.
  */
-class SaveOnboardingCatalog
+class SaveOnboardingGoal
 {
     use AsAction;
     use AuthorizesDashboardTenant;
@@ -24,33 +23,44 @@ class SaveOnboardingCatalog
      */
     public function rules(): array
     {
-        $sellableSlugs = app(ContentTypeRegistry::class)->configured()
-            ->filter(fn ($type): bool => $type->sellable)
-            ->pluck('slug')
-            ->all();
-
         $partial = request()->boolean('partial');
+        $actionKeys = array_keys(config('onboarding-actions', []));
 
         return [
             'partial' => ['sometimes', 'boolean'],
-            'enabled' => [$partial ? 'sometimes' : 'required', 'array', $partial ? 'nullable' : 'min:1'],
-            'enabled.*' => ['required', 'string', Rule::in($sellableSlugs)],
+            'primary_action_type' => [
+                $partial ? 'sometimes' : 'required',
+                'string',
+                Rule::in($actionKeys),
+            ],
+            'secondary_action_type' => [
+                'nullable',
+                'string',
+                Rule::in($actionKeys),
+                'different:primary_action_type',
+            ],
         ];
     }
 
     /**
-     * @param  array{enabled?: list<string>}  $data
+     * @param  array{primary_action_type?: string|null, secondary_action_type?: string|null}  $data
      * @return array<string, mixed>
      */
     public function handle(Tenant $tenant, array $data, Onboarding $onboarding): array
     {
-        if (! array_key_exists('enabled', $data)) {
-            return GetOnboarding::make()->handle($tenant->fresh(), $onboarding);
+        if (array_key_exists('primary_action_type', $data) && filled($data['primary_action_type'])) {
+            $tenant->meta->set('primary_action_type', (string) $data['primary_action_type']);
         }
 
-        $config = is_array($tenant->config) ? $tenant->config : [];
-        $config['enabled_content_types'] = array_values(array_unique($data['enabled'] ?? []));
-        $tenant->config = $config;
+        if (array_key_exists('secondary_action_type', $data)) {
+            $tenant->meta->set(
+                'secondary_action_type',
+                filled($data['secondary_action_type'] ?? null)
+                    ? (string) $data['secondary_action_type']
+                    : null,
+            );
+        }
+
         $tenant->save();
 
         return GetOnboarding::make()->handle($tenant->fresh(), $onboarding);
@@ -63,7 +73,7 @@ class SaveOnboardingCatalog
     {
         $tenant = $this->currentDashboardTenant($request);
 
-        /** @var array{enabled: list<string>} $validated */
+        /** @var array{primary_action_type?: string|null, secondary_action_type?: string|null} $validated */
         $validated = $request->validated();
 
         return $this->handle($tenant, $validated, $onboarding);

@@ -20,7 +20,7 @@ const {
     loaded,
 } = storeToRefs(store);
 
-const { completed: onboardingCompleted } = storeToRefs(onboardingStore);
+const { completed: onboardingCompleted, dismissed: onboardingDismissed } = storeToRefs(onboardingStore);
 
 const copied = ref(false);
 const shareInput = ref(null);
@@ -101,7 +101,7 @@ function shareLink(platform) {
                     </Button>
                 </div>
 
-                <div class="mt-8">
+                <div v-if="onboardingDismissed" class="mt-8">
                     <OnboardingWidget on-primary />
                 </div>
             </div>

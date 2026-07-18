@@ -43,6 +43,7 @@ use App\API\Courses\UploadCourseCoverImage;
 use App\API\Courses\UploadCourseEditorImage;
 use App\API\Courses\UploadCourseLessonFile;
 use App\API\Dashboard\AddWelcomeSocialLink;
+use App\API\Dashboard\DismissOnboardingWizard;
 use App\API\Dashboard\GetDashboardChart;
 use App\API\Dashboard\GetDashboardContext;
 use App\API\Dashboard\GetDashboardStat;
@@ -52,6 +53,7 @@ use App\API\Dashboard\GetWelcomeWidget;
 use App\API\Dashboard\SaveOnboardingBusiness;
 use App\API\Dashboard\SaveOnboardingCatalog;
 use App\API\Dashboard\SaveOnboardingContact;
+use App\API\Dashboard\SaveOnboardingGoal;
 use App\API\Dashboard\SaveOnboardingIdentity;
 use App\API\Dashboard\UpdateWelcomeBasicInfo;
 use App\API\Dashboard\UpdateWelcomeContact;
@@ -322,8 +324,14 @@ Route::put('/dashboard/onboarding/contact', SaveOnboardingContact::class)
 Route::put('/dashboard/onboarding/identity', SaveOnboardingIdentity::class)
     ->name('api.dashboard.onboarding.identity');
 
+Route::put('/dashboard/onboarding/goal', SaveOnboardingGoal::class)
+    ->name('api.dashboard.onboarding.goal');
+
 Route::put('/dashboard/onboarding/catalog', SaveOnboardingCatalog::class)
     ->name('api.dashboard.onboarding.catalog');
+
+Route::post('/dashboard/onboarding/dismiss', DismissOnboardingWizard::class)
+    ->name('api.dashboard.onboarding.dismiss');
 
 Route::get('/plans', ListPlans::class)
     ->name('api.plans.index');
