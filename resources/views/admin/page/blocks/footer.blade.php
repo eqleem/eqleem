@@ -300,6 +300,7 @@ new class extends \Livewire\Component
         $documentNumbers = BusinessDocuments::sanitizeNumbers($this->documentNumbers);
 
         $this->saveData([
+            ...(is_array($this->block()->data) ? $this->block()->data : []),
             'show_documents_warranties' => $this->showDocumentsWarranties,
             'show_eqleem_logo' => true,
             'document_numbers' => $documentNumbers,
@@ -346,7 +347,7 @@ new class extends \Livewire\Component
     public function with(): array
     {
         return [
-            'businessDocuments' => BusinessDocuments::definitions(),
+            'businessDocuments' => collect(BusinessDocuments::definitions())->except('other')->all(),
             'linkTypeOptions' => $this->ctaLinkTypeOptions(),
             'footerLinks' => Content::query()
                 ->where('block_id', $this->blockId)

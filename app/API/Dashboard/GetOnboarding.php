@@ -38,6 +38,13 @@ class GetOnboarding
 
         $enabledContentTypes = data_get($tenant->config, 'enabled_content_types');
         $enabledContentTypes = is_array($enabledContentTypes) ? array_values($enabledContentTypes) : [];
+        $sellableSlugs = app(ContentTypeRegistry::class)->configured()
+            ->filter(fn ($type): bool => $type->sellable)
+            ->pluck('slug');
+        $enabledCatalogContentTypes = collect($enabledContentTypes)
+            ->filter(fn (mixed $slug): bool => is_string($slug) && $sellableSlugs->contains($slug))
+            ->values()
+            ->all();
 
         $catalogOptions = app(ContentTypeRegistry::class)->configured()
             ->filter(fn ($type): bool => $type->sellable)
@@ -135,7 +142,7 @@ class GetOnboarding
                     'secondary_action_type' => (string) data_get($tenant->meta, 'secondary_action_type', ''),
                 ],
                 'catalog' => [
-                    'enabled' => $enabledContentTypes,
+                    'enabled' => $enabledCatalogContentTypes,
                 ],
                 'orders' => [
                     'payment_active' => $onboarding->hasActivePayment($tenant),

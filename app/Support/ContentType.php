@@ -27,6 +27,8 @@ class ContentType
         public string $color = 'gray',
         public bool $active = true,
         public bool $sellable = false,
+        public string $section = 'content',
+        public bool $permanent = false,
     ) {}
 
     /**
@@ -45,6 +47,8 @@ class ContentType
             color: $config['color'] ?? 'gray',
             active: array_key_exists('active', $config) ? (bool) $config['active'] : true,
             sellable: array_key_exists('sellable', $config) ? (bool) $config['sellable'] : false,
+            section: $config['section'] ?? 'content',
+            permanent: (bool) ($config['permanent'] ?? false),
         );
     }
 
@@ -105,6 +109,7 @@ class ContentType
             'color' => $this->color,
             'active' => $this->active,
             'sellable' => $this->sellable,
+            'section' => $this->section,
         ];
     }
 
@@ -123,6 +128,7 @@ class ContentType
             'type' => 'content',
             'color' => $this->color,
             'sellable' => $this->sellable,
+            'section' => $this->section,
             'color_bg_class' => self::backgroundClassFor($this->color),
             'color_hover_class' => self::hoverBackgroundClassFor($this->color),
             'color_bg_hex' => self::backgroundHexFor($this->color),
@@ -134,6 +140,7 @@ class ContentType
                 'icon_url' => asset($this->icon),
                 'color' => $this->color,
                 'sellable' => $this->sellable,
+                'section' => $this->section,
             ],
         ];
     }

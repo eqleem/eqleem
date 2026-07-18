@@ -158,6 +158,39 @@ test('owner can manage cta links', function () {
     expect(Content::query()->whereKey($linkId)->exists())->toBeFalse();
 });
 
+test('owner can manage footer links', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+    $block = Block::findSingleton('footer');
+
+    $create = $this->actingAs($user)
+        ->postJson('/api/page/blocks/'.$block->id.'/links', [
+            'link_type' => 'external',
+            'label' => 'سياسة الخصوصية',
+            'url' => 'https://example.com/privacy',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.label', 'سياسة الخصوصية');
+
+    $linkId = (int) $create->json('data.id');
+
+    setCurrentTenant($tenant);
+    expect(Content::query()->whereKey($linkId)->value('type'))->toBe('footer-link');
+
+    $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful()
+        ->assertJsonPath('data.bottom_blocks.0.editor.links.0.id', $linkId)
+        ->assertJsonPath('data.bottom_blocks.0.editor.links.0.label', 'سياسة الخصوصية');
+
+    $this->actingAs($user)
+        ->deleteJson('/api/page/blocks/'.$block->id.'/links/'.$linkId)
+        ->assertSuccessful();
+
+    expect(Content::query()->whereKey($linkId)->exists())->toBeFalse();
+});
+
 test('cta block editor exposes link type picker options', function () {
     [$user, $tenant] = createUserWithTenantForPageBlockSettings();
 
@@ -338,7 +371,13 @@ test('owner can update block-link settings', function () {
 
     expect($contentPickerKeys->sort()->values()->all())
         ->toBe($activeContentTypeSlugs->sort()->values()->all());
-    expect($contentPickerKeys)->not->toContain('forms', 'courses', 'services', 'newsletter');
+    expect($contentPickerKeys)->toContain('pages', 'forms')
+        ->not->toContain('courses', 'newsletter');
+
+    $pickerByKey = collect($picker)->keyBy('key');
+
+    expect($pickerByKey['pages']['label'])->toBe('رابط صفحة')
+        ->and($pickerByKey['forms']['label'])->toBe('رابط نموذج');
 });
 
 test('owner can update block-link to external url and specific item', function () {

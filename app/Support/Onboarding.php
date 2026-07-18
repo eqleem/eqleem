@@ -133,7 +133,17 @@ class Onboarding
     {
         $enabled = data_get($tenant->config, 'enabled_content_types');
 
-        return is_array($enabled) && count($enabled) > 0;
+        if (! is_array($enabled)) {
+            return false;
+        }
+
+        $sellableSlugs = app(ContentTypeRegistry::class)->configured()
+            ->filter(fn (ContentType $contentType): bool => $contentType->sellable)
+            ->pluck('slug');
+
+        return collect($enabled)->contains(
+            fn (mixed $slug): bool => is_string($slug) && $sellableSlugs->contains($slug)
+        );
     }
 
     public function ordersDone(Tenant $tenant): bool

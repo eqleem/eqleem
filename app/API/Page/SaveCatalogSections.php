@@ -2,16 +2,18 @@
 
 namespace App\API\Page;
 
+use App\Actions\SyncTenantSections;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Models\Tenant;
 use App\Support\ContentTypeRegistry;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Saves which sellable catalog content types are enabled for the tenant.
+ * Saves enabled content types and synchronizes their public page section links.
  */
 class SaveCatalogSections
 {
@@ -23,14 +25,13 @@ class SaveCatalogSections
      */
     public function rules(): array
     {
-        $sellableSlugs = app(ContentTypeRegistry::class)->configured()
-            ->filter(fn ($type): bool => $type->sellable)
+        $contentTypeSlugs = app(ContentTypeRegistry::class)->managedSections()
             ->pluck('slug')
             ->all();
 
         return [
             'enabled' => ['present', 'array'],
-            'enabled.*' => ['required', 'string', Rule::in($sellableSlugs)],
+            'enabled.*' => ['required', 'string', 'distinct', Rule::in($contentTypeSlugs)],
         ];
     }
 
@@ -40,10 +41,17 @@ class SaveCatalogSections
      */
     public function handle(Tenant $tenant, array $data, ContentTypeRegistry $contentTypes): array
     {
-        $config = is_array($tenant->config) ? $tenant->config : [];
-        $config['enabled_content_types'] = array_values(array_unique($data['enabled']));
-        $tenant->config = $config;
-        $tenant->save();
+        $enabled = array_values(array_unique($data['enabled']));
+
+        DB::transaction(function () use ($tenant, $enabled, $contentTypes): void {
+            $config = is_array($tenant->config) ? $tenant->config : [];
+            $config['enabled_content_types'] = $enabled;
+            $config['page_sections_configured'] = true;
+            $tenant->config = $config;
+            $tenant->save();
+
+            SyncTenantSections::run($tenant, $enabled, $contentTypes);
+        });
 
         $payload = ListCatalogSections::make()->handle($tenant->fresh(), $contentTypes);
 

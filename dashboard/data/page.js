@@ -20,6 +20,7 @@ export const contentTypeCatalog = [
     { slug: 'menu', name: 'قائمة الطعام', description: 'إدارة أصناف وعناصر قائمة الطعام.', icon: 'assets/icons/business/059-teacup.svg', color: 'amber' },
     { slug: 'unit-rental', name: 'تأجير الوحدات', description: 'إدارة الوحدات المتاحة للتأجير.', icon: 'assets/icons/business/010-location.svg', color: 'lime' },
     { slug: 'courses', name: 'الدورات التدريبية', description: 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.', icon: 'assets/icons/business/011-presentation.svg', color: 'pink' },
+    { slug: 'reviews', name: 'التقييمات', description: 'عرض قائمة التقييمات وآراء العملاء.', icon: 'assets/icons/ecommerce/006-badge.svg', color: 'amber' },
 ];
 
 /** @deprecated Prefer useContentTypesStore().contentTypes for nav — kept for section stores. */

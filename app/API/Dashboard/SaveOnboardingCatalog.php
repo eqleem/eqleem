@@ -49,7 +49,18 @@ class SaveOnboardingCatalog
         }
 
         $config = is_array($tenant->config) ? $tenant->config : [];
-        $config['enabled_content_types'] = array_values(array_unique($data['enabled'] ?? []));
+        $sellableSlugs = app(ContentTypeRegistry::class)->configured()
+            ->filter(fn ($type): bool => $type->sellable)
+            ->pluck('slug');
+        $existing = collect($config['enabled_content_types'] ?? [])
+            ->filter(fn (mixed $slug): bool => is_string($slug))
+            ->reject(fn (string $slug): bool => $sellableSlugs->contains($slug));
+
+        $config['enabled_content_types'] = $existing
+            ->merge($data['enabled'] ?? [])
+            ->unique()
+            ->values()
+            ->all();
         $tenant->config = $config;
         $tenant->save();
 

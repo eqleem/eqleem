@@ -98,6 +98,17 @@ test('owner can list page structure with system and user blocks', function () {
                         'link_type_picker_options',
                     ],
                 ],
+                'bottom_blocks' => [
+                    '*' => [
+                        'id',
+                        'editor' => [
+                            'type',
+                            'links',
+                            'link_type_options',
+                            'link_type_picker_options',
+                        ],
+                    ],
+                ],
                 'float_links_block' => [
                     'id',
                     'editor' => [
@@ -108,7 +119,9 @@ test('owner can list page structure with system and user blocks', function () {
                     ],
                 ],
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.bottom_blocks.0.type', 'footer')
+        ->assertJsonPath('data.bottom_blocks.0.editor.type', 'footer');
 });
 
 test('cta block is not included among locked top blocks', function () {

@@ -51,6 +51,10 @@ return [
             'index' => 'tenant.digital-services.index',
             'detail' => 'tenant.digital-services.detail',
         ],
+        'reviews' => [
+            'index' => 'tenant.pages.reviews',
+            'detail' => null,
+        ],
         'pages' => [
             'index' => null,
             'detail' => 'tenant.page.detail',
@@ -73,6 +77,7 @@ return [
         'courses' => 'hugeicons:presentation-06',
         'digital-products' => 'hugeicons:file-download',
         'digital-services' => 'hugeicons:customer-service-01',
+        'reviews' => 'hugeicons:star',
         'pages' => 'hugeicons:file-01',
         'form' => 'hugeicons:file-01',
         'external' => 'hugeicons:link-04',
@@ -89,8 +94,8 @@ return [
         'courses' => 'دورة محددة',
         'digital-products' => 'منتج رقمي محدد',
         'digital-services' => 'خدمة رقمية محددة',
-        'pages' => 'صفحة داخلية',
-        'forms' => 'نموذج محدد',
+        'pages' => 'رابط صفحة',
+        'forms' => 'رابط نموذج',
     ],
 
     'block_link' => [
@@ -134,6 +139,10 @@ return [
             'digital-services' => [
                 'title' => 'الخدمات الرقمية',
                 'description' => 'خدمات رقمية احترافية مع مدة تسليم واضحة.',
+            ],
+            'reviews' => [
+                'title' => 'التقييمات',
+                'description' => 'تقييمات وآراء عملائنا.',
             ],
         ],
         'items' => [

@@ -53,9 +53,9 @@ test('owner can list active content types for page nav', function () {
     $bySellable = collect($response->json('data'))->groupBy(fn (array $tab) => $tab['sellable'] ? 'sellable' : 'content');
 
     expect($slugs)->toBe($expectedSlugs)
-        ->and($slugs)->toContain('blog', 'store')
-        ->and($slugs)->not->toContain('courses', 'forms', 'newsletter', 'digital-services')
-        ->and($bySellable->get('content')?->pluck('slug')->all() ?? [])->toContain('pages', 'blog', 'portfolio')
+        ->and($slugs)->toContain('pages', 'forms', 'blog', 'store')
+        ->and($slugs)->not->toContain('courses', 'newsletter', 'digital-services')
+        ->and($bySellable->get('content')?->pluck('slug')->all() ?? [])->toContain('pages', 'forms', 'blog', 'portfolio')
         ->and($bySellable->get('sellable')?->pluck('slug')->all() ?? [])->toContain('store');
 });
 

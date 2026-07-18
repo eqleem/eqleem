@@ -582,7 +582,7 @@ async function submit() {
 <template>
     <Form class="!rounded-none !p-4" @submit="submit">
         <div class="space-y-2">
-            <Field name="link_type" label="نوع الرابط" :error="errors.link_type">
+            <Field v-if="isNestedLink || isNew" name="link_type" label="نوع الرابط" :error="errors.link_type">
                 <div ref="pickerRoot" class="relative w-full">
                     <button
                         type="button"

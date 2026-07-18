@@ -18,5 +18,9 @@ return [
             'label' => 'وثيقة العمل الحر',
             'logo' => 'assets/images/documents/freelance.svg',
         ],
+        'other' => [
+            'label' => 'أخرى',
+            'logo' => null,
+        ],
     ],
 ];

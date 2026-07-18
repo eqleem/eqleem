@@ -8,8 +8,6 @@ use App\Models\Block;
 use App\Models\Tenant;
 use App\Services\TenantProfileService;
 use App\Support\BlockTypeRegistry;
-use App\Support\BusinessDocuments;
-use App\Support\CtaLink;
 use Illuminate\Http\JsonResponse;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -81,7 +79,7 @@ class ShowPageBlock
             ],
             'float-links' => $this->floatLinksEditorPayload($block),
             'header' => $this->headerEditorPayload($block, $tenant, $data),
-            'footer' => $this->footerEditorPayload($block, $data),
+            'footer' => $this->footerEditorPayload($block),
             'cta' => $this->ctaEditorPayload($block),
             'block-link' => $this->blockLinkEditorPayload($data),
             default => [
@@ -122,31 +120,6 @@ class ShowPageBlock
                 ])
                 ->values()
                 ->all(),
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function footerEditorPayload(Block $block, array $data): array
-    {
-        return [
-            'type' => 'footer',
-            'show_documents_warranties' => (bool) ($data['show_documents_warranties'] ?? true),
-            'show_eqleem_logo' => true,
-            'document_numbers' => BusinessDocuments::numbersFromBlockData($data),
-            'business_documents' => collect(BusinessDocuments::definitions())
-                ->map(fn (array $document, string $key): array => [
-                    'key' => $key,
-                    'label' => $document['label'],
-                    'logo' => $document['logo'],
-                ])
-                ->values()
-                ->all(),
-            'links' => $this->mapBlockLinks($block, 'footer-link'),
-            'link_type_options' => CtaLink::linkTypeOptions('nav'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];
     }
 }

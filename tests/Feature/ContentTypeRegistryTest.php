@@ -112,3 +112,37 @@ it('exposes sellable flag from config on tabs', function () {
     expect($tabs['blog']['sellable'])->toBeFalse()
         ->and($tabs['store']['sellable'])->toBeTrue();
 });
+
+it('always exposes permanent types and excludes them from managed sections', function () {
+    config([
+        'content-types' => [
+            'pages' => [
+                'active' => false,
+                'permanent' => true,
+                'order' => 1,
+                'slug' => 'pages',
+                'model_type' => 'page',
+                'name' => 'الصفحات',
+                'description' => 'Pages',
+                'icon' => 'assets/icons/ecommerce/031-content.svg',
+                'color' => 'blue',
+            ],
+            'blog' => [
+                'active' => false,
+                'order' => 2,
+                'slug' => 'blog',
+                'model_type' => 'blog',
+                'name' => 'المدونة',
+                'description' => 'Blog',
+                'icon' => 'assets/icons/stationery/002-book.svg',
+                'color' => 'orange',
+            ],
+        ],
+    ]);
+
+    $registry = app(ContentTypeRegistry::class);
+
+    expect($registry->all()->pluck('slug')->all())->toBe(['pages'])
+        ->and($registry->managedSections()->pluck('slug')->all())->toBe(['blog'])
+        ->and($registry->findActive('pages'))->toBeInstanceOf(ContentType::class);
+});

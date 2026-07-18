@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import Input from '../../ui/Input.vue';
 import Toggle from '../../ui/Toggle.vue';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
@@ -26,7 +25,6 @@ const links = ref([...(props.editor.links ?? [])]);
 
 const form = reactive({
     show_documents_warranties: Boolean(props.editor.show_documents_warranties ?? true),
-    document_numbers: { ...(props.editor.document_numbers ?? {}) },
 });
 
 const linkModal = ref(false);
@@ -39,7 +37,6 @@ const dragId = ref(null);
 watch(() => props.editor, (value) => {
     links.value = [...(value.links ?? [])];
     form.show_documents_warranties = Boolean(value.show_documents_warranties ?? true);
-    form.document_numbers = { ...(value.document_numbers ?? {}) };
 }, { deep: true });
 
 function linkTypeFromData(data = {}) {
@@ -181,7 +178,6 @@ async function saveSettings() {
     try {
         const payload = await store.updateBlock(props.blockId, {
             show_documents_warranties: form.show_documents_warranties,
-            document_numbers: form.document_numbers,
         });
         emit('saved', payload);
     } catch (error) {
@@ -192,6 +188,17 @@ async function saveSettings() {
 }
 
 const modalTitle = computed(() => (editingLinkId.value ? 'تعديل رابط' : 'إضافة رابط'));
+const emptyLinksMessage = computed(() => {
+    if (props.contentType === 'footer-link') {
+        return props.embedded
+            ? 'لا توجد روابط بعد. اضغط «أضف رابط» لإضافة أول رابط في تذييل الصفحة.'
+            : 'لا توجد روابط بعد. أضف أول رابط في تذييل الصفحة.';
+    }
+
+    return props.embedded
+        ? 'لا توجد أزرار بعد. اضغط «أضف زر» لإضافة أول زر إجراء.'
+        : 'لا توجد روابط بعد. أضف أول زر إجراء.';
+});
 
 onBeforeUnmount(() => {
     if (linkModal.value) {
@@ -207,15 +214,6 @@ defineExpose({ openAdd });
     <div :class="embedded ? 'relative min-h-20' : 'space-y-4 !p-4'">
         <template v-if="showSettings">
             <Toggle v-model="form.show_documents_warranties" name="show_documents_warranties" label="إظهار الوثائق والضمانات" />
-            <div v-if="form.show_documents_warranties" class="space-y-2">
-                <Input
-                    v-for="doc in (editor.business_documents ?? [])"
-                    :key="doc.key"
-                    v-model="form.document_numbers[doc.key]"
-                    :name="`document_${doc.key}`"
-                    :label="doc.label"
-                />
-            </div>
         </template>
 
         <div v-if="!embedded" class="flex items-center justify-between gap-3">
@@ -231,9 +229,7 @@ defineExpose({ openAdd });
                 ? 'pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400'
                 : 'py-2 text-xs text-stone-400'"
         >
-            {{ embedded
-                ? 'لا توجد أزرار بعد. اضغط «أضف زر» لإضافة أول زر إجراء.'
-                : 'لا توجد روابط بعد. أضف أول زر إجراء.' }}
+            {{ emptyLinksMessage }}
         </p>
         <ul v-else :class="embedded ? 'space-y-1.5 p-2' : 'space-y-1.5'">
             <li

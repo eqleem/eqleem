@@ -3,9 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import Icon from '../ui/Icon.vue';
-import CatalogSectionsModal from './CatalogSectionsModal.vue';
 import { fixedTabs } from '../../data/page.js';
-import { openModal } from '../../lib/modal.js';
 import { useContentTypesStore } from '../../stores/contentTypes.js';
 
 // Mirror Nav.vue: a content type stays lit across its whole section
@@ -14,13 +12,46 @@ import { useContentTypesStore } from '../../stores/contentTypes.js';
 const route = useRoute();
 const mobileNavOpen = ref(false);
 const contentTypesStore = useContentTypesStore();
-const { contentTabs, sellableTabs } = storeToRefs(contentTypesStore);
+const { tabs } = storeToRefs(contentTypesStore);
 
-/** Shared section order for desktop sidebar + mobile slideout. Catalog always shown. */
-const contentSections = computed(() => [
-    { id: 'catalog', label: 'البيع', tabs: sellableTabs.value, alwaysShow: true },
-    { id: 'content', label: 'المحتوى والنشر', tabs: contentTabs.value, alwaysShow: false },
-].filter((section) => section.alwaysShow || section.tabs.length > 0));
+/** Shared section order for desktop sidebar + mobile slideout. */
+const sectionLabels = {
+    sell: 'البيع',
+    content: 'المحتوى',
+    permanent: '. . .',
+    trust: 'الثقة والمصداقية',
+};
+const sectionOrder = ['sell', 'content', 'permanent', 'trust'];
+const permanentContentTypes = new Set(['pages', 'forms']);
+const contentSections = computed(() => {
+    const groups = new Map();
+
+    for (const tab of tabs.value) {
+        const section = permanentContentTypes.has(tab.slug)
+            ? 'permanent'
+            : (tab.section || 'content');
+
+        if (!groups.has(section)) {
+            groups.set(section, []);
+        }
+
+        groups.get(section).push(tab);
+    }
+
+    return [...groups.entries()]
+        .map(([id, sectionTabs]) => ({
+            id,
+            label: sectionLabels[id] || id,
+            tabs: sectionTabs,
+        }))
+        .sort((first, second) => {
+            const firstIndex = sectionOrder.indexOf(first.id);
+            const secondIndex = sectionOrder.indexOf(second.id);
+
+            return (firstIndex === -1 ? sectionOrder.length : firstIndex)
+                - (secondIndex === -1 ? sectionOrder.length : secondIndex);
+        });
+});
 
 function isFixedActive(tabId) {
     if (route.path !== '/manage') {
@@ -42,11 +73,6 @@ function openMobileNav() {
 
 function closeMobileNav() {
     mobileNavOpen.value = false;
-}
-
-function openCatalogSections() {
-    closeMobileNav();
-    openModal('catalog-sections');
 }
 
 function onEscape(event) {
@@ -95,26 +121,8 @@ onBeforeUnmount(() => {
         </RouterLink>
 
         <template v-for="section in contentSections" :key="section.id">
-            <div class="mt-3 hidden items-center justify-between gap-1 px-2 lg:flex">
-                <button
-                    v-if="section.id === 'catalog'"
-                    type="button"
-                    class="min-w-0 cursor-pointer truncate text-xs text-stone-400 transition hover:text-primary-600"
-                    @click="openCatalogSections"
-                >
-                    {{ section.label }}
-                </button>
-                <p v-else class="min-w-0 truncate px-1 text-xs text-stone-400">{{ section.label }}</p>
-
-                <button
-                    v-if="section.id === 'catalog'"
-                    type="button"
-                    class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
-                    aria-label="إعدادات البيع"
-                    @click="openCatalogSections"
-                >
-                    <Icon name="settings" class="size-3.5" />
-                </button>
+            <div class="hidden px-2 pt-6 lg:block">
+                <p class="truncate text-xs text-stone-400">{{ section.label }}</p>
             </div>
             <div class="mx-1 mb-2 border-t border-dotted border-stone-300 max-lg:mb-6"></div>
 
@@ -188,26 +196,8 @@ onBeforeUnmount(() => {
                 </RouterLink>
 
                 <template v-for="section in contentSections" :key="`slideout-section-${section.id}`">
-                    <div class="mt-3 flex items-center justify-between gap-1 px-2">
-                        <button
-                            v-if="section.id === 'catalog'"
-                            type="button"
-                            class="min-w-0 truncate text-xs text-stone-400 transition hover:text-primary-600 cursor-pointer"
-                            @click="openCatalogSections"
-                        >
-                            {{ section.label }}
-                        </button>
-                        <p v-else class="min-w-0 truncate px-1 text-xs text-stone-400">{{ section.label }}</p>
-
-                        <button
-                            v-if="section.id === 'catalog'"
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-md p-1 text-stone-400 transition hover:bg-white/70 hover:text-primary-600"
-                            aria-label="إعدادات البيع"
-                            @click="openCatalogSections"
-                        >
-                            <Icon name="settings" class="size-3.5" />
-                        </button>
+                    <div class="px-2 pt-6">
+                        <p class="truncate text-xs text-stone-400">{{ section.label }}</p>
                     </div>
                     <div class="mx-1 mb-2 border-t border-dotted border-stone-300"></div>
 
@@ -226,6 +216,4 @@ onBeforeUnmount(() => {
             </nav>
         </Transition>
     </Teleport>
-
-    <CatalogSectionsModal />
 </template>

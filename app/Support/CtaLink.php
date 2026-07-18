@@ -96,7 +96,9 @@ class CtaLink
         foreach (self::activeContentTypes() as $type) {
             $options[] = [
                 'key' => $type->slug,
-                'label' => 'رابط '.$type->name,
+                'label' => self::contentTypeRequiresItem($type->slug)
+                    ? (string) config('cta-link-types.item_labels.'.$type->slug, 'رابط '.$type->name)
+                    : 'رابط '.$type->name,
                 'icon_url' => asset($type->icon),
                 'group' => 'content',
                 'supports_section' => self::contentTypeHasSectionRoute($type->slug),

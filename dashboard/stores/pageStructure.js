@@ -22,6 +22,9 @@ export const usePageStructureStore = defineStore('pageStructure', {
         floatLinksBlock: null,
         blockTypes: [],
         blockLinkEditor: null,
+        contentCounts: {},
+        contentCountsLoading: false,
+        contentCountsError: null,
         loading: false,
         loaded: false,
         error: null,
@@ -34,6 +37,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
 
     getters: {
         userBlocksEmpty: (state) => state.loaded && !state.loading && state.userBlocks.length === 0,
+        footerBlock: (state) => state.bottomBlocks.find((block) => block.type === 'footer') ?? null,
     },
 
     actions: {
@@ -58,6 +62,12 @@ export const usePageStructureStore = defineStore('pageStructure', {
                 ...this.ctaBlock,
                 editor: editor ?? this.ctaBlock.editor,
             };
+        },
+
+        setFooterEditor(editor) {
+            this.bottomBlocks = this.bottomBlocks.map((block) => block.type === 'footer'
+                ? { ...block, editor: editor ?? block.editor }
+                : block);
         },
 
         setFloatLinksEditor(editor) {
@@ -145,6 +155,29 @@ export const usePageStructureStore = defineStore('pageStructure', {
                 throw error;
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async fetchContentCounts() {
+            if (this.contentCountsLoading) {
+                return;
+            }
+
+            this.contentCountsLoading = true;
+            this.contentCountsError = null;
+
+            try {
+                const payload = await api('/page/section-content-counts');
+                const counts = payload?.data;
+                this.contentCounts = counts && typeof counts === 'object' && !Array.isArray(counts)
+                    ? counts
+                    : {};
+            } catch (error) {
+                this.contentCountsError = error instanceof ApiError
+                    ? error.message
+                    : 'تعذر تحميل أعداد المحتوى.';
+            } finally {
+                this.contentCountsLoading = false;
             }
         },
 

@@ -255,17 +255,18 @@ class UpdatePageBlock
      */
     protected function updateFooter(Block $block, array $data): void
     {
-        $documentNumbers = BusinessDocuments::sanitizeNumbers(
-            is_array($data['document_numbers'] ?? null) ? $data['document_numbers'] : []
-        );
+        $blockData = is_array($block->data) ? $block->data : [];
 
-        $block->update([
-            'data' => [
-                'show_documents_warranties' => (bool) $data['show_documents_warranties'],
-                'show_eqleem_logo' => true,
-                'document_numbers' => $documentNumbers,
-            ],
-        ]);
+        $blockData['show_documents_warranties'] = (bool) $data['show_documents_warranties'];
+        $blockData['show_eqleem_logo'] = true;
+
+        if (array_key_exists('document_numbers', $data)) {
+            $blockData['document_numbers'] = BusinessDocuments::sanitizeNumbers(
+                is_array($data['document_numbers']) ? $data['document_numbers'] : []
+            );
+        }
+
+        $block->update(['data' => $blockData]);
     }
 
     /**

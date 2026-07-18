@@ -8,6 +8,7 @@ use App\Services\TenantProfileService;
 use App\Support\BlockBrandMark;
 use App\Support\BlockType;
 use App\Support\BlockTypeRegistry;
+use App\Support\BusinessDocuments;
 use App\Support\ContentTypeRegistry;
 use App\Support\CtaLink;
 use Illuminate\Support\Collection;
@@ -114,6 +115,7 @@ trait MapsPageBlocks
         $mapped = $this->mapBlocks($blocks, $blockTypes);
         $system = $mapped->where('is_default', true)->values();
         $cta = $this->blocksForTypes($system, ['cta'])->first();
+        $footer = $this->blocksForTypes($system, ['footer'])->first();
         $floatLinks = $this->blocksForTypes($system, ['float-links'])->first();
 
         if ($cta !== null) {
@@ -135,11 +137,18 @@ trait MapsPageBlocks
                 : $this->floatLinksEditorPayloadFromData([]);
         }
 
+        if ($footer !== null) {
+            $footerModel = $blocks->firstWhere('id', $footer['id']);
+            $footer['editor'] = $footerModel instanceof Block
+                ? $this->footerEditorPayload($footerModel)
+                : $this->footerEditorPayloadFromData([]);
+        }
+
         return [
             'top' => $this->blocksForTypes($system, ['top-nav', 'header']),
             'cta' => $cta,
             'user' => $mapped->where('is_default', false)->values(),
-            'bottom' => $this->blocksForTypes($system, ['footer']),
+            'bottom' => collect($footer ? [$footer] : []),
             'float_links' => $floatLinks,
         ];
     }
@@ -152,6 +161,45 @@ trait MapsPageBlocks
         return [
             'type' => 'cta',
             'links' => $this->mapBlockLinks($block, 'cta-link'),
+            'link_type_options' => CtaLink::linkTypeOptions('nav'),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function footerEditorPayload(Block $block): array
+    {
+        return $this->footerEditorPayloadFromData(
+            is_array($block->data) ? $block->data : [],
+            $this->mapBlockLinks($block, 'footer-link')
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<array<string, mixed>>  $links
+     * @return array<string, mixed>
+     */
+    protected function footerEditorPayloadFromData(array $data, array $links = []): array
+    {
+        return [
+            'type' => 'footer',
+            'show_documents_warranties' => (bool) ($data['show_documents_warranties'] ?? true),
+            'show_eqleem_logo' => true,
+            'documents' => BusinessDocuments::forEditor($data),
+            'document_type_options' => BusinessDocuments::typeOptions(),
+            'document_numbers' => BusinessDocuments::numbersFromBlockData($data),
+            'business_documents' => collect(BusinessDocuments::definitions())
+                ->map(fn (array $document, string $key): array => [
+                    'key' => $key,
+                    'label' => $document['label'],
+                    'logo' => $document['logo'],
+                ])
+                ->values()
+                ->all(),
+            'links' => $links,
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
             'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
         ];

@@ -71,6 +71,7 @@ class EnsureSectionBlockLink
                 'content_id' => null,
                 'title' => $title,
                 'description' => $description,
+                'managed_section' => true,
             ],
             'sort_order' => $maxOrder + 1,
             'is_default' => false,

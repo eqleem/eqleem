@@ -3,6 +3,7 @@ import { api, ApiError } from '../lib/api.js';
 
 function mapTab(tab) {
     const sellable = Boolean(tab.sellable ?? tab.content_type?.sellable);
+    const section = tab.section ?? tab.content_type?.section ?? (sellable ? 'sell' : 'content');
 
     return {
         id: tab.id ?? `content-${tab.slug}`,
@@ -14,6 +15,7 @@ function mapTab(tab) {
         type: 'content',
         color: tab.color ?? tab.content_type?.color,
         sellable,
+        section,
         content_type: tab.content_type ?? {
             slug: tab.slug,
             name: tab.label ?? tab.name,
@@ -21,6 +23,7 @@ function mapTab(tab) {
             icon: tab.icon,
             color: tab.color,
             sellable,
+            section,
         },
     };
 }
@@ -33,6 +36,7 @@ function mapCatalogOption(option) {
         icon: option.icon,
         icon_url: option.icon_url,
         color: option.color,
+        section: option.section ?? 'content',
         enabled: Boolean(option.enabled),
     };
 }

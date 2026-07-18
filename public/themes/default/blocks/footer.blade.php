@@ -7,12 +7,12 @@
                     wire:key="footer-document-{{ $document['key'] }}"
                     class="flex items-center gap-2 rounded-md bg-black/5 p-1.5"
                 >
-                    <img
-                        src="{{ asset($document['logo']) }}"
-                        alt="{{ $document['label'] }}"
-                        class="h-9 w-auto shrink-0 object-contain"
-                        loading="lazy"
-                    >
+                    <x-brand-mark
+                        :mark="$document['brand_mark']"
+                        :alt="$document['label']"
+                        class="size-9 shrink-0 object-contain"
+                        icon-size="1.75rem"
+                    />
 
                     <div class="min-w-0 text-end">
                         <p class="text-xs font-medium text-stone-500">{{ $document['label'] }}</p>

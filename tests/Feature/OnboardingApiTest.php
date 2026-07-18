@@ -255,6 +255,9 @@ it('exposes onboarding fonts without milligram or eqleem and includes effra', fu
 
 it('saves catalog enabled content types', function () {
     [$user, $tenant] = createOnboardingUserWithTenant();
+    $tenant->update([
+        'config' => ['enabled_content_types' => ['blog', 'store']],
+    ]);
 
     $this->actingAs($user)
         ->putJson('/api/dashboard/onboarding/catalog', [
@@ -263,7 +266,8 @@ it('saves catalog enabled content types', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.forms.catalog.enabled', ['store', 'digital-products']);
 
-    expect(data_get($tenant->fresh()->config, 'enabled_content_types'))->toBe(['store', 'digital-products']);
+    expect(data_get($tenant->fresh()->config, 'enabled_content_types'))
+        ->toBe(['blog', 'store', 'digital-products']);
 });
 
 it('rejects empty catalog selection', function () {

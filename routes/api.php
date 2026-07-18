@@ -140,13 +140,16 @@ use App\API\Page\AddPageHeaderSocialLink;
 use App\API\Page\CreatePageBlock;
 use App\API\Page\DeletePageBlock;
 use App\API\Page\DeletePageBlockLink;
+use App\API\Page\DeletePageFooterDocument;
 use App\API\Page\DeletePageHeaderSocialLink;
 use App\API\Page\GetPageDesign;
+use App\API\Page\GetPageSectionContentCounts;
 use App\API\Page\GetPageStructure;
 use App\API\Page\ListCatalogSections;
 use App\API\Page\ListContentTypes;
 use App\API\Page\ReorderPageBlockLinks;
 use App\API\Page\ReorderPageBlocks;
+use App\API\Page\ReorderPageFooterDocuments;
 use App\API\Page\ReorderPageHeaderSocialLinks;
 use App\API\Page\SaveCatalogSections;
 use App\API\Page\SavePageThemeOptions;
@@ -156,6 +159,7 @@ use App\API\Page\ShowPageBlock;
 use App\API\Page\TogglePageBlockActive;
 use App\API\Page\UpdatePageBlock;
 use App\API\Page\UpsertPageBlockLink;
+use App\API\Page\UpsertPageFooterDocument;
 use App\API\Pages\CreatePage;
 use App\API\Pages\CreatePageBlock as StandaloneCreatePageBlock;
 use App\API\Pages\DeletePageBlock as StandaloneDeletePageBlock;
@@ -514,6 +518,9 @@ Route::put('/settings/shipping-options/custom/{id}/active', UpdateCustomShipping
 Route::get('/page/structure', GetPageStructure::class)
     ->name('api.page.structure');
 
+Route::get('/page/section-content-counts', GetPageSectionContentCounts::class)
+    ->name('api.page.section-content-counts');
+
 Route::get('/page/content-types', ListContentTypes::class)
     ->name('api.page.content-types');
 
@@ -577,6 +584,22 @@ Route::delete('/page/blocks/{id}/links/{linkId}', DeletePageBlockLink::class)
     ->name('api.page.blocks.links.destroy')
     ->whereNumber('id')
     ->whereNumber('linkId');
+
+Route::post('/page/blocks/{id}/footer-documents', UpsertPageFooterDocument::class)
+    ->name('api.page.blocks.footer-documents.store')
+    ->whereNumber('id');
+
+Route::put('/page/blocks/{id}/footer-documents/reorder', ReorderPageFooterDocuments::class)
+    ->name('api.page.blocks.footer-documents.reorder')
+    ->whereNumber('id');
+
+Route::match(['put', 'post'], '/page/blocks/{id}/footer-documents/{documentId}', UpsertPageFooterDocument::class)
+    ->name('api.page.blocks.footer-documents.update')
+    ->whereNumber('id');
+
+Route::delete('/page/blocks/{id}/footer-documents/{documentId}', DeletePageFooterDocument::class)
+    ->name('api.page.blocks.footer-documents.destroy')
+    ->whereNumber('id');
 
 Route::get('/icons/tabler', SearchTablerIcons::class)
     ->name('api.icons.tabler');

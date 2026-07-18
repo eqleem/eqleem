@@ -9,7 +9,8 @@ class ContentTypeRegistry
 {
     /**
      * Active content types from config/content-types.php, ordered for nav/tabs.
-     * Sellable types respect per-tenant `config.enabled_content_types` when set.
+     * All types respect the tenant selection after page sections are configured.
+     * Older catalog-only preferences continue to affect sellable types only.
      *
      * @return Collection<int, ContentType>
      */
@@ -18,9 +19,18 @@ class ContentTypeRegistry
         $tenant = $tenant ?? currentTenant();
         $enabled = data_get($tenant?->config, 'enabled_content_types');
         $hasPrefs = is_array($enabled);
+        $managesAllSections = (bool) data_get($tenant?->config, 'page_sections_configured', false);
 
         return $this->configured()
-            ->filter(function (ContentType $contentType) use ($hasPrefs, $enabled): bool {
+            ->filter(function (ContentType $contentType) use ($hasPrefs, $enabled, $managesAllSections): bool {
+                if ($contentType->permanent) {
+                    return true;
+                }
+
+                if ($managesAllSections && $hasPrefs) {
+                    return in_array($contentType->slug, $enabled, true);
+                }
+
                 if (! $contentType->sellable) {
                     return $contentType->active;
                 }
@@ -31,6 +41,18 @@ class ContentTypeRegistry
 
                 return $contentType->active;
             })
+            ->values();
+    }
+
+    /**
+     * Content types controlled by the page section manager.
+     *
+     * @return Collection<int, ContentType>
+     */
+    public function managedSections(): Collection
+    {
+        return $this->configured()
+            ->reject(fn (ContentType $contentType): bool => $contentType->permanent)
             ->values();
     }
 

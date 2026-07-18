@@ -10,14 +10,16 @@ import Switch from '../settings/Switch.vue';
 import BlockEditor from './editors/BlockEditor.vue';
 import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
 import BlockLinksPanel from './editors/BlockLinksPanel.vue';
+import FooterDocumentsPanel from './editors/FooterDocumentsPanel.vue';
 import FloatLinksPanel from './editors/FloatLinksPanel.vue';
 import HeaderSocialLinksPanel from './editors/HeaderSocialLinksPanel.vue';
+import CatalogSectionsModal from './CatalogSectionsModal.vue';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
 
-function openCatalogSections() {
+function openManageSections() {
     openModal('catalog-sections');
 }
 
@@ -26,8 +28,9 @@ const {
     topBlocks,
     ctaBlock,
     userBlocks,
-    bottomBlocks,
+    footerBlock,
     floatLinksBlock,
+    contentCounts,
     loading,
     error,
     saving,
@@ -40,12 +43,20 @@ const dragId = ref(null);
 const busyId = ref(null);
 const editTitle = ref('إعدادات البلوك');
 const ctaLinksPanel = ref(null);
+const footerDocumentsPanel = ref(null);
+const footerLinksPanel = ref(null);
 const floatLinksPanel = ref(null);
 const headerSocialBlockId = ref(null);
 const socialModalOpen = ref(false);
-const quickButtonsExpanded = ref(true);
-const pageSectionsExpanded = ref(true);
-const floatingButtonsExpanded = ref(true);
+const expandedSection = ref('quick-buttons');
+
+function isSectionExpanded(section) {
+    return expandedSection.value === section;
+}
+
+function toggleSection(section) {
+    expandedSection.value = isSectionExpanded(section) ? null : section;
+}
 
 function onEditModalClosed(event) {
     if (event.detail?.modal === 'edit-block') {
@@ -54,7 +65,9 @@ function onEditModalClosed(event) {
 }
 
 onMounted(() => {
-    store.fetchStructure();
+    void store.fetchStructure()
+        .then(() => store.fetchContentCounts())
+        .catch(() => {});
     window.addEventListener('closemodal', onEditModalClosed);
 });
 
@@ -65,6 +78,14 @@ onBeforeUnmount(() => {
 
 function openAddCtaLink() {
     ctaLinksPanel.value?.openAdd?.();
+}
+
+function openAddFooterLink() {
+    footerLinksPanel.value?.openAdd?.();
+}
+
+function openAddFooterDocument() {
+    footerDocumentsPanel.value?.openAdd?.();
 }
 
 function openFloatLinksPosition() {
@@ -93,16 +114,22 @@ function onCtaUpdated(payload) {
     }
 }
 
+function onFooterLinksUpdated(payload) {
+    if (payload?.editor) {
+        store.setFooterEditor(payload.editor);
+    }
+}
+
+function onFooterDocumentsUpdated(payload) {
+    if (payload?.editor) {
+        store.setFooterEditor(payload.editor);
+    }
+}
+
 function onFloatLinksUpdated(payload) {
     if (payload?.editor) {
         store.setFloatLinksEditor(payload.editor);
     }
-}
-
-function addLinkBlock() {
-    editTitle.value = 'إضافة قسم';
-    store.beginCreateBlockLink();
-    openModal('edit-block');
 }
 
 async function openEdit(id, title = null) {
@@ -225,25 +252,6 @@ function contentManageLabel(block) {
         <p v-else-if="error" class="px-4 pt-3 text-sm text-red-500">{{ error }}</p>
 
         <div v-else class="space-y-4 p-4">
-            <!-- <div class="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5">
-                <button
-                    type="button"
-                    class="min-w-0 flex-1 text-start transition hover:text-primary-600"
-                    @click="openCatalogSections"
-                >
-                    <span class="block text-sm font-medium text-stone-800">الكتالوج</span>
-                    <span class="mt-0.5 block text-xs text-stone-400">ايش تبيع؟ — اختيار الأقسام المفعّلة</span>
-                </button>
-                <button
-                    type="button"
-                    class="shrink-0 rounded-lg p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
-                    aria-label="إعدادات الكتالوج"
-                    @click="openCatalogSections"
-                >
-                    <Icon name="settings" class="h-5 w-5" />
-                </button>
-            </div> -->
-
             <template v-if="topBlocks.length">
                 <div
                     v-for="block in topBlocks"
@@ -303,14 +311,14 @@ function contentManageLabel(block) {
                             type="button"
                             class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
                             aria-controls="quick-buttons-section"
-                            :aria-expanded="quickButtonsExpanded"
-                            :aria-label="quickButtonsExpanded ? 'طي الأزرار السريعة' : 'توسيع الأزرار السريعة'"
-                            @click="quickButtonsExpanded = !quickButtonsExpanded"
+                            :aria-expanded="isSectionExpanded('quick-buttons')"
+                            :aria-label="isSectionExpanded('quick-buttons') ? 'طي الأزرار السريعة' : 'توسيع الأزرار السريعة'"
+                            @click="toggleSection('quick-buttons')"
                         >
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
-                                :class="{ 'rotate-180': quickButtonsExpanded }"
+                                :class="{ 'rotate-180': isSectionExpanded('quick-buttons') }"
                             />
                         </button>
                         <img :src="'/assets/icons/tabler/hand-click.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
@@ -324,7 +332,7 @@ function contentManageLabel(block) {
                     </Button>
                 </div>
 
-                <div id="quick-buttons-section" v-show="quickButtonsExpanded">
+                <div id="quick-buttons-section" v-show="isSectionExpanded('quick-buttons')">
                     <BlockLinksPanel
                         ref="ctaLinksPanel"
                         embedded
@@ -343,14 +351,14 @@ function contentManageLabel(block) {
                             type="button"
                             class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
                             aria-controls="page-sections-list"
-                            :aria-expanded="pageSectionsExpanded"
-                            :aria-label="pageSectionsExpanded ? 'طي أقسام الصفحة' : 'توسيع أقسام الصفحة'"
-                            @click="pageSectionsExpanded = !pageSectionsExpanded"
+                            :aria-expanded="isSectionExpanded('page-sections')"
+                            :aria-label="isSectionExpanded('page-sections') ? 'طي أقسام الصفحة' : 'توسيع أقسام الصفحة'"
+                            @click="toggleSection('page-sections')"
                         >
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
-                                :class="{ 'rotate-180': pageSectionsExpanded }"
+                                :class="{ 'rotate-180': isSectionExpanded('page-sections') }"
                             />
                         </button>
                         <img :src="'/assets/icons/tabler/layout-list.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
@@ -359,12 +367,12 @@ function contentManageLabel(block) {
                             <p class="text-xs text-stone-400">قم بإضافة وترتيب أقسام وروابط الصفحة</p>
                         </div>
                     </div>
-                    <Button label="أضف قسم" class="shrink-0" :disabled="saving" @click="addLinkBlock">
-                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    <Button label="إدارة الأقسام" class="shrink-0" :disabled="saving" @click="openManageSections">
+                        <template #icon><Icon name="settings" class="hidden h-4 w-4 sm:block" /></template>
                     </Button>
                 </div>
 
-                <div id="page-sections-list" v-show="pageSectionsExpanded" class="relative min-h-20">
+                <div id="page-sections-list" v-show="isSectionExpanded('page-sections')" class="relative min-h-20">
                     <ul class="space-y-1.5 p-2">
                         <li
                             v-for="block in userBlocks"
@@ -404,6 +412,12 @@ function contentManageLabel(block) {
                                 </div>
                                 <span class="min-w-0 truncate text-sm font-medium text-stone-800">
                                     {{ block.title }}
+                                </span>
+                                <span
+                                    v-if="contentCounts[block.id] !== undefined"
+                                    class="shrink-0 rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-500"
+                                >
+                                    {{ contentCounts[block.id].count }} {{ contentCounts[block.id].label }}
                                 </span>
                             </button>
 
@@ -449,47 +463,87 @@ function contentManageLabel(block) {
                         v-if="!userBlocks.length"
                         class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
-                        لا توجد أقسام بعد. اضغط «أضف قسم» لإضافة أول قسم في الصفحة.
+                        لا توجد أقسام مفعّلة. اضغط «إدارة الأقسام» لاختيار أقسام الصفحة.
                     </p>
                 </div>
             </div>
 
-            <div v-if="bottomBlocks.length" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
-                <ul class="space-y-1.5 p-2">
-                    <li
-                        v-for="block in bottomBlocks"
-                        :key="block.id"
-                        class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2"
-                    >
-                        <div class="hidden rounded-md p-1 text-stone-200 sm:block">
-                            <Icon name="lock" class="h-4 w-4" />
-                        </div>
-
+            <div v-if="footerBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
+                    <div class="flex min-w-0 items-center gap-2">
                         <button
-                            v-if="block.editable"
                             type="button"
-                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
-                            @click="openEdit(block.id, block.title)"
+                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
+                            aria-controls="footer-documents-section"
+                            :aria-expanded="isSectionExpanded('footer-documents')"
+                            :aria-label="isSectionExpanded('footer-documents') ? 'طي الوثائق والضمانات' : 'توسيع الوثائق والضمانات'"
+                            @click="toggleSection('footer-documents')"
                         >
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
+                            <Icon
+                                name="chevron-down"
+                                class="h-5 w-5 transition-transform"
+                                :class="{ 'rotate-180': isSectionExpanded('footer-documents') }"
+                            />
                         </button>
-                        <div v-else class="flex min-w-0 flex-1 items-center gap-2">
-                            <img :src="block.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
-                            <span class="truncate text-sm font-medium text-stone-800">{{ block.title }}</span>
+                        <img :src="'/assets/icons/tabler/file-certificate.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-stone-700">الوثائق والضمانات</p>
+                            <p class="text-xs text-stone-400">أضف وثائق النشاط والضمانات التي تظهر في تذييل الصفحة</p>
                         </div>
+                    </div>
+                    <Button label="أضف وثيقة" class="shrink-0" @click="openAddFooterDocument">
+                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    </Button>
+                </div>
 
+                <div id="footer-documents-section" v-show="isSectionExpanded('footer-documents')">
+                    <FooterDocumentsPanel
+                        ref="footerDocumentsPanel"
+                        :block-id="footerBlock.id"
+                        :editor="footerBlock.editor"
+                        @updated="onFooterDocumentsUpdated"
+                    />
+                </div>
+            </div>
+
+            <div v-if="footerBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
+                <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
+                    <div class="flex min-w-0 items-center gap-2">
                         <button
-                            v-if="block.editable"
                             type="button"
-                            class="cursor-pointer rounded-lg p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600"
-                            aria-label="خيارات البلوك"
-                            @click="openEdit(block.id, block.title)"
+                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
+                            aria-controls="footer-links-section"
+                            :aria-expanded="isSectionExpanded('footer-links')"
+                            :aria-label="isSectionExpanded('footer-links') ? 'طي روابط تذييل الصفحة' : 'توسيع روابط تذييل الصفحة'"
+                            @click="toggleSection('footer-links')"
                         >
-                            <Icon name="settings" class="h-5 w-5" />
+                            <Icon
+                                name="chevron-down"
+                                class="h-5 w-5 transition-transform"
+                                :class="{ 'rotate-180': isSectionExpanded('footer-links') }"
+                            />
                         </button>
-                    </li>
-                </ul>
+                        <img :src="'/assets/icons/tabler/Link.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-stone-700">روابط تذييل الصفحة</p>
+                            <p class="text-xs text-stone-400">أضف روابط مهمة تظهر في تذييل الصفحة</p>
+                        </div>
+                    </div>
+                    <Button label="أضف رابط" class="shrink-0" @click="openAddFooterLink">
+                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    </Button>
+                </div>
+
+                <div id="footer-links-section" v-show="isSectionExpanded('footer-links')">
+                    <BlockLinksPanel
+                        ref="footerLinksPanel"
+                        embedded
+                        content-type="footer-link"
+                        :block-id="footerBlock.id"
+                        :editor="footerBlock.editor"
+                        @updated="onFooterLinksUpdated"
+                    />
+                </div>
             </div>
 
             <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
@@ -499,14 +553,14 @@ function contentManageLabel(block) {
                             type="button"
                             class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
                             aria-controls="floating-buttons-section"
-                            :aria-expanded="floatingButtonsExpanded"
-                            :aria-label="floatingButtonsExpanded ? 'طي الأزرار الطافية' : 'توسيع الأزرار الطافية'"
-                            @click="floatingButtonsExpanded = !floatingButtonsExpanded"
+                            :aria-expanded="isSectionExpanded('floating-buttons')"
+                            :aria-label="isSectionExpanded('floating-buttons') ? 'طي الأزرار الطافية' : 'توسيع الأزرار الطافية'"
+                            @click="toggleSection('floating-buttons')"
                         >
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
-                                :class="{ 'rotate-180': floatingButtonsExpanded }"
+                                :class="{ 'rotate-180': isSectionExpanded('floating-buttons') }"
                             />
                         </button>
                         <img :src="'/assets/icons/tabler/float-right.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
@@ -526,7 +580,7 @@ function contentManageLabel(block) {
                     </button>
                 </div>
 
-                <div id="floating-buttons-section" v-show="floatingButtonsExpanded">
+                <div id="floating-buttons-section" v-show="isSectionExpanded('floating-buttons')">
                     <FloatLinksPanel
                         ref="floatLinksPanel"
                         :block-id="floatLinksBlock.id"
@@ -579,4 +633,6 @@ function contentManageLabel(block) {
             </div>
         </Teleport>
     </MainBox>
+
+    <CatalogSectionsModal />
 </template>
