@@ -10,6 +10,7 @@ import { api } from '../../lib/api.js';
 import {
     emojiCategories,
     emojiGroups,
+    emojiKeywords,
     iconColors,
     skinTones,
 } from '../../data/emojis.js';
@@ -74,7 +75,7 @@ const filteredEmojiGroups = computed(() => {
         let items = list.map((emoji) => applySkinTone(emoji, tone));
 
         if (q) {
-            items = items.filter((emoji) => emoji.includes(q));
+            items = items.filter((emoji) => emojiMatchesQuery(emoji, q));
         }
 
         if (items.length) {
@@ -91,9 +92,8 @@ const visibleRecentEmojis = computed(() => {
 
     return recentEmojis.value
         .map((emoji) => applySkinTone(emoji, tone))
-        .filter((emoji) => !q || emoji.includes(q));
+        .filter((emoji) => !q || emojiMatchesQuery(emoji, q));
 });
-
 const previewStyle = computed(() => iconColorStyle(current.value.type === 'icon' ? current.value.color : null));
 
 const activeSkinModifier = computed(
@@ -518,6 +518,25 @@ function normalizeEmojiBase(emoji) {
     return stripSkinTone(emoji);
 }
 
+function emojiMatchesQuery(emoji, query) {
+    if (!query) {
+        return true;
+    }
+
+    if (emoji.includes(query)) {
+        return true;
+    }
+
+    const base = normalizeEmojiBase(emoji);
+    const keywords = emojiKeywords[emoji]
+        || emojiKeywords[base]
+        || emojiKeywords[`${base}\uFE0F`]
+        || emojiKeywords[emoji.replace(/\uFE0F/g, '')]
+        || '';
+
+    return keywords.includes(query);
+}
+
 const SKIN_TONEABLE_EMOJI = new Set([
     '👋', '🤚', '🖐', '✋', '🖖', '👌', '🤌', '🤏', '✌', '🤞', '🤟', '🤘', '🤙',
     '👈', '👉', '👆', '🖕', '👇', '☝', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏',
@@ -732,6 +751,13 @@ const SKIN_TONEABLE_EMOJI = new Set([
                                 </button>
                             </div>
                         </div>
+
+                        <p
+                            v-if="filter.trim() && !visibleRecentEmojis.length && !Object.keys(filteredEmojiGroups).length"
+                            class="py-10 text-center text-xs text-stone-500"
+                        >
+                            لا توجد نتائج
+                        </p>
                     </div>
 
                     <div class="flex items-center justify-between gap-1 border-t border-white/10 px-2 py-1.5">

@@ -2,6 +2,7 @@
 
 use App\Actions\CreateDefaultBlocks;
 use App\Models\Block;
+use App\Models\Content;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\ContentTypeRegistry;
@@ -141,7 +142,7 @@ test('reviews section is offered under the trust group and can be enabled', func
         ->and($reviewsBlock->title)->toBe('التقييمات');
 });
 
-test('owner can disable all sections and their page links', function () {
+test('owner can disable all sections and delete their page links', function () {
     [$user, $tenant] = createUserWithTenantForCatalogSectionsApi();
 
     $this->actingAs($user)
@@ -164,15 +165,14 @@ test('owner can disable all sections and their page links', function () {
 
     setCurrentTenant($tenant->fresh());
 
-    $activeSectionLinks = Block::queryForTenantRoots()
+    $sectionLinks = Block::queryForTenantRoots()
         ->userBlocks()
         ->where('type', 'block-link')
         ->where('data->link_type', 'section')
-        ->where('active', true)
         ->count();
 
     expect($navSlugs)->toBe(['pages', 'forms'])
-        ->and($activeSectionLinks)->toBe(0);
+        ->and($sectionLinks)->toBe(0);
 });
 
 test('legacy catalog preferences do not disable non-sellable sections', function () {
@@ -220,18 +220,12 @@ test('saving enabled sections does not reactivate manually disabled blocks', fun
         ->and(data_get($blogBlock->fresh()->data, 'disabled_by_section_manager'))->toBeNull();
 });
 
-test('re-enabling a section restores blocks disabled by the section manager', function () {
+test('re-enabling a section creates a new block while preserving its content', function () {
     [$user, $tenant] = createUserWithTenantForCatalogSectionsApi();
 
     $this->actingAs($user)
         ->putJson('/api/page/catalog-sections', [
             'enabled' => ['blog'],
-        ])
-        ->assertSuccessful();
-
-    $this->actingAs($user)
-        ->putJson('/api/page/catalog-sections', [
-            'enabled' => [],
         ])
         ->assertSuccessful();
 
@@ -244,8 +238,23 @@ test('re-enabling a section restores blocks disabled by the section manager', fu
         ->where('data->content_type', 'blog')
         ->firstOrFail();
 
-    expect($blogBlock->active)->toBeFalse()
-        ->and(data_get($blogBlock->data, 'disabled_by_section_manager'))->toBeTrue();
+    $content = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('blog'),
+        'title' => 'مقال محفوظ',
+        'slug' => 'preserved-blog-post-'.Str::lower(Str::random(6)),
+        'status' => 'draft',
+        'active' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->putJson('/api/page/catalog-sections', [
+            'enabled' => [],
+        ])
+        ->assertSuccessful();
+
+    $this->assertModelMissing($blogBlock);
+    $this->assertModelExists($content);
 
     $this->actingAs($user)
         ->putJson('/api/page/catalog-sections', [
@@ -253,11 +262,16 @@ test('re-enabling a section restores blocks disabled by the section manager', fu
         ])
         ->assertSuccessful();
 
-    $blogBlock = $blogBlock->fresh();
+    $newBlogBlock = Block::queryForTenantRoots()
+        ->userBlocks()
+        ->where('type', 'block-link')
+        ->where('data->link_type', 'section')
+        ->where('data->content_type', 'blog')
+        ->firstOrFail();
 
-    expect($blogBlock->active)->toBeTrue()
-        ->and(data_get($blogBlock->data, 'disabled_by_section_manager'))->toBeNull()
-        ->and(data_get($blogBlock->data, 'managed_section'))->toBeTrue();
+    expect($newBlogBlock->id)->not->toBe($blogBlock->id)
+        ->and($newBlogBlock->active)->toBeTrue()
+        ->and(data_get($newBlogBlock->data, 'managed_section'))->toBeTrue();
 });
 
 test('guest cannot list or save page sections', function () {

@@ -158,7 +158,7 @@ async function removeSelected() {
                                 @change="toggleOne(item.id, $event.target.checked)"
                             >
                         </td>
-                        <td class="px-4 py-4">
+                        <td class="max-w-0 px-4 py-4">
                             <RouterLink
                                 :to="`/manage/newsletter/detail/${item.uuid}`"
                                 class="block min-w-0 transition hover:text-primary-600"

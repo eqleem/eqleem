@@ -16,6 +16,7 @@ const props = defineProps({
     emptyLabel: { type: String, default: 'لا توجد نتائج' },
     clearable: { type: Boolean, default: false },
     clearLabel: { type: String, default: 'بدون اختيار' },
+    showSelectedDescription: { type: Boolean, default: false },
     options: { type: Array, default: () => [] },
 });
 
@@ -33,6 +34,7 @@ const list = computed(() => (
             label: String(option.label ?? option.name ?? option.id ?? ''),
             description: String(option.description ?? ''),
             icon: option.icon ?? null,
+            emoji: option.emoji ?? null,
         }))
         : []
 ));
@@ -107,7 +109,7 @@ onBeforeUnmount(() => {
 
 <template>
     <Field :name="name" :label="label" :info="info" :error="error" width="w-full">
-        <div ref="root" class="relative w-full">
+        <div ref="root" class="relative w-full" :class="{ 'z-50': open }">
             <button
                 :id="name"
                 type="button"
@@ -121,15 +123,22 @@ onBeforeUnmount(() => {
                     :icon="selected.icon"
                     class="shrink-0 text-lg text-stone-500"
                 ></iconify-icon>
-                <span class="min-w-0 flex-1 truncate" :class="selected ? 'text-stone-700' : 'text-stone-400'">
-                    {{ selected?.label || placeholder }}
+                <span v-else-if="selected?.emoji" class="shrink-0 text-xl leading-none">{{ selected.emoji }}</span>
+                <span class="min-w-0 flex-1" :class="selected ? 'text-stone-700' : 'text-stone-400'">
+                    <span class="block truncate font-medium">{{ selected?.label || placeholder }}</span>
+                    <span
+                        v-if="showSelectedDescription && selected?.description"
+                        class="block truncate text-xs text-stone-400"
+                    >
+                        {{ selected.description }}
+                    </span>
                 </span>
                 <iconify-icon icon="hugeicons:arrow-down-01" class="shrink-0 text-lg text-stone-400"></iconify-icon>
             </button>
 
             <div
                 v-if="open"
-                class="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg"
+                class="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg"
             >
                 <div class="border-b border-stone-100 p-2">
                     <input
@@ -168,6 +177,7 @@ onBeforeUnmount(() => {
                             :icon="option.icon"
                             class="shrink-0 text-lg"
                         ></iconify-icon>
+                        <span v-else-if="option.emoji" class="shrink-0 text-xl leading-none">{{ option.emoji }}</span>
                         <span class="min-w-0 flex-1">
                             <span class="block truncate font-medium">{{ option.label }}</span>
                             <span v-if="option.description" class="block truncate text-xs text-stone-400">{{ option.description }}</span>

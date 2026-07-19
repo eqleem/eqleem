@@ -127,6 +127,15 @@ const secondaryActionSelectOptions = computed(() => (
         }))
 ));
 
+const industrySelectOptions = computed(() => (
+    industryOptions.value.map((option) => ({
+        id: option.slug,
+        label: option.label,
+        description: option.description,
+        emoji: option.emoji,
+    }))
+));
+
 const previewSocialLinks = computed(() => {
     if (social.username.trim()) {
         return [{ network: social.network || 'twitter', username: social.username.trim() }];
@@ -243,6 +252,11 @@ function selectStep(step) {
     }
 
     activeKey.value = step.key;
+}
+
+function onIndustryChange(value) {
+    business.industry = value;
+    scheduleAutosave();
 }
 
 function goBack() {
@@ -900,7 +914,7 @@ watch([showSuccess, shouldShow], async () => {
                 <div>
                     <p class="text-xs font-medium text-white/75">إعداد صفحتك لأول مرة</p>
                     <h2 class="mt-1 text-xl font-bold sm:text-2xl">
-                        {{ showSuccess ? 'صفحتك جاهزة 🎉' : 'كمّل صفحتك واستقبل طلبات عملائك' }}
+                        {{ showSuccess ? 'صفحتك جاهزة 🎉' : 'أكمل صفحتك واستقبل طلبات عملائك' }}
                     </h2>
                     <p class="mt-1 max-w-md text-sm text-white/80">
                         {{ showSuccess ? 'شارك رابطك وابدأ استقبال عملائك.' : 'أكمل صفحتك خلال دقائق وإبدأ باستقبال الطلبات فورا' }}
@@ -1023,7 +1037,7 @@ watch([showSuccess, shouldShow], async () => {
                         v-for="(step, index) in steps"
                         :key="step.key"
                         type="button"
-                        class="group flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 transition sm:items-start sm:px-2"
+                        class="group flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 transition sm:items-start sm:px-2"
                         :class="[
                             activeKey === step.key
                                 ? 'bg-indigo-50 text-indigo-700'
@@ -1055,7 +1069,12 @@ watch([showSuccess, shouldShow], async () => {
                             </span>
                             <span class="hidden text-xs font-semibold sm:inline">{{ step.title }}</span>
                         </span>
-                        <span class="hidden text-[11px] leading-tight text-stone-400 sm:block">{{ step.description }}</span>
+                        <span
+                            v-if="activeKey === step.key"
+                            class="hidden text-[11px] leading-tight text-stone-400 sm:block"
+                        >
+                            {{ step.description }}
+                        </span>
                     </button>
                 </div>
 
@@ -1096,28 +1115,17 @@ watch([showSuccess, shouldShow], async () => {
                             @change="scheduleAutosave"
                         />
 
-                        <div>
-                            <p class="mb-2 text-sm font-medium text-stone-700">إيش مجالك؟ *</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button
-                                    v-for="option in industryOptions"
-                                    :key="option.slug"
-                                    type="button"
-                                    class="flex items-start gap-2 rounded-2xl border px-2.5 py-2.5 text-start transition sm:gap-3 sm:px-3 sm:py-3"
-                                    :class="business.industry === option.slug
-                                        ? 'border-indigo-400 bg-indigo-50 ring-1 ring-indigo-200'
-                                        : 'border-stone-100 bg-white hover:border-stone-200'"
-                                    @click="business.industry = option.slug; scheduleAutosave()"
-                                >
-                                    <span class="text-xl leading-none sm:text-2xl">{{ option.emoji }}</span>
-                                    <span class="min-w-0">
-                                        <span class="block text-xs font-semibold text-stone-800 sm:text-sm">{{ option.label }}</span>
-                                        <span class="mt-0.5 block text-[10px] leading-snug text-stone-400 sm:text-xs">{{ option.description }}</span>
-                                    </span>
-                                </button>
-                            </div>
-                            <p v-if="errors.industry" class="mt-1 text-xs text-red-500">{{ errors.industry }}</p>
-                        </div>
+                        <SearchableSelect
+                            :model-value="business.industry"
+                            name="industry"
+                            label="إيش مجالك؟ *"
+                            placeholder="ابحث عن مجالك…"
+                            empty-label="لم نجد مجالاً مطابقاً"
+                            :options="industrySelectOptions"
+                            :error="errors.industry"
+                            show-selected-description
+                            @update:model-value="onIndustryChange"
+                        />
                     </div>
 
                     <div v-else-if="activeKey === 'contact'" class="space-y-3">
@@ -1374,9 +1382,9 @@ watch([showSuccess, shouldShow], async () => {
                 aria-hidden="true"
             ></div>
             <div
-                class="z-30 border-t border-stone-100 bg-white/95 px-4 py-3 backdrop-blur sm:px-6"
+                class="rounded-b-3xl border-t border-stone-100 bg-white/95 px-4 py-3 backdrop-blur sm:px-6"
                 :class="footerFixed
-                    ? 'fixed bottom-0 rounded-b-3xl shadow-[0_-8px_24px_rgba(0,0,0,0.08)]'
+                    ? 'fixed bottom-0 z-30 shadow-[0_-8px_24px_rgba(0,0,0,0.08)]'
                     : 'relative'"
                 :style="footerStyle"
             >

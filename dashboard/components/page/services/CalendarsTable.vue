@@ -126,7 +126,7 @@ async function remove(calendarId) {
                         :key="calendar.id"
                         class="hover:bg-stone-50"
                     >
-                        <td class="px-6 py-4">
+                        <td class="max-w-0 px-6 py-4">
                             <div class="flex min-w-0 items-center gap-2">
                                 <span
                                     v-if="calendar.active"
@@ -134,7 +134,7 @@ async function remove(calendarId) {
                                 />
                                 <button
                                     type="button"
-                                    class="truncate text-start font-medium text-stone-800 transition hover:text-primary-600"
+                                    class="min-w-0 truncate text-start font-medium text-stone-800 transition hover:text-primary-600"
                                     @click="openEdit(calendar.id)"
                                 >
                                     {{ calendar.name }}

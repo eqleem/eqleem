@@ -30,7 +30,7 @@ class SyncTenantSections
                 continue;
             }
 
-            $this->deactivateManagedBlocks($tenant->id, $contentType->slug);
+            $this->deleteManagedBlocks($tenant->id, $contentType->slug);
         }
     }
 
@@ -50,18 +50,11 @@ class SyncTenantSections
             });
     }
 
-    protected function deactivateManagedBlocks(int $tenantId, string $contentTypeSlug): void
+    protected function deleteManagedBlocks(int $tenantId, string $contentTypeSlug): void
     {
         $this->sectionBlocks($tenantId, $contentTypeSlug)
             ->each(function (Block $block): void {
-                $data = is_array($block->data) ? $block->data : [];
-                $data['managed_section'] = true;
-                $data['disabled_by_section_manager'] = true;
-
-                $block->update([
-                    'active' => false,
-                    'data' => $data,
-                ]);
+                $block->delete();
             });
     }
 

@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <Modal title="إدارة الأقسام" size="2xl" :name="MODAL_NAME">
+    <Modal title="إدارة مكونات الصفحة" size="2xl" :name="MODAL_NAME">
         <div class="space-y-4 p-4">
             <p class="text-sm text-stone-500">
                 اختر الأقسام التي تريد تفعيلها. ستظهر الأقسام المفعّلة في القائمة وفي صفحتك تلقائياً.
@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
                             <img :src="option.icon_url || `/${option.icon}`" alt="" class="size-10 shrink-0 rounded-lg bg-white p-1.5 shadow-sm">
                             <span class="min-w-0 flex-1">
                                 <span class="flex items-center justify-between gap-2">
-                                    <span class="block text-sm font-semibold text-stone-800">{{ option.name }}</span>
+                                    <span class="block truncate text-sm font-semibold text-stone-800">{{ option.name }}</span>
                                     <span
                                         class="inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
                                         :class="selected.includes(option.slug)
@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
                                         <iconify-icon icon="hugeicons:tick-02" class="text-sm"></iconify-icon>
                                     </span>
                                 </span>
-                                <span class="mt-0.5 block text-xs leading-relaxed text-stone-400">{{ option.description }}</span>
+                                <span class="mt-0.5 block truncate text-xs leading-relaxed text-stone-400">{{ option.description }}</span>
                             </span>
                         </button>
                     </div>

@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Block;
+use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
 use App\Support\CtaLink;
 use Illuminate\Support\Str;
@@ -23,6 +24,10 @@ class EnsureSectionBlockLink
             return null;
         }
 
+        if ($this->isDisabledForTenant($tenantId, $contentTypeSlug)) {
+            return null;
+        }
+
         $indexRoute = config("cta-link-types.routes.{$contentTypeSlug}.index");
 
         if (! is_string($indexRoute) || ! filled($indexRoute)) {
@@ -39,7 +44,11 @@ class EnsureSectionBlockLink
         $existing = Block::query()
             ->withoutGlobalScope('tenant')
             ->where('tenant_id', $tenantId)
+            ->whereNull('parent_id')
+            ->whereNull('content_id')
+            ->where('is_default', false)
             ->where('type', 'block-link')
+            ->where('position', 'home')
             ->where('data->content_type', $contentTypeSlug)
             ->where('data->link_type', 'section')
             ->first();
@@ -80,5 +89,19 @@ class EnsureSectionBlockLink
             'position' => 'home',
             'published_at' => now(),
         ]);
+    }
+
+    protected function isDisabledForTenant(int $tenantId, string $contentTypeSlug): bool
+    {
+        $config = Tenant::query()->find($tenantId)?->config;
+
+        if (! is_array($config) || ! data_get($config, 'page_sections_configured', false)) {
+            return false;
+        }
+
+        $enabledContentTypes = data_get($config, 'enabled_content_types', []);
+
+        return ! is_array($enabledContentTypes)
+            || ! in_array($contentTypeSlug, $enabledContentTypes, true);
     }
 }

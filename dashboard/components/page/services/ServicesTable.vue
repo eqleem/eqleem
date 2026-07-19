@@ -125,7 +125,7 @@ async function removeSelected() {
                     :key="item.uuid"
                     class="flex w-full items-center justify-between ps-3 sm:ps-0 gap-x-7 hover:bg-stone-50 last:rounded-b-2xl"
                 >
-                    <div class="hidden ps-4 sm:block">
+                    <div class="hidden flex-none ps-4 sm:block">
                         <input
                             type="checkbox"
                             class="h-4 w-4 rounded-xl border-stone-300 shadow-sm"
@@ -134,7 +134,7 @@ async function removeSelected() {
                         >
                     </div>
 
-                    <div class="w-full py-3">
+                    <div class="min-w-0 flex-1 py-3">
                         <RouterLink :to="`/manage/services/detail/${item.uuid}`" class="flex items-center gap-x-3">
                             <div class="flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-xl bg-stone-100">
                                 <img
@@ -163,7 +163,7 @@ async function removeSelected() {
                         </RouterLink>
                     </div>
 
-                    <div class="pe-6">
+                    <div class="flex-none pe-6">
                         <Dropdown width="w-36">
                             <template #trigger>
                                 <button type="button" class="rounded p-1.5 text-stone-500 hover:bg-stone-100" aria-label="menu">

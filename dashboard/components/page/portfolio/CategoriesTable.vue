@@ -146,7 +146,7 @@ async function onDrop(targetId) {
                     @drop.prevent="onDrop(category.id)"
                 >
                     <div
-                        class="min-w-0 w-full py-3"
+                        class="min-w-0 flex-1 py-3"
                         :style="{ paddingInlineStart: `calc(1.5rem + ${(category.depth ?? 0) * 1.25}rem)` }"
                     >
                         <div class="flex min-w-0 items-center gap-x-3 pe-4">

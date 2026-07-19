@@ -21,7 +21,7 @@ const sectionLabels = {
     permanent: '. . .',
     trust: 'الثقة والمصداقية',
 };
-const sectionOrder = ['sell', 'content', 'permanent', 'trust'];
+const sectionOrder = ['sell', 'content', 'trust'];
 const permanentContentTypes = new Set(['pages', 'forms']);
 const contentSections = computed(() => {
     const groups = new Map();
@@ -45,6 +45,14 @@ const contentSections = computed(() => {
             tabs: sectionTabs,
         }))
         .sort((first, second) => {
+            if (first.id === 'permanent') {
+                return 1;
+            }
+
+            if (second.id === 'permanent') {
+                return -1;
+            }
+
             const firstIndex = sectionOrder.indexOf(first.id);
             const secondIndex = sectionOrder.indexOf(second.id);
 

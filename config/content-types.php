@@ -47,7 +47,7 @@ return [
         'sellable' => false,
         'slug' => 'portfolio',
         'model_type' => 'portfolio',
-        'section' => 'content',
+        'section' => 'trust',
         'name' => 'معرض الأعمال',
         'count_singular' => 'مشروع',
         'count_plural' => 'مشاريع',

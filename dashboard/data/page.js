@@ -1,6 +1,6 @@
 // Fixed page tabs — from config/page-tabs.php.
 export const fixedTabs = [
-    { id: 'structure', slug: 'structure', label: 'أقسام الصفحة', icon: 'assets/icons/tabler/puzzle-2.svg' },
+    { id: 'structure', slug: 'structure', label: 'صفحتي', icon: 'assets/icons/tabler/puzzle-2.svg' },
     { id: 'design', slug: 'design', label: 'تصميم الصفحة', icon: 'assets/icons/tabler/color-swatch.svg' },
 ];
 

@@ -66,6 +66,14 @@ it('adds a section block link when the first content item is created', function 
 ) {
     [, $tenant] = createTenantForBlockLinkTest();
 
+    $tenant->update([
+        'config' => [
+            ...($tenant->config ?? []),
+            'page_sections_configured' => true,
+            'enabled_content_types' => [$contentTypeSlug],
+        ],
+    ]);
+
     expect(sectionBlockLinkCount($tenant->id, $contentTypeSlug))->toBe(0);
 
     Content::query()->create([
@@ -99,6 +107,14 @@ it('does not duplicate the section block link when another item is created', fun
 ) {
     [, $tenant] = createTenantForBlockLinkTest();
 
+    $tenant->update([
+        'config' => [
+            ...($tenant->config ?? []),
+            'page_sections_configured' => true,
+            'enabled_content_types' => [$contentTypeSlug],
+        ],
+    ]);
+
     Content::query()->create([
         'tenant_id' => $tenant->id,
         'type' => $modelType,
@@ -119,6 +135,28 @@ it('does not duplicate the section block link when another item is created', fun
 
     expect(sectionBlockLinkCount($tenant->id, $contentTypeSlug))->toBe(1);
 })->with('section block link content types');
+
+it('does not add a section block link when the section is disabled', function () {
+    [, $tenant] = createTenantForBlockLinkTest();
+
+    $tenant->update([
+        'config' => [
+            'page_sections_configured' => true,
+            'enabled_content_types' => [],
+        ],
+    ]);
+
+    Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('store'),
+        'title' => 'Disabled Section Item',
+        'slug' => 'disabled-section-item-'.Str::lower(Str::random(6)),
+        'status' => 'draft',
+        'active' => true,
+    ]);
+
+    expect(sectionBlockLinkCount($tenant->id, 'store'))->toBe(0);
+});
 
 it('does not add a block link for excluded content types like forms', function () {
     [, $tenant] = createTenantForBlockLinkTest();

@@ -6,7 +6,6 @@ import Button from '../ui/Button.vue';
 import BrandMark from '../ui/BrandMark.vue';
 import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
-import Switch from '../settings/Switch.vue';
 import BlockEditor from './editors/BlockEditor.vue';
 import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
 import BlockLinksPanel from './editors/BlockLinksPanel.vue';
@@ -45,10 +44,40 @@ const editTitle = ref('إعدادات البلوك');
 const ctaLinksPanel = ref(null);
 const footerDocumentsPanel = ref(null);
 const footerLinksPanel = ref(null);
-const floatLinksPanel = ref(null);
 const headerSocialBlockId = ref(null);
 const socialModalOpen = ref(false);
-const expandedSection = ref('quick-buttons');
+const expandedSectionStorageKey = 'eqleem:page-structure:expanded-section';
+const sectionIds = new Set([
+    'quick-buttons',
+    'page-sections',
+    'footer-documents',
+    'footer-links',
+    'floating-buttons',
+]);
+
+function initialExpandedSection() {
+    if (typeof window === 'undefined') {
+        return 'page-sections';
+    }
+
+    try {
+        const storedValue = window.localStorage.getItem(expandedSectionStorageKey);
+
+        if (storedValue === null) {
+            return 'page-sections';
+        }
+
+        const storedSection = JSON.parse(storedValue);
+
+        if (storedSection === null || sectionIds.has(storedSection)) {
+            return storedSection;
+        }
+    } catch {}
+
+    return 'page-sections';
+}
+
+const expandedSection = ref(initialExpandedSection());
 
 function isSectionExpanded(section) {
     return expandedSection.value === section;
@@ -56,6 +85,10 @@ function isSectionExpanded(section) {
 
 function toggleSection(section) {
     expandedSection.value = isSectionExpanded(section) ? null : section;
+
+    try {
+        window.localStorage.setItem(expandedSectionStorageKey, JSON.stringify(expandedSection.value));
+    } catch {}
 }
 
 function onEditModalClosed(event) {
@@ -86,10 +119,6 @@ function openAddFooterLink() {
 
 function openAddFooterDocument() {
     footerDocumentsPanel.value?.openAdd?.();
-}
-
-function openFloatLinksPosition() {
-    floatLinksPanel.value?.openPosition?.();
 }
 
 function openHeaderSocialLinks(block) {
@@ -159,18 +188,6 @@ async function onSaved(payload) {
     notifyApiSuccess(payload, 'Saved');
 }
 
-async function toggleActive(block) {
-    busyId.value = block.id;
-
-    try {
-        await store.toggleActive(block.id, !block.active);
-    } catch {
-        // error surfaced via store
-    } finally {
-        busyId.value = null;
-    }
-}
-
 async function removeBlock(block) {
     if (!window.confirm('هل أنت متأكد من حذف هذا البلوك؟')) {
         return;
@@ -237,13 +254,10 @@ function contentManageTo(block) {
     return url.replace(/^\/dashboard/, '') || null;
 }
 
-function contentManageLabel(block) {
-    return block.content_manage_label || 'إدارة المحتوى';
-}
 </script>
 
 <template>
-    <MainBox title="أقسام الصفحة" subtitle="قم بترتيب وتنظيف أقسام صفحتك">
+    <MainBox title="صفحتي" subtitle="قم بإضافة وترتيب مكونات ومحتوى صفحتك">
         <template #icon>
             <img :src="'/assets/icons/tabler/puzzle-2.svg'" class="h-7 w-7" alt="">
         </template>
@@ -304,31 +318,40 @@ function contentManageLabel(block) {
                 </div>
             </template>
 
+            <div>
+                <div class="border-t-2 border-stone-200 my-10 border-dotted" aria-hidden="true" />
+            </div>
+
             <div v-if="ctaBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <button
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
-                            aria-controls="quick-buttons-section"
-                            :aria-expanded="isSectionExpanded('quick-buttons')"
-                            :aria-label="isSectionExpanded('quick-buttons') ? 'طي الأزرار السريعة' : 'توسيع الأزرار السريعة'"
-                            @click="toggleSection('quick-buttons')"
-                        >
+                    <button
+                        type="button"
+                        class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
+                        aria-controls="quick-buttons-section"
+                        :aria-expanded="isSectionExpanded('quick-buttons')"
+                        :aria-label="isSectionExpanded('quick-buttons') ? 'طي الأزرار السريعة' : 'توسيع الأزرار السريعة'"
+                        @click="toggleSection('quick-buttons')"
+                    >
+                        <span class="shrink-0 rounded-lg p-1.5 text-stone-400 transition group-hover:bg-white group-hover:text-primary-600">
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
                                 :class="{ 'rotate-180': isSectionExpanded('quick-buttons') }"
                             />
-                        </button>
+                        </span>
                         <img :src="'/assets/icons/tabler/hand-click.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-stone-700">الأزرار السريعة (هدف الصفحة)</p>
                             <p class="text-xs text-stone-400">أضف زر رئيسي وأزرار ثانوية لدفع العميل لإتخاذ الإجراء المطلوب.</p>
                         </div>
-                    </div>
-                    <Button label="أضف زر" class="shrink-0" @click="openAddCtaLink">
-                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    </button>
+                    <Button
+                        class="shrink-0 !px-2.5 sm:!px-4"
+                        aria-label="أضف زر"
+                        @click="openAddCtaLink"
+                    >
+                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                        <span class="hidden sm:inline">أضف زر</span>
                     </Button>
                 </div>
 
@@ -344,31 +367,41 @@ function contentManageLabel(block) {
                 </div>
             </div>
 
+            <div>
+                <div class="border-t-2 border-stone-200 my-10 border-dotted" aria-hidden="true" />
+            </div>
+
             <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <button
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
-                            aria-controls="page-sections-list"
-                            :aria-expanded="isSectionExpanded('page-sections')"
-                            :aria-label="isSectionExpanded('page-sections') ? 'طي أقسام الصفحة' : 'توسيع أقسام الصفحة'"
-                            @click="toggleSection('page-sections')"
-                        >
+                    <button
+                        type="button"
+                        class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
+                        aria-controls="page-sections-list"
+                        :aria-expanded="isSectionExpanded('page-sections')"
+                        :aria-label="isSectionExpanded('page-sections') ? 'طي أقسام الصفحة' : 'توسيع أقسام الصفحة'"
+                        @click="toggleSection('page-sections')"
+                    >
+                        <span class="shrink-0 rounded-lg p-1.5 text-stone-400 transition group-hover:bg-white group-hover:text-primary-600">
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
                                 :class="{ 'rotate-180': isSectionExpanded('page-sections') }"
                             />
-                        </button>
+                        </span>
                         <img :src="'/assets/icons/tabler/layout-list.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
                         <div class="min-w-0">
-                            <p class="text-sm font-medium text-stone-700">أقسام الصفحة</p>
-                            <p class="text-xs text-stone-400">قم بإضافة وترتيب أقسام وروابط الصفحة</p>
+                            <p class="text-sm font-medium text-stone-700">مكونات الصفحة</p>
+                            <p class="text-xs text-stone-400">قم بإضافة وترتيب مكونات نشاطك</p>
                         </div>
-                    </div>
-                    <Button label="إدارة الأقسام" class="shrink-0" :disabled="saving" @click="openManageSections">
-                        <template #icon><Icon name="settings" class="hidden h-4 w-4 sm:block" /></template>
+                    </button>
+                    <Button
+                        class="shrink-0 !px-2.5 sm:!px-4"
+                        aria-label="إدارة المكونات"
+                        :disabled="saving"
+                        @click="openManageSections"
+                    >
+                        <template #icon><Icon name="settings" class="h-4 w-4" /></template>
+                        <span class="hidden sm:inline">إدارة المكونات</span>
                     </Button>
                 </div>
 
@@ -394,51 +427,63 @@ function contentManageLabel(block) {
                                 <Icon name="grip-vertical" class="h-4 w-4" />
                             </div>
 
-                            <button
-                                type="button"
-                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start transition hover:text-primary-600"
-                                @click.stop="openEdit(block.id, block.title)"
-                            >
-                                <div class="hidden shrink-0 sm:block">
-                                    <BrandMark
-                                        :mark="block.brand_mark"
-                                        :url="block.icon_url"
-                                        :fallback="block.icon_url"
-                                        :alt="block.title"
-                                        size-class="h-6 w-6 rounded-md bg-stone-100 p-1"
-                                        icon-class="text-base leading-none"
-                                        img-class="object-contain"
-                                    />
-                                </div>
-                                <span class="min-w-0 truncate text-sm font-medium text-stone-800">
-                                    {{ block.title }}
-                                </span>
+                            <div class="hidden shrink-0 sm:block">
+                                <BrandMark
+                                    :mark="block.brand_mark"
+                                    :url="block.icon_url"
+                                    :fallback="block.icon_url"
+                                    :alt="block.title"
+                                    size-class="h-6 w-6 rounded-md bg-stone-100 p-1"
+                                    icon-class="text-base leading-none"
+                                    img-class="object-contain"
+                                />
+                            </div>
+
+                            <div class="flex min-w-0 flex-1 items-center gap-2">
+                                <RouterLink
+                                    v-if="contentManageTo(block)"
+                                    :to="contentManageTo(block)"
+                                    class="inline-flex min-w-0 cursor-pointer items-center gap-1 transition hover:text-primary-600"
+                                    @click.stop
+                                >
+                                    <span class="truncate text-sm font-medium text-stone-800">
+                                        {{ block.title }}
+                                    </span>
+                                    <Icon name="arrow-up" class="h-4 w-4 shrink-0 -rotate-90 text-stone-400" />
+                                </RouterLink>
+
+                                <button
+                                    v-else
+                                    type="button"
+                                    class="min-w-0 cursor-pointer text-start transition hover:text-primary-600"
+                                    @click.stop="openEdit(block.id, block.title)"
+                                >
+                                    <span class="block truncate text-sm font-medium text-stone-800">
+                                        {{ block.title }}
+                                    </span>
+                                </button>
+
                                 <span
                                     v-if="contentCounts[block.id] !== undefined"
-                                    class="shrink-0 rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-500"
+                                    class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                    :class="Number(contentCounts[block.id].count) > 0
+                                        ? 'bg-emerald-50 text-emerald-700'
+                                        : 'bg-stone-100 text-stone-500'"
                                 >
-                                    {{ contentCounts[block.id].count }} {{ contentCounts[block.id].label }}
+                                    {{ contentCounts[block.id].count }}
+                                    <span class="hidden sm:inline">{{ contentCounts[block.id].label }}</span>
                                 </span>
-                            </button>
+                            </div>
 
                             <button
                                 type="button"
-                                class="pointer-events-none shrink-0 cursor-pointer rounded-lg p-1 text-red-400/80 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:pointer-events-auto group-hover:opacity-100"
+                                class="hidden"
                                 aria-label="حذف البلوك"
                                 :disabled="busyId === block.id"
                                 @click.stop="removeBlock(block)"
                             >
                                 <Icon name="trash" class="h-4 w-4" />
                             </button>
-
-                            <RouterLink
-                                v-if="contentManageTo(block)"
-                                :to="contentManageTo(block)"
-                                class="hidden shrink-0 cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition hover:bg-primary-50 sm:inline-flex"
-                                @click.stop
-                            >
-                                {{ contentManageLabel(block) }}
-                            </RouterLink>
 
                             <button
                                 v-if="block.editable"
@@ -450,12 +495,6 @@ function contentManageLabel(block) {
                                 <Icon name="settings" class="h-5 w-5" />
                             </button>
 
-                            <Switch
-                                :model-value="block.active"
-                                :label="block.active ? 'تعطيل البلوك' : 'تفعيل البلوك'"
-                                :disabled="busyId === block.id"
-                                @update:model-value="toggleActive(block)"
-                            />
                         </li>
                     </ul>
 
@@ -463,36 +502,45 @@ function contentManageLabel(block) {
                         v-if="!userBlocks.length"
                         class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
-                        لا توجد أقسام مفعّلة. اضغط «إدارة الأقسام» لاختيار أقسام الصفحة.
+                        لا توجد أقسام مفعّلة. اضغط «إدارة المكونات» لاختيار أقسام الصفحة.
                     </p>
                 </div>
             </div>
 
+            <div>
+                <div class="border-t-2 border-stone-200 my-10 border-dotted" aria-hidden="true" />
+            </div>
+
             <div v-if="footerBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <button
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
-                            aria-controls="footer-documents-section"
-                            :aria-expanded="isSectionExpanded('footer-documents')"
-                            :aria-label="isSectionExpanded('footer-documents') ? 'طي الوثائق والضمانات' : 'توسيع الوثائق والضمانات'"
-                            @click="toggleSection('footer-documents')"
-                        >
+                    <button
+                        type="button"
+                        class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
+                        aria-controls="footer-documents-section"
+                        :aria-expanded="isSectionExpanded('footer-documents')"
+                        :aria-label="isSectionExpanded('footer-documents') ? 'طي الوثائق والضمانات' : 'توسيع الوثائق والضمانات'"
+                        @click="toggleSection('footer-documents')"
+                    >
+                        <span class="shrink-0 rounded-lg p-1.5 text-stone-400 transition group-hover:bg-white group-hover:text-primary-600">
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
                                 :class="{ 'rotate-180': isSectionExpanded('footer-documents') }"
                             />
-                        </button>
+                        </span>
                         <img :src="'/assets/icons/tabler/file-certificate.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-stone-700">الوثائق والضمانات</p>
                             <p class="text-xs text-stone-400">أضف وثائق النشاط والضمانات التي تظهر في تذييل الصفحة</p>
                         </div>
-                    </div>
-                    <Button label="أضف وثيقة" class="shrink-0" @click="openAddFooterDocument">
-                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    </button>
+                    <Button
+                        class="shrink-0 !px-2.5 sm:!px-4"
+                        aria-label="أضف وثيقة"
+                        @click="openAddFooterDocument"
+                    >
+                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                        <span class="hidden sm:inline">أضف وثيقة</span>
                     </Button>
                 </div>
 
@@ -506,31 +554,40 @@ function contentManageLabel(block) {
                 </div>
             </div>
 
+            <div>
+                <div class="border-t-2 border-stone-200 my-10 border-dotted" aria-hidden="true" />
+            </div>
+
             <div v-if="footerBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <button
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
-                            aria-controls="footer-links-section"
-                            :aria-expanded="isSectionExpanded('footer-links')"
-                            :aria-label="isSectionExpanded('footer-links') ? 'طي روابط تذييل الصفحة' : 'توسيع روابط تذييل الصفحة'"
-                            @click="toggleSection('footer-links')"
-                        >
+                    <button
+                        type="button"
+                        class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
+                        aria-controls="footer-links-section"
+                        :aria-expanded="isSectionExpanded('footer-links')"
+                        :aria-label="isSectionExpanded('footer-links') ? 'طي روابط تذييل الصفحة' : 'توسيع روابط تذييل الصفحة'"
+                        @click="toggleSection('footer-links')"
+                    >
+                        <span class="shrink-0 rounded-lg p-1.5 text-stone-400 transition group-hover:bg-white group-hover:text-primary-600">
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
                                 :class="{ 'rotate-180': isSectionExpanded('footer-links') }"
                             />
-                        </button>
+                        </span>
                         <img :src="'/assets/icons/tabler/Link.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-stone-700">روابط تذييل الصفحة</p>
                             <p class="text-xs text-stone-400">أضف روابط مهمة تظهر في تذييل الصفحة</p>
                         </div>
-                    </div>
-                    <Button label="أضف رابط" class="shrink-0" @click="openAddFooterLink">
-                        <template #icon><Icon name="plus" class="hidden h-4 w-4 sm:block" /></template>
+                    </button>
+                    <Button
+                        class="shrink-0 !px-2.5 sm:!px-4"
+                        aria-label="أضف رابط"
+                        @click="openAddFooterLink"
+                    >
+                        <template #icon><Icon name="plus" class="h-4 w-4" /></template>
+                        <span class="hidden sm:inline">أضف رابط</span>
                     </Button>
                 </div>
 
@@ -548,41 +605,31 @@ function contentManageLabel(block) {
 
             <div v-if="floatLinksBlock?.editor" class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/80">
                 <div class="flex items-center justify-between gap-3 border-b border-dotted border-stone-200 px-3 py-2.5">
-                    <div class="flex min-w-0 items-center gap-2">
-                        <button
-                            type="button"
-                            class="shrink-0 cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-white hover:text-primary-600"
-                            aria-controls="floating-buttons-section"
-                            :aria-expanded="isSectionExpanded('floating-buttons')"
-                            :aria-label="isSectionExpanded('floating-buttons') ? 'طي الأزرار الطافية' : 'توسيع الأزرار الطافية'"
-                            @click="toggleSection('floating-buttons')"
-                        >
+                    <button
+                        type="button"
+                        class="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
+                        aria-controls="floating-buttons-section"
+                        :aria-expanded="isSectionExpanded('floating-buttons')"
+                        :aria-label="isSectionExpanded('floating-buttons') ? 'طي الأزرار الطافية' : 'توسيع الأزرار الطافية'"
+                        @click="toggleSection('floating-buttons')"
+                    >
+                        <span class="shrink-0 rounded-lg p-1.5 text-stone-400 transition group-hover:bg-white group-hover:text-primary-600">
                             <Icon
                                 name="chevron-down"
                                 class="h-5 w-5 transition-transform"
                                 :class="{ 'rotate-180': isSectionExpanded('floating-buttons') }"
                             />
-                        </button>
+                        </span>
                         <img :src="'/assets/icons/tabler/float-right.svg'" alt="" class="hidden h-7 w-7 shrink-0 rounded-md bg-white p-1 sm:block">
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-stone-700">الأزرار الطافية</p>
                             <p class="text-xs text-stone-400">أزرار سريعة ثابتة للتواصل تظهر عائمة أسفل الصفحة بشكل دائم</p>
                         </div>
-                    </div>
-                    <button
-                        type="button"
-                        class="shrink-0 cursor-pointer rounded-lg p-1 text-xs text-stone-500 transition hover:bg-stone-100 hover:text-primary-600"
-                        aria-label="خيارات الأزرار الطافية"
-                        @click="openFloatLinksPosition"
-                    >
-                        <span class="sm:hidden">الموضع</span>
-                        <Icon name="settings" class="hidden h-5 w-5 sm:block" />
                     </button>
                 </div>
 
                 <div id="floating-buttons-section" v-show="isSectionExpanded('floating-buttons')">
                     <FloatLinksPanel
-                        ref="floatLinksPanel"
                         :block-id="floatLinksBlock.id"
                         :editor="floatLinksBlock.editor"
                         @updated="onFloatLinksUpdated"

@@ -669,7 +669,7 @@ async function submit() {
                 />
 
                 <Toggle
-                    v-if="canPickSpecificItem && !isExternal && !mustPickSpecificItem"
+                    v-if="isNew && canPickSpecificItem && !isExternal && !mustPickSpecificItem"
                     v-model="form.specific_item"
                     name="specific_item"
                     label="مادة محددة"

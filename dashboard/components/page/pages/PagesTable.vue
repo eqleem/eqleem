@@ -242,7 +242,7 @@ async function createTemplatePage(template) {
                     :key="item.uuid"
                     class="flex w-full items-center justify-between ps-3 sm:ps-0 gap-x-7 hover:bg-stone-50 last:rounded-b-2xl"
                 >
-                    <div class="hidden ps-4 sm:block">
+                    <div class="hidden flex-none ps-4 sm:block">
                         <div v-if="!item.is_system_page" class="flex items-center">
                             <input
                                 type="checkbox"
@@ -253,10 +253,10 @@ async function createTemplatePage(template) {
                         </div>
                     </div>
 
-                    <div class="w-full py-3">
+                    <div class="min-w-0 flex-1 py-3">
                         <RouterLink
                             :to="pageEditPath(item)"
-                            class="flex w-full items-center gap-x-3 text-start"
+                            class="flex items-center gap-x-3 text-start"
                         >
                             <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-stone-100">
                                 <img
@@ -290,7 +290,7 @@ async function createTemplatePage(template) {
                         </RouterLink>
                     </div>
 
-                    <div class="pe-6">
+                    <div class="flex-none pe-6">
                         <Dropdown width="w-44">
                             <template #trigger>
                                 <button type="button" class="rounded p-1.5 text-stone-500 hover:bg-stone-100" aria-label="menu">
