@@ -190,6 +190,34 @@ test('legacy catalog preferences do not disable non-sellable sections', function
     expect($navSlugs)->toContain('pages', 'blog', 'portfolio', 'store');
 });
 
+test('catalog content_enabled respects strict tenant preferences for add-content UIs', function () {
+    [$user, $tenant] = createUserWithTenantForCatalogSectionsApi();
+
+    $tenant->update([
+        'config' => ['enabled_content_types' => ['store']],
+    ]);
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/page/catalog-sections')
+        ->assertSuccessful();
+
+    expect($response->json('content_enabled'))->toBe(['store'])
+        ->and($response->json('content_enabled'))->not->toContain('blog', 'portfolio')
+        ->and($response->json('enabled'))->toContain('blog', 'portfolio', 'store');
+});
+
+test('catalog content_enabled matches saved page sections', function () {
+    [$user] = createUserWithTenantForCatalogSectionsApi();
+
+    $this->actingAs($user)
+        ->putJson('/api/page/catalog-sections', [
+            'enabled' => ['blog', 'store'],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('content_enabled', ['blog', 'store'])
+        ->assertJsonPath('enabled', ['blog', 'store']);
+});
+
 test('saving enabled sections does not reactivate manually disabled blocks', function () {
     [$user, $tenant] = createUserWithTenantForCatalogSectionsApi();
 

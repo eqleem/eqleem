@@ -84,7 +84,7 @@ return [
         'active' => true,
         'default' => false,
         'sellable' => true,
-        'slug' => 'store',
+        'slug' => 'store', 
         'model_type' => 'product',
         'section' => 'sell',
         'name' => 'المتجر الإلكتروني',

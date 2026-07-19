@@ -49,6 +49,7 @@ export const useContentTypesStore = defineStore('contentTypes', {
         error: null,
         catalogOptions: [],
         catalogEnabled: [],
+        catalogContentEnabled: [],
         catalogLoading: false,
         catalogSaving: false,
         catalogLoaded: false,
@@ -119,6 +120,9 @@ export const useContentTypesStore = defineStore('contentTypes', {
 
                 this.catalogOptions = rows.map(mapCatalogOption);
                 this.catalogEnabled = Array.isArray(payload?.enabled) ? payload.enabled : [];
+                this.catalogContentEnabled = Array.isArray(payload?.content_enabled)
+                    ? payload.content_enabled
+                    : this.catalogEnabled;
                 this.catalogLoaded = true;
             } catch (error) {
                 this.catalogError = error instanceof ApiError
@@ -149,6 +153,9 @@ export const useContentTypesStore = defineStore('contentTypes', {
 
                 this.catalogOptions = rows.map(mapCatalogOption);
                 this.catalogEnabled = Array.isArray(payload?.enabled) ? payload.enabled : enabled;
+                this.catalogContentEnabled = Array.isArray(payload?.content_enabled)
+                    ? payload.content_enabled
+                    : this.catalogEnabled;
                 this.catalogLoaded = true;
 
                 await this.fetchContentTypes({ force: true });

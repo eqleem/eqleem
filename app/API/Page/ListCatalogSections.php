@@ -19,11 +19,27 @@ class ListCatalogSections
     use AuthorizesDashboardTenant;
 
     /**
-     * @return array{data: list<array<string, mixed>>, enabled: list<string>}
+     * @return array{data: list<array<string, mixed>>, enabled: list<string>, content_enabled: list<string>}
      */
     public function handle(Tenant $tenant, ContentTypeRegistry $contentTypes): array
     {
         $enabled = $contentTypes->all($tenant)->pluck('slug')->all();
+        $rawPreferences = data_get($tenant->config, 'enabled_content_types');
+        $hasPreferences = is_array($rawPreferences);
+        $managedSlugs = $contentTypes->managedSections()->pluck('slug')->all();
+
+        // Strict tenant preferences for "add content" UIs. Legacy catalog prefs only
+        // listed sellable types; non-sellable still appear in nav until page sections
+        // are configured, but must not show up as addable content types.
+        $contentEnabled = $hasPreferences
+            ? collect($rawPreferences)
+                ->filter(fn (mixed $slug): bool => is_string($slug) && in_array($slug, $managedSlugs, true))
+                ->values()
+                ->all()
+            : collect($enabled)
+                ->filter(fn (string $slug): bool => in_array($slug, $managedSlugs, true))
+                ->values()
+                ->all();
 
         $options = $contentTypes->managedSections()
             ->map(fn (ContentType $type): array => [
@@ -48,11 +64,12 @@ class ListCatalogSections
         return [
             'data' => $options,
             'enabled' => $selected,
+            'content_enabled' => $contentEnabled,
         ];
     }
 
     /**
-     * @return array{data: list<array<string, mixed>>, enabled: list<string>}
+     * @return array{data: list<array<string, mixed>>, enabled: list<string>, content_enabled: list<string>}
      */
     public function asController(ActionRequest $request, ContentTypeRegistry $contentTypes): array
     {
@@ -60,7 +77,7 @@ class ListCatalogSections
     }
 
     /**
-     * @param  array{data: list<array<string, mixed>>, enabled: list<string>}  $payload
+     * @param  array{data: list<array<string, mixed>>, enabled: list<string>, content_enabled: list<string>}  $payload
      */
     public function jsonResponse(array $payload): JsonResponse
     {

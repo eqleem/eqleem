@@ -275,7 +275,7 @@ async function submitPassword() {
             </MainBox>
 
             <!-- Password -->
-            <MainBox title="كلمة المرور" subtitle="حدّث كلمة المرور وأبطل رموز الوصول القديمة.">
+            <MainBox v-if="false" title="كلمة المرور" subtitle="حدّث كلمة المرور وأبطل رموز الوصول القديمة.">
                 <template #icon>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-stone-600" viewBox="0 0 24 24" fill="none">
                         <path d="M6 10V8c0-3.31 1-6 6-6s6 2.69 6 6v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />

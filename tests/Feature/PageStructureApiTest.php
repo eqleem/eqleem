@@ -5,6 +5,8 @@ use App\Models\Block;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\BlockTypeRegistry;
+use App\Support\ContentType;
+use App\Support\ContentTypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -133,6 +135,24 @@ test('cta block is not included among locked top blocks', function () {
         ->json('data.top_blocks.*.type');
 
     expect($types)->not->toContain('cta');
+});
+
+test('enabled sell sections appear among page components', function () {
+    [$user] = createUserWithTenantForPageStructure();
+
+    $expectedUrls = app(ContentTypeRegistry::class)
+        ->all()
+        ->filter(fn (ContentType $contentType): bool => $contentType->section === 'sell')
+        ->map(fn (ContentType $contentType): string => '/dashboard/manage/'.$contentType->slug)
+        ->values()
+        ->all();
+
+    $componentUrls = $this->actingAs($user)
+        ->getJson('/api/page/structure')
+        ->assertSuccessful()
+        ->json('data.user_blocks.*.content_manage_url');
+
+    expect($componentUrls)->toContain(...$expectedUrls);
 });
 
 test('float links block is not included among locked bottom blocks', function () {

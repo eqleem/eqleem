@@ -37,7 +37,7 @@ class SaveCatalogSections
 
     /**
      * @param  array{enabled: list<string>}  $data
-     * @return array{data: list<array<string, mixed>>, enabled: list<string>, message: string}
+     * @return array{data: list<array<string, mixed>>, enabled: list<string>, content_enabled: list<string>, message: string}
      */
     public function handle(Tenant $tenant, array $data, ContentTypeRegistry $contentTypes): array
     {

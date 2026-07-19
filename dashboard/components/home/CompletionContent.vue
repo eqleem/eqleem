@@ -23,15 +23,20 @@ const addForms = {
 };
 
 const contentTypesStore = useContentTypesStore();
-const { contentTypes, catalogEnabled } = storeToRefs(contentTypesStore);
+const { contentTypes, catalogContentEnabled } = storeToRefs(contentTypesStore);
 
 const visibleContentTypes = computed(() => {
-    const enabledContentTypes = new Set([
-        ...catalogEnabled.value,
+    const enabledSlugs = new Set([
+        ...catalogContentEnabled.value,
         ...permanentContentTypes,
     ]);
 
-    return contentTypes.value.filter((type) => enabledContentTypes.has(type.slug));
+    return contentTypes.value
+        .filter((type) => enabledSlugs.has(type.slug) && Boolean(addForms[type.slug]))
+        .sort((first, second) => (
+            Number(permanentContentTypes.has(first.slug))
+            - Number(permanentContentTypes.has(second.slug))
+        ));
 });
 
 onMounted(() => {
@@ -60,7 +65,6 @@ function openAddModal(slug) {
             :key="type.slug"
             type="button"
             class="flex items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="!addForms[type.slug]"
             @click="openAddModal(type.slug)"
         >
             <img :src="`/${type.icon}`" alt="" class="size-9 shrink-0 rounded-lg bg-stone-100 p-1.5">

@@ -19,6 +19,7 @@ const tenantUrl = computed(() => tenant.value?.url ?? '#');
 const tenantPlan = computed(() => tenant.value?.plan ?? 'بداية');
 const userName = computed(() => user.value?.name ?? '');
 const userEmail = computed(() => user.value?.email ?? '');
+const userPhone = computed(() => user.value?.phone ?? '');
 const userImage = computed(() => user.value?.image ?? 'https://www.gravatar.com/avatar/?d=mp');
 const appName = computed(() => app.value?.name ?? 'Eqleem');
 const homeUrl = computed(() => app.value?.home_url ?? '/');
@@ -27,6 +28,7 @@ const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
 const menuProps = computed(() => ({
     userName: userName.value,
     userEmail: userEmail.value,
+    userPhone: userPhone.value,
     userImage: userImage.value,
     tenantName: tenantName.value,
     tenantLogo: tenantLogo.value,
@@ -69,7 +71,7 @@ onBeforeUnmount(() => {
 <template>
     <header class="fixed inset-x-0 top-0 z-40 bg-primary-700 p-2 text-white">
         <div class="mx-auto flex max-w-7xl justify-between gap-x-2 lg:gap-x-3">
-            <div class="flex min-w-0 flex-1 items-center gap-x-2 justify-between ">
+            <div class="flex min-w-0 flex-1 items-center justify-start gap-x-2">
                 <RouterLink to="/" class="flex min-w-0 items-center gap-x-2">
                     <BrandMark
                         class="ms-1"
@@ -197,16 +199,15 @@ onBeforeUnmount(() => {
         >
             <aside
                 v-if="mobileMenuOpen"
-                class="fixed bottom-0 left-0 top-0 z-[60] flex w-72 max-w-[85vw] flex-col overflow-y-auto overscroll-y-contain rounded-e-2xl bg-stone-100 shadow-2xl md:hidden"
+                class="fixed bottom-2 left-2 top-2 z-[60] flex w-72 max-w-[85vw] flex-col overflow-y-auto overscroll-y-contain rounded-2xl bg-white shadow-2xl md:hidden"
                 role="dialog"
                 aria-modal="true"
                 aria-label="قائمة الحساب"
             >
-                <div class="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
-                    <p class="text-sm font-medium text-stone-700">القائمة</p>
+                <div class="absolute left-3 top-3 z-10">
                     <button
                         type="button"
-                        class="rounded-lg p-1.5 text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
+                        class="rounded-lg p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-stone-800"
                         aria-label="إغلاق القائمة"
                         @click="closeMobileMenu"
                     >

@@ -71,17 +71,17 @@ onBeforeUnmount(() => {
 
 <template>
     <div
-        class="pointer-events-none fixed top-4 left-4 right-4 z-[60] flex flex-col gap-2 md:right-auto md:max-w-sm"
+        class="pointer-events-none fixed right-4 bottom-4 left-4 z-[60] flex flex-col gap-2 md:top-4 md:right-auto md:bottom-auto md:max-w-sm"
         aria-live="polite"
         aria-relevant="additions"
     >
         <TransitionGroup
             enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 -translate-y-2"
+            enter-from-class="translate-y-2 opacity-0 md:-translate-y-2"
             enter-to-class="opacity-100 translate-y-0"
             leave-active-class="transition duration-200 ease-in"
             leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-2"
+            leave-to-class="translate-y-2 opacity-0 md:-translate-y-2"
         >
             <button
                 v-for="notice in notices"

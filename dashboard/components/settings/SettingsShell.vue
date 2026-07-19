@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-    <Container v-if="!embedded" :title="title" back-route="/settings">
+    <Container v-if="!embedded" :title="title" back-route="/settings" fixed-title-bar>
         <div class="space-y-10">
             <slot />
         </div>

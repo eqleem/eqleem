@@ -2,11 +2,15 @@
 
 namespace App\API\Page;
 
+use App\Actions\EnsureSectionBlockLink;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Page\Concerns\MapsPageBlocks;
 use App\Http\Resources\PageStructureResource;
+use App\Models\Block;
 use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
+use App\Support\ContentType;
+use App\Support\ContentTypeRegistry;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -22,9 +26,21 @@ class GetPageStructure
     /**
      * @return array<string, mixed>
      */
-    public function handle(Tenant $tenant, BlockTypeRegistry $blockTypes): array
-    {
+    public function handle(
+        Tenant $tenant,
+        BlockTypeRegistry $blockTypes,
+        ?ContentTypeRegistry $contentTypes = null,
+    ): array {
         setCurrentTenant($tenant);
+        $contentTypes ??= app(ContentTypeRegistry::class);
+
+        $contentTypes->all($tenant)
+            ->filter(fn (ContentType $contentType): bool => $contentType->section === 'sell')
+            ->each(fn (ContentType $contentType): ?Block => EnsureSectionBlockLink::run(
+                $tenant->id,
+                $contentType->slug,
+                $blockTypes,
+            ));
 
         $grouped = $this->groupedBlocks($blockTypes);
 
@@ -42,9 +58,16 @@ class GetPageStructure
     /**
      * @return array<string, mixed>
      */
-    public function asController(ActionRequest $request, BlockTypeRegistry $blockTypes): array
-    {
-        return $this->handle($this->currentDashboardTenant($request), $blockTypes);
+    public function asController(
+        ActionRequest $request,
+        BlockTypeRegistry $blockTypes,
+        ContentTypeRegistry $contentTypes,
+    ): array {
+        return $this->handle(
+            $this->currentDashboardTenant($request),
+            $blockTypes,
+            $contentTypes,
+        );
     }
 
     /**
