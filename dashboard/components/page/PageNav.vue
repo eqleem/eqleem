@@ -83,6 +83,8 @@ function closeMobileNav() {
     mobileNavOpen.value = false;
 }
 
+defineExpose({ openMobileNav });
+
 function onEscape(event) {
     if (event.key === 'Escape') {
         closeMobileNav();
@@ -105,17 +107,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <nav class="sticky top-[var(--dashboard-chrome-h)] z-20 max-h-[calc(100vh-var(--dashboard-chrome-h))] w-auto shrink-0 self-start space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-y-contain rounded-xl bg-stone-300/30 p-0.5 lg:w-48">
-        <button
-            type="button"
-            class="flex w-full items-center justify-center mb-2 gap-2 rounded-lg px-1 py-1.5 text-white transition bg-primary-500 hover:bg-primary-600 lg:hidden"
-            aria-label="فتح قائمة التبويبات"
-            @click="openMobileNav"
-        >
-            <Icon name="menu-2" class="size-7 lg:size-5 shrink-0" />
-            <span class="hidden truncate text-sm lg:block">كل التبويبات</span>
-        </button>
-
+    <nav class="sticky top-[var(--dashboard-chrome-h)] z-20 hidden max-h-[calc(100vh-var(--dashboard-chrome-h))] w-48 shrink-0 self-start space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-y-contain rounded-xl bg-stone-300/30 p-0.5 lg:block">
         <!-- Fixed tabs — bg only in one branch so it never fights Tailwind source order -->
         <RouterLink
             v-for="tab in fixedTabs"
@@ -173,6 +165,7 @@ onBeforeUnmount(() => {
             leave-to-class="translate-x-full"
         >
             <nav
+                id="page-mobile-nav"
                 v-if="mobileNavOpen"
                 class="fixed bottom-0 right-0 top-[var(--dashboard-chrome-h)] z-50 w-72 max-w-[85vw] space-y-0.5 overflow-y-auto overscroll-y-contain rounded-e-2xl bg-stone-100 p-3 shadow-2xl lg:hidden"
                 role="dialog"

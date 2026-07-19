@@ -48,17 +48,21 @@ class SaveOnboardingGoal
      */
     public function handle(Tenant $tenant, array $data, Onboarding $onboarding): array
     {
+        $partial = (bool) ($data['partial'] ?? false);
+
         if (array_key_exists('primary_action_type', $data) && filled($data['primary_action_type'])) {
             $tenant->meta->set('primary_action_type', (string) $data['primary_action_type']);
         }
 
         if (array_key_exists('secondary_action_type', $data)) {
-            $tenant->meta->set(
-                'secondary_action_type',
-                filled($data['secondary_action_type'] ?? null)
-                    ? (string) $data['secondary_action_type']
-                    : null,
-            );
+            if (filled($data['secondary_action_type'] ?? null)) {
+                $tenant->meta->set('secondary_action_type', (string) $data['secondary_action_type']);
+            } elseif (! $partial) {
+                // Full saves may clear the secondary button. Partial autosaves often
+                // send null when the field is untouched — ignore those so a slower
+                // in-flight primary-only request cannot wipe a later secondary save.
+                $tenant->meta->set('secondary_action_type', null);
+            }
         }
 
         $tenant->save();
@@ -73,8 +77,9 @@ class SaveOnboardingGoal
     {
         $tenant = $this->currentDashboardTenant($request);
 
-        /** @var array{primary_action_type?: string|null, secondary_action_type?: string|null} $validated */
+        /** @var array{partial?: bool, primary_action_type?: string|null, secondary_action_type?: string|null} $validated */
         $validated = $request->validated();
+        $validated['partial'] = $request->boolean('partial');
 
         return $this->handle($tenant, $validated, $onboarding);
     }

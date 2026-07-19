@@ -5,7 +5,6 @@ import Modal from '../ui/Modal.vue';
 import Button from '../ui/Button.vue';
 import CompletionContent from './CompletionContent.vue';
 import CompletionContentAddModals from './CompletionContentAddModals.vue';
-import OnboardingWidget from './OnboardingWidget.vue';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { useOnboardingStore } from '../../stores/onboarding.js';
 import { openModal } from '../../lib/modal.js';
@@ -20,7 +19,7 @@ const {
     loaded,
 } = storeToRefs(store);
 
-const { completed: onboardingCompleted, dismissed: onboardingDismissed } = storeToRefs(onboardingStore);
+const { completed: onboardingCompleted } = storeToRefs(onboardingStore);
 
 const copied = ref(false);
 const shareInput = ref(null);
@@ -99,10 +98,6 @@ function shareLink(platform) {
                         </template>
                         إضافة محتوى
                     </Button>
-                </div>
-
-                <div v-if="onboardingDismissed" class="mt-8">
-                    <OnboardingWidget on-primary />
                 </div>
             </div>
 

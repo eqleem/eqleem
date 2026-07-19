@@ -22,13 +22,12 @@ import { useSession, updateTenant } from '../../stores/session.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { notifySuccess, notifyError } from '../../lib/notify.js';
 import { defaultCountryCode } from '../../data/countries.js';
-import { COVER_CLEAR } from '../../data/coverPresets.js';
+import { COVER_CLEAR, COVER_COLORS, encodeCssCover } from '../../data/coverPresets.js';
 import { appDomain } from '../../data/settings.js';
 
 const store = useOnboardingStore();
 const {
     percentage,
-    completedSteps,
     totalSteps,
     steps,
     forms,
@@ -49,6 +48,7 @@ const { tenant, user } = useSession();
 
 const activeKey = ref('business');
 const showSuccess = ref(false);
+const forceOpen = ref(false);
 const errors = reactive({});
 const confettiPieces = ref([]);
 const autosaving = ref(false);
@@ -89,15 +89,50 @@ const goal = reactive({
     secondary_action_type: '',
 });
 const enabledCatalog = ref([]);
+const defaultCatalogSlugs = ['store', 'digital-services'];
+const headerFollowsPrimaryColor = ref(true);
+
+const primaryColorHexes = Object.fromEntries(
+    COVER_COLORS.map((color) => [color.id, color.value]),
+);
+primaryColorHexes.gray = '#78716c';
 
 let autosaveTimer = null;
 let syncingFromStore = false;
 let hydrated = false;
+const onboardingModalName = 'new-user-onboarding';
 
 const stepIndex = computed(() => steps.value.findIndex((step) => step.key === activeKey.value));
 const activeStep = computed(() => steps.value.find((step) => step.key === activeKey.value) ?? null);
 const isLastStep = computed(() => stepIndex.value === steps.value.length - 1);
 const canGoBack = computed(() => stepIndex.value > 0);
+const isWidgetVisible = computed(() => shouldShow.value || forceOpen.value);
+const activeStepNumber = computed(() => Math.max(stepIndex.value + 1, 1));
+const displayPercentage = computed(() => Math.max(percentage.value, 5));
+
+const stepTitles = {
+    business: 'النشاط',
+    contact: 'معلومات الاتصال',
+    identity: 'الهوية',
+    goal: 'الأهداف',
+    catalog: 'الكتالوج',
+    orders: 'استقبال الطلبات',
+};
+
+const timelineSteps = computed(() => [
+    ...steps.value.map((step) => ({
+        ...step,
+        title: stepTitles[step.key] ?? step.title,
+    })),
+    {
+        key: 'publish',
+        title: 'النشر',
+        icon: 'hugeicons:rocket-01',
+        done: completed.value,
+        unlocked: false,
+        milestone: true,
+    },
+]);
 
 const primaryActionLabel = computed(() => (
     actionOptions.value.find((item) => item.type === goal.primary_action_type)?.label || ''
@@ -146,14 +181,6 @@ const previewSocialLinks = computed(() => {
 
 const handlePrefix = computed(() => `https://${appDomain}/`);
 
-const circularProgressStyle = computed(() => ({
-    background: `conic-gradient(#fbbf24 ${percentage.value * 3.6}deg, rgba(255,255,255,0.22) 0deg)`,
-}));
-
-const progressGradient = computed(() => (
-    'linear-gradient(90deg, #6366f1 0%, #8b5cf6 45%, #ec4899 100%)'
-));
-
 function hasBrandMark(mark) {
     if (!mark || typeof mark !== 'object') {
         return false;
@@ -168,6 +195,20 @@ function hasBrandMark(mark) {
     }
 
     return false;
+}
+
+function primaryColorCover(color) {
+    const value = String(color ?? '').trim();
+    const hex = /^#[0-9a-fA-F]{3,8}$/.test(value)
+        ? value
+        : primaryColorHexes[value] ?? primaryColorHexes.blue;
+
+    return encodeCssCover('color', hex);
+}
+
+function onHeaderImageChange(value) {
+    identity.header_image = value;
+    headerFollowsPrimaryColor.value = false;
 }
 
 const canContinue = computed(() => {
@@ -256,6 +297,21 @@ function selectStep(step) {
 
 function onIndustryChange(value) {
     business.industry = value;
+    scheduleAutosave();
+}
+
+function onPrimaryActionChange(value) {
+    goal.primary_action_type = value == null ? '' : String(value);
+
+    if (goal.secondary_action_type && goal.secondary_action_type === goal.primary_action_type) {
+        goal.secondary_action_type = '';
+    }
+
+    scheduleAutosave();
+}
+
+function onSecondaryActionChange(value) {
+    goal.secondary_action_type = value == null ? '' : String(value);
     scheduleAutosave();
 }
 
@@ -348,6 +404,8 @@ function syncFromStore() {
     identity.header_image = value.identity?.header_image ?? '';
     identity.header_image_url = value.identity?.header_image_url ?? '';
     identity.header_image_position = value.identity?.header_image_position ?? 50;
+    headerFollowsPrimaryColor.value = !identity.header_image
+        || identity.header_image === primaryColorCover(identity.primary_color);
 
     goal.primary_action_type = value.goal?.primary_action_type ?? '';
     goal.secondary_action_type = value.goal?.secondary_action_type ?? '';
@@ -355,7 +413,9 @@ function syncFromStore() {
     const enabled = value.catalog?.enabled ?? [];
     enabledCatalog.value = enabled.length
         ? [...enabled]
-        : catalogOptions.value.filter((item) => item.enabled).map((item) => item.slug);
+        : catalogOptions.value
+            .filter((item) => defaultCatalogSlugs.includes(item.slug))
+            .map((item) => item.slug);
 
     if (!activeKey.value || !steps.value.some((step) => step.key === activeKey.value)) {
         activeKey.value = store.currentStep || steps.value[0]?.key || 'business';
@@ -463,11 +523,33 @@ async function autosaveGoal() {
         return { ok: true };
     }
 
-    return store.saveGoal({
+    const payload = {
         partial: true,
-        primary_action_type: goal.primary_action_type || undefined,
-        secondary_action_type: goal.secondary_action_type || null,
-    });
+    };
+
+    if (goal.primary_action_type) {
+        payload.primary_action_type = goal.primary_action_type;
+    }
+
+    // Always send secondary on goal autosave so a chosen value is persisted, and an
+    // intentional clear (empty string) can be distinguished later on full save.
+    if (goal.secondary_action_type) {
+        payload.secondary_action_type = goal.secondary_action_type;
+    }
+
+    const result = await store.saveGoal(payload);
+
+    if (result.ok) {
+        if (store.forms.goal.primary_action_type) {
+            goal.primary_action_type = store.forms.goal.primary_action_type;
+        }
+
+        if (store.forms.goal.secondary_action_type) {
+            goal.secondary_action_type = store.forms.goal.secondary_action_type;
+        }
+    }
+
+    return result;
 }
 
 async function autosaveCatalog() {
@@ -502,6 +584,9 @@ async function runAutosave() {
                 break;
             case 'goal':
                 result = await autosaveGoal();
+                if (!result.ok) {
+                    Object.assign(errors, flattenErrors(result.errors));
+                }
                 break;
             case 'catalog':
                 result = await autosaveCatalog();
@@ -651,6 +736,14 @@ async function continueStep() {
             return;
         }
 
+        if (result.ok) {
+            goal.primary_action_type = store.forms.goal.primary_action_type || goal.primary_action_type;
+            // Prefer server value when present; keep local selection if the response
+            // unexpectedly omits a secondary that we just submitted.
+            goal.secondary_action_type = store.forms.goal.secondary_action_type
+                || (goal.secondary_action_type || '');
+        }
+
         advanceToNext();
         return;
     }
@@ -739,6 +832,30 @@ function onOrdersModalClosed(event) {
     }
 }
 
+function onOnboardingModalClosed(event) {
+    if (event.detail?.modal !== onboardingModalName) {
+        return;
+    }
+
+    if (shouldShow.value) {
+        nextTick(() => openModal(onboardingModalName));
+    } else {
+        forceOpen.value = false;
+    }
+}
+
+function onOnboardingModalOpened(event) {
+    if (event.detail?.modal !== onboardingModalName || shouldShow.value) {
+        return;
+    }
+
+    forceOpen.value = true;
+    showSuccess.value = false;
+    activeKey.value = steps.value[0]?.key || 'business';
+
+    nextTick(() => setupFooterObserver());
+}
+
 watch(() => [
     forms.value.orders.payment_active,
     forms.value.orders.shipping_active,
@@ -773,16 +890,20 @@ watch([
 
 watch([
     () => identity.handle,
-    () => identity.primary_color,
     () => identity.header_image,
     () => identity.header_image_position,
     headerFile,
 ], () => scheduleAutosave());
 
-watch([
-    () => goal.primary_action_type,
-    () => goal.secondary_action_type,
-], () => scheduleAutosave());
+watch(() => identity.primary_color, (value) => {
+    if (hydrated && !syncingFromStore && headerFollowsPrimaryColor.value) {
+        identity.header_image = primaryColorCover(value);
+        identity.header_image_url = '';
+        headerFile.value = null;
+    }
+
+    scheduleAutosave();
+});
 
 watch(completed, (value) => {
     if (value && !showSuccess.value) {
@@ -848,19 +969,26 @@ function setupFooterObserver() {
 onMounted(async () => {
     await store.fetchOnboarding();
     syncFromStore();
+    window.addEventListener('openmodal', onOnboardingModalOpened);
     window.addEventListener('closemodal', onOrdersModalClosed);
+    window.addEventListener('closemodal', onOnboardingModalClosed);
 
     if (completed.value) {
         showSuccess.value = true;
     }
 
     await nextTick();
+    if (shouldShow.value) {
+        openModal(onboardingModalName);
+    }
     setupFooterObserver();
 });
 
 onBeforeUnmount(() => {
     clearTimeout(autosaveTimer);
+    window.removeEventListener('openmodal', onOnboardingModalOpened);
     window.removeEventListener('closemodal', onOrdersModalClosed);
+    window.removeEventListener('closemodal', onOnboardingModalClosed);
     window.removeEventListener('scroll', updateFooterPin);
     window.removeEventListener('resize', updateFooterPin);
     footerObserver?.disconnect();
@@ -876,16 +1004,33 @@ watch([showSuccess, shouldShow], async () => {
         footerStyle.value = {};
     }
 });
+
+watch(shouldShow, async (value) => {
+    await nextTick();
+
+    if (value) {
+        openModal(onboardingModalName);
+    } else {
+        closeModal(onboardingModalName);
+    }
+});
 </script>
 
 <template>
-    <div
-        v-if="shouldShow"
-        ref="wizardRoot"
-        class="relative mb-6 rounded-3xl border border-stone-200/80 bg-white shadow-xl shadow-indigo-100/40"
-        dir="rtl"
-        :class="{ 'animate-pulse opacity-80': loading && !loaded }"
+    <Modal
+        title="إعداد صفحتك"
+        size="5xl"
+        :name="onboardingModalName"
+        :close="!shouldShow"
+        :escape="!shouldShow"
     >
+        <div
+            v-if="isWidgetVisible"
+            ref="wizardRoot"
+            class="relative rounded-3xl border border-stone-200/80 bg-white shadow-xl shadow-indigo-100/40"
+            dir="rtl"
+            :class="{ 'animate-pulse opacity-80': loading && !loaded }"
+        >
         <div
             v-if="confettiPieces.length"
             class="pointer-events-none absolute inset-0 z-20 overflow-hidden"
@@ -905,37 +1050,21 @@ watch([showSuccess, shouldShow], async () => {
             ></span>
         </div>
 
-        <div class="relative overflow-hidden rounded-t-3xl bg-gradient-to-br from-blue-900 via-purple-800 to-blue-800 px-5 py-6 text-white sm:px-7 sm:py-7">
-            <div class="pointer-events-none absolute -start-8 -top-10 size-40 rounded-full bg-white/10 blur-2xl"></div>
-            <div class="pointer-events-none absolute -end-6 bottom-0 size-32 rounded-full bg-amber-300/20 blur-2xl"></div>
-            <div class="pointer-events-none absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,.35) 0, transparent 40%), radial-gradient(circle at 80% 0%, rgba(255,255,255,.2) 0, transparent 35%);"></div>
-
-            <div class="relative flex items-start justify-between gap-3">
-                <div>
-                    <p class="text-xs font-medium text-white/75">إعداد صفحتك لأول مرة</p>
-                    <h2 class="mt-1 text-xl font-bold sm:text-2xl">
-                        {{ showSuccess ? 'صفحتك جاهزة 🎉' : 'أكمل صفحتك واستقبل طلبات عملائك' }}
-                    </h2>
-                    <p class="mt-1 max-w-md text-sm text-white/80">
-                        {{ showSuccess ? 'شارك رابطك وابدأ استقبال عملائك.' : 'أكمل صفحتك خلال دقائق وإبدأ باستقبال الطلبات فورا' }}
-                    </p>
-                </div>
-                <div
-                    class="relative inline-flex size-14 shrink-0 items-center justify-center rounded-full p-[3px]"
-                    :style="circularProgressStyle"
-                >
-                    <div class="flex size-full flex-col items-center justify-center rounded-full bg-indigo-950/70 text-center backdrop-blur-sm">
-                        <p class="text-sm font-bold leading-none">{{ percentage }}%</p>
-                        <p class="mt-0.5 text-[9px] text-white/70">{{ completedSteps }}/{{ totalSteps }}</p>
-                    </div>
-                </div>
+        <div class="rounded-t-3xl border-b border-stone-200 bg-stone-50 px-5 py-4 sm:px-6">
+            <div class="flex items-center justify-between gap-3">
+                <p class="text-sm font-normal text-stone-600">
+                    أكمل صفحتك خلال دقائق وإبدأ باستقبال الطلبات فورا
+                </p>
+                <p class="shrink-0 text-xs font-medium tabular-nums text-stone-500" dir="ltr">
+                    {{ activeStepNumber }}/{{ totalSteps }} ({{ displayPercentage }}%)
+                </p>
             </div>
 
-            <div class="relative mt-5">
-                <div class="h-2 overflow-hidden rounded-full bg-black/20">
+            <div class="mt-3">
+                <div class="h-1.5 overflow-hidden rounded-full bg-stone-200">
                     <div
-                        class="h-full rounded-full transition-all duration-500"
-                        :style="{ width: `${percentage}%`, background: progressGradient }"
+                        class="h-full rounded-full bg-indigo-400 transition-all duration-500"
+                        :style="{ width: `${displayPercentage}%` }"
                     ></div>
                 </div>
             </div>
@@ -966,7 +1095,6 @@ watch([showSuccess, shouldShow], async () => {
                     </Button>
                     <Button
                         type="button"
-                        variant="outline"
                         class="h-11 rounded-xl"
                         label="زيارة"
                         :href="pageUrl || '#'"
@@ -977,6 +1105,19 @@ watch([showSuccess, shouldShow], async () => {
                         </template>
                     </Button>
                 </div>
+
+                <Button
+                    type="button"
+                    variant="secondary"
+                    class="mt-2 h-12 w-full rounded-xl text-base font-bold"
+                    label="إنهاء الإعداد"
+                    :loading="saving"
+                    @click="dismissWizard"
+                >
+                    <template #icon>
+                        <iconify-icon icon="hugeicons:tick-02" class="text-xl"></iconify-icon>
+                    </template>
+                </Button>
             </div>
 
             <OnboardingPagePreview
@@ -994,101 +1135,57 @@ watch([showSuccess, shouldShow], async () => {
                 :secondary-action-label="secondaryActionLabel"
                 :social-links="previewSocialLinks"
             />
-
-            <div class="space-y-2">
-                <Button
-                    type="button"
-                    class="h-12 w-full rounded-2xl text-base font-bold"
-                    label="ابدأ استقبال عملائك"
-                    :href="pageUrl || '#'"
-                    target="_blank"
-                >
-                    <template #icon>
-                        <iconify-icon icon="hugeicons:rocket-01" class="text-xl"></iconify-icon>
-                    </template>
-                </Button>
-                <Button
-                    type="button"
-                    variant="outline"
-                    class="h-11 w-full rounded-2xl font-semibold"
-                    label="زيارة الصفحة"
-                    :href="pageUrl || '#'"
-                    target="_blank"
-                />
-                <Button
-                    type="button"
-                    variant="secondary"
-                    class="h-12 w-full rounded-2xl text-base font-bold"
-                    label="إنهاء الإعداد"
-                    :loading="saving"
-                    @click="dismissWizard"
-                >
-                    <template #icon>
-                        <iconify-icon icon="hugeicons:tick-02" class="text-xl"></iconify-icon>
-                    </template>
-                </Button>
-            </div>
         </div>
 
         <template v-else>
-            <div class="border-b border-stone-100 px-3 py-3 sm:px-5">
-                <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1">
-                    <button
-                        v-for="(step, index) in steps"
-                        :key="step.key"
-                        type="button"
-                        class="group flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 transition sm:items-start sm:px-2"
-                        :class="[
-                            activeKey === step.key
-                                ? 'bg-indigo-50 text-indigo-700'
-                                : isUnlocked(step)
-                                    ? 'text-stone-600 hover:bg-stone-50'
-                                    : 'cursor-not-allowed text-stone-300',
-                        ]"
-                        :disabled="!isUnlocked(step)"
-                        @click="selectStep(step)"
-                    >
-                        <span class="inline-flex items-center gap-1.5">
-                            <span
-                                class="inline-flex size-7 items-center justify-center rounded-full text-xs font-bold"
+            <div class="border-b border-stone-100 py-3 sm:px-5">
+                <div class="overflow-x-auto pb-1">
+                    <div class="flex w-full items-center justify-between px-2 sm:px-0">
+                        <template v-for="(step, index) in timelineSteps" :key="step.key">
+                            <button
+                                type="button"
+                                class="group flex shrink-0 items-center gap-1 rounded-lg px-1 py-1 text-xs transition sm:gap-1.5 sm:px-1.5"
                                 :class="[
-                                    step.done
-                                        ? 'bg-emerald-500 text-white'
-                                        : activeKey === step.key
-                                            ? 'bg-indigo-600 text-white'
+                                    activeKey === step.key
+                                        ? 'font-bold text-primary-600'
+                                        : step.done
+                                            ? 'text-emerald-600'
                                             : isUnlocked(step)
-                                                ? 'bg-stone-200 text-stone-600'
-                                                : 'bg-stone-100 text-stone-300',
+                                                ? 'text-stone-500 hover:bg-stone-50'
+                                                : 'cursor-not-allowed text-stone-300',
                                 ]"
+                                :disabled="step.milestone || !isUnlocked(step)"
+                                @click="!step.milestone && selectStep(step)"
                             >
-                                <iconify-icon v-if="step.done" icon="hugeicons:tick-02" class="text-sm"></iconify-icon>
-                                <iconify-icon v-else :icon="step.icon || 'hugeicons:circle'" class="text-base sm:hidden"></iconify-icon>
-                                <template v-if="!step.done">
-                                    <span class="hidden sm:inline">{{ index + 1 }}</span>
-                                </template>
-                            </span>
-                            <span class="hidden text-xs font-semibold sm:inline">{{ step.title }}</span>
-                        </span>
-                        <span
-                            v-if="activeKey === step.key"
-                            class="hidden text-[11px] leading-tight text-stone-400 sm:block"
-                        >
-                            {{ step.description }}
-                        </span>
-                    </button>
-                </div>
-
-                <div class="mt-2 sm:hidden">
-                    <p class="text-sm font-bold text-stone-900">{{ activeStep?.title }}</p>
-                    <p class="text-xs text-stone-500">{{ activeStep?.description }}</p>
+                                <span class="hidden w-3 items-center justify-center text-sm leading-none sm:inline-flex">
+                                    {{ activeKey === step.key ? '●' : step.done ? '✓' : '○' }}
+                                </span>
+                                <iconify-icon
+                                    :icon="step.icon || 'hugeicons:circle'"
+                                    class="shrink-0 text-base"
+                                ></iconify-icon>
+                                <span class="text-[10px] tabular-nums sm:hidden">{{ index + 1 }}</span>
+                                <span
+                                    v-if="activeKey === step.key"
+                                    class="whitespace-nowrap text-[11px] sm:hidden"
+                                >
+                                    {{ step.title }}
+                                </span>
+                                <span class="hidden whitespace-nowrap sm:inline">{{ step.title }}</span>
+                            </button>
+                            <span
+                                v-if="index < timelineSteps.length - 1"
+                                class="mx-0.5 h-px min-w-1 flex-1 bg-stone-200 sm:mx-1"
+                            ></span>
+                        </template>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
-                <div class="min-w-0 px-4 pb-4 pt-4 sm:px-6 lg:pb-6">
-                    <div class="mb-4 hidden sm:block">
-                        <h3 class="text-lg font-bold text-stone-900">{{ activeStep?.title }}</h3>
-                        <p class="mt-0.5 text-sm text-stone-500">{{ activeStep?.description }}</p>
+            <div class="grid gap-0 lg:grid-cols-8">
+                <div class="min-w-0 px-4 pb-4 pt-4 sm:px-6 lg:col-span-5 lg:pb-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-stone-500">{{ activeStep?.description }}</p>
                     </div>
 
                     <div v-if="activeKey === 'business'" class="space-y-4">
@@ -1201,6 +1298,7 @@ watch([showSuccess, shouldShow], async () => {
                             :prefix="handlePrefix"
                             placeholder="my-page"
                             dir="ltr"
+                            info-dir="rtl"
                             info="يمكنك تغييره لاحقاً أو ربط دومينك المخصص."
                             :error="errors.handle"
                         />
@@ -1214,7 +1312,7 @@ watch([showSuccess, shouldShow], async () => {
                         />
 
                         <UploadCover
-                            v-model="identity.header_image"
+                            :model-value="identity.header_image"
                             v-model:file="headerFile"
                             v-model:preview="identity.header_image_url"
                             v-model:position="identity.header_image_position"
@@ -1222,23 +1320,24 @@ watch([showSuccess, shouldShow], async () => {
                             label="صورة الهيدر"
                             info="صورة أبلغ من ألف كلمة."
                             :error="errors.header_image || errors.header_image_file"
+                            @update:model-value="onHeaderImageChange"
                         />
                     </div>
 
                     <div v-else-if="activeKey === 'goal'" class="space-y-4">
                         <SearchableSelect
-                            v-model="goal.primary_action_type"
+                            :model-value="goal.primary_action_type"
                             name="primary_action_type"
                             label="الزر الرئيسي *"
                             placeholder="ابحث عن إجراء…"
                             info="اختر أهم زر هنا، يمكنك إضافة باقي الأزرار لاحقاً كأزرار ثانوية أو أزرار للصفحة."
                             :options="primaryActionSelectOptions"
                             :error="errors.primary_action_type"
-                            @update:model-value="scheduleAutosave"
+                            @update:model-value="onPrimaryActionChange"
                         />
 
                         <SearchableSelect
-                            v-model="goal.secondary_action_type"
+                            :model-value="goal.secondary_action_type"
                             name="secondary_action_type"
                             label="الزر الثانوي"
                             placeholder="ابحث عن إجراء ثانوي…"
@@ -1246,7 +1345,7 @@ watch([showSuccess, shouldShow], async () => {
                             clear-label="بدون زر ثانوي"
                             :options="secondaryActionSelectOptions"
                             :error="errors.secondary_action_type"
-                            @update:model-value="scheduleAutosave"
+                            @update:model-value="onSecondaryActionChange"
                         />
                     </div>
 
@@ -1356,7 +1455,7 @@ watch([showSuccess, shouldShow], async () => {
                     </div>
                 </div>
 
-                <div class="w-full border-t border-stone-100 bg-stone-50/80 px-4 py-5 lg:border-s lg:border-t-0 lg:px-5">
+                <div class="hidden w-full border-t border-stone-100 bg-stone-50/80 px-4 py-5 lg:col-span-3 lg:block lg:border-s lg:border-t-0 lg:px-5">
                     <OnboardingPagePreview
                         :name="business.name"
                         :bio="business.bio"
@@ -1375,14 +1474,76 @@ watch([showSuccess, shouldShow], async () => {
                 </div>
             </div>
 
-            <div ref="footerSentinel" class="h-px w-full" aria-hidden="true"></div>
             <div
-                v-if="footerFixed"
-                class="h-[4.25rem]"
+                class="lg:hidden"
+                :class="activeKey === 'identity' ? 'h-[calc(5rem+58vh)]' : 'h-[19rem]'"
                 aria-hidden="true"
             ></div>
             <div
-                class="rounded-b-3xl border-t border-stone-100 bg-white/95 px-4 py-3 backdrop-blur sm:px-6"
+                class="fixed inset-x-4 bottom-0 z-30 overflow-hidden rounded-b-xl border border-stone-200 bg-stone-50/95 shadow-[0_-8px_24px_rgba(0,0,0,0.12)] backdrop-blur lg:hidden"
+            >
+                <div class="flex items-center gap-2 px-4 py-3">
+                    <Button
+                        v-if="canGoBack"
+                        type="button"
+                        variant="outline"
+                        class="h-12 shrink-0 rounded-2xl px-4"
+                        label="رجوع"
+                        @click="goBack"
+                    >
+                        <template #icon>
+                            <iconify-icon icon="solar:alt-arrow-right-bold-duotone" class="text-xl"></iconify-icon>
+                        </template>
+                    </Button>
+                    <Button
+                        type="button"
+                        class="h-12 flex-1 rounded-2xl text-base font-bold"
+                        :disabled="!canContinue"
+                        :loading="saving && !autosaving"
+                        :label="isLastStep ? 'إنهاء إعداد صفحتك' : 'حفظ وإكمال'"
+                        icon-position="end"
+                        @click="continueStep"
+                    >
+                        <template #icon>
+                            <iconify-icon
+                                :icon="isLastStep ? 'solar:check-circle-bold-duotone' : 'solar:arrow-left-bold-duotone'"
+                                class="text-2xl"
+                            ></iconify-icon>
+                        </template>
+                    </Button>
+                </div>
+
+                <div
+                    class="overflow-y-auto border-t border-stone-200 bg-stone-50/80 p-3"
+                    :class="activeKey === 'identity' ? 'max-h-[58vh]' : 'max-h-56'"
+                >
+                    <OnboardingPagePreview
+                        :name="business.name"
+                        :bio="business.bio"
+                        :handle="identity.handle"
+                        :page-url="pageUrl"
+                        :brand-mark="brandMark"
+                        :logo-url="forms.business.logo"
+                        :header-image="identity.header_image"
+                        :header-image-url="identity.header_image_url"
+                        :header-image-position="identity.header_image_position"
+                        :primary-color="identity.primary_color"
+                        :primary-action-label="primaryActionLabel"
+                        :secondary-action-label="secondaryActionLabel"
+                        :social-links="previewSocialLinks"
+                        :compact-cover="activeKey !== 'identity'"
+                    />
+                </div>
+            </div>
+
+            <div ref="footerSentinel" class="h-px w-full" aria-hidden="true"></div>
+            <div
+                v-if="footerFixed"
+                class="hidden h-[4.25rem] lg:block"
+                aria-hidden="true"
+            ></div>
+            <div
+                class="hidden rounded-b-3xl border-t border-stone-200 bg-stone-50/95 px-4 py-3 backdrop-blur sm:px-6 lg:block"
                 :class="footerFixed
                     ? 'fixed bottom-0 z-30 shadow-[0_-8px_24px_rgba(0,0,0,0.08)]'
                     : 'relative'"
@@ -1453,10 +1614,11 @@ watch([showSuccess, shouldShow], async () => {
             </div>
         </Modal>
 
-        <Modal title="توثيق النشاط" size="lg" name="new-onboarding-verification">
-            <CompletionVerification skip-welcome-flow @saved="onVerificationSaved" />
-        </Modal>
-    </div>
+            <Modal title="توثيق النشاط" size="lg" name="new-onboarding-verification">
+                <CompletionVerification skip-welcome-flow @saved="onVerificationSaved" />
+            </Modal>
+        </div>
+    </Modal>
 </template>
 
 <style scoped>

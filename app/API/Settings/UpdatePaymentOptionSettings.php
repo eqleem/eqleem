@@ -71,6 +71,26 @@ class UpdatePaymentOptionSettings
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function getValidationAttributes(): array
+    {
+        $slug = (string) request()->route('slug');
+
+        if ($slug !== 'bank-transfer') {
+            return [];
+        }
+
+        return [
+            'accounts' => 'الحسابات البنكية',
+            'accounts.*.bank_name' => 'اسم الحساب البنكي',
+            'accounts.*.account_name' => 'اسم صاحب الحساب',
+            'accounts.*.iban' => 'رقم الآيبان',
+            'accounts.*.account_number' => 'رقم الحساب',
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
@@ -92,6 +112,10 @@ class UpdatePaymentOptionSettings
 
         $active = (bool) data_get(Setting::paymentMethod($slug), 'active', false);
         $settings = $this->normalizeSettings($slug, $data);
+
+        if ($slug === 'bank-transfer' && $settings['accounts'] === []) {
+            $active = false;
+        }
 
         Setting::savePaymentMethod($slug, $settings, $active);
 

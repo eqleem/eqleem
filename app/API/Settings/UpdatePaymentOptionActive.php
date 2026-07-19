@@ -50,6 +50,13 @@ class UpdatePaymentOptionActive
         }
 
         $saved = Setting::paymentMethod($slug);
+
+        if ($slug === 'bank-transfer' && $active && blank(data_get($saved, 'accounts'))) {
+            throw ValidationException::withMessages([
+                'active' => 'أضف حساباً بنكياً واحداً على الأقل قبل تفعيل التحويل البنكي.',
+            ]);
+        }
+
         $settings = collect($saved)->except('active')->all();
 
         Setting::savePaymentMethod($slug, $settings, $active);

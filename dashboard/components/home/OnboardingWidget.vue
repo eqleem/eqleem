@@ -99,10 +99,7 @@ function onOrdersModalClosed(event) {
 }
 
 function openEditor() {
-    editorStep.value = completed.value
-        ? 'business'
-        : (currentStep.value || 'business');
-    openModal('onboarding-editor');
+    openModal('new-user-onboarding');
 }
 
 function closeOrdersSetupModal(name) {

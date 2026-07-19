@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { closeModal, openModal } from '../../lib/modal.js';
 import { useContentTypesStore } from '../../stores/contentTypes.js';
+
+const permanentContentTypes = new Set(['pages', 'forms']);
 
 /** @type {Record<string, { modal: string }>} */
 const addForms = {
@@ -21,10 +23,22 @@ const addForms = {
 };
 
 const contentTypesStore = useContentTypesStore();
-const { contentTypes } = storeToRefs(contentTypesStore);
+const { contentTypes, catalogEnabled } = storeToRefs(contentTypesStore);
+
+const visibleContentTypes = computed(() => {
+    const enabledContentTypes = new Set([
+        ...catalogEnabled.value,
+        ...permanentContentTypes,
+    ]);
+
+    return contentTypes.value.filter((type) => enabledContentTypes.has(type.slug));
+});
 
 onMounted(() => {
-    contentTypesStore.fetchContentTypes();
+    void Promise.all([
+        contentTypesStore.fetchContentTypes({ force: true }),
+        contentTypesStore.fetchCatalogSections({ force: true }),
+    ]).catch(() => {});
 });
 
 function openAddModal(slug) {
@@ -42,7 +56,7 @@ function openAddModal(slug) {
 <template>
     <div class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2" dir="rtl">
         <button
-            v-for="type in contentTypes"
+            v-for="type in visibleContentTypes"
             :key="type.slug"
             type="button"
             class="flex items-center gap-3 rounded-xl border border-stone-100 px-3 py-3 text-start transition hover:border-stone-200 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"

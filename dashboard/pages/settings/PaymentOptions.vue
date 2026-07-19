@@ -17,9 +17,9 @@ defineProps({
 
 const methods = ref([]);
 const activeSlug = ref(null);
+const modalActive = ref(false);
 const loading = ref(true);
 const saving = ref(false);
-const toggling = ref(null);
 const message = ref(null);
 
 const modalForm = reactive({
@@ -71,7 +71,9 @@ function openMethod(slug) {
     }
 
     activeSlug.value = slug;
+    modalActive.value = Boolean(method.active);
     clearErrors();
+    message.value = null;
 
     const settings = method?.settings ?? {};
     Object.assign(modalForm, {
@@ -114,6 +116,10 @@ function addBankAccount() {
 
 function removeBankAccount(index) {
     modalForm.accounts.splice(index, 1);
+
+    if (modalForm.accounts.length === 0) {
+        modalActive.value = false;
+    }
 }
 
 function settingsBody(slug) {
@@ -172,31 +178,14 @@ function settingsBody(slug) {
     };
 }
 
-async function toggleActive(method) {
-    if (!method.available) {
-        return;
+function applyMethodData(slug, data) {
+    const index = methods.value.findIndex((item) => item.slug === slug);
+
+    if (index !== -1) {
+        methods.value[index] = { ...methods.value[index], ...data };
     }
 
-    const next = !method.active;
-    toggling.value = method.slug;
-    message.value = null;
-
-    try {
-        const payload = await api(`/settings/payment-options/${method.slug}/active`, {
-            method: 'PUT',
-            body: { active: next },
-        });
-        const data = payload?.data ?? payload;
-        const index = methods.value.findIndex((item) => item.slug === method.slug);
-
-        if (index !== -1) {
-            methods.value[index] = { ...methods.value[index], ...data };
-        }
-    } catch (error) {
-        message.value = error instanceof ApiError ? error.message : 'تعذر تحديث حالة الوسيلة.';
-    } finally {
-        toggling.value = null;
-    }
+    modalActive.value = Boolean(data.active);
 }
 
 async function saveMethod() {
@@ -209,23 +198,61 @@ async function saveMethod() {
     clearErrors();
 
     try {
-        const payload = await api(`/settings/payment-options/${activeSlug.value}`, {
-            method: 'PUT',
-            body: settingsBody(activeSlug.value),
-        });
-        const data = payload?.data ?? payload;
-        const index = methods.value.findIndex((item) => item.slug === activeSlug.value);
+        const slug = activeSlug.value;
+        const body = settingsBody(slug);
+        const wantsActive = modalActive.value;
 
-        if (index !== -1) {
-            methods.value[index] = { ...methods.value[index], ...data };
+        if (slug === 'bank-transfer' && wantsActive && body.accounts.length === 0) {
+            modalActive.value = false;
+            errors.active = 'أضف حساباً بنكياً واحداً على الأقل قبل تفعيل التحويل البنكي.';
+
+            return;
         }
 
-        closeModal(`payment-method-${activeSlug.value}`);
+        let payload = await api(`/settings/payment-options/${slug}`, {
+            method: 'PUT',
+            body,
+        });
+
+        let data = payload?.data ?? payload;
+
+        if (slug === 'bank-transfer' && body.accounts.length === 0) {
+            modalActive.value = false;
+        }
+
+        if (wantsActive !== Boolean(data.active) && !(slug === 'bank-transfer' && body.accounts.length === 0)) {
+            try {
+                payload = await api(`/settings/payment-options/${slug}/active`, {
+                    method: 'PUT',
+                    body: { active: wantsActive },
+                });
+                data = payload?.data ?? payload;
+            } catch (activateError) {
+                applyMethodData(slug, data);
+
+                if (activateError instanceof ApiError) {
+                    errors.active = activateError.errors?.active?.[0]
+                        ?? activateError.message
+                        ?? 'تعذر تفعيل وسيلة الدفع.';
+                } else {
+                    errors.active = 'تعذر تفعيل وسيلة الدفع.';
+                }
+
+                return;
+            }
+        }
+
+        applyMethodData(slug, data);
+        closeModal(`payment-method-${slug}`);
         notifySuccess('تم الحفظ.');
     } catch (error) {
         if (error instanceof ApiError) {
             for (const [key, messages] of Object.entries(error.errors ?? {})) {
                 errors[key] = messages?.[0] ?? null;
+            }
+
+            if (errors.active || Object.keys(errors).some((key) => key.startsWith('accounts'))) {
+                return;
             }
         }
 
@@ -305,9 +332,9 @@ onMounted(load);
 
                     <Switch
                         :model-value="method.available ? method.active : false"
-                        :label="method.active ? `تعطيل ${method.name}` : `تفعيل ${method.name}`"
-                        :disabled="!method.available || toggling === method.slug"
-                        @update:model-value="toggleActive(method)"
+                        :label="method.active ? `${method.name} مفعلة` : `${method.name} غير مفعلة`"
+                        class="!cursor-default !opacity-100"
+                        disabled
                     />
                 </div>
             </div>
@@ -321,16 +348,44 @@ onMounted(load);
             :name="`payment-method-${method.slug}`"
         >
             <Form class="!rounded-none" @submit="saveMethod">
+                <div
+                    class="mb-4 rounded-xl border px-3 py-2.5"
+                    :class="errors.active
+                        ? 'border-red-200 bg-red-50/70'
+                        : 'border-stone-100 bg-stone-50'"
+                >
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-stone-700">حالة وسيلة الدفع</p>
+                            <p class="text-xs" :class="modalActive ? 'text-emerald-600' : 'text-stone-400'">
+                                {{ modalActive ? 'مفعلة' : 'غير مفعلة' }}
+                            </p>
+                        </div>
+                        <Switch
+                            :model-value="modalActive"
+                            :label="modalActive ? `تعطيل ${method.name}` : `تفعيل ${method.name}`"
+                            :disabled="saving"
+                            @update:model-value="modalActive = $event; delete errors.active"
+                        />
+                    </div>
+                    <p v-if="errors.active" class="mt-2 text-xs text-red-600">{{ errors.active }}</p>
+                </div>
+
                 <template v-if="method.slug === 'bank-transfer'">
                     <div
                         v-for="(account, index) in modalForm.accounts"
                         :key="index"
                         class="mb-3 space-y-2 rounded-xl border border-stone-100 bg-stone-50/50 p-3"
+                        :class="{
+                            'border-red-200': errors[`accounts.${index}.bank_name`]
+                                || errors[`accounts.${index}.account_name`]
+                                || errors[`accounts.${index}.iban`]
+                                || errors[`accounts.${index}.account_number`],
+                        }"
                     >
                         <div class="flex items-center justify-between">
                             <p class="text-sm font-semibold text-stone-700">حساب بنكي {{ index + 1 }}</p>
                             <button
-                                v-if="modalForm.accounts.length > 1"
                                 type="button"
                                 class="text-xs text-red-500"
                                 @click="removeBankAccount(index)"
@@ -338,11 +393,34 @@ onMounted(load);
                                 حذف
                             </button>
                         </div>
-                        <Input v-model="account.bank_name" :name="`bank_name_${index}`" label="اسم البنك" />
-                        <Input v-model="account.account_name" :name="`account_name_${index}`" label="اسم صاحب الحساب" />
-                        <Input v-model="account.iban" :name="`iban_${index}`" label="IBAN" dir="ltr" />
-                        <Input v-model="account.account_number" :name="`account_number_${index}`" label="رقم الحساب" dir="ltr" />
+                        <Input
+                            v-model="account.bank_name"
+                            :name="`accounts.${index}.bank_name`"
+                            label="اسم البنك"
+                            :error="errors[`accounts.${index}.bank_name`]"
+                        />
+                        <Input
+                            v-model="account.account_name"
+                            :name="`accounts.${index}.account_name`"
+                            label="اسم صاحب الحساب"
+                            :error="errors[`accounts.${index}.account_name`]"
+                        />
+                        <Input
+                            v-model="account.iban"
+                            :name="`accounts.${index}.iban`"
+                            label="IBAN"
+                            dir="ltr"
+                            :error="errors[`accounts.${index}.iban`]"
+                        />
+                        <Input
+                            v-model="account.account_number"
+                            :name="`accounts.${index}.account_number`"
+                            label="رقم الحساب"
+                            dir="ltr"
+                            :error="errors[`accounts.${index}.account_number`]"
+                        />
                     </div>
+                    <p v-if="errors.accounts" class="mb-2 text-xs text-red-600">{{ errors.accounts }}</p>
                     <Button type="button" variant="secondary" label="إضافة حساب" @click="addBankAccount" />
                 </template>
 

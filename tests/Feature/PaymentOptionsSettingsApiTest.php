@@ -53,6 +53,17 @@ test('owner can list and toggle payment options', function () {
         ->assertJsonFragment(['slug' => 'tamara', 'available' => false])
         ->assertJsonFragment(['slug' => 'custom', 'available' => false]);
 
+    setCurrentTenant($tenant);
+    Setting::savePaymentMethod('bank-transfer', [
+        'accounts' => [[
+            'id' => (string) Str::uuid(),
+            'bank_name' => 'الراجحي',
+            'account_name' => 'متجري',
+            'iban' => '',
+            'account_number' => '123456',
+        ]],
+    ], false);
+
     $this->actingAs($user)
         ->putJson('/api/settings/payment-options/bank-transfer/active', [
             'active' => true,
@@ -76,6 +87,78 @@ test('owner cannot activate unavailable payment methods', function () {
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['active']);
+});
+
+test('owner cannot activate bank transfer without a bank account', function () {
+    [$user, $tenant] = createUserWithTenantForPaymentOptionsSettings();
+
+    setCurrentTenant($tenant);
+    Setting::savePaymentMethod('bank-transfer', ['accounts' => []], false);
+
+    $this->actingAs($user)
+        ->putJson('/api/settings/payment-options/bank-transfer/active', [
+            'active' => true,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['active']);
+
+    setCurrentTenant($tenant);
+    expect((bool) data_get(Setting::paymentMethod('bank-transfer'), 'active'))->toBeFalse();
+});
+
+test('removing the last bank account deactivates bank transfer', function () {
+    [$user, $tenant] = createUserWithTenantForPaymentOptionsSettings();
+
+    setCurrentTenant($tenant);
+    Setting::savePaymentMethod('bank-transfer', [
+        'accounts' => [[
+            'id' => (string) Str::uuid(),
+            'bank_name' => 'الراجحي',
+            'account_name' => 'متجري',
+            'iban' => '',
+            'account_number' => '123456',
+        ]],
+    ], true);
+
+    $this->actingAs($user)
+        ->putJson('/api/settings/payment-options/bank-transfer', [
+            'accounts' => [],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.settings.accounts', []);
+
+    setCurrentTenant($tenant);
+    $saved = Setting::paymentMethod('bank-transfer');
+
+    expect((bool) data_get($saved, 'active'))->toBeFalse()
+        ->and(data_get($saved, 'accounts'))->toBe([]);
+});
+
+test('bank transfer validation uses arabic field labels', function () {
+    [$user] = createUserWithTenantForPaymentOptionsSettings();
+
+    $response = $this->actingAs($user)
+        ->putJson('/api/settings/payment-options/bank-transfer', [
+            'accounts' => [
+                [
+                    'bank_name' => '',
+                    'account_name' => '',
+                    'iban' => '',
+                    'account_number' => '',
+                ],
+            ],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'accounts.0.bank_name',
+            'accounts.0.account_name',
+        ]);
+
+    $errors = $response->json('errors');
+
+    expect($errors['accounts.0.bank_name'][0] ?? null)->toBe('اسم الحساب البنكي مطلوب.')
+        ->and($errors['accounts.0.account_name'][0] ?? null)->toBe('اسم صاحب الحساب مطلوب.');
 });
 
 test('owner can update bank transfer settings and preserve active', function () {

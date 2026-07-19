@@ -2,11 +2,11 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import Form from '../ui/Form.vue';
 import Input from '../ui/Input.vue';
-import Select from '../ui/Select.vue';
+import CountrySelect from '../ui/CountrySelect.vue';
 import Radio from '../ui/Radio.vue';
 import Alert from '../ui/Alert.vue';
 import Button from '../ui/Button.vue';
-import { identityTypes as fallbackTypes, verificationCountries as fallbackCountries } from '../../data/settings.js';
+import { identityTypes as fallbackTypes } from '../../data/settings.js';
 import { api, ApiError } from '../../lib/api.js';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { notifyApiSuccess, notifyApiError } from '../../lib/notify.js';
@@ -30,7 +30,6 @@ const form = reactive({
 });
 
 const identityTypes = ref({ ...fallbackTypes });
-const verificationCountries = ref({ ...fallbackCountries });
 const fileInput = ref(null);
 const selectedFile = ref(null);
 
@@ -61,10 +60,6 @@ function applyPayload(payload) {
 
     if (data.types) {
         identityTypes.value = data.types;
-    }
-
-    if (data.countries) {
-        verificationCountries.value = data.countries;
     }
 }
 
@@ -166,11 +161,10 @@ onMounted(load);
                     placeholder="1234567890"
                     :error="errors.identity_number"
                 />
-                <Select
+                <CountrySelect
                     v-model="form.country"
                     name="country"
                     label="الدولة"
-                    :options="verificationCountries"
                     :error="errors.country"
                 />
 

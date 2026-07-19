@@ -6,7 +6,6 @@ use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Http\Resources\VerificationSettingsResource;
 use App\Models\Tenant;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Validation\Rule;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -32,9 +31,9 @@ class UpdateVerificationSettings
             : ['required', 'image', 'max:5024'];
 
         return [
-            'identity_type' => ['required', 'string', Rule::in(['individual', 'llc', 'company', 'charity'])],
+            'identity_type' => ['required', 'string', 'in:individual,llc,company,charity'],
             'identity_number' => ['required', 'string', 'min:8', 'max:255'],
-            'country' => ['nullable', 'string', Rule::in(array_keys(config('verification.countries', [])))],
+            'country' => ['nullable', 'string', 'size:2', 'regex:/^[A-Z]{2}$/'],
             'file' => $fileRules,
         ];
     }

@@ -85,9 +85,13 @@ function clear() {
 }
 
 function onDocumentClick(event) {
-    if (!root.value?.contains(event.target)) {
-        open.value = false;
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+
+    if (root.value && (root.value.contains(event.target) || path.includes(root.value))) {
+        return;
     }
+
+    open.value = false;
 }
 
 function onKeydown(event) {
@@ -157,7 +161,7 @@ onBeforeUnmount(() => {
                         v-if="clearable"
                         role="option"
                         class="cursor-pointer px-3 py-2 text-sm text-stone-500 transition hover:bg-stone-50"
-                        @click="clear"
+                        @mousedown.prevent="clear"
                     >
                         {{ clearLabel }}
                     </li>
@@ -170,7 +174,7 @@ onBeforeUnmount(() => {
                         role="option"
                         class="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition hover:bg-stone-50"
                         :class="option.id === String(modelValue) ? 'bg-primary-50 text-primary-800' : 'text-stone-700'"
-                        @click="select(option)"
+                        @mousedown.prevent="select(option)"
                     >
                         <iconify-icon
                             v-if="option.icon"

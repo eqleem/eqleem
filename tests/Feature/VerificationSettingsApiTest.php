@@ -68,12 +68,13 @@ test('owner can submit verification with identity file', function () {
         ->post('/api/settings/verification', [
             'identity_type' => 'individual',
             'identity_number' => '1234567890',
-            'country' => 'SA',
+            'country' => 'AE',
             'file' => UploadedFile::fake()->image('id.png', 200, 200),
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonPath('data.identity_type', 'individual')
         ->assertJsonPath('data.identity_number', '1234567890')
+        ->assertJsonPath('data.country', 'AE')
         ->assertJsonPath('data.confirm_status', 'pending')
         ->assertJsonPath('data.is_confirmed', false)
         ->assertJsonStructure(['message']);
@@ -81,6 +82,7 @@ test('owner can submit verification with identity file', function () {
     $tenant = $tenant->fresh();
 
     expect(data_get($tenant->meta, 'identity_file'))->not->toBeEmpty()
+        ->and(data_get($tenant->meta, 'country'))->toBe('AE')
         ->and(data_get($tenant->meta, 'confirm_status'))->toBe('pending');
 });
 

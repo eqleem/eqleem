@@ -17,6 +17,8 @@ const props = defineProps({
     primaryActionLabel: { type: String, default: '' },
     secondaryActionLabel: { type: String, default: '' },
     socialLinks: { type: Array, default: () => [] },
+    showCover: { type: Boolean, default: true },
+    compactCover: { type: Boolean, default: false },
 });
 
 const networkIcons = {
@@ -152,8 +154,16 @@ const previewSocials = computed(() => {
             </div>
 
             <div class="relative bg-white">
-                <div class="relative h-40 w-full overflow-hidden sm:h-44" :style="coverStyle">
-                    <div class="absolute start-2 top-2 z-10 flex items-center gap-1.5">
+                <div
+                    v-if="showCover"
+                    class="relative w-full overflow-hidden"
+                    :class="compactCover ? 'h-6' : 'h-40 sm:h-44'"
+                    :style="coverStyle"
+                >
+                    <div
+                        v-if="!compactCover"
+                        class="absolute start-2 top-2 z-10 flex items-center gap-1.5"
+                    >
                         <span
                             v-for="link in previewSocials"
                             :key="link.network"
@@ -214,7 +224,7 @@ const previewSocials = computed(() => {
                 </div>
 
                 <!-- Empty space below CTAs so the fade never covers the action buttons -->
-                <div class="relative h-20 sm:h-24">
+                <div v-if="showCover && !compactCover" class="relative h-20 sm:h-24">
                     <div
                         class="pointer-events-none absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-white via-white/85 to-transparent"
                     ></div>
