@@ -13,12 +13,12 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right size-4 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </a>
                 @else
-                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center h-10 px-5 shrink-0 rounded-full bg-[#111111] text-white text-sm font-normal hover:bg-[#333333] transition-colors">
+                    <a href="{{ route('auth.register-login') }}" wire:navigate class="inline-flex items-center justify-center h-10 px-5 shrink-0 rounded-full bg-[#111111] text-white text-sm font-normal hover:bg-[#333333] transition-colors">
                         <span class="inline md:hidden"> تسجيل </span>
                         <span class="hidden md:inline">أنش صفحتي الآن </span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right size-4 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </a>
-                    <a href="{{ route('auth.login') }}" wire:navigate class="inline-flex items-center justify-center p-2 px-4 rounded-full border border-black/10 text-[#111111] text-sm font-normal hover:bg-black/5 transition-colors w-full sm:w-auto gap-2 group">
+                    <a href="{{ route('auth.register-login') }}" wire:navigate class="inline-flex items-center justify-center p-2 px-4 rounded-full border border-black/10 text-[#111111] text-sm font-normal hover:bg-black/5 transition-colors w-full sm:w-auto gap-2 group">
                         دخول 
                         <iconify-icon noobserver icon="solar:arrow-left-linear" stroke-width="1.5" class=" transition-transform hidden md:block"></iconify-icon>
                     </a>
@@ -64,7 +64,7 @@
                 </p>
 
                 <div class="flex flex-col items-center">
-                    <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
+                    <a href="{{ route('auth.register-login') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
                         أنشئ صفحتي الآن -  مجاناً
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </a>
@@ -163,7 +163,7 @@
                                             'mdi:youtube',
                                             'ri:twitter-x-fill',
                                         ] as $social)
-                                            <a href="{{ route('auth.register') }}" wire:navigate class="size-7 rounded-lg bg-stone-100 text-zinc-500 hover:bg-stone-200 hover:text-zinc-800 flex items-center justify-center transition-colors" aria-label="سوشال">
+                                            <a href="{{ route('auth.register-login') }}" wire:navigate class="size-7 rounded-lg bg-stone-100 text-zinc-500 hover:bg-stone-200 hover:text-zinc-800 flex items-center justify-center transition-colors" aria-label="سوشال">
                                                 <iconify-icon noobserver icon="{{ $social }}" class="text-[13px]"></iconify-icon>
                                             </a>
                                         @endforeach
@@ -172,11 +172,11 @@
 
                                 {{-- CTAs --}}
                                 <div class="mt-3 grid grid-cols-2 gap-1.5 shrink-0">
-                                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] font-semibold py-2.5 px-1.5 shadow-sm shadow-primary-500/20 transition-colors">
+                                    <a href="{{ route('auth.register-login') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] font-semibold py-2.5 px-1.5 shadow-sm shadow-primary-500/20 transition-colors">
                                         <iconify-icon noobserver icon="hugeicons:calendar-03" class="text-xs"></iconify-icon>
                                         حجز موعد
                                     </a>
-                                    <a href="{{ route('auth.register') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold py-2.5 px-1.5 transition-colors">
+                                    <a href="{{ route('auth.register-login') }}" wire:navigate class="inline-flex items-center justify-center gap-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold py-2.5 px-1.5 transition-colors">
                                         <iconify-icon noobserver icon="mdi:whatsapp" class="text-sm"></iconify-icon>
                                         تواصل الآن
                                     </a>
@@ -190,7 +190,7 @@
                                         ['icon' => 'hugeicons:image-01', 'title' => 'أعمالنا', 'desc' => 'معرض مشاريع منفّذة'],
                                         ['icon' => 'hugeicons:package-01', 'title' => 'الباقات', 'desc' => 'باقات تناسب ميزانيتك'],
                                     ] as $link)
-                                        <a href="{{ route('auth.register') }}" wire:navigate class="group flex items-center gap-2 rounded-xl bg-stone-50 hover:bg-stone-100 px-2 py-1.5 transition-colors">
+                                        <a href="{{ route('auth.register-login') }}" wire:navigate class="group flex items-center gap-2 rounded-xl bg-stone-50 hover:bg-stone-100 px-2 py-1.5 transition-colors">
                                             <span class="size-7 rounded-lg bg-primary-500 text-white flex items-center justify-center shrink-0">
                                                 <iconify-icon noobserver icon="{{ $link['icon'] }}" class="text-xs"></iconify-icon>
                                             </span>
@@ -204,7 +204,7 @@
                                 </div>
 
                                 {{-- Soft conversion cue --}}
-                                <a href="{{ route('auth.register') }}" wire:navigate class="mt-1.5 shrink-0 inline-flex items-center justify-center gap-1 text-[9px] font-medium text-primary-600 hover:text-primary-700">
+                                <a href="{{ route('auth.register-login') }}" wire:navigate class="mt-1.5 shrink-0 inline-flex items-center justify-center gap-1 text-[9px] font-medium text-primary-600 hover:text-primary-700">
                                     أنشئ صفحتك مثل هذه مجاناً
                                     <iconify-icon noobserver icon="solar:arrow-left-linear" class="text-[10px]"></iconify-icon>
                                 </a>
@@ -382,7 +382,7 @@
                     </p>
 
                     <div>
-                        <a href="{{ route('auth.register') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
+                        <a href="{{ route('auth.register-login') }}" wire:navigate class="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-gray-900 text-white text-lg font-medium hover:bg-gray-800 transition-all duration-300 group">
                             أنشئ صفحتي الآن -  مجاناً
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 ms-3 group-hover:-translate-x-1 transition-transform -rotate-180" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                         </a>
@@ -1448,7 +1448,7 @@
                   <span>تفعيل بوابات الدفع الرقمية</span>
                 </li>
               </ul>
-              <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
+              <a href="{{ route('auth.register-login') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
                 ابدأ الآن
                 <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
@@ -1512,7 +1512,7 @@
                   <span>إزالة شعار إقليم</span>
                 </li>
               </ul>
-              <a href="{{ route('auth.register') }}" wire:navigate class="group relative mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all duration-300 hover:bg-primary-500">
+              <a href="{{ route('auth.register-login') }}" wire:navigate class="group relative mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-all duration-300 hover:bg-primary-500">
                 اختر انطلاق
                 <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
@@ -1558,7 +1558,7 @@
                   <span>جميع التكاملات Integrations</span>
                 </li>
               </ul>
-              <a href="{{ route('auth.register') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
+              <a href="{{ route('auth.register-login') }}" wire:navigate class="group mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-primary-700">
                 اختر نمو
                 <iconify-icon noobserver icon="hugeicons:arrow-left-02" class="text-lg transition-transform group-hover:-translate-x-0.5"></iconify-icon>
               </a>
@@ -1905,7 +1905,7 @@
             </div>
 
             <div class="mt-10">
-                <a href="{{ route('auth.register') }}" wire:navigate class="group inline-flex items-center justify-center gap-px">
+                <a href="{{ route('auth.register-login') }}" wire:navigate class="group inline-flex items-center justify-center gap-px">
                     <span class="bg-zinc-900 text-white text-base sm:text-lg font-medium inline-flex items-center justify-center px-7 py-3.5 rounded-full transition-all duration-300 group-hover:bg-primary-700">
                         أنشئ صفحتي الآن، مجاناً
                     </span>
@@ -1929,15 +1929,15 @@
                 <ul class="flex flex-wrap justify-center md:justify-start gap-6 lg:gap-8 text-base font-medium text-[#0D0C22]">
                     <li><a href="#pricing" class="hover:text-gray-600 transition-colors">الباقات والأسعار</a></li>
                     <li><a href="#faq" class="hover:text-gray-600 transition-colors">الأسئلة الشائعة</a></li>
-                    <li><a href="{{ route('auth.register') }}" wire:navigate class="hover:text-gray-600 transition-colors">أنشئ صفحتك</a></li>
-                    <li><a href="{{ route('auth.login') }}" wire:navigate class="hover:text-gray-600 transition-colors">تسجيل الدخول</a></li>
+                    <li><a href="{{ route('auth.register-login') }}" wire:navigate class="hover:text-gray-600 transition-colors">أنشئ صفحتك</a></li>
+                    <li><a href="{{ route('auth.register-login') }}" wire:navigate class="hover:text-gray-600 transition-colors">تسجيل الدخول</a></li>
                 </ul>
             </div>
             <div class="flex items-center gap-4 shrink-0 text-[#0D0C22]">
                 <a href="https://x.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="X"><iconify-icon noobserver icon="solar:hashtag-linear" class="w-5 h-5"></iconify-icon></a>
                 <a href="{{ route('home') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="{{ config('app.name') }}"><iconify-icon noobserver icon="solar:global-linear" class="w-5 h-5"></iconify-icon></a>
                 <a href="https://www.instagram.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام"><iconify-icon noobserver icon="solar:camera-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="{{ route('auth.register') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="ابدأ الآن"><iconify-icon noobserver icon="solar:play-circle-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="{{ route('auth.register-login') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="ابدأ الآن"><iconify-icon noobserver icon="solar:play-circle-linear" class="w-5 h-5"></iconify-icon></a>
             </div>
         </div>
         

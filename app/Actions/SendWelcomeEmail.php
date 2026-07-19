@@ -26,8 +26,8 @@ class SendWelcomeEmail
             user: $user,
             tenant: $tenant,
             pageUrl: $tenant->url,
-            dashboardUrl: route('admin.home'),
-            managePageUrl: route('admin.page.home'),
+            dashboardUrl: route('dashboard'),
+            managePageUrl: route('dashboard', ['any' => 'manage']),
         ));
     }
 }

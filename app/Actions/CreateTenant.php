@@ -44,7 +44,11 @@ class CreateTenant
 
         SubscribeTenantToPlan::make()->subscribeToFreePlan($tenant);
 
-        SendWelcomeEmail::run($tenant);
+        try {
+            SendWelcomeEmail::run($tenant);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
 
         app(TenantProfileService::class)->seedFromUser($tenant->fresh());
 

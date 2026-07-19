@@ -41,8 +41,8 @@ it('queues a welcome email after tenant registration', function () {
             && $mail->user->is($user)
             && $mail->tenant->is($tenant)
             && $mail->pageUrl === route('tenant.home', $tenant->handle)
-            && $mail->dashboardUrl === route('admin.home')
-            && $mail->managePageUrl === route('admin.page.home');
+            && $mail->dashboardUrl === route('dashboard')
+            && $mail->managePageUrl === route('dashboard', ['any' => 'manage']);
     });
 });
 

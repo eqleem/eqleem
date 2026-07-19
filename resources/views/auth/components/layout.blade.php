@@ -8,12 +8,7 @@
         </span> --}}
     </a>
 
-    <ui:nav class="mt-12">
-        <ui:button variant="ghost"  href="{{ route('auth.register') }}" icon="hexagon-plus" wire:navigate label="أنشئ صفحة أعمال جديدة" wire:current="!bg-white" />
-        <ui:button variant="ghost"  href="{{ route('auth.login') }}" icon="lock-open" wire:navigate label="تسجيل الدخول" wire:current="!bg-white" />
-    </ui:nav>
-
-    <div class="px-2 lg:px-0 mt-6 w-full mx-auto">
+    <div class="px-2 lg:px-0 mt-12 w-full mx-auto">
         <ui:card class="max-w-lg mx-auto p-4 sm:p-10 py-12 sm:py-16">
             <div class="text-center">
                 @if ($title)

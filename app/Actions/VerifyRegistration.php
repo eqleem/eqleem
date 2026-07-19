@@ -2,16 +2,12 @@
 
 namespace App\Actions;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
-use App\Actions\CreateUser;
-use App\Actions\CreateTenant;
-use App\Models\User;
-use App\Models\Tenant;
 
 class VerifyRegistration
 {
@@ -34,11 +30,11 @@ class VerifyRegistration
             ->where('email', $email)
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             throw new \Exception('رابط التسجيل غير صالح أو منتهي الصلاحية.');
         }
 
-        if (!hash_equals($record->token, hash('sha256', $token))) {
+        if (! hash_equals($record->token, hash('sha256', $token))) {
             throw new \Exception('رابط التسجيل غير صالح.');
         }
 
@@ -53,34 +49,39 @@ class VerifyRegistration
         if ($existingUser) {
             DB::table('registration_tokens')->where('email', $email)->delete();
 
-            // Return existing user and tenant to log them in
-            $existingUser->load('tenant');
-            return ['tenant' => $existingUser->tenant, 'user' => $existingUser];
+            $tenant = $existingUser->currentTenant
+                ?? Tenant::query()->where('user_id', $existingUser->id)->first();
+
+            if ($tenant && (int) $existingUser->current_tenant_id !== (int) $tenant->id) {
+                $existingUser->update(['current_tenant_id' => $tenant->id]);
+            }
+
+            return ['tenant' => $tenant, 'user' => $existingUser->fresh()];
         }
 
         // Generate random password
         $password = Str::random(16);
-        
+
         // Generate username from email prefix (ensure uniqueness)
         $emailPrefix = explode('@', $email)[0];
         do {
-            $username = $emailPrefix . '-' . generateKey(7);
+            $username = $emailPrefix.'-'.generateKey(7);
         } while (User::where('username', $username)->exists());
- 
+
         // Create user
         $user = CreateUser::run([
             'name' => $username, // Use email prefix as name
             'email' => $email,
             'password' => $password,
         ]);
-        
+
         // Update username after creation (since CreateUser doesn't handle it)
         $user->update(['username' => $username]);
 
         if ($user) {
             // Generate tenant handle
             $tenantHandle = $username;
-            
+
             // Create tenant
             $tenant = CreateTenant::run([
                 'tenant_name' => $emailPrefix,
@@ -102,4 +103,3 @@ class VerifyRegistration
         return ['tenant' => $tenant ?? null, 'user' => $user ?? null];
     }
 }
-
