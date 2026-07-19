@@ -22,6 +22,7 @@ const socialDraft = reactive({
 const socialError = ref(null);
 const socialSaving = ref(false);
 const dragSocialId = ref(null);
+const reorderBusyId = ref(null);
 
 const networkOptions = computed(() => {
     if (networks.value.length) {
@@ -111,24 +112,10 @@ function onSocialDragStart(event, id) {
     event.dataTransfer.effectAllowed = 'move';
 }
 
-async function onSocialDrop(event, targetId) {
-    event.preventDefault();
-    const sourceId = dragSocialId.value;
-    dragSocialId.value = null;
-
-    if (!sourceId || sourceId === targetId) {
-        return;
-    }
-
-    const ids = socialLinks.value.map((link) => link.id);
-    const from = ids.indexOf(sourceId);
-    const to = ids.indexOf(targetId);
-    if (from === -1 || to === -1) {
-        return;
-    }
-
-    ids.splice(from, 1);
-    ids.splice(to, 0, sourceId);
+async function reorderSocialLinks(ids, activeId) {
+    const previous = [...socialLinks.value];
+    socialLinks.value = ids.map((id) => previous.find((link) => link.id === id)).filter(Boolean);
+    reorderBusyId.value = activeId;
 
     try {
         const payload = await api('/page/header/social/reorder', {
@@ -137,8 +124,46 @@ async function onSocialDrop(event, targetId) {
         });
         socialLinks.value = Array.isArray(payload?.data) ? payload.data : socialLinks.value;
     } catch {
-        // ignore
+        socialLinks.value = previous;
+    } finally {
+        reorderBusyId.value = null;
     }
+}
+
+async function onSocialDrop(event, targetId) {
+    event.preventDefault();
+    const sourceId = dragSocialId.value;
+    dragSocialId.value = null;
+
+    if (!sourceId || sourceId === targetId || reorderBusyId.value !== null) {
+        return;
+    }
+
+    const ids = socialLinks.value.map((link) => link.id);
+    const from = ids.indexOf(sourceId);
+    const to = ids.indexOf(targetId);
+
+    if (from === -1 || to === -1) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, sourceId);
+    await reorderSocialLinks(ids, sourceId);
+}
+
+async function moveSocialLink(linkId, direction) {
+    const ids = socialLinks.value.map((link) => link.id);
+    const from = ids.indexOf(linkId);
+    const to = from + direction;
+
+    if (from === -1 || to < 0 || to >= ids.length || reorderBusyId.value !== null) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, linkId);
+    await reorderSocialLinks(ids, linkId);
 }
 
 onMounted(() => {
@@ -194,17 +219,42 @@ defineExpose({ load });
 
             <ul v-if="socialLinks.length" class="space-y-1.5">
                 <li
-                    v-for="link in socialLinks"
+                    v-for="(link, index) in socialLinks"
                     :key="link.id"
                     class="group flex items-center gap-2 rounded-lg border border-stone-100 bg-white px-2.5 py-2"
-                    draggable="true"
-                    @dragstart="onSocialDragStart($event, link.id)"
                     @dragover.prevent
                     @drop="onSocialDrop($event, link.id)"
                 >
-                    <button type="button" class="cursor-grab rounded-md p-1 text-stone-300" aria-label="سحب">
+                    <button
+                        type="button"
+                        draggable="true"
+                        class="hidden cursor-grab rounded-md p-1 text-stone-300 sm:block"
+                        aria-label="سحب لإعادة الترتيب"
+                        @dragstart="onSocialDragStart($event, link.id)"
+                        @dragend="dragSocialId = null"
+                    >
                         <Icon name="grip-vertical" class="h-4 w-4" />
                     </button>
+                    <div class="flex shrink-0 items-center sm:hidden">
+                        <button
+                            type="button"
+                            class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                            aria-label="نقل رابط التواصل للأعلى"
+                            :disabled="index === 0 || reorderBusyId !== null"
+                            @click.stop="moveSocialLink(link.id, -1)"
+                        >
+                            <Icon name="arrow-up" class="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                            aria-label="نقل رابط التواصل للأسفل"
+                            :disabled="index === socialLinks.length - 1 || reorderBusyId !== null"
+                            @click.stop="moveSocialLink(link.id, 1)"
+                        >
+                            <Icon name="arrow-down" class="h-4 w-4" />
+                        </button>
+                    </div>
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-medium text-stone-800">{{ networkMeta(link.network)?.label ?? link.network }}</p>
                         <p class="truncate text-xs text-stone-400" dir="ltr">{{ link.url }}</p>

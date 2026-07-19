@@ -25,6 +25,7 @@ const editingId = ref(null);
 const saving = ref(false);
 const errors = ref({});
 const dragId = ref(null);
+const reorderBusyId = ref(null);
 const brandMark = ref(null);
 const form = reactive({
     type: 'vat',
@@ -134,27 +135,10 @@ async function deleteDocument(document) {
     }
 }
 
-async function onDrop(event, targetId) {
-    event.preventDefault();
-    const sourceId = dragId.value;
-    dragId.value = null;
-
-    if (!sourceId || sourceId === targetId) {
-        return;
-    }
-
+async function reorderDocuments(ids, activeId) {
     const previous = [...documents.value];
-    const ids = documents.value.map((document) => document.id);
-    const from = ids.indexOf(sourceId);
-    const to = ids.indexOf(targetId);
-
-    if (from === -1 || to === -1) {
-        return;
-    }
-
-    ids.splice(from, 1);
-    ids.splice(to, 0, sourceId);
     documents.value = ids.map((id) => previous.find((document) => document.id === id)).filter(Boolean);
+    reorderBusyId.value = activeId;
 
     try {
         const payload = await api(`/page/blocks/${props.blockId}/footer-documents/reorder`, {
@@ -167,7 +151,45 @@ async function onDrop(event, targetId) {
     } catch (error) {
         documents.value = previous;
         notifyApiError(error, 'تعذر إعادة ترتيب الوثائق.');
+    } finally {
+        reorderBusyId.value = null;
     }
+}
+
+async function onDrop(event, targetId) {
+    event.preventDefault();
+    const sourceId = dragId.value;
+    dragId.value = null;
+
+    if (!sourceId || sourceId === targetId || reorderBusyId.value !== null) {
+        return;
+    }
+
+    const ids = documents.value.map((document) => document.id);
+    const from = ids.indexOf(sourceId);
+    const to = ids.indexOf(targetId);
+
+    if (from === -1 || to === -1) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, sourceId);
+    await reorderDocuments(ids, sourceId);
+}
+
+async function moveDocument(documentId, direction) {
+    const ids = documents.value.map((document) => document.id);
+    const from = ids.indexOf(documentId);
+    const to = from + direction;
+
+    if (from === -1 || to < 0 || to >= ids.length || reorderBusyId.value !== null) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, documentId);
+    await reorderDocuments(ids, documentId);
 }
 
 onBeforeUnmount(() => {
@@ -191,7 +213,7 @@ defineExpose({ openAdd });
 
         <ul v-else class="space-y-1.5 p-2">
             <li
-                v-for="document in documents"
+                v-for="(document, index) in documents"
                 :key="document.id"
                 class="group flex items-center gap-2 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                 @dragover.prevent
@@ -200,13 +222,34 @@ defineExpose({ openAdd });
                 <button
                     type="button"
                     draggable="true"
-                    class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
+                    class="hidden cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing sm:block"
                     aria-label="سحب لإعادة الترتيب"
                     @dragstart="dragId = document.id"
                     @dragend="dragId = null"
                 >
                     <Icon name="grip-vertical" class="h-4 w-4" />
                 </button>
+
+                <div class="flex shrink-0 items-center sm:hidden">
+                    <button
+                        type="button"
+                        class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                        aria-label="نقل الوثيقة للأعلى"
+                        :disabled="index === 0 || reorderBusyId !== null"
+                        @click.stop="moveDocument(document.id, -1)"
+                    >
+                        <Icon name="arrow-up" class="h-4 w-4" />
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                        aria-label="نقل الوثيقة للأسفل"
+                        :disabled="index === documents.length - 1 || reorderBusyId !== null"
+                        @click.stop="moveDocument(document.id, 1)"
+                    >
+                        <Icon name="arrow-down" class="h-4 w-4" />
+                    </button>
+                </div>
 
                 <button type="button" class="flex min-w-0 flex-1 items-center gap-2 text-start" @click="openEdit(document)">
                     <BrandMark

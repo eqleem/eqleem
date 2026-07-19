@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import ManageLayout from '../../components/page/ManageLayout.vue';
 import ContentShell from '../../components/page/ContentShell.vue';
 import ContentTable from '../../components/page/ContentTable.vue';
+import ReviewsTable from '../../components/page/ReviewsTable.vue';
 import NotFound from '../NotFound.vue';
 import { contentTypeBySlug } from '../../data/page.js';
 
@@ -14,7 +15,8 @@ const contentType = computed(() => contentTypeBySlug(route.params.type));
 <template>
     <ManageLayout v-if="contentType">
         <ContentShell :content-type="contentType">
-            <ContentTable :key="contentType.slug" :content-type="contentType" />
+            <ReviewsTable v-if="contentType.slug === 'reviews'" />
+            <ContentTable v-else :key="contentType.slug" :content-type="contentType" />
         </ContentShell>
     </ManageLayout>
     <NotFound v-else />

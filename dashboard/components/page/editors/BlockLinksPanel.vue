@@ -33,6 +33,7 @@ const linkEditor = ref(null);
 const linkEditorKey = ref(0);
 const saving = ref(false);
 const dragId = ref(null);
+const reorderBusyId = ref(null);
 
 watch(() => props.editor, (value) => {
     links.value = [...(value.links ?? [])];
@@ -137,24 +138,10 @@ async function deleteLink(id) {
     }
 }
 
-async function onDrop(event, targetId) {
-    event.preventDefault();
-    const sourceId = dragId.value;
-    dragId.value = null;
-    if (!sourceId || sourceId === targetId) {
-        return;
-    }
-
-    const ids = links.value.map((link) => link.id);
-    const from = ids.indexOf(sourceId);
-    const to = ids.indexOf(targetId);
-    if (from === -1 || to === -1) {
-        return;
-    }
-
-    ids.splice(from, 1);
-    ids.splice(to, 0, sourceId);
-    links.value = ids.map((id) => links.value.find((link) => link.id === id)).filter(Boolean);
+async function reorderLinks(ids, activeId) {
+    const previous = [...links.value];
+    links.value = ids.map((id) => previous.find((link) => link.id === id)).filter(Boolean);
+    reorderBusyId.value = activeId;
 
     try {
         await api(`/page/blocks/${props.blockId}/links/reorder`, {
@@ -163,8 +150,46 @@ async function onDrop(event, targetId) {
         });
         emit('updated', { editor: { ...props.editor, links: links.value } });
     } catch {
-        // ignore
+        links.value = previous;
+    } finally {
+        reorderBusyId.value = null;
     }
+}
+
+async function onDrop(event, targetId) {
+    event.preventDefault();
+    const sourceId = dragId.value;
+    dragId.value = null;
+
+    if (!sourceId || sourceId === targetId || reorderBusyId.value !== null) {
+        return;
+    }
+
+    const ids = links.value.map((link) => link.id);
+    const from = ids.indexOf(sourceId);
+    const to = ids.indexOf(targetId);
+
+    if (from === -1 || to === -1) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, sourceId);
+    await reorderLinks(ids, sourceId);
+}
+
+async function moveLink(linkId, direction) {
+    const ids = links.value.map((link) => link.id);
+    const from = ids.indexOf(linkId);
+    const to = from + direction;
+
+    if (from === -1 || to < 0 || to >= ids.length || reorderBusyId.value !== null) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, linkId);
+    await reorderLinks(ids, linkId);
 }
 
 async function saveSettings() {
@@ -242,13 +267,33 @@ defineExpose({ openAdd });
                 <button
                     type="button"
                     draggable="true"
-                    class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
+                    class="hidden cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing sm:block"
                     aria-label="سحب لإعادة الترتيب"
                     @dragstart="dragId = link.id"
                     @dragend="dragId = null"
                 >
                     <Icon name="grip-vertical" class="h-4 w-4" />
                 </button>
+                <div class="flex shrink-0 items-center sm:hidden">
+                    <button
+                        type="button"
+                        class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                        aria-label="نقل الرابط للأعلى"
+                        :disabled="index === 0 || reorderBusyId !== null"
+                        @click.stop="moveLink(link.id, -1)"
+                    >
+                        <Icon name="arrow-up" class="h-4 w-4" />
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                        aria-label="نقل الرابط للأسفل"
+                        :disabled="index === links.length - 1 || reorderBusyId !== null"
+                        @click.stop="moveLink(link.id, 1)"
+                    >
+                        <Icon name="arrow-down" class="h-4 w-4" />
+                    </button>
+                </div>
                 <button type="button" class="flex min-w-0 flex-1 cursor-pointer flex-col items-start text-start hover:text-primary-600" @click="openEdit(link)">
                     <span class="flex min-w-0 max-w-full items-center gap-2">
                         <span class="truncate text-sm font-medium text-stone-800">{{ link.label }}</span>

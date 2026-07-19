@@ -15,7 +15,14 @@ defineEmits(['update:modelValue']);
 </script>
 
 <template>
-    <Field :name="name" :label="label" :info="info" :label-width="labelWidth" :error="error">
+    <Field
+        :name="name"
+        :label="label"
+        :info="info"
+        :label-width="labelWidth"
+        :error="error"
+        class="flex justify-between [&>div]:w-auto"
+    >
         <label :for="`toggle-${name}`" class="inline-flex cursor-pointer items-center">
             <input
                 :id="`toggle-${name}`"

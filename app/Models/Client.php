@@ -62,6 +62,11 @@ class Client extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     /**
      * Tenant-scoped profile data from the tenantables pivot.
      *

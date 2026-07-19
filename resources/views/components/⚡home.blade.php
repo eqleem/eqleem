@@ -29,7 +29,7 @@
     </nav>
 
     {{-- Showcase hero: centered headline + phone + floating capabilities --}}
-    <section class="relative w-full overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-20 lg:pt-36 lg:pb-24"  >
+    <section class="relative w-full overflow-hidden pt-28 xpb-16x sm:pt-32x sm:pb-20x lg:pt-36x lg:pb-24x"  >
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
             <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-[min(90vw,42rem)] h-[min(90vw,42rem)] rounded-full bg-[radial-gradient(circle_at_center,rgba(227,95,38,0.08)_0%,transparent_68%)]"></div>
             <div class="absolute bottom-[8%] right-[12%] size-56 rounded-full bg-orange-200/20 blur-3xl"></div>
@@ -107,8 +107,65 @@
             </div>
         </div>
 
+
+        {{-- Baseline gallery: equal-size shots revealed by different amounts --}}
+        <div class="hero-shots relative bg-blackx mx-auto px-4 sm:px-6 flex items-end justify-center gap-2.5 sm:gap-4">
+            @foreach ([
+                ['title' => 'متجر أزياء',    'visible' => '.45', 'img' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'مقهى مختص',    'visible' => '.65', 'img' => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'صالون عناية',  'visible' => '.90', 'img' => 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'مطعم برجر',    'visible' => '.55', 'img' => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'استوديو تصوير', 'visible' => '.75', 'img' => 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'مساحة عمل',    'visible' => '.30', 'img' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=640&auto=format&fit=crop'],
+                ['title' => 'حلويات فاخرة', 'visible' => '.60', 'img' => 'https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=640&auto=format&fit=crop'],
+            ] as $i => $shot)
+                <figure class="hero-shot group/shot relative min-w-0 flex-1 {{ $i >= 4 ? 'hidden md:block' : 'block' }}" style="--visible: {{ $shot['visible'] }}">
+                    <figcaption class="hero-shot-caption absolute inset-x-0 ms-1 flex items-end gap-1 text-[10px] sm:text-xs font-medium text-stone-500 transition-all duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/shot:text-stone-800">
+                        <span class="truncate">{{ $shot['title'] }}</span>
+                        <iconify-icon noobserver icon="arcticons:emoji-arrow-pointing-rightwards-then-curving-downwards" class="shrink-0 text-base sm:text-lg -scale-x-100 {{ $i % 2 === 0 ? '-rotate-6' : 'rotate-3' }} translate-y-1 text-stone-400 transition-colors duration-300 group-hover/shot:text-[#C94309]" aria-hidden="true"></iconify-icon>
+                    </figcaption>
+                    <div class="hero-shot-frame absolute inset-x-0 bottom-0 overflow-hidden rounded-t-2xl sm:rounded-t-3xl bg-stone-300 ring-1 ring-black/5 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.4)]">
+                        <img
+                            src="{{ $shot['img'] }}"
+                            alt="{{ $shot['title'] }}"
+                            loading="lazy"
+                            decoding="async"
+                            class="absolute inset-x-0 bottom-0 w-full object-cover"
+                        />
+                    </div>
+                </figure>
+            @endforeach
+        </div>
+
+        <style>
+            .hero-shots { --shot-height: 22rem; --caption-gap: 1.75rem; }
+            @media (max-width: 767px) {
+                .hero-shots { --shot-height: 15rem; --caption-gap: 1.5rem; }
+            }
+            /* Each shot reserves the full height so growing the frame never shifts layout */
+            .hero-shot {
+                height: calc(var(--shot-height) + var(--caption-gap));
+            }
+            .hero-shot-frame {
+                height: calc(var(--shot-height) * var(--visible));
+                transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .hero-shot-frame img {
+                height: var(--shot-height);
+            }
+            .hero-shot-caption {
+                bottom: calc(var(--shot-height) * var(--visible));
+            }
+            .hero-shots .hero-shot:hover .hero-shot-frame {
+                height: var(--shot-height);
+            }
+            .hero-shots .hero-shot:hover .hero-shot-caption {
+                bottom: var(--shot-height);
+            }
+        </style>
+
         {{-- Stage: phone + orbiting capability cards --}}
-        <div class="relative mx-auto mt-12 sm:mt-14 lg:mt-16 w-full max-w-5xl px-2 sm:px-6 min-h-[34rem] sm:min-h-[38rem] lg:min-h-[42rem]">
+        <div hidden class="relative mx-auto xmt-12 sm:mt-14x lg:mt-16x w-full max-w-5xl px-2 sm:px-6 min-h-[34rem] sm:min-h-[38rem] lg:min-h-[42rem]">
             {{-- Soft ground glow under phone --}}
             <div class="absolute left-1/2 bottom-[6%] -translate-x-1/2 w-[70%] max-w-md h-24 rounded-full bg-stone-400/15 blur-2xl pointer-events-none" aria-hidden="true"></div>
 

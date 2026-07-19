@@ -143,6 +143,7 @@ const linkClass = {
         </RouterLink>
 
         <a :href="homeUrl" :class="linkClass.compact" @click="onNavigate">
+            <img :src="'/assets/images/logo-shape-black.webp'" alt="" class="size-5 shrink-0 object-contain">
             {{ appName }}
         </a>
 

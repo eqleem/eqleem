@@ -195,6 +195,7 @@ use App\API\Portfolio\UpdatePortfolioProject;
 use App\API\Portfolio\UpdatePortfolioSettings;
 use App\API\Portfolio\UploadPortfolioEditorImage;
 use App\API\Portfolio\UploadPortfolioImage;
+use App\API\Reviews\ListReviews;
 use App\API\Services\CreateService;
 use App\API\Services\CreateServiceCalendar;
 use App\API\Services\CreateServiceCategory;
@@ -404,6 +405,9 @@ Route::get('/form-submissions', ListFormSubmissions::class)
 Route::get('/form-submissions/{id}', ShowFormSubmission::class)
     ->name('api.form-submissions.show')
     ->whereNumber('id');
+
+Route::get('/reviews', ListReviews::class)
+    ->name('api.reviews.index');
 
 Route::get('/clients', ListClients::class)
     ->name('api.clients.index');

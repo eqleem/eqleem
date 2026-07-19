@@ -162,6 +162,9 @@ const routes = [
     { path: '/manage/pages/faq/:id', name: 'pages-faq-detail', component: PagesFaqDetail },
     { path: '/manage/pages/detail/:id', name: 'pages-detail', component: PagesDetail },
 
+    // Reviews has no categories; keep the old URL from landing on mock taxonomy UI.
+    { path: '/manage/reviews/categories', redirect: { name: 'manage-index', params: { type: 'reviews' } } },
+
     // Generic content-type stubs (other types until they get dedicated pages).
     { path: '/manage/:type', name: 'manage-index', component: ContentIndex },
     { path: '/manage/:type/detail/:id', name: 'manage-detail', component: ContentDetail },

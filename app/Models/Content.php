@@ -117,6 +117,11 @@ class Content extends Model implements HasMedia
         return $this->hasMany(FormSubmission::class, 'content_id');
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

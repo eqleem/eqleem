@@ -28,11 +28,15 @@ const section = computed(() => {
 const subTabs = computed(() => {
     const slug = props.contentType.slug;
 
-    return [
-        { key: 'index', label: 'العناصر', to: `/manage/${slug}`, icon: 'hugeicons:menu-01' },
+    const tabs = [
+        { key: 'index', label: slug === 'reviews' ? 'التقييمات' : 'العناصر', to: `/manage/${slug}`, icon: 'hugeicons:menu-01' },
         { key: 'categories', label: 'التصنيفات', to: `/manage/${slug}/categories`, icon: 'hugeicons:folder-02' },
         { key: 'settings', label: 'الإعدادات', to: `/manage/${slug}/settings`, icon: 'hugeicons:paint-board' },
     ];
+
+    return slug === 'reviews'
+        ? tabs.filter((tab) => tab.key !== 'categories')
+        : tabs;
 });
 </script>
 

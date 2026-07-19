@@ -40,6 +40,7 @@ const {
 
 const dragId = ref(null);
 const busyId = ref(null);
+const reorderBusyId = ref(null);
 const editTitle = ref('إعدادات البلوك');
 const ctaLinksPanel = ref(null);
 const footerDocumentsPanel = ref(null);
@@ -243,6 +244,28 @@ async function onDrop(event, targetId) {
     }
 }
 
+async function moveBlock(blockId, direction) {
+    const ids = userBlocks.value.map((block) => block.id);
+    const from = ids.indexOf(blockId);
+    const to = from + direction;
+
+    if (from === -1 || to < 0 || to >= ids.length || reorderBusyId.value !== null) {
+        return;
+    }
+
+    ids.splice(from, 1);
+    ids.splice(to, 0, blockId);
+    reorderBusyId.value = blockId;
+
+    try {
+        await store.reorderBlocks(ids);
+    } catch {
+        // error surfaced via store
+    } finally {
+        reorderBusyId.value = null;
+    }
+}
+
 function contentManageTo(block) {
     const url = block.content_manage_url;
 
@@ -408,7 +431,7 @@ function contentManageTo(block) {
                 <div id="page-sections-list" v-show="isSectionExpanded('page-sections')" class="relative min-h-20">
                     <ul class="space-y-1.5 p-2">
                         <li
-                            v-for="block in userBlocks"
+                            v-for="(block, index) in userBlocks"
                             :key="block.id"
                             class="group flex items-center lg:gap-2 gap-1 rounded-lg border border-transparent bg-white px-2 py-2 transition hover:border-stone-200"
                             :class="{ 'opacity-50': !block.active }"
@@ -417,7 +440,7 @@ function contentManageTo(block) {
                         >
                             <div
                                 draggable="true"
-                                class="cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing"
+                                class="hidden cursor-grab rounded-md p-1 text-stone-300 transition hover:bg-stone-100 hover:text-stone-500 active:cursor-grabbing sm:block"
                                 role="button"
                                 tabindex="0"
                                 aria-label="سحب لإعادة الترتيب"
@@ -425,6 +448,27 @@ function contentManageTo(block) {
                                 @dragend="dragId = null"
                             >
                                 <Icon name="grip-vertical" class="h-4 w-4" />
+                            </div>
+
+                            <div class="flex shrink-0 items-center sm:hidden">
+                                <button
+                                    type="button"
+                                    class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                                    aria-label="نقل القسم للأعلى"
+                                    :disabled="index === 0 || reorderBusyId !== null"
+                                    @click.stop="moveBlock(block.id, -1)"
+                                >
+                                    <Icon name="arrow-up" class="h-4 w-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    class="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-25"
+                                    aria-label="نقل القسم للأسفل"
+                                    :disabled="index === userBlocks.length - 1 || reorderBusyId !== null"
+                                    @click.stop="moveBlock(block.id, 1)"
+                                >
+                                    <Icon name="arrow-down" class="h-4 w-4" />
+                                </button>
                             </div>
 
                             <div class="hidden shrink-0 sm:block">

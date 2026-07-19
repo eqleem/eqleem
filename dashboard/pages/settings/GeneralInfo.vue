@@ -5,6 +5,7 @@ import MainBox from '../../components/ui/MainBox.vue';
 import Form from '../../components/ui/Form.vue';
 import Input from '../../components/ui/Input.vue';
 import Select from '../../components/ui/Select.vue';
+import CountrySelect from '../../components/ui/CountrySelect.vue';
 import Button from '../../components/ui/Button.vue';
 import Modal from '../../components/ui/Modal.vue';
 import BrandMarkField from '../../components/ui/BrandMarkField.vue';
@@ -353,7 +354,7 @@ onMounted(load);
                             <Input v-model="contact.phone" name="phone" label="رقم الجوال للاتصال" placeholder="05xxxxxxxx" dir="ltr" :error="errors.phone" />
                             <Input v-model="contact.email" name="email" label="البريد الإلكتروني" placeholder="hello@example.com" dir="ltr" :error="errors.email" />
                             <Input v-model="contact.whatsapp" name="whatsapp" label="جوال الواتساب" placeholder="966500000000" dir="ltr" :error="errors.whatsapp" />
-                            <Input v-model="contact.country" name="country" label="الدولة" placeholder="السعودية" :error="errors.country" />
+                            <CountrySelect v-model="contact.country" name="country" label="الدولة" :error="errors.country" />
                             <Input v-model="contact.city" name="city" label="المدينة" placeholder="الرياض" :error="errors.city" />
 
                             <template #footer>

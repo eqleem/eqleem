@@ -26,7 +26,7 @@ const error = computed(() => localError.value || catalogError.value);
 const sectionLabels = {
     sell: 'البيع',
     content: 'المحتوى والنشر',
-    trust: 'الثقة والمصداقية',
+    trust: 'الثقة',
 };
 const sectionOrder = ['sell', 'content', 'trust'];
 const groupedOptions = computed(() => {

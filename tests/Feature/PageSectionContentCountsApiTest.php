@@ -3,6 +3,7 @@
 use App\Actions\CreateDefaultBlocks;
 use App\Models\Block;
 use App\Models\Content;
+use App\Models\Review;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -134,4 +135,32 @@ test('section content counts are tenant isolated and include zero values', funct
         ->assertJsonPath('data.'.$blogBlock->id.'.label', 'تدوينات')
         ->assertJsonPath('data.'.$coursesBlock->id.'.count', 0)
         ->assertJsonPath('data.'.$coursesBlock->id.'.label', 'دورات');
+});
+
+test('reviews section content counts use the reviews table', function () {
+    [$user, $tenant] = createTenantForSectionContentCounts();
+    $reviewsBlock = createCountedSectionBlock($tenant, 'reviews', 93);
+    $content = createCountedContent($tenant, 'product');
+
+    Review::query()->create([
+        'tenant_id' => $tenant->id,
+        'content_id' => $content->id,
+        'name' => 'زائر',
+        'rating' => 5,
+        'published' => true,
+    ]);
+
+    Review::query()->create([
+        'tenant_id' => $tenant->id,
+        'content_id' => $content->id,
+        'name' => 'عميل',
+        'rating' => 4,
+        'published' => false,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/page/section-content-counts')
+        ->assertSuccessful()
+        ->assertJsonPath('data.'.$reviewsBlock->id.'.count', 2)
+        ->assertJsonPath('data.'.$reviewsBlock->id.'.label', 'تقييمات');
 });

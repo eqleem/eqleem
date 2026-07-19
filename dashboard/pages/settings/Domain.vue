@@ -174,6 +174,7 @@ async function submitCustomDomain() {
                     label="الدومين المخصص"
                     placeholder="shop.example.com"
                     dir="ltr"
+                    info-dir="rtl"
                     info="أدخل الدومين بدون https:// — مثل shop.example.com أو www.example.com"
                     :error="errors.custom_domain"
                 />

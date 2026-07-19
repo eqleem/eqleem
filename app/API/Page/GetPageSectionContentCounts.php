@@ -5,10 +5,12 @@ namespace App\API\Page;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\Models\Block;
 use App\Models\Content;
+use App\Models\Review;
 use App\Models\Tenant;
 use App\Support\ContentType;
 use App\Support\ContentTypeRegistry;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -30,6 +32,7 @@ class GetPageSectionContentCounts
 
                 return [
                     $contentType->slug => [
+                        'slug' => $contentType->slug,
                         'model_type' => $contentType->modelType,
                         'singular' => (string) ($config['count_singular'] ?? $contentType->name),
                         'plural' => (string) ($config['count_plural'] ?? $contentType->name),
@@ -61,18 +64,11 @@ class GetPageSectionContentCounts
             return [];
         }
 
-        $countsByType = Content::query()
-            ->whereIn('type', $sections->pluck('model_type')->unique()->all())
-            ->where('active', true)
-            ->whereNull('block_id')
-            ->whereNull('parent_id')
-            ->selectRaw('type, COUNT(*) as aggregate')
-            ->groupBy('type')
-            ->pluck('aggregate', 'type');
+        $countsBySlug = $this->countsBySlug($sections);
 
         return $sections
-            ->mapWithKeys(function (array $section) use ($countsByType): array {
-                $count = (int) ($countsByType[$section['model_type']] ?? 0);
+            ->mapWithKeys(function (array $section) use ($countsBySlug): array {
+                $count = (int) ($countsBySlug[$section['slug']] ?? 0);
 
                 return [
                     $section['block_id'] => [
@@ -82,6 +78,40 @@ class GetPageSectionContentCounts
                 ];
             })
             ->all();
+    }
+
+    /**
+     * @param  Collection<int, array{block_id: int, slug: string, model_type: string, singular: string, plural: string}>  $sections
+     * @return array<string, int>
+     */
+    private function countsBySlug(Collection $sections): array
+    {
+        $counts = [];
+
+        $contentSections = $sections->reject(
+            fn (array $section): bool => $section['slug'] === 'reviews'
+        );
+
+        if ($contentSections->isNotEmpty()) {
+            $countsByType = Content::query()
+                ->whereIn('type', $contentSections->pluck('model_type')->unique()->all())
+                ->where('active', true)
+                ->whereNull('block_id')
+                ->whereNull('parent_id')
+                ->selectRaw('type, COUNT(*) as aggregate')
+                ->groupBy('type')
+                ->pluck('aggregate', 'type');
+
+            foreach ($contentSections as $section) {
+                $counts[$section['slug']] = (int) ($countsByType[$section['model_type']] ?? 0);
+            }
+        }
+
+        if ($sections->contains(fn (array $section): bool => $section['slug'] === 'reviews')) {
+            $counts['reviews'] = Review::query()->count();
+        }
+
+        return $counts;
     }
 
     /**

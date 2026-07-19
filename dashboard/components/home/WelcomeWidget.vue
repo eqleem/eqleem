@@ -105,8 +105,6 @@ function shareLink(platform) {
                 class="bg-black/10 p-5 sm:p-6"
                 :class="isReady ? '' : 'border-t border-white/10 lg:w-96 lg:border-s lg:border-t-0'"
             >
-                <p class="mb-2 text-xs font-medium text-primary-100">رابط صفحتك</p>
-
                 <div class="flex items-center gap-2 rounded-xl bg-white/10 p-2 ring-1 ring-white/10">
                     <input
                         ref="shareInput"

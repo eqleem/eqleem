@@ -141,7 +141,7 @@
                 class="absolute top-0 bottom-0 right-0 w-72 max-w-[85vw] bg-stone-100 shadow-2xl overflow-y-auto rounded-e-2xl p-3 space-y-0.5"
             >
                 <div class="flex items-center justify-between mb-2 px-1">
-                    <p class="text-sm font-medium text-gray-700">التبويبات</p>
+                    {{-- <p class="text-sm font-medium text-gray-700">التبويبات</p> --}}
                     <button
                         type="button"
                         x-on:click="mobileNavOpen = false"

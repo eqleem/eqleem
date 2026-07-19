@@ -18,8 +18,8 @@ const { tabs } = storeToRefs(contentTypesStore);
 const sectionLabels = {
     sell: 'البيع',
     content: 'المحتوى',
-    permanent: '. . .',
-    trust: 'الثقة والمصداقية',
+    permanent: ' ',
+    trust: 'الثقة',
 };
 const sectionOrder = ['sell', 'content', 'trust'];
 const permanentContentTypes = new Set(['pages', 'forms']);
@@ -171,9 +171,9 @@ onBeforeUnmount(() => {
                 role="dialog"
                 aria-modal="true"
                 aria-label="قائمة التبويبات"
-            >
+            > 
                 <div class="mb-2 flex items-center justify-between px-1">
-                    <p class="text-sm font-medium text-stone-700">التبويبات</p>
+                    <p class="text-sm font-medium text-stone-700"> </p>
                     <button
                         type="button"
                         class="rounded-lg p-1.5 text-stone-500 transition hover:bg-white/70 hover:text-stone-800"
