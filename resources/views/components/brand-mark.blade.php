@@ -30,11 +30,11 @@
 @endphp
 
 @if ($type === 'emoji' && filled($value))
-    <span {{ $attributes->class([$class, 'inline-flex items-center justify-center leading-none select-none']) }} style="font-size: {{ $iconFontSize }};" role="img" aria-label="{{ $alt }}">
+    <span {{ $attributes->class([$class, 'flex items-center justify-center leading-none select-none']) }} style="font-size: {{ $iconFontSize }};" role="img" aria-label="{{ $alt }}">
         {{ $value }}
     </span>
 @elseif ($type === 'icon' && filled($value))
-    <span {{ $attributes->class([$class, 'inline-flex items-center justify-center']) }} role="img" aria-label="{{ $alt }}">
+    <span {{ $attributes->class([$class, 'flex items-center justify-center']) }} role="img" aria-label="{{ $alt }}">
         <iconify-icon icon="{{ $value }}" style="{{ $iconStyle }}" stroke-width="1.5"></iconify-icon>
     </span>
 @elseif (filled($imageUrl))

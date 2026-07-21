@@ -5,7 +5,7 @@
     x-on:click="loading = true"
     x-on:livewire:navigated.window="loading = false"
     x-bind:aria-busy="loading"
-    class="relative bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
+    class="relative bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl  flex items-center gap-x-2 text-base"
     aria-label="{{ $count > 0 ? "سلة المشتريات، {$count} عناصر" : 'سلة المشتريات' }}"
 >
     <span class="sr-only">{{ $count > 0 ? "سلة المشتريات، {$count} عناصر" : 'سلة المشتريات' }}</span>

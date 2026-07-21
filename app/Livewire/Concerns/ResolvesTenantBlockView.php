@@ -18,9 +18,9 @@ trait ResolvesTenantBlockView
         return [$this->blockType()];
     }
 
-    protected function resolveSingletonBlock(): ?Block
+    protected function resolveSingletonBlock(string $type = null): ?Block
     {
-        return app(TenantPageBlocks::class)->singleton($this->blockType())
+        return app(TenantPageBlocks::class)->singleton($type ?? $this->blockType())
             ?? Block::findSingleton($this->blockType());
     }
 

@@ -1,10 +1,10 @@
 <div>
-    <nav class="">
-        <div class="absolute md:top-4 top-2 md:start-0 start-1 flex items-center gap-2">
+    <nav class="grid grid-cols-3 w-full py-2 px-2 lg:px-0">
+        <div class="flex items-center justify-start gap-x-2">
             @if ($showShareButton)
                 <button
                     type="button"
-                    class=" bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 rounded-xl text-black/50"
+                    class="backdrop-blur-md p-2 rounded-xl bg-black/20 hover:bg-black/30 text-white/80 hover:text-white"
                     x-on:click="$dispatch('open-modal', { name: 'share-page-modal' })"
                     aria-label="مشاركة الصفحة"
                 >
@@ -27,7 +27,7 @@
             @endif --}}
         </div>
 
-        <div class="flex items-center justify-center w-full h-14">
+        <div class="flex items-center justify-center w-full h-14x">
             @if ($showBackButtonLink)
                 <a
                     href="{{ $homeUrl }}"
@@ -37,7 +37,7 @@
                     x-on:click="loading = true"
                     x-on:livewire:navigated.window="loading = false"
                     x-bind:aria-busy="loading"
-                    class="h-11 w-11 mt-3 rounded-full bg-black/10 hover:bg-white p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden"
+                    class="h-10 w-10 rounded-full bg-black/10 hover:bg-black/20 text-black/70 hover:text-black p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden"
                     aria-label="الصفحة الرئيسية"
                 >
                     <span class="sr-only">الصفحة الرئيسية</span>
@@ -49,7 +49,7 @@
                             :mark="$topNavBrandMark"
                             :url="tenant('logo')"
                             alt="{{ tenant('name') }}"
-                            :icon-size="($topNavBrandMark['type'] ?? '') === 'emoji' ? '1.35rem' : '1.75rem'"
+                            :icon-size="($topNavBrandMark['type'] ?? '') === 'emoji' ? '1.7rem' : '1.75rem'"
                             class="w-full h-full object-cover rounded-full transition-transform duration-500"
                         />
                     </span>
@@ -65,7 +65,7 @@
             @endif
         </div>
 
-        <div class="absolute md:top-4 top-3 md:end-0 end-1 flex items-center gap-2">
+        <div class="shrink-0 flex items-end justify-end gap-x-2 w-full">
             @if ($showPagesMenu)
                 <livewire:tenant.blocks.pages-menu lazy.bundle />
             @endif
@@ -104,7 +104,7 @@
                 @else
                     <button
                         type="button"
-                        class="bg-black/10 hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
+                        class="bg-black/20 hover:bg-black/30 text-white/80 shrink-0 hover:text-white backdrop-blur-md p-2 px-3 rounded-xl flex items-center gap-x-2 text-base"
                         x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
                         aria-label="{{ $clientLoginLabel }}"
                     >

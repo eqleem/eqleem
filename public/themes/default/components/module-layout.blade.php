@@ -30,7 +30,7 @@
     </div> 
  
 
-    <div class="w-full mb-3 px-2 lg:px-3 min-h-[50vh]">
+    <div class="w-full mb-3 px-2 lg:px-3 min-h-[65vh]">
         {{ $slot }}
     </div>
 </x-tenant-theme::layout>

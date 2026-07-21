@@ -10,19 +10,19 @@
 
 <div
     @class([
-        'p-1 md:p-px min-h-screen [background-size:40px_40px]',
+        'p-px min-h-screen [background-size:40px_40px]',
         $bgIsHex || $bgIsTransparent ? null : 'bg-'.$bgColor,
         $bgIsTransparent ? 'bg-transparent' : null,
     ])
     @style([$bgIsHex ? 'background-color: '.$bgColor : null])
 >
-    <div class="{{ $width }} mx-auto relative">
-        @livewire('tenant.blocks.top-nav')
+    @unless (request()->routeIs('tenant.home'))
+        <div class="{{ $width }} mx-auto pt-0 lg:pt-3 relative">
+            @livewire('tenant.blocks.top-nav')
+        </div>
+    @endunless
 
-        {{-- <x-tenant-theme::top-nav /> --}}
-    </div>
-
-    <main class="{{ $width }} pb-12 mt-1 md:mt-4 relative  mx-auto flex-grow Xpx-3 Xpy-1 flex flex-col relative w-full bg-white/90 Xbackdrop-blur-2xl rounded-3xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
+    <main class="{{ $width }} pb-12 lg:mt-7 relative  mx-auto flex-grow flex flex-col relative w-full bg-white/90 backdrop-blur-2xl rounded-[22px] overflow-hidden animate-card transform-style-3d">
         {{ $slot }}
     </main>
 
