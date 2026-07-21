@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import Modal from '../ui/Modal.vue';
 import Button from '../ui/Button.vue';
@@ -19,7 +19,11 @@ const {
     loaded,
 } = storeToRefs(store);
 
-const { completed: onboardingCompleted } = storeToRefs(onboardingStore);
+const {
+    completed: onboardingCompleted,
+    dismissed: onboardingDismissed,
+    pageUrl: onboardingPageUrl,
+} = storeToRefs(onboardingStore);
 
 const copied = ref(false);
 const shareInput = ref(null);
@@ -38,6 +42,20 @@ const socials = [
 
 onMounted(() => {
     store.fetchWelcome();
+});
+
+// Keep share URL in sync while onboarding updates the tenant handle.
+watch(onboardingPageUrl, (url) => {
+    if (url && url !== pageUrl.value) {
+        store.pageUrl = url;
+    }
+});
+
+// After first-time setup is finished, reload greeting/share payload from the server.
+watch(onboardingDismissed, async (dismissed, wasDismissed) => {
+    if (dismissed && !wasDismissed) {
+        await store.fetchWelcome({ force: true, quiet: true });
+    }
 });
 
 async function copyLink() {

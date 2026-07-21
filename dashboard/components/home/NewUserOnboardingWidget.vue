@@ -18,7 +18,8 @@ import CompletionVerification from './CompletionVerification.vue';
 import SettingsPaymentOptions from '../../pages/settings/PaymentOptions.vue';
 import SettingsShippingOptions from '../../pages/settings/ShippingOptions.vue';
 import { useOnboardingStore } from '../../stores/onboarding.js';
-import { useSession, updateTenant } from '../../stores/session.js';
+import { useWelcomeStore } from '../../stores/welcome.js';
+import { useSession, updateTenant, loadDashboardContext } from '../../stores/session.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { notifySuccess, notifyError } from '../../lib/notify.js';
 import { defaultCountryCode } from '../../data/countries.js';
@@ -26,6 +27,7 @@ import { COVER_CLEAR, COVER_COLORS, encodeCssCover } from '../../data/coverPrese
 import { appDomain } from '../../data/settings.js';
 
 const store = useOnboardingStore();
+const welcomeStore = useWelcomeStore();
 const {
     percentage,
     totalSteps,
@@ -266,6 +268,41 @@ function brandMarkFromPayload(data) {
         url: null,
         file: null,
     };
+}
+
+/**
+ * Keep the dashboard header (logo / preview URL) in sync with onboarding saves.
+ */
+function syncSessionTenantFromOnboarding() {
+    if (!tenant.value) {
+        return;
+    }
+
+    const savedMark = brandMarkFromPayload(store.forms.business);
+    const nextHandle = store.forms.identity.handle
+        || identity.handle.trim()
+        || tenant.value.handle;
+    const nextUrl = store.pageUrl || tenant.value.url;
+
+    updateTenant({
+        ...tenant.value,
+        name: store.forms.business.name || business.name.trim() || tenant.value.name,
+        logo: store.forms.business.logo || savedMark.url || tenant.value.logo,
+        brand_mark: savedMark.type
+            ? {
+                type: savedMark.type,
+                value: savedMark.value,
+                color: savedMark.color,
+                url: savedMark.url,
+            }
+            : tenant.value.brand_mark,
+        handle: nextHandle,
+        url: nextUrl,
+    });
+
+    if (nextUrl) {
+        welcomeStore.pageUrl = nextUrl;
+    }
 }
 
 function clearErrors() {
@@ -607,20 +644,8 @@ async function runAutosave() {
                 break;
         }
 
-        if (result.ok && activeKey.value === 'business' && tenant.value) {
-            updateTenant({
-                ...tenant.value,
-                name: business.name.trim() || tenant.value.name,
-                logo: store.forms.business.logo || tenant.value.logo,
-            });
-        }
-
-        if (result.ok && activeKey.value === 'identity' && tenant.value) {
-            updateTenant({
-                ...tenant.value,
-                handle: identity.handle.trim() || tenant.value.handle,
-                url: store.pageUrl || tenant.value.url,
-            });
+        if (result.ok && (activeKey.value === 'business' || activeKey.value === 'identity')) {
+            syncSessionTenantFromOnboarding();
         }
     } finally {
         autosaving.value = false;
@@ -662,14 +687,7 @@ async function continueStep() {
         }
 
         brandMark.value = brandMarkFromPayload(store.forms.business);
-
-        if (tenant.value) {
-            updateTenant({
-                ...tenant.value,
-                name: business.name.trim(),
-                logo: store.forms.business.logo || tenant.value.logo,
-            });
-        }
+        syncSessionTenantFromOnboarding();
 
         advanceToNext();
         return;
@@ -723,14 +741,7 @@ async function continueStep() {
         headerFile.value = null;
         identity.header_image = store.forms.identity.header_image;
         identity.header_image_url = store.forms.identity.header_image_url;
-
-        if (tenant.value) {
-            updateTenant({
-                ...tenant.value,
-                handle: identity.handle.trim(),
-                url: store.pageUrl || tenant.value.url,
-            });
-        }
+        syncSessionTenantFromOnboarding();
 
         advanceToNext();
         return;
@@ -781,6 +792,7 @@ async function continueStep() {
             return;
         }
 
+        syncSessionTenantFromOnboarding();
         showSuccess.value = true;
         fireConfetti();
         notifySuccess('صفحتك جاهزة لاستقبال العملاء 🎉');
@@ -795,6 +807,9 @@ async function dismissWizard() {
         return;
     }
 
+    // Refresh dashboard session so header logo + preview URL match saved tenant.
+    syncSessionTenantFromOnboarding();
+    await loadDashboardContext();
     notifySuccess('تم إنهاء الإعداد');
 }
 

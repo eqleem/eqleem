@@ -223,6 +223,42 @@ it('saves identity theme options including handle', function () {
         ->and($saved['logoRadius'])->not->toBeEmpty();
 });
 
+it('exposes updated brand mark handle and page url on dashboard context after onboarding saves', function () {
+    [$user, $tenant] = createOnboardingUserWithTenant();
+    $originalHandle = $tenant->handle;
+    $handle = 'ready-'.Str::lower(Str::random(5));
+
+    $this->actingAs($user)
+        ->postJson('/api/dashboard/onboarding/business', [
+            'industry' => 'retail',
+            'name' => 'متجر جاهز',
+            'bio' => 'نبذة بعد الإعداد',
+            'brand_mark_type' => 'emoji',
+            'brand_mark_value' => '🎯',
+        ])
+        ->assertSuccessful();
+
+    $this->actingAs($user)
+        ->putJson('/api/dashboard/onboarding/identity', [
+            'handle' => $handle,
+            'primary_color' => 'blue',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.forms.identity.handle', $handle)
+        ->assertJsonPath('data.page_url', route('tenant.home', $handle));
+
+    expect($handle)->not->toBe($originalHandle);
+
+    $this->actingAs($user)
+        ->getJson('/api/dashboard/context')
+        ->assertSuccessful()
+        ->assertJsonPath('data.tenant.name', 'متجر جاهز')
+        ->assertJsonPath('data.tenant.handle', $handle)
+        ->assertJsonPath('data.tenant.url', route('tenant.home', $handle))
+        ->assertJsonPath('data.tenant.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.tenant.brand_mark.value', '🎯');
+});
+
 it('saves goal action types', function () {
     [$user, $tenant] = createOnboardingUserWithTenant();
 
