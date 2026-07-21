@@ -8,7 +8,7 @@
         >
             <button
                 type="button"
-                class="bg-black/20 hover:bg-black/30 text-white/80 hover:text-white backdrop-blur-md p-2 px-3 rounded-xl flex items-center gap-x-2 text-base"
+                class="bg-black/40 hover:bg-black/50 text-white/90 hover:text-white backdrop-blur-md p-2 px-3 rounded-xl flex items-center gap-x-2 text-base"
                 x-on:click="open = !open"
                 aria-label="الصفحات"
                 aria-haspopup="true"

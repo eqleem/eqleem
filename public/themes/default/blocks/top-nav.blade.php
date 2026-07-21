@@ -4,7 +4,7 @@
             @if ($showShareButton)
                 <button
                     type="button"
-                    class="backdrop-blur-md p-2 rounded-xl bg-black/20 hover:bg-black/30 text-white/80 hover:text-white"
+                    class="backdrop-blur-md p-2 rounded-xl bg-black/40 hover:bg-black/50 text-white/90 hover:text-white"
                     x-on:click="$dispatch('open-modal', { name: 'share-page-modal' })"
                     aria-label="مشاركة الصفحة"
                 >
@@ -37,7 +37,7 @@
                     x-on:click="loading = true"
                     x-on:livewire:navigated.window="loading = false"
                     x-bind:aria-busy="loading"
-                    class="h-10 w-10 rounded-full bg-black/10 hover:bg-black/20 text-black/70 hover:text-black p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden"
+                    class="h-10 w-10 rounded-full bg-black/20 hover:bg-black/20 text-black/70 hover:text-black p-0.5 flex items-center justify-center transition-all duration-200 overflow-hidden"
                     aria-label="الصفحة الرئيسية"
                 >
                     <span class="sr-only">الصفحة الرئيسية</span>
@@ -77,7 +77,7 @@
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
                         <button
                             type="button"
-                            class="bg-black/10  hover:bg-black/20 backdrop-blur-md p-2 px-3 rounded-xl text-black/50 flex items-center gap-x-2 text-base"
+                            class="bg-black/40  hover:bg-black/50 backdrop-blur-md p-2 px-3 rounded-xl text-white/90 hover:text-white flex items-center gap-x-2 text-base"
                             x-on:click="open = !open"
                             aria-label="{{ authClient()->displayName() }}"
                             aria-haspopup="true"
@@ -104,7 +104,7 @@
                 @else
                     <button
                         type="button"
-                        class="bg-black/20 hover:bg-black/30 text-white/80 shrink-0 hover:text-white backdrop-blur-md p-2 px-3 rounded-xl flex items-center gap-x-2 text-base"
+                        class="bg-black/40 hover:bg-black/50 text-white/90 shrink-0 hover:text-white backdrop-blur-md p-2 px-3 rounded-xl flex items-center gap-x-2 text-base"
                         x-on:click="$dispatch('open-modal', { name: 'customer-login-modal' })"
                         aria-label="{{ $clientLoginLabel }}"
                     >

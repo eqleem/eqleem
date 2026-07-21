@@ -10,7 +10,7 @@
 
 <div
     @class([
-        'p-px min-h-screen [background-size:40px_40px]',
+        'p-0 md:p-px min-h-screen x[background-size:40px_40px]',
         $bgIsHex || $bgIsTransparent ? null : 'bg-'.$bgColor,
         $bgIsTransparent ? 'bg-transparent' : null,
     ])
@@ -22,7 +22,7 @@
         </div>
     @endunless
 
-    <main class="{{ $width }} pb-12 lg:mt-7 relative  mx-auto flex-grow flex flex-col relative w-full bg-white/90 backdrop-blur-2xl rounded-[22px] overflow-hidden animate-card transform-style-3d">
+    <main class="{{ $width }} pb-12 md:mt-4 lg:mt-7 relative  mx-auto flex-grow flex flex-col relative w-full bg-white/90 backdrop-blur-2xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
         {{ $slot }}
     </main>
 
