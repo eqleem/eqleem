@@ -32,7 +32,9 @@ it('creates an account and logs the user in from the registration email link', f
 
     SendRegistrationLink::run($email);
 
-    Mail::assertQueued(RegistrationLink::class);
+    Mail::assertQueued(RegistrationLink::class, function (RegistrationLink $mail) use ($email) {
+        return $mail->hasTo($email) && strlen($mail->code) === 6 && filled($mail->url);
+    });
 
     $token = str_repeat('a', 64);
 

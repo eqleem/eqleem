@@ -44,7 +44,16 @@ class VerifyRegistration
             throw new \Exception('رابط التسجيل منتهي الصلاحية. يرجى طلب رابط جديد.');
         }
 
-        // Check if user already exists
+        return $this->complete($email);
+    }
+
+    /**
+     * Complete login or registration after the email has already been verified.
+     *
+     * @return array{tenant: ?Tenant, user: ?User}
+     */
+    public function complete(string $email): array
+    {
         $existingUser = User::where('email', $email)->first();
         if ($existingUser) {
             DB::table('registration_tokens')->where('email', $email)->delete();
@@ -59,30 +68,26 @@ class VerifyRegistration
             return ['tenant' => $tenant, 'user' => $existingUser->fresh()];
         }
 
-        // Generate random password
         $password = Str::random(16);
 
-        // Generate username from email prefix (ensure uniqueness)
         $emailPrefix = explode('@', $email)[0];
         do {
             $username = $emailPrefix.'-'.generateKey(7);
         } while (User::where('username', $username)->exists());
 
-        // Create user
         $user = CreateUser::run([
-            'name' => $username, // Use email prefix as name
+            'name' => $username,
             'email' => $email,
             'password' => $password,
         ]);
 
-        // Update username after creation (since CreateUser doesn't handle it)
         $user->update(['username' => $username]);
 
+        $tenant = null;
+
         if ($user) {
-            // Generate tenant handle
             $tenantHandle = $username;
 
-            // Create tenant
             $tenant = CreateTenant::run([
                 'tenant_name' => $emailPrefix,
                 'tenant_handle' => $tenantHandle,
@@ -97,9 +102,8 @@ class VerifyRegistration
             ]);
         }
 
-        // Delete the token
         DB::table('registration_tokens')->where('email', $email)->delete();
 
-        return ['tenant' => $tenant ?? null, 'user' => $user ?? null];
+        return ['tenant' => $tenant, 'user' => $user];
     }
 }

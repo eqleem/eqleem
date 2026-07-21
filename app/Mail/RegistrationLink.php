@@ -13,15 +13,10 @@ class RegistrationLink extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $url;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($url)
-    {
-        $this->url = $url;
-    }
+    public function __construct(
+        public string $url,
+        public string $code,
+    ) {}
 
     /**
      * Get the message envelope.
@@ -29,7 +24,7 @@ class RegistrationLink extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'رابط تسجيل الدخول - إقليم',
+            subject: 'رابط وكود تسجيل الدخول - إقليم',
         );
     }
 
