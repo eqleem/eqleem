@@ -1,18 +1,25 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 
 // Port of resources/views/ui/modal.blade.php — x-teleport -> <Teleport>, Alpine open/close
 // via the same 'openmodal'/'closemodal' window events (see dashboard/lib/modal.js).
+// Optional v-model:open for controlled usage (null = uncontrolled event-bus mode).
 const props = defineProps({
     title: { type: String, default: null },
     size: { type: String, default: '4xl' },
     name: { type: String, default: 'default' },
     escape: { type: Boolean, default: true },
     close: { type: Boolean, default: true },
+    /** null = uncontrolled (window events). boolean = controlled via v-model:open */
+    open: { type: Boolean, default: null },
 });
 
-const show = ref(false);
+const emit = defineEmits(['update:open', 'closed']);
+
+const uncontrolledShow = ref(false);
+const isControlled = computed(() => props.open !== null);
+const show = computed(() => (isControlled.value ? Boolean(props.open) : uncontrolledShow.value));
 
 // Literal classes so Tailwind picks them up (dynamic string interpolation would be purged).
 const sizeClasses = {
@@ -26,13 +33,12 @@ const sizeClasses = {
     '5xl': 'sm:max-w-5xl',
 };
 
-function releaseScrollLock() {
-    if (!show.value) {
-        return;
+function setShow(value) {
+    if (isControlled.value) {
+        emit('update:open', value);
+    } else {
+        uncontrolledShow.value = value;
     }
-
-    show.value = false;
-    unlockBodyScroll();
 }
 
 function hide() {
@@ -40,22 +46,25 @@ function hide() {
         return;
     }
 
-    releaseScrollLock();
+    setShow(false);
+    emit('closed');
     window.dispatchEvent(new CustomEvent('closemodal', { detail: { modal: props.name } }));
 }
 
 function onOpen(event) {
-    if (event.detail?.modal !== props.name || show.value) {
+    if (event.detail?.modal !== props.name) {
         return;
     }
 
-    show.value = true;
-    lockBodyScroll();
+    setShow(true);
 }
 
 function onClose(event) {
     if (!event.detail?.modal || event.detail.modal === props.name) {
-        releaseScrollLock();
+        if (show.value) {
+            setShow(false);
+            emit('closed');
+        }
     }
 }
 
@@ -65,23 +74,38 @@ function onKeydown(event) {
     }
 }
 
+watch(show, (visible, wasVisible) => {
+    if (visible && !wasVisible) {
+        lockBodyScroll();
+    } else if (!visible && wasVisible) {
+        unlockBodyScroll();
+    }
+});
+
 onMounted(() => {
     window.addEventListener('openmodal', onOpen);
     window.addEventListener('closemodal', onClose);
     window.addEventListener('keydown', onKeydown);
+
+    if (show.value) {
+        lockBodyScroll();
+    }
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('openmodal', onOpen);
     window.removeEventListener('closemodal', onClose);
     window.removeEventListener('keydown', onKeydown);
-    releaseScrollLock();
+
+    if (show.value) {
+        unlockBodyScroll();
+    }
 });
 </script>
 
 <template>
     <Teleport to="body">
-        <div v-if="show" class="relative z-40" role="dialog" aria-modal="true">
+        <div v-if="show" class="relative z-[70]" role="dialog" aria-modal="true">
             <div class="fixed inset-0 bg-stone-800/75 transition-opacity"></div>
 
             <div class="fixed inset-0 overflow-y-auto overscroll-contain">

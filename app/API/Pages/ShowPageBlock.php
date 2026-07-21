@@ -106,7 +106,7 @@ class ShowPageBlock
                 ? (Content::query()->find($contentId)?->title ?? '')
                 : '',
             'link_type_options' => CtaLink::linkTypeOptions('block'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: true),
         ];
     }
 }

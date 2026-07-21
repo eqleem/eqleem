@@ -83,7 +83,7 @@
                             aria-haspopup="true"
                             x-bind:aria-expanded="open"
                         >
-                            <img src="{{ authClient()->avatar }}" alt="" class="h-7 w-7 rounded-full object-cover" aria-hidden="true">
+                            <img src="{{ authClient()->avatar }}" alt="" class="size-6 rounded-full object-cover" aria-hidden="true">
                             <span class="hidden md:inline">{{ authClient()->displayName() }}</span>
                         </button>
 

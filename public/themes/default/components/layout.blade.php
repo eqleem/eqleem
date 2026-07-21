@@ -22,7 +22,7 @@
         </div>
     @endunless
 
-    <main class="{{ $width }} pb-12 md:mt-4 lg:mt-7 relative  mx-auto flex-grow flex flex-col relative w-full bg-white/90 backdrop-blur-2xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
+    <main class="{{ $width }} pb-12 md:mt-4 relative  mx-auto flex-grow flex flex-col relative w-full bg-white/90 backdrop-blur-2xl md:rounded-[22px] overflow-hidden animate-card transform-style-3d">
         {{ $slot }}
     </main>
 

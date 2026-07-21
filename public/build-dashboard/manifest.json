@@ -1,16 +1,16 @@
 {
   "dashboard/app.css": {
-    "file": "assets/app-CFfqlDLL.css",
+    "file": "assets/app-BxCybdl2.css",
     "src": "dashboard/app.css",
     "isEntry": true
   },
   "dashboard/main.js": {
-    "file": "assets/main-DfxGQHOf.js",
+    "file": "assets/main-sxrjpPKm.js",
     "name": "main",
     "src": "dashboard/main.js",
     "isEntry": true,
     "css": [
-      "assets/main-Sw2EReOH.css"
+      "assets/main-Dg-BaaTm.css"
     ]
   }
 }

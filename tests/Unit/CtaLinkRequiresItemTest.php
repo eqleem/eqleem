@@ -30,6 +30,28 @@ it('exposes item-only picker flags for pages and forms', function () {
     ]);
 });
 
+it('can build item-only picker options for page component links', function () {
+    $options = collect(CtaLink::blockLinkPickerOptions(itemsOnly: true))->keyBy('key');
+
+    expect($options->get('blog'))->toMatchArray([
+        'label' => 'تدوينة محددة',
+        'supports_section' => false,
+        'supports_item' => true,
+    ])->and($options->get('pages'))->toMatchArray([
+        'label' => 'رابط صفحة',
+        'supports_section' => false,
+        'supports_item' => true,
+    ])->and($options->get('forms'))->toMatchArray([
+        'label' => 'رابط نموذج',
+        'supports_section' => false,
+        'supports_item' => true,
+    ])->and($options->get('external'))->toMatchArray([
+        'supports_section' => false,
+        'supports_item' => false,
+    ])->and($options->has('menu'))->toBeFalse()
+        ->and($options->has('reviews'))->toBeFalse();
+});
+
 it('does not allow section keys for pages and forms', function () {
     $keys = CtaLink::allowedBlockLinkTypeKeys();
 

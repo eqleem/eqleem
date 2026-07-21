@@ -77,6 +77,9 @@ class CtaLink
     /**
      * Searchable picker options for the block-link editor (content types + external).
      *
+     * When $itemsOnly is true (page-component block links), section destinations are
+     * omitted — only specific items (like pages/forms) and external URLs are offered.
+     *
      * @return list<array{
      *     key: string,
      *     label: string,
@@ -89,20 +92,27 @@ class CtaLink
      *     item_description: string
      * }>
      */
-    public static function blockLinkPickerOptions(): array
+    public static function blockLinkPickerOptions(bool $itemsOnly = false): array
     {
         $options = [];
 
         foreach (self::activeContentTypes() as $type) {
+            $supportsItem = self::contentTypeHasItemRoute($type->slug);
+            $supportsSection = ! $itemsOnly && self::contentTypeHasSectionRoute($type->slug);
+
+            if ($itemsOnly && ! $supportsItem) {
+                continue;
+            }
+
             $options[] = [
                 'key' => $type->slug,
-                'label' => self::contentTypeRequiresItem($type->slug)
+                'label' => ($itemsOnly || self::contentTypeRequiresItem($type->slug))
                     ? (string) config('cta-link-types.item_labels.'.$type->slug, 'رابط '.$type->name)
                     : 'رابط '.$type->name,
                 'icon_url' => asset($type->icon),
                 'group' => 'content',
-                'supports_section' => self::contentTypeHasSectionRoute($type->slug),
-                'supports_item' => self::contentTypeHasItemRoute($type->slug),
+                'supports_section' => $supportsSection,
+                'supports_item' => $supportsItem,
                 'section_title' => (string) config(
                     "cta-link-types.block_link.sections.{$type->slug}.title",
                     $type->name

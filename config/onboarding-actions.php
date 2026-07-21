@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'contact-form' => [
+        'label' => 'نموذج اتصل بنا',
+        'description' => 'يفتح نموذج اتصل بنا',
+        'icon' => 'hugeicons:file-01',
+    ],
     'appointment-modal' => [
         'label' => 'حجز موعد',
         'description' => 'يفتح نموذج حجز موعد',

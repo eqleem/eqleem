@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { nextTick, onMounted, onBeforeUnmount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import MainBox from '../ui/MainBox.vue';
 import Button from '../ui/Button.vue';
@@ -8,12 +8,13 @@ import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
 import BlockEditor from './editors/BlockEditor.vue';
 import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
+import BlockLinkEditor from './editors/BlockLinkEditor.vue';
 import BlockLinksPanel from './editors/BlockLinksPanel.vue';
 import FooterDocumentsPanel from './editors/FooterDocumentsPanel.vue';
 import FloatLinksPanel from './editors/FloatLinksPanel.vue';
 import HeaderSocialLinksPanel from './editors/HeaderSocialLinksPanel.vue';
 import CatalogSectionsModal from './CatalogSectionsModal.vue';
-import { openModal, closeModal } from '../../lib/modal.js';
+import { openModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
@@ -42,6 +43,9 @@ const dragId = ref(null);
 const busyId = ref(null);
 const reorderBusyId = ref(null);
 const editTitle = ref('إعدادات البلوك');
+const editModalOpen = ref(false);
+const addLinkModalOpen = ref(false);
+const addLinkEditorKey = ref(0);
 const ctaLinksPanel = ref(null);
 const footerDocumentsPanel = ref(null);
 const footerLinksPanel = ref(null);
@@ -92,22 +96,15 @@ function toggleSection(section) {
     } catch {}
 }
 
-function onEditModalClosed(event) {
-    if (event.detail?.modal === 'edit-block') {
-        store.clearEditing();
-    }
-}
-
 onMounted(() => {
     void store.fetchStructure()
         .then(() => store.fetchContentCounts())
         .catch(() => {});
-    window.addEventListener('closemodal', onEditModalClosed);
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('closemodal', onEditModalClosed);
     closeHeaderSocialLinks();
+    closeAddLinkModal();
 });
 
 function openAddCtaLink() {
@@ -116,6 +113,33 @@ function openAddCtaLink() {
 
 function openAddFooterLink() {
     footerLinksPanel.value?.openAdd?.();
+}
+
+async function openAddPageLink() {
+    editTitle.value = 'إضافة رابط';
+    expandedSection.value = 'page-sections';
+
+    try {
+        window.localStorage.setItem(expandedSectionStorageKey, JSON.stringify(expandedSection.value));
+    } catch {}
+
+    store.beginCreateBlockLink();
+    addLinkEditorKey.value += 1;
+
+    // Defer past the opening click so the new overlay cannot swallow it and auto-close.
+    await nextTick();
+    addLinkModalOpen.value = true;
+    lockBodyScroll();
+}
+
+function closeAddLinkModal() {
+    if (!addLinkModalOpen.value) {
+        return;
+    }
+
+    addLinkModalOpen.value = false;
+    store.clearEditing();
+    unlockBodyScroll();
 }
 
 function openAddFooterDocument() {
@@ -164,7 +188,7 @@ function onFloatLinksUpdated(payload) {
 
 async function openEdit(id, title = null) {
     editTitle.value = title || 'إعدادات البلوك';
-    openModal('edit-block');
+    editModalOpen.value = true;
 
     try {
         const payload = await store.fetchBlock(id);
@@ -175,7 +199,11 @@ async function openEdit(id, title = null) {
 }
 
 function onCloseEdit() {
-    closeModal('edit-block');
+    editModalOpen.value = false;
+    store.clearEditing();
+}
+
+function onEditModalClosed() {
     store.clearEditing();
 }
 
@@ -184,8 +212,13 @@ async function onSaved(payload) {
         editTitle.value = payload.block.title;
     }
 
-    closeModal('edit-block');
-    store.clearEditing();
+    if (addLinkModalOpen.value) {
+        closeAddLinkModal();
+    } else {
+        editModalOpen.value = false;
+        store.clearEditing();
+    }
+
     notifyApiSuccess(payload, 'Saved');
 }
 
@@ -417,15 +450,28 @@ function contentManageTo(block) {
                             <p class="text-xs text-stone-400">قم بإضافة وترتيب مكونات نشاطك</p>
                         </div>
                     </button>
-                    <Button
-                        class="shrink-0 !px-2.5 sm:!px-4"
-                        aria-label="إدارة المكونات"
-                        :disabled="saving"
-                        @click="openManageSections"
-                    >
-                        <template #icon><Icon name="settings" class="h-4 w-4" /></template>
-                        <span class="hidden sm:inline">إدارة المكونات</span>
-                    </Button>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <button
+                            type="button"
+                            class="inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary-600 !px-2.5 py-2 text-sm text-white transition hover:bg-primary-700 disabled:pointer-events-none disabled:opacity-50 sm:!px-4"
+                            aria-label="إضافة رابط"
+                            :disabled="saving"
+                            @click.stop.prevent="openAddPageLink"
+                        >
+                            <Icon name="plus" class="h-4 w-4" />
+                            <span class="hidden sm:inline">إضافة رابط</span>
+                        </button>
+                        <Button
+                            class="shrink-0 !px-2.5 sm:!px-4"
+                            variant="secondary"
+                            aria-label="إدارة المكونات"
+                            :disabled="saving"
+                            @click="openManageSections"
+                        >
+                            <template #icon><Icon name="settings" class="h-4 w-4" /></template>
+                            <span class="hidden sm:inline">إدارة المكونات</span>
+                        </Button>
+                    </div>
                 </div>
 
                 <div id="page-sections-list" v-show="isSectionExpanded('page-sections')" class="relative min-h-20">
@@ -546,7 +592,7 @@ function contentManageTo(block) {
                         v-if="!userBlocks.length"
                         class="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-4 text-center text-xs text-stone-400"
                     >
-                        لا توجد أقسام مفعّلة. اضغط «إدارة المكونات» لاختيار أقسام الصفحة.
+                        لا توجد مكونات بعد. اضغط «إضافة رابط» أو «إدارة المكونات» للبدء.
                     </p>
                 </div>
             </div>
@@ -682,7 +728,13 @@ function contentManageTo(block) {
             </div>
         </div>
 
-        <Modal :title="editTitle" size="lg" name="edit-block">
+        <Modal
+            v-model:open="editModalOpen"
+            :title="editTitle"
+            size="lg"
+            name="edit-block"
+            @closed="onEditModalClosed"
+        >
             <BlockEditorSkeleton v-if="editingLoading" />
             <p v-else-if="editingError" class="px-4 py-4 text-sm text-red-500">{{ editingError }}</p>
             <BlockEditor
@@ -692,6 +744,42 @@ function contentManageTo(block) {
                 @close="onCloseEdit"
             />
         </Modal>
+
+        <Teleport to="body">
+            <div
+                v-if="addLinkModalOpen && editing?.editor"
+                class="relative z-[70]"
+                role="dialog"
+                aria-modal="true"
+            >
+                <div class="fixed inset-0 bg-stone-800/75" @click="closeAddLinkModal" />
+
+                <div class="fixed inset-0 overflow-y-auto overscroll-contain">
+                    <div class="flex min-h-full items-center justify-center p-4" @click.self="closeAddLinkModal">
+                        <div class="relative w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-xl">
+                            <div class="flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
+                                <p class="text-sm font-semibold text-stone-600">{{ editTitle }}</p>
+                                <button
+                                    type="button"
+                                    class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400 transition hover:bg-stone-200 hover:text-stone-600"
+                                    aria-label="إغلاق"
+                                    @click="closeAddLinkModal"
+                                >
+                                    <Icon name="x" class="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <BlockLinkEditor
+                                :key="addLinkEditorKey"
+                                :editor="editing.editor"
+                                @saved="onSaved"
+                                @close="closeAddLinkModal"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
 
         <Teleport to="body">
             <div

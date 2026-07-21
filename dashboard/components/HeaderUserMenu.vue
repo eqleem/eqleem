@@ -80,6 +80,7 @@ function openCreateModal(event) {
     event?.stopPropagation?.();
     newPageName.value = '';
     nameError.value = null;
+    onNavigate();
     openModal(createModalName);
 }
 
@@ -382,7 +383,7 @@ onMounted(() => {
         </a>
     </div>
 
-    <Modal :name="createModalName" title="إضافة صفحة جديدة" size="sm">
+    <Modal :name="createModalName" title="إضافة صفحة جديدة" size="sm" :escape="false">
         <form class="space-y-4 p-4" @submit.prevent="createTenant">
             <Input
                 v-model="newPageName"

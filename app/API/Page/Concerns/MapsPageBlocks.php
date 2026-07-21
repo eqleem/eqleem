@@ -304,7 +304,7 @@ trait MapsPageBlocks
                 is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
             ),
             'link_type_options' => CtaLink::linkTypeOptions('block'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: true),
         ];
     }
 

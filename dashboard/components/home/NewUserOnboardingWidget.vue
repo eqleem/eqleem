@@ -84,8 +84,9 @@ const identity = reactive({
     header_image_position: 50,
 });
 const headerFile = ref(null);
+const defaultPrimaryActionType = 'contact-form';
 const goal = reactive({
-    primary_action_type: '',
+    primary_action_type: defaultPrimaryActionType,
     secondary_action_type: '',
 });
 const enabledCatalog = ref([]);
@@ -414,7 +415,7 @@ function syncFromStore() {
     headerFollowsPrimaryColor.value = !identity.header_image
         || identity.header_image === primaryColorCover(identity.primary_color);
 
-    goal.primary_action_type = value.goal?.primary_action_type ?? '';
+    goal.primary_action_type = value.goal?.primary_action_type || defaultPrimaryActionType;
     goal.secondary_action_type = value.goal?.secondary_action_type ?? '';
 
     const enabled = value.catalog?.enabled ?? [];
@@ -1301,22 +1302,10 @@ watch(shouldShow, async (value) => {
                             name="primary_action_type"
                             label="الزر الرئيسي *"
                             placeholder="ابحث عن إجراء…"
-                            info="اختر أهم زر هنا، يمكنك إضافة باقي الأزرار لاحقاً كأزرار ثانوية أو أزرار للصفحة."
+                            info="اختر أهم زر في صفحتك. يمكنك إضافة المزيد لاحقاً من إعدادات الصفحة."
                             :options="primaryActionSelectOptions"
                             :error="errors.primary_action_type"
                             @update:model-value="onPrimaryActionChange"
-                        />
-
-                        <SearchableSelect
-                            :model-value="goal.secondary_action_type"
-                            name="secondary_action_type"
-                            label="الزر الثانوي"
-                            placeholder="ابحث عن إجراء ثانوي…"
-                            clearable
-                            clear-label="بدون زر ثانوي"
-                            :options="secondaryActionSelectOptions"
-                            :error="errors.secondary_action_type"
-                            @update:model-value="onSecondaryActionChange"
                         />
                     </div>
 
