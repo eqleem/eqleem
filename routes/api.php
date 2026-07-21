@@ -260,6 +260,9 @@ use App\API\Store\UpdateStoreProduct;
 use App\API\Store\UpdateStoreSettings;
 use App\API\Store\UploadStoreEditorImage;
 use App\API\Store\UploadStoreImage;
+use App\API\Tenants\CreateUserTenant;
+use App\API\Tenants\ListUserTenants;
+use App\API\Tenants\SwitchUserTenant;
 use App\API\UnitRental\CreateUnitRental;
 use App\API\UnitRental\CreateUnitRentalCalendar;
 use App\API\UnitRental\CreateUnitRentalCategory;
@@ -435,6 +438,16 @@ Route::post('/account/avatar', UploadAccountAvatar::class)
 
 Route::put('/account/password', UpdateAccountPassword::class)
     ->name('api.account.password.update');
+
+Route::get('/tenants', ListUserTenants::class)
+    ->name('api.tenants.index');
+
+Route::post('/tenants', CreateUserTenant::class)
+    ->name('api.tenants.store');
+
+Route::post('/tenants/{tenant}/switch', SwitchUserTenant::class)
+    ->name('api.tenants.switch')
+    ->whereNumber('tenant');
 
 Route::put('/settings/domain/handle', UpdateTenantHandle::class)
     ->name('api.settings.domain.handle');

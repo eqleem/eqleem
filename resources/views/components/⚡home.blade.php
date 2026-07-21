@@ -29,14 +29,10 @@
     </nav>
 
     {{-- Showcase hero: centered headline + phone + floating capabilities --}}
-    <section class="relative w-full overflow-hidden pt-28 xpb-16x sm:pt-32x sm:pb-20x lg:pt-36x lg:pb-24x"  >
-        <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-[min(90vw,42rem)] h-[min(90vw,42rem)] rounded-full bg-[radial-gradient(circle_at_center,rgba(227,95,38,0.08)_0%,transparent_68%)]"></div>
-            <div class="absolute bottom-[8%] right-[12%] size-56 rounded-full bg-orange-200/20 blur-3xl"></div>
-            <div class="absolute top-[30%] left-[8%] size-48 rounded-full bg-stone-300/40 blur-3xl"></div>
-        </div>
+    <section class="relative w-full overflow-hidden pt-28 bg-white/30"  >
+ 
 
-        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center mb-24">
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
             <div class="text-xs w-auto flex-shrink bg-stone-300/80 text-stone-600 px-4 py-1.5 rounded-full tracking-widest inline-flex items-center gap-2 backdrop-blur-sm">
                 <span class="size-3 rounded-full bg-[#E35F26] animate-pulse -mx-1 me-1"></span>
                 جاهزة للنشر خلال دقائق
@@ -58,6 +54,7 @@
                 </h1>
 
                 <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[34rem] font-normal mx-auto">
+                    ابني حضورك الرقمي بدقائق، 
                     أنشئ صفحة لأعمالك، تحوّل زوارك إلى عملاء،
                      تعرض منتجاتك وخدماتك،
                       وتستقبل الطلبات والحجوزات على مدار الساعة.
@@ -108,8 +105,100 @@
         </div>
 
 
+        <div class="bg-stone-100x z-50 relative mt-12 md:mt-24 mb-24 lg:-mb-32 lg:shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+            
+                <div class=" grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+                    
+                    <div class="lg:pt-24 order-2 lg:order-none flex flex-col gap-10">
+                        <div class="flex items-start gap-3 lg:text-end lg:flex-row-reverse">
+                            <div class="shrink-0">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-12"  xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2 8L8 10" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path d="M6 4L8 7" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M11 6.56252L14.7001 2.93755C16.1597 1.50753 18.7629 1.73938 20.5145 3.4554C22.266 5.17142 22.5027 7.72176 21.043 9.15178L18.1358 12" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M15 15.5866L10.9653 20.001C9.57254 21.5247 7.0887 21.2777 5.41744 19.4492C3.74618 17.6207 3.52038 14.9032 4.91309 13.3795L6.17395 12" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+                                {{-- <svg xmlns="http://www.w3.org/2000/svg" class="size-10" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm0 6h12v2H3V9zm0 6h18v2H3v-2z"/></svg> --}}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> رابط دائم </h3>
+                                <p class="mt-1 text-sm text-stone-600"> احصل على رابط دائم لصفحتك يمكن تخصيصه وربطه بدومين مخصص باسم هويتك وشاركه مع عملائك. </p>
+                                {{-- <a href="#" class="mt-2 inline-block text-sm font-medium text-stone-700 hover:text-stone-900 underline underline-offset-4">Learn More</a> --}}
+                            </div>
+                        </div>
+
+                        <div class="mt-16x flex items-start lg:text-end gap-3 lg:flex-row-reverse">
+                            <div class="shrink-0">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-12" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2 6C2 3.79086 3.79086 2 6 2C8.20914 2 10 3.79086 10 6V18C10 20.2091 8.20914 22 6 22C3.79086 22 2 20.2091 2 18V6Z" stroke="#1C274C" stroke-width="1.5"></path> <path d="M10 8.24268L13.3137 4.92902C14.8758 3.36692 17.4084 3.36692 18.9705 4.92902C20.5326 6.49112 20.5326 9.02378 18.9705 10.5859L9.3064 20.25" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M6 22L18 22C20.2091 22 22 20.2091 22 18C22 15.7909 20.2091 14 18 14L15.5 14" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M7 18C7 18.5523 6.55228 19 6 19C5.44772 19 5 18.5523 5 18C5 17.4477 5.44772 17 6 17C6.55228 17 7 17.4477 7 18Z" stroke="#1C274C" stroke-width="1.5"></path> </g></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> تصميم مخصص  </h3>
+                                <p class="mt-1 text-sm text-stone-600">تصميم مخصص لصفحتك، بناءً على ألوان هويتك وبراندك.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-16x flex items-start lg:text-end gap-3 lg:flex-row-reverse">
+                            <div class="shrink-0">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-12" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3.79424 12.0291C4.33141 9.34329 4.59999 8.00036 5.48746 7.13543C5.65149 6.97557 5.82894 6.8301 6.01786 6.70061C7.04004 6 8.40956 6 11.1486 6H12.8515C15.5906 6 16.9601 6 17.9823 6.70061C18.1712 6.8301 18.3486 6.97557 18.5127 7.13543C19.4001 8.00036 19.6687 9.34329 20.2059 12.0291C20.9771 15.8851 21.3627 17.8131 20.475 19.1793C20.3143 19.4267 20.1267 19.6555 19.9157 19.8616C18.7501 21 16.7839 21 12.8515 21H11.1486C7.21622 21 5.25004 21 4.08447 19.8616C3.87342 19.6555 3.68582 19.4267 3.5251 19.1793C2.63744 17.8131 3.02304 15.8851 3.79424 12.0291Z" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M9 6V5C9 3.34315 10.3431 2 12 2C13.6569 2 15 3.34315 15 5V6" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M9.1709 15C9.58273 16.1652 10.694 17 12.0002 17C13.3064 17 14.4177 16.1652 14.8295 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> أعرض منتجاتك وخدماتك </h3>
+                                <p class="mt-1 text-sm text-stone-600"> أعرض خدماتك ومنتجاتك بأسعارها وتفاصيلها واسمح لعملائك بالطلب المباشر أو التواصل معك لحجز والإستفسار بأي وقت.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-1 lg:order-none">
+                        <ui:mobile-dark>
+                            {{-- <img src="https://template.canva.com/EAEsa3Aii8U/4/0/900w-3QolSmpWFXk.jpg" class="w-full h-full object-cover" alt="" /> --}}
+                            {{-- <img src="https://template.canva.com/EAFqeAlAaHc/1/0/900w-2-Zw-73tvq4.jpg" class="w-full h-full object-cover" alt="" /> --}}
+                            {{-- <img src="{{ asset('assets/images/demo.webp') }}" class="w-full h-full object-contain object-top" alt="" /> --}}
+                            <img src="{{ asset('assets/images/aswar.webp') }}" class="w-full h-full object-contain object-top" alt="" />
+                        </ui:mobile-dark>
+                    </div>
+
+                    <div class="lg:pt-24 order-3 lg:order-none flex flex-col gap-10">
+                        <div class="flex items-start gap-3 lg:justify-end">
+                            <div class="shrink-0 ">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-12" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2 10C2 7.17157 2 5.75736 2.87868 4.87868C3.75736 4 5.17157 4 8 4H13C15.8284 4 17.2426 4 18.1213 4.87868C19 5.75736 19 7.17157 19 10C19 12.8284 19 14.2426 18.1213 15.1213C17.2426 16 15.8284 16 13 16H8C5.17157 16 3.75736 16 2.87868 15.1213C2 14.2426 2 12.8284 2 10Z" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M19.0003 7.07617C19.9754 7.17208 20.6317 7.38885 21.1216 7.87873C22.0003 8.75741 22.0003 10.1716 22.0003 13.0001C22.0003 15.8285 22.0003 17.2427 21.1216 18.1214C20.2429 19.0001 18.8287 19.0001 16.0003 19.0001H11.0003C8.17187 19.0001 6.75766 19.0001 5.87898 18.1214C5.38909 17.6315 5.17233 16.9751 5.07642 16" stroke="#1C274C" stroke-width="1.5"></path> <path d="M13 10C13 11.3807 11.8807 12.5 10.5 12.5C9.11929 12.5 8 11.3807 8 10C8 8.61929 9.11929 7.5 10.5 7.5C11.8807 7.5 13 8.61929 13 10Z" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M16 12L16 8" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M5 12L5 8" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> استقبل طلبات عملائك </h3>
+                                <p class="mt-1 text-sm text-stone-600"> لا تفوّت عميل، استقبل طلبات وحجوزات وتواصل عملائك من خلال نماذج ذكية.</p>
+                                {{-- <a href="#" class="mt-2 inline-block text-sm font-medium text-stone-700 hover:text-stone-900 underline underline-offset-4">Learn More</a> --}}
+                            </div>
+                            
+                        </div>
+
+                        <div class="xmt-16 flex items-start gap-3 lg:justify-end">
+                            <div class="shrink-0">
+                                <svg viewBox="0 0 24 24" fill="none" class="size-12"  xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.5" d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.5" d="M11.25 18C11.25 18.4142 11.5858 18.75 12 18.75C12.4142 18.75 12.75 18.4142 12.75 18H11.25ZM18 8L18.5303 8.53033C18.8232 8.23744 18.8232 7.76256 18.5303 7.46967L18 8ZM17.0303 5.96967C16.7374 5.67678 16.2626 5.67678 15.9697 5.96967C15.6768 6.26256 15.6768 6.73744 15.9697 7.03033L17.0303 5.96967ZM15.9697 8.96967C15.6768 9.26256 15.6768 9.73744 15.9697 10.0303C16.2626 10.3232 16.7374 10.3232 17.0303 10.0303L15.9697 8.96967ZM12.75 18V12H11.25V18H12.75ZM16 8.75H18V7.25H16V8.75ZM18.5303 7.46967L17.0303 5.96967L15.9697 7.03033L17.4697 8.53033L18.5303 7.46967ZM17.4697 7.46967L15.9697 8.96967L17.0303 10.0303L18.5303 8.53033L17.4697 7.46967ZM12.75 12C12.75 10.2051 14.2051 8.75 16 8.75V7.25C13.3766 7.25 11.25 9.37665 11.25 12H12.75Z" fill="#1C274C"></path> <path d="M11.25 18C11.25 18.4142 11.5858 18.75 12 18.75C12.4142 18.75 12.75 18.4142 12.75 18H11.25ZM6 8L5.46967 7.46967C5.17678 7.76256 5.17678 8.23744 5.46967 8.53033L6 8ZM8.03033 7.03033C8.32322 6.73744 8.32322 6.26256 8.03033 5.96967C7.73744 5.67678 7.26256 5.67678 6.96967 5.96967L8.03033 7.03033ZM6.96967 10.0303C7.26256 10.3232 7.73744 10.3232 8.03033 10.0303C8.32322 9.73744 8.32322 9.26256 8.03033 8.96967L6.96967 10.0303ZM12.75 18V12H11.25V18H12.75ZM8 7.25H6V8.75H8V7.25ZM6.53033 8.53033L8.03033 7.03033L6.96967 5.96967L5.46967 7.46967L6.53033 8.53033ZM5.46967 8.53033L6.96967 10.0303L8.03033 8.96967L6.53033 7.46967L5.46967 8.53033ZM12.75 12C12.75 9.37665 10.6234 7.25 8 7.25V8.75C9.79493 8.75 11.25 10.2051 11.25 12H12.75Z" fill="#1C274C"></path> </g></svg>
+
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> متعدد اللغات  </h3>
+                                <p class="mt-1 text-sm text-stone-600"> خاطب عميلك بلغته، أضف الإنجليزية بجانب العربية ولغات أخرى عديدة.</p>
+                                {{-- <a href="#" class="mt-2 inline-block text-sm font-medium text-stone-700 hover:text-stone-900 underline underline-offset-4">Learn More</a> --}}
+                            </div>  
+                        </div>
+
+                        <div class="xmt-16 flex items-start gap-3 lg:justify-end">
+                            <div class="shrink-0">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-12"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10.0802 7.89712C11.1568 5.96571 11.6952 5 12.5 5C13.3048 5 13.8432 5.96571 14.9198 7.89712L15.1984 8.3968C15.5043 8.94564 15.6573 9.22007 15.8958 9.40114C16.1343 9.5822 16.4314 9.64942 17.0255 9.78384L17.5664 9.90622C19.6571 10.3793 20.7025 10.6158 20.9512 11.4156C21.1999 12.2153 20.4872 13.0487 19.0619 14.7154L18.6932 15.1466C18.2881 15.6203 18.0856 15.8571 17.9945 16.1501C17.9034 16.443 17.934 16.759 17.9953 17.3909L18.051 17.9662C18.2665 20.19 18.3742 21.3019 17.7231 21.7962C17.072 22.2905 16.0932 21.8398 14.1357 20.9385L13.6292 20.7053C13.073 20.4492 12.7948 20.3211 12.5 20.3211C12.2052 20.3211 11.927 20.4492 11.3708 20.7053L10.8643 20.9385C8.90677 21.8398 7.928 22.2905 7.27688 21.7962C6.62575 21.3019 6.7335 20.19 6.94899 17.9662L7.00474 17.3909C7.06597 16.759 7.09659 16.443 7.00548 16.1501C6.91438 15.8571 6.71186 15.6203 6.30683 15.1466L5.93808 14.7154C4.51276 13.0487 3.8001 12.2153 4.04881 11.4156C4.29751 10.6158 5.34288 10.3793 7.43361 9.90622L7.9745 9.78384C8.56862 9.64942 8.86568 9.5822 9.1042 9.40114C9.34272 9.22007 9.4957 8.94565 9.80165 8.3968L10.0802 7.89712Z" stroke="#1C274C" stroke-width="1.5"></path> <path opacity="0.55" d="M4.98987 2C4.98987 2 5.2778 3.45771 5.90909 4.08475C6.54037 4.71179 8 4.98987 8 4.98987C8 4.98987 6.54229 5.2778 5.91525 5.90909C5.28821 6.54037 5.01013 8 5.01013 8C5.01013 8 4.7222 6.54229 4.09091 5.91525C3.45963 5.28821 2 5.01013 2 5.01013C2 5.01013 3.45771 4.7222 4.08475 4.09091C4.71179 3.45963 4.98987 2 4.98987 2Z" stroke="#1C274C" stroke-linejoin="round"></path> <path opacity="0.55" d="M18 5H20M19 6L19 4" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-900"> أعرض أعمالك وعملائك  </h3>
+                                <p class="mt-1 text-sm text-stone-600"> أعرض قائمة أعمالك ومشاريعك السابقة وشعارات العملاء الذين تعاملت معهم لتعزيز وتقوية رسالتك التسويقية.</p>
+                                {{-- <a href="#" class="mt-2 inline-block text-sm font-medium text-stone-700 hover:text-stone-900 underline underline-offset-4">Learn More</a> --}}
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         {{-- Baseline gallery: equal-size shots revealed by different amounts --}}
-        <div class="hero-shots relative bg-blackx mx-auto px-4 sm:px-6 flex items-end justify-center gap-2.5 sm:gap-4">
+        <div hidden class="hidden hero-shots relative bg-blackx mx-auto px-4 sm:px-6 flex items-end justify-center gap-2.5 sm:gap-4">
             @foreach ([
                 ['title' => 'متجر أزياء',    'visible' => '.45', 'img' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=640&auto=format&fit=crop'],
                 ['title' => 'مقهى مختص',    'visible' => '.65', 'img' => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=640&auto=format&fit=crop'],
@@ -435,6 +524,7 @@
                     </h1>
 
                     <p class="text-base md:text-lg text-stone-500 leading-relaxed max-w-[34rem] font-normal">
+                        ابني حضورك الرقمي بدقائق، 
                         أنشئ صفحة لأعمالك، تستقبل الزوار، تجيب عن أسئلتهم، تعرض المنتجات والخدمات، وتستقبل الطلبات والحجوزات على مدار الساعة.
                     </p>
 
@@ -1991,10 +2081,16 @@
                 </ul>
             </div>
             <div class="flex items-center gap-4 shrink-0 text-[#0D0C22]">
-                <a href="https://x.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="X"><iconify-icon noobserver icon="solar:hashtag-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="{{ route('home') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="{{ config('app.name') }}"><iconify-icon noobserver icon="solar:global-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="https://www.instagram.com/broshurcom" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام"><iconify-icon noobserver icon="solar:camera-linear" class="w-5 h-5"></iconify-icon></a>
-                <a href="{{ route('auth.register-login') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="ابدأ الآن"><iconify-icon noobserver icon="solar:play-circle-linear" class="w-5 h-5"></iconify-icon></a>
+                <a href="https://x.com/eqleemapp" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="X">
+                    <iconify-icon noobserver icon="bxl:twitter-x" class="w-5 h-5"></iconify-icon>
+                </a>
+                {{-- <a href="{{ route('home') }}" wire:navigate class="hover:text-gray-600 transition-colors" aria-label="{{ config('app.name') }}"><iconify-icon noobserver icon="solar:global-linear" class="w-5 h-5"></iconify-icon></a> --}}
+                <a href="https://www.instagram.com/eqleemapp" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام">
+                    <iconify-icon noobserver icon="solar:camera-linear" class="w-5 h-5"></iconify-icon>
+                </a>    
+                <a href="https://www.tiktok.com/@eqleemapp" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600 transition-colors" aria-label="إنستغرام">
+                    <iconify-icon noobserver icon="mingcute:tiktok-line" class="w-5 h-5"></iconify-icon>
+                </a>
             </div>
         </div>
         

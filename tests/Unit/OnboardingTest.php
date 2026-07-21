@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\CreateDefaultBlocks;
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\Theme;
 use App\Models\User;
@@ -93,4 +94,41 @@ it('marks identity done when primary color is saved', function () {
     ]);
 
     expect($onboarding->identityDone($tenant->fresh()))->toBeTrue();
+});
+
+it('marks orders done when payment is active without verification', function () {
+    $user = User::factory()->create(['uuid' => (string) Str::uuid()]);
+
+    $theme = Theme::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'إفتراضي',
+        'slug' => 'default',
+        'type' => 'all',
+        'app' => 'all',
+        'active' => true,
+        'public' => true,
+        'sort' => 1,
+    ]);
+
+    $tenant = Tenant::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'متجري',
+        'handle' => 'onboard-orders-'.Str::lower(Str::random(6)),
+        'user_id' => $user->id,
+        'theme_id' => $theme->id,
+        'active' => true,
+        'status' => 'active',
+    ]);
+
+    setCurrentTenant($tenant);
+
+    $onboarding = app(Onboarding::class);
+
+    expect($onboarding->ordersDone($tenant))->toBeFalse()
+        ->and($onboarding->verificationDone($tenant))->toBeFalse();
+
+    Setting::savePaymentMethod('cash-on-delivery', [], true);
+
+    expect($onboarding->ordersDone($tenant))->toBeTrue()
+        ->and($onboarding->verificationDone($tenant))->toBeFalse();
 });

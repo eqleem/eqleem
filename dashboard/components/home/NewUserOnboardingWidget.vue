@@ -105,7 +105,7 @@ const onboardingModalName = 'new-user-onboarding';
 const stepIndex = computed(() => steps.value.findIndex((step) => step.key === activeKey.value));
 const activeStep = computed(() => steps.value.find((step) => step.key === activeKey.value) ?? null);
 const isLastStep = computed(() => stepIndex.value === steps.value.length - 1);
-const canGoBack = computed(() => stepIndex.value > 0);
+const canGoBack = computed(() => showSuccess.value || stepIndex.value > 0);
 const isWidgetVisible = computed(() => shouldShow.value || forceOpen.value);
 const activeStepNumber = computed(() => Math.max(stepIndex.value + 1, 1));
 const displayPercentage = computed(() => Math.max(percentage.value, 5));
@@ -229,7 +229,7 @@ const canContinue = computed(() => {
         case 'catalog':
             return enabledCatalog.value.length > 0;
         case 'orders':
-            return Boolean(forms.value.orders.payment_active && forms.value.orders.verification_done);
+            return Boolean(forms.value.orders.payment_active);
         default:
             return false;
     }
@@ -292,6 +292,7 @@ function selectStep(step) {
         return;
     }
 
+    showSuccess.value = false;
     activeKey.value = step.key;
 }
 
@@ -317,6 +318,12 @@ function onSecondaryActionChange(value) {
 
 function goBack() {
     if (!canGoBack.value) {
+        return;
+    }
+
+    if (showSuccess.value) {
+        showSuccess.value = false;
+        activeKey.value = steps.value[steps.value.length - 1]?.key || 'orders';
         return;
     }
 
@@ -421,7 +428,11 @@ function syncFromStore() {
         activeKey.value = store.currentStep || steps.value[0]?.key || 'business';
     }
 
-    showSuccess.value = completed.value;
+    // Only auto-enter success on first hydrate. Later refreshes must not yank the
+    // user back if they navigated to a previous step after completing.
+    if (!hydrated && completed.value) {
+        showSuccess.value = true;
+    }
 
     nextTick(() => {
         syncingFromStore = false;
@@ -764,8 +775,8 @@ async function continueStep() {
     if (activeKey.value === 'orders') {
         await store.refreshQuiet();
 
-        if (!forms.value.orders.payment_active || !forms.value.orders.verification_done) {
-            notifyError('فعّل وسيلة دفع وأكمل التوثيق للمتابعة');
+        if (!forms.value.orders.payment_active) {
+            notifyError('فعّل وسيلة دفع واحدة على الأقل للمتابعة');
             return;
         }
 
@@ -856,18 +867,10 @@ function onOnboardingModalOpened(event) {
     nextTick(() => setupFooterObserver());
 }
 
-watch(() => [
-    forms.value.orders.payment_active,
-    forms.value.orders.shipping_active,
-    forms.value.orders.verification_done,
-    completed.value,
-], () => {
-    if (!hydrated) {
-        return;
-    }
-
-    if (completed.value) {
+watch(completed, (value, previous) => {
+    if (value && !previous) {
         showSuccess.value = true;
+        fireConfetti();
     }
 });
 
@@ -905,13 +908,6 @@ watch(() => identity.primary_color, (value) => {
     scheduleAutosave();
 });
 
-watch(completed, (value) => {
-    if (value && !showSuccess.value) {
-        showSuccess.value = true;
-        fireConfetti();
-    }
-});
-
 function updateFooterPin() {
     if (typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches) {
         footerFixed.value = false;
@@ -922,7 +918,7 @@ function updateFooterPin() {
     const root = wizardRoot.value;
     const sentinel = footerSentinel.value;
 
-    if (!root || !sentinel || showSuccess.value) {
+    if (!root || !sentinel) {
         footerFixed.value = false;
         footerStyle.value = {};
         return;
@@ -1070,6 +1066,54 @@ watch(shouldShow, async (value) => {
             </div>
         </div>
 
+        <div class="border-b border-stone-100 py-3 sm:px-5">
+            <div class="overflow-x-auto pb-1">
+                <div class="flex w-full items-center justify-between px-2 sm:px-0">
+                    <template v-for="(step, index) in timelineSteps" :key="step.key">
+                        <button
+                            type="button"
+                            class="group flex shrink-0 items-center gap-1 rounded-lg px-1 py-1 text-xs transition sm:gap-1.5 sm:px-1.5"
+                            :class="[
+                                (showSuccess && step.key === 'publish') || (!showSuccess && activeKey === step.key)
+                                    ? 'font-bold text-primary-600'
+                                    : step.done || (showSuccess && step.key !== 'publish')
+                                        ? 'text-emerald-600'
+                                        : isUnlocked(step)
+                                            ? 'text-stone-500 hover:bg-stone-50'
+                                            : 'cursor-not-allowed text-stone-300',
+                            ]"
+                            :disabled="step.milestone || !isUnlocked(step)"
+                            @click="!step.milestone && selectStep(step)"
+                        >
+                            <span class="hidden w-3 items-center justify-center text-sm leading-none sm:inline-flex">
+                                {{ (showSuccess && step.key === 'publish') || (!showSuccess && activeKey === step.key)
+                                    ? '●'
+                                    : step.done || (showSuccess && step.key !== 'publish')
+                                        ? '✓'
+                                        : '○' }}
+                            </span>
+                            <iconify-icon
+                                :icon="step.icon || 'hugeicons:circle'"
+                                class="shrink-0 text-base"
+                            ></iconify-icon>
+                            <span class="text-[10px] tabular-nums sm:hidden">{{ index + 1 }}</span>
+                            <span
+                                v-if="(showSuccess && step.key === 'publish') || (!showSuccess && activeKey === step.key)"
+                                class="whitespace-nowrap text-[11px] sm:hidden"
+                            >
+                                {{ step.title }}
+                            </span>
+                            <span class="hidden whitespace-nowrap sm:inline">{{ step.title }}</span>
+                        </button>
+                        <span
+                            v-if="index < timelineSteps.length - 1"
+                            class="mx-0.5 h-px min-w-1 flex-1 bg-stone-200 sm:mx-1"
+                        ></span>
+                    </template>
+                </div>
+            </div>
+        </div>
+
         <div v-if="showSuccess" class="space-y-5 p-5 sm:p-7">
             <div class="mx-auto max-w-md text-center">
                 <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-rose-100 text-3xl">
@@ -1105,83 +1149,10 @@ watch(shouldShow, async (value) => {
                         </template>
                     </Button>
                 </div>
-
-                <Button
-                    type="button"
-                    variant="secondary"
-                    class="mt-2 h-12 w-full rounded-xl text-base font-bold"
-                    label="إنهاء الإعداد"
-                    :loading="saving"
-                    @click="dismissWizard"
-                >
-                    <template #icon>
-                        <iconify-icon icon="hugeicons:tick-02" class="text-xl"></iconify-icon>
-                    </template>
-                </Button>
             </div>
-
-            <OnboardingPagePreview
-                :name="business.name"
-                :bio="business.bio"
-                :handle="identity.handle"
-                :page-url="pageUrl"
-                :brand-mark="brandMark"
-                :logo-url="forms.business.logo"
-                :header-image="identity.header_image"
-                :header-image-url="identity.header_image_url"
-                :header-image-position="identity.header_image_position"
-                :primary-color="identity.primary_color"
-                :primary-action-label="primaryActionLabel"
-                :secondary-action-label="secondaryActionLabel"
-                :social-links="previewSocialLinks"
-            />
         </div>
 
         <template v-else>
-            <div class="border-b border-stone-100 py-3 sm:px-5">
-                <div class="overflow-x-auto pb-1">
-                    <div class="flex w-full items-center justify-between px-2 sm:px-0">
-                        <template v-for="(step, index) in timelineSteps" :key="step.key">
-                            <button
-                                type="button"
-                                class="group flex shrink-0 items-center gap-1 rounded-lg px-1 py-1 text-xs transition sm:gap-1.5 sm:px-1.5"
-                                :class="[
-                                    activeKey === step.key
-                                        ? 'font-bold text-primary-600'
-                                        : step.done
-                                            ? 'text-emerald-600'
-                                            : isUnlocked(step)
-                                                ? 'text-stone-500 hover:bg-stone-50'
-                                                : 'cursor-not-allowed text-stone-300',
-                                ]"
-                                :disabled="step.milestone || !isUnlocked(step)"
-                                @click="!step.milestone && selectStep(step)"
-                            >
-                                <span class="hidden w-3 items-center justify-center text-sm leading-none sm:inline-flex">
-                                    {{ activeKey === step.key ? '●' : step.done ? '✓' : '○' }}
-                                </span>
-                                <iconify-icon
-                                    :icon="step.icon || 'hugeicons:circle'"
-                                    class="shrink-0 text-base"
-                                ></iconify-icon>
-                                <span class="text-[10px] tabular-nums sm:hidden">{{ index + 1 }}</span>
-                                <span
-                                    v-if="activeKey === step.key"
-                                    class="whitespace-nowrap text-[11px] sm:hidden"
-                                >
-                                    {{ step.title }}
-                                </span>
-                                <span class="hidden whitespace-nowrap sm:inline">{{ step.title }}</span>
-                            </button>
-                            <span
-                                v-if="index < timelineSteps.length - 1"
-                                class="mx-0.5 h-px min-w-1 flex-1 bg-stone-200 sm:mx-1"
-                            ></span>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
             <div class="grid gap-0 lg:grid-cols-8">
                 <div class="min-w-0 px-4 pb-4 pt-4 sm:px-6 lg:col-span-5 lg:pb-6">
                     <div class="mb-4">
@@ -1443,14 +1414,14 @@ watch(shouldShow, async (value) => {
                             <span class="min-w-0 flex-1">
                                 <span class="block text-sm font-semibold text-stone-800">توثيق النشاط</span>
                                 <span class="block text-xs" :class="forms.orders.verification_done ? 'text-emerald-600' : 'text-stone-400'">
-                                    {{ forms.orders.verification_done ? 'تم إرسال التوثيق' : 'مطلوب لاستقبال المدفوعات بأمان' }}
+                                    {{ forms.orders.verification_done ? 'تم إرسال التوثيق' : 'اختياري — يمكنك توثيق متجرك لاحقاً بعد اكتمال الإعداد' }}
                                 </span>
                             </span>
                             <iconify-icon icon="hugeicons:arrow-left-01" class="text-xl text-stone-300"></iconify-icon>
                         </button>
 
                         <p class="pt-1 text-xs text-stone-400">
-                            إعداد مرة واحدة: فعّل وسيلة دفع وأكمل التوثيق. الشحن اختياري.
+                            للمتابعة: فعّل وسيلة دفع واحدة على الأقل. الشحن والتوثيق اختياريان.
                         </p>
                     </div>
                 </div>
@@ -1473,10 +1444,13 @@ watch(shouldShow, async (value) => {
                     />
                 </div>
             </div>
+        </template>
 
             <div
                 class="lg:hidden"
-                :class="activeKey === 'identity' ? 'h-[calc(5rem+58vh)]' : 'h-[19rem]'"
+                :class="showSuccess
+                    ? 'h-[5rem]'
+                    : activeKey === 'identity' ? 'h-[calc(5rem+58vh)]' : 'h-[19rem]'"
                 aria-hidden="true"
             ></div>
             <div
@@ -1498,15 +1472,15 @@ watch(shouldShow, async (value) => {
                     <Button
                         type="button"
                         class="h-12 flex-1 rounded-2xl text-base font-bold"
-                        :disabled="!canContinue"
-                        :loading="saving && !autosaving"
-                        :label="isLastStep ? 'إنهاء إعداد صفحتك' : 'حفظ وإكمال'"
+                        :disabled="showSuccess ? false : !canContinue"
+                        :loading="showSuccess ? saving : (saving && !autosaving)"
+                        :label="showSuccess ? 'إنهاء الإعداد' : (isLastStep ? 'إنهاء إعداد صفحتك' : 'حفظ وإكمال')"
                         icon-position="end"
-                        @click="continueStep"
+                        @click="showSuccess ? dismissWizard() : continueStep()"
                     >
                         <template #icon>
                             <iconify-icon
-                                :icon="isLastStep ? 'solar:check-circle-bold-duotone' : 'solar:arrow-left-bold-duotone'"
+                                :icon="showSuccess || isLastStep ? 'solar:check-circle-bold-duotone' : 'solar:arrow-left-bold-duotone'"
                                 class="text-2xl"
                             ></iconify-icon>
                         </template>
@@ -1514,6 +1488,7 @@ watch(shouldShow, async (value) => {
                 </div>
 
                 <div
+                    v-if="!showSuccess"
                     class="overflow-y-auto border-t border-stone-200 bg-stone-50/80 p-3"
                     :class="activeKey === 'identity' ? 'max-h-[58vh]' : 'max-h-56'"
                 >
@@ -1565,22 +1540,21 @@ watch(shouldShow, async (value) => {
                     <Button
                         type="button"
                         class="h-12 flex-1 rounded-2xl text-base font-bold"
-                        :disabled="!canContinue"
-                        :loading="saving && !autosaving"
-                        :label="isLastStep ? 'إنهاء إعداد صفحتك' : 'حفظ وإكمال'"
+                        :disabled="showSuccess ? false : !canContinue"
+                        :loading="showSuccess ? saving : (saving && !autosaving)"
+                        :label="showSuccess ? 'إنهاء الإعداد' : (isLastStep ? 'إنهاء إعداد صفحتك' : 'حفظ وإكمال')"
                         icon-position="end"
-                        @click="continueStep"
+                        @click="showSuccess ? dismissWizard() : continueStep()"
                     >
                         <template #icon>
                             <iconify-icon
-                                :icon="isLastStep ? 'solar:check-circle-bold-duotone' : 'solar:arrow-left-bold-duotone'"
+                                :icon="showSuccess || isLastStep ? 'solar:check-circle-bold-duotone' : 'solar:arrow-left-bold-duotone'"
                                 class="text-2xl"
                             ></iconify-icon>
                         </template>
                     </Button>
                 </div>
             </div>
-        </template>
 
         <Modal title="طرق الدفع" size="2xl" name="new-onboarding-payment">
             <div class="flex max-h-[75vh] flex-col">

@@ -21,7 +21,7 @@ return [
         'order' => 2,
         'slug' => 'credit-card',
         'name' => 'البطاقة الإئتمانية',
-        'description' => 'مدفوعات كتالوج: الدفع بواسطة البطاقات الإئتمانية، فيز وماستركارد ومدى.',
+        'description' => 'مدفوعات إقليم: الدفع بواسطة البطاقات الإئتمانية، فيز وماستركارد ومدى.',
         'icon' => 'assets/images/credit-card-payment.svg',
         'components' => [
             'modal' => 'admin::settings.payment-options.modals.credit-card',

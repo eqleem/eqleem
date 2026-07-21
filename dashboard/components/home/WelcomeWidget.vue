@@ -83,7 +83,7 @@ function shareLink(platform) {
             :class="isReady ? 'flex flex-col' : 'grid lg:grid-cols-[1fr_auto]'"
         >
             <div
-                class="p-5 sm:p-6"
+                class="p-5 sm:p-4"
                 :class="isReady ? 'border-b border-white/10 pb-4' : ''"
             >
                 <div class="flex items-center justify-between gap-3">

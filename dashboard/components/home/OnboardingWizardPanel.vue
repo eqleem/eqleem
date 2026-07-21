@@ -129,7 +129,7 @@ const canContinue = computed(() => {
         case 'catalog':
             return enabledCatalog.value.length > 0;
         case 'orders':
-            return Boolean(forms.value.orders.payment_active && forms.value.orders.verification_done);
+            return Boolean(forms.value.orders.payment_active);
         default:
             return false;
     }
@@ -475,8 +475,8 @@ async function continueStep() {
     if (activeKey.value === 'orders') {
         await store.refreshQuiet();
 
-        if (!forms.value.orders.payment_active || !forms.value.orders.verification_done) {
-            notifyError('فعّل وسيلة دفع وأكمل التوثيق للمتابعة');
+        if (!forms.value.orders.payment_active) {
+            notifyError('فعّل وسيلة دفع واحدة على الأقل للمتابعة');
             return;
         }
 
@@ -805,7 +805,7 @@ async function continueStep() {
                     <span class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-stone-800">توثيق النشاط</span>
                         <span class="block text-xs" :class="forms.orders.verification_done ? 'text-emerald-600' : 'text-stone-400'">
-                            {{ forms.orders.verification_done ? 'تم إرسال التوثيق' : 'مطلوب لاستقبال المدفوعات بأمان' }}
+                            {{ forms.orders.verification_done ? 'تم إرسال التوثيق' : 'اختياري — يمكنك توثيق متجرك لاحقاً بعد اكتمال الإعداد' }}
                         </span>
                     </span>
                     <iconify-icon
@@ -817,21 +817,13 @@ async function continueStep() {
                 </button>
 
                 <p class="pt-1 text-xs text-stone-400">
-                    للمتابعة: فعّل وسيلة دفع واحدة على الأقل وأكمل طلب التوثيق. الشحن اختياري.
+                    للمتابعة: فعّل وسيلة دفع واحدة على الأقل. الشحن والتوثيق اختياريان.
                 </p>
                 <p
-                    v-if="!forms.orders.payment_active || !forms.orders.verification_done"
+                    v-if="!forms.orders.payment_active"
                     class="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800"
                 >
-                    <template v-if="!forms.orders.payment_active && !forms.orders.verification_done">
-                        فعّل طرق الدفع وأكمل التوثيق لتفعيل زر الحفظ.
-                    </template>
-                    <template v-else-if="!forms.orders.payment_active">
-                        فعّل وسيلة دفع واحدة على الأقل، ثم اضغط «تم».
-                    </template>
-                    <template v-else>
-                        أكمل توثيق النشاط لتفعيل زر الحفظ.
-                    </template>
+                    فعّل وسيلة دفع واحدة على الأقل، ثم اضغط «تم».
                 </p>
             </div>
         </div>

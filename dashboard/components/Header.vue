@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
     <header class="fixed inset-x-0 top-0 z-40 bg-primary-700 p-2 text-white">
         <div class="mx-auto flex max-w-7xl justify-between gap-x-2 lg:gap-x-3">
             <div class="flex min-w-0 flex-1 items-center justify-start gap-x-2">
-                <RouterLink to="/" class="flex min-w-0 items-center gap-x-2">
+                <RouterLink to="/" class="flex min-w-0 cursor-pointer items-center gap-x-2">
                     <BrandMark
                         class="ms-1"
                         :mark="tenantBrandMark"
@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
 
                 <RouterLink
                     to="/plan"
-                    class="shrink-0"
+                    class="shrink-0 cursor-pointer"
                     :title="tenantPlan"
                     :aria-label="`الباقة: ${tenantPlan}`"
                 >
@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
                     :href="tenantUrl"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="hidden items-center gap-x-2 rounded-full bg-green-600 p-1 px-3 text-sm text-white hover:bg-green-500 md:flex"
+                    class="hidden cursor-pointer items-center gap-x-2 rounded-full bg-green-600 p-1 px-3 text-sm text-white hover:bg-green-500 md:flex"
                 >
                     معاينة <span class="hidden lg:block">الصفحة</span>
                     <svg
@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
                 <RouterLink
                     to="/settings"
                     title="الإعدادات"
-                    class="flex items-center gap-x-2 rounded-full p-1 px-2 text-sm text-white hover:bg-black/30"
+                    class="flex cursor-pointer items-center gap-x-2 rounded-full p-1 px-2 text-sm text-white hover:bg-black/30"
                     :class="{ 'bg-black/30': route.name === 'settings' }"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-6 md:size-5" viewBox="0 0 24 24" fill="none">
@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
 
                 <button
                     type="button"
-                    class="flex items-center gap-2 md:hidden"
+                    class="flex cursor-pointer items-center gap-2 md:hidden"
                     aria-haspopup="dialog"
                     aria-label="فتح القائمة"
                     @click="openMobileMenu"
@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
                 </button>
 
                 <div class="hidden md:block ms-0 md:ms-2">
-                    <Dropdown width="w-48" class="text-stone-800">
+                    <Dropdown width="w-64" class="text-stone-800">
                         <template #trigger>
                             <button type="button" class="flex cursor-pointer items-center gap-2" aria-haspopup="menu">
                                 <div class="flex items-center justify-center gap-x-2 text-center">
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
                 <div class="absolute left-3 top-3 z-10">
                     <button
                         type="button"
-                        class="rounded-lg p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-stone-800"
+                        class="cursor-pointer rounded-lg p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-stone-800"
                         aria-label="إغلاق القائمة"
                         @click="closeMobileMenu"
                     >

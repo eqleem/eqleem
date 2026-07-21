@@ -148,7 +148,7 @@ class Onboarding
 
     public function ordersDone(Tenant $tenant): bool
     {
-        return $this->hasActivePayment($tenant) && $this->verificationDone($tenant);
+        return $this->hasActivePayment($tenant);
     }
 
     public function hasActivePayment(Tenant $tenant): bool
