@@ -17,8 +17,8 @@ Route::as('auth.')
 
         Route::livewire('/password/forgot-password', 'auth::forgot-password')->middleware('guest')->name('password.forgot-password')->middleware('guest');
         Route::livewire('/register-login', 'auth::register-login')->name('register-login')->middleware('guest');
-        Route::livewire('/login', 'auth::login')->name('login')->middleware('guest');
-        Route::livewire('/register', 'auth::register')->name('register')->middleware('guest');
+        Route::livewire('/login', 'auth::register-login')->name('login')->middleware('guest');
+        Route::livewire('/register', 'auth::register-login')->name('register')->middleware('guest');
 
         Route::get('/logout', function (Request $request) {
             auth()->logout();
