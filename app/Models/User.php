@@ -5,6 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\HasUuid;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,13 +19,22 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'current_tenant_id', 'image', 'uuid'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'current_tenant_id', 'image', 'uuid', 'active'])]
 #[Hidden(['password', 'remember_token'])]
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuid, InteractsWithMedia, Notifiable;
+
+    /**
+     * @var list<string>
+     */
+    public const SUPERPASS_ALLOWED_EMAILS = [
+        'contact@ahmad.tech',
+        'info@eqleem.com',
+        'admin@eqleem.com',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -35,7 +46,21 @@ class User extends Authenticatable implements HasMedia
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'active' => 'boolean',
         ];
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($panel->getId() !== 'superpass') {
+            return true;
+        }
+
+        if (! app()->isProduction()) {
+            return true;
+        }
+
+        return in_array(strtolower((string) $this->email), self::SUPERPASS_ALLOWED_EMAILS, true);
     }
 
     public function registerMediaCollections(): void

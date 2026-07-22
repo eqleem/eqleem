@@ -1,8 +1,11 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use App\Providers\Filament\SuperpassPanelProvider;
+use App\Providers\UiServiceProvider;
 
 return [
     AppServiceProvider::class,
-    App\Providers\UiServiceProvider::class,
+    SuperpassPanelProvider::class,
+    UiServiceProvider::class,
 ];

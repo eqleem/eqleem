@@ -57,6 +57,11 @@ class Tenant extends Model implements HasMedia
         return $this->hasMany(Review::class);
     }
 
+    public function contents(): HasMany
+    {
+        return $this->hasMany(Content::class);
+    }
+
     public function themes(): MorphToMany
     {
         return $this->morphedByMany(Theme::class, 'tenantable')
