@@ -4,21 +4,24 @@ import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
+import Price from '../../../components/ui/Price.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import Toggle from '../../../components/ui/Toggle.vue';
 import Alert from '../../../components/ui/Alert.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
 import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import FileGallery from '../../../components/ui/FileGallery.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useDigitalProductsStore } from '../../../stores/digital-products.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useDigitalProductsStore();
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const formTab = ref('edit');
 const uploading = ref(false);
 const uploadingDownloads = ref(false);
@@ -33,7 +36,7 @@ const form = reactive({
     price: '',
     comparePrice: '',
     categoryIds: [],
-    published: false,
+    active: false,
     images: [],
     downloads: [],
 });
@@ -48,6 +51,7 @@ const uuid = computed(() => String(route.params.id));
 const editorUploadUrl = computed(() => `/api/digital-products/${uuid.value}/editor-images`);
 const categories = computed(() => store.detail?.category_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/digital-products/');
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 function switchTab(tab) {
     formTab.value = tab;
@@ -64,7 +68,7 @@ function loadForm(product, { syncEditor = true } = {}) {
     form.price = product.price ?? '';
     form.comparePrice = product.compare_price ?? '';
     form.categoryIds = [...(product.category_ids ?? [])].map(String);
-    form.published = Boolean(product.published);
+    form.active = Boolean(product.active ?? product.published);
     form.images = [...(product.images ?? [])];
     form.downloads = [...(product.downloads ?? [])];
     errors.title = null;
@@ -199,7 +203,10 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            switchTab('edit');
+            expandAdvanced();
+        }
         return;
     }
 
@@ -215,7 +222,7 @@ async function persist({ close = false } = {}) {
         body,
         slug,
         category_ids: categoryIds,
-        published: Boolean(form.published),
+        active: Boolean(form.active),
         editor_mode: 'html',
     };
 
@@ -245,10 +252,9 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ المنتج.')
                 : null;
 
-            if (errors.title) {
+            if (errors.slug) {
                 switchTab('edit');
-            } else if (errors.slug) {
-                switchTab('advanced');
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ المنتج.';
@@ -304,14 +310,6 @@ function saveAndClose() {
                     >
                         ملفات التحميل
                     </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('advanced')"
-                    >
-                        متقدم
-                    </button>
                 </nav>
             </div>
 
@@ -319,65 +317,84 @@ function saveAndClose() {
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
 
                 <div
-                    class="space-y-2"
+                    class="space-y-4"
                     :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'"
                 >
-                    <Input
-                        v-model="form.title"
-                        name="title"
-                        placeholder="اسم المنتج"
-                        :error="errors.title"
-                    />
-
-                    <Textarea
-                        v-model="form.subtitle"
-                        name="subtitle"
-                        placeholder="عنوان فرعي"
-                        info="عنوان فرعي يظهر تحت اسم المنتج في صفحة العرض وقائمة المنتجات."
-                        :rows="2"
-                    />
-
-                    <MediaGallery
-                        v-model="form.images"
-                        label="صور المنتج"
-                        :uploading="uploading"
-                        :disabled="store.saving"
-                        @upload="uploadFiles"
-                        @remove="removeImage"
-                        @reorder="reorderImages"
-                    />
-
-                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div class="space-y-2">
                         <Input
-                            v-model="form.price"
-                            name="price"
-                            label="السعر"
-                            type="number"
-                            dir="ltr"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
+                            v-model="form.title"
+                            name="title"
+                            placeholder="اسم المنتج"
+                            :error="errors.title"
                         />
-                        <Input
-                            v-model="form.comparePrice"
-                            name="comparePrice"
-                            label="سعر المقارنة"
-                            type="number"
-                            dir="ltr"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
+
+                        <MediaGallery
+                            v-model="form.images"
+                            label="صور المنتج"
+                            :uploading="uploading"
+                            :disabled="store.saving"
+                            @upload="uploadFiles"
+                            @remove="removeImage"
+                            @reorder="reorderImages"
+                        />
+
+                        <Price v-model="form.price" name="price" :currency="priceCurrency" />
+
+                        <CkEditor
+                            v-if="editorUploadUrl"
+                            ref="bodyEditor"
+                            :key="uuid"
+                            :model-value="bodySeed"
+                            name="body"
+                            :upload-url="editorUploadUrl"
                         />
                     </div>
 
-                    <CkEditor
-                        v-if="editorUploadUrl"
-                        ref="bodyEditor"
-                        :key="uuid"
-                        :model-value="bodySeed"
-                        name="body"
-                        :upload-url="editorUploadUrl"
-                    />
+                    <PageFormMetaSection
+                        v-model:published="form.active"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
+                    >
+                        <Textarea
+                            v-model="form.subtitle"
+                            name="subtitle"
+                            label="عنوان فرعي"
+                            placeholder="عنوان فرعي"
+                            info="عنوان فرعي يظهر تحت اسم المنتج في صفحة العرض وقائمة المنتجات."
+                            :rows="2"
+                        />
+
+                        <Price
+                            v-model="form.comparePrice"
+                            name="comparePrice"
+                            label="سعر المقارنة"
+                            :currency="priceCurrency"
+                            info="السعر الأصلي قبل الخصم؛ يظهر مشطوباً بجانب سعر البيع لإبراز التخفيض."
+                        />
+
+                        <div class="space-y-1.5">
+                            <span class="block text-sm font-semibold text-stone-500">القسم</span>
+                            <div class="space-y-1.5">
+                                <label
+                                    v-for="option in categories"
+                                    :key="option.id"
+                                    class="flex items-center gap-2 text-sm"
+                                    :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-stone-300"
+                                        :disabled="!option.selectable"
+                                        :checked="form.categoryIds.includes(String(option.id))"
+                                        @change="toggleCategory(option.id, $event.target.checked)"
+                                    >
+                                    <span>{{ option.label }}</span>
+                                </label>
+                                <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                            </div>
+                        </div>
+                    </PageFormMetaSection>
                 </div>
 
                 <div
@@ -399,44 +416,6 @@ function saveAndClose() {
                         @remove="removeDownload"
                         @reorder="reorderDownloads"
                     />
-                </div>
-
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
-                >
-                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
-                        <div class="w-full space-y-1.5 p-2">
-                            <label
-                                v-for="option in categories"
-                                :key="option.id"
-                                class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-4 w-4 rounded border-stone-300"
-                                    :disabled="!option.selectable"
-                                    :checked="form.categoryIds.includes(String(option.id))"
-                                    @change="toggleCategory(option.id, $event.target.checked)"
-                                >
-                                <span>{{ option.label }}</span>
-                            </label>
-                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
-                        </div>
-                    </div>
-
-                    <Input
-                        v-model="form.slug"
-                        name="slug"
-                        label="نص الرابط"
-                        dir="ltr"
-                        :prefix="slugPrefix"
-                        :error="errors.slug"
-                    />
-
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
                 </div>
 
                 <template #footer>

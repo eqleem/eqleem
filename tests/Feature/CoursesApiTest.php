@@ -5,6 +5,7 @@ use App\Models\Setting;
 use App\Models\Taxonomy;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -74,11 +75,15 @@ test('owner can create list update and delete courses', function () {
                 'slug_prefix',
                 'price',
                 'compare_price',
+                'currency_code',
+                'currency_symbol',
                 'subtitle',
                 'level_options',
                 'course_type_options',
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.currency_code', 'SAR')
+        ->assertJsonPath('data.currency_symbol', Money::SAR_SYMBOL);
 
     setCurrentTenant($tenant);
 

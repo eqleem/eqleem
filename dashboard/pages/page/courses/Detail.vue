@@ -4,21 +4,23 @@ import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
+import Price from '../../../components/ui/Price.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import Toggle from '../../../components/ui/Toggle.vue';
 import Alert from '../../../components/ui/Alert.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
 import MediaGallery from '../../../components/ui/MediaGallery.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useCoursesStore } from '../../../stores/courses.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
-const route = useRoute(); 
+const route = useRoute();
 const router = useRouter();
 const store = useCoursesStore();
-const formTab = ref('edit');
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const uploading = ref(false);
 const uploadingLesson = ref(null);
 const notFound = ref(false);
@@ -54,6 +56,7 @@ const categories = computed(() => store.detail?.category_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/courses/');
 const levelOptions = computed(() => store.detail?.level_options ?? {});
 const courseTypeOptions = computed(() => store.detail?.course_type_options ?? {});
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 const totalLessons = computed(() => form.chapters.reduce((sum, chapter) => sum + (chapter.lessons?.length ?? 0), 0));
 
@@ -85,10 +88,6 @@ function blankChapter() {
         description: '',
         lessons: [],
     };
-}
-
-function switchTab(tab) {
-    formTab.value = tab;
 }
 
 function cloneChapters(chapters) {
@@ -155,7 +154,6 @@ watch(() => route.params.id, async (id) => {
     }
 
     notFound.value = false;
-    formTab.value = 'edit';
 
     try {
         const course = await store.fetchCourse(String(id));
@@ -339,7 +337,9 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            expandAdvanced();
+        }
         return;
     }
 
@@ -389,10 +389,8 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ الدورة.')
                 : null;
 
-            if (errors.title) {
-                switchTab('edit');
-            } else if (errors.slug) {
-                switchTab('advanced');
+            if (errors.slug) {
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ الدورة.';
@@ -430,241 +428,232 @@ function saveAndClose() {
                         <span class="truncate text-stone-600 hidden md:inline">تحرير الدورة</span>
                     </div>
                 </div>
-
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('edit')"
-                    >
-                        تحرير
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'curriculum' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('curriculum')"
-                    >
-                        المحتوى التعليمي
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('advanced')"
-                    >
-                        متقدم
-                    </button>
-                </nav>
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
 
-                <div class="space-y-2" :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'">
-                    <Input v-model="form.title" name="title" label="اسم الدورة" placeholder="مثال: مهارات المحادثة باللغة الإنجليزية" :error="errors.title" />
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <Input v-model="form.title" name="title" label="اسم الدورة" placeholder="مثال: مهارات المحادثة باللغة الإنجليزية" :error="errors.title" />
 
-                    <Textarea
-                        v-model="form.subtitle"
-                        name="subtitle"
-                        label="عنوان ترويجي"
-                        placeholder="مثال: مقدمة شاملة تأخذك من ما قبل البداية إلى مرحلة الإنطلاقة"
-                        info="عنوان فرعي لا يزيد عن 300 حرف."
-                        maxlength="300"
-                        :rows="2"
-                    />
+                        <Price v-model="form.price" name="price" :currency="priceCurrency" />
 
-                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <Input v-model="form.price" name="price" label="السعر" type="number" dir="ltr" step="0.01" min="0" placeholder="0.00" />
-                        <Input v-model="form.comparePrice" name="comparePrice" label="سعر المقارنة" type="number" dir="ltr" step="0.01" min="0" placeholder="0.00" />
-                    </div>
+                        <MediaGallery
+                            v-model="form.images"
+                            label="الصورة"
+                            :max-files="1"
+                            :sortable="false"
+                            :uploading="uploading"
+                            :disabled="store.saving"
+                            @upload="uploadCover"
+                            @remove="removeCover"
+                        />
 
-                    <MediaGallery
-                        v-model="form.images"
-                        label="الصورة"
-                        :max-files="1"
-                        :sortable="false"
-                        :uploading="uploading"
-                        :disabled="store.saving"
-                        @upload="uploadCover"
-                        @remove="removeCover"
-                    />
-
-                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                            <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">نوع الدورة</span>
-                            <div class="w-full p-2">
-                                <select v-model="form.courseType" class="block w-full rounded-lg border-stone-300 text-sm">
-                                    <option v-for="(label, key) in courseTypeOptions" :key="key" :value="key">{{ label }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <Input v-model="form.hours" name="hours" label="عدد ساعات الدورة" type="number" dir="ltr" step="0.5" min="0" placeholder="0" />
-                    </div>
-
-                    <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">المستوى</span>
-                        <div class="flex w-full flex-wrap gap-3 p-2">
-                            <label v-for="(label, key) in levelOptions" :key="key" class="flex items-center gap-2 text-sm text-stone-700">
-                                <input v-model="form.level" type="radio" name="level" :value="key" class="h-4 w-4 border-stone-300">
-                                <span>{{ label }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <CkEditor v-if="editorUploadUrl" ref="bodyEditor" :key="uuid" :model-value="bodySeed" name="body" :upload-url="editorUploadUrl" />
-                </div>
-
-                <div class="space-y-4" :class="formTab === 'curriculum' ? 'relative z-0 block' : 'hidden'">
-                    <Alert
-                        color="blue"
-                        heading="المحتوى التعليمي"
-                        text="نظّم الدورة في فصول (أقسام) ودروس. لكل درس يمكنك رفع ملف أو إضافة رابط خارجي."
-                    />
-
-                    <div class="flex items-center justify-between gap-3">
-                        <p class="text-sm text-stone-600">
-                            {{ form.chapters.length }} {{ form.chapters.length === 1 ? 'فصل' : 'فصول' }}
-                            — {{ totalLessons }} {{ totalLessons === 1 ? 'درس' : 'دروس' }}
-                        </p>
-                        <Button type="button" variant="secondary" label="إضافة فصل" @click="addChapter" />
-                    </div>
-
-                    <div v-if="form.chapters.length === 0" class="rounded-xl border border-dashed border-stone-200 p-8 text-center text-sm text-stone-500">
-                        لا يوجد محتوى تعليمي بعد. أضف فصولاً ودروساً لبناء محتوى الدورة.
-                    </div>
-
-                    <div v-else class="space-y-3">
-                        <div
-                            v-for="(chapter, chapterIndex) in form.chapters"
-                            :key="chapter.id"
-                            class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60"
-                        >
-                            <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 py-3">
-                                <button type="button" class="flex min-w-0 items-center gap-2 text-start" @click="openChapters[chapterIndex] = !openChapters[chapterIndex]">
-                                    <span class="truncate text-sm font-semibold text-stone-800">
-                                        فصل {{ chapterIndex + 1 }}
-                                        <template v-if="chapter.title"> — {{ chapter.title }}</template>
-                                    </span>
-                                    <span class="shrink-0 text-xs text-stone-500">{{ chapter.lessons.length }} دروس</span>
-                                </button>
-                                <div class="flex shrink-0 items-center gap-1">
-                                    <button type="button" class="rounded-lg px-2.5 py-1.5 text-sm text-stone-600 hover:bg-primary-50 hover:text-primary-600" @click="addLesson(chapterIndex)">
-                                        إضافة درس
-                                    </button>
-                                    <button type="button" class="rounded-lg p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeChapter(chapterIndex)">
-                                        حذف
-                                    </button>
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                                <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">نوع الدورة</span>
+                                <div class="w-full p-2">
+                                    <select v-model="form.courseType" class="block w-full rounded-lg border-stone-300 text-sm">
+                                        <option v-for="(label, key) in courseTypeOptions" :key="key" :value="key">{{ label }}</option>
+                                    </select>
                                 </div>
                             </div>
+                            <Input
+                                v-model="form.hours"
+                                name="hours"
+                                label="عدد ساعات الدورة"
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                placeholder="0"
+                                suffix="ساعات"
+                            />
+                        </div>
 
-                            <div v-show="openChapters[chapterIndex] !== false" class="space-y-3 p-4">
-                                <Input v-model="chapter.title" :name="`chapter-title-${chapterIndex}`" label="عنوان الفصل" placeholder="مثال: الأساسيات والتحضير" />
-                                <Textarea v-model="chapter.description" :name="`chapter-desc-${chapterIndex}`" label="وصف الفصل" :rows="2" />
+                        <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                            <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">المستوى</span>
+                            <div class="flex w-full flex-wrap gap-3 p-2">
+                                <label v-for="(label, key) in levelOptions" :key="key" class="flex items-center gap-2 text-sm text-stone-700">
+                                    <input v-model="form.level" type="radio" name="level" :value="key" class="h-4 w-4 border-stone-300">
+                                    <span>{{ label }}</span>
+                                </label>
+                            </div>
+                        </div>
 
-                                <div v-if="chapter.lessons.length === 0" class="text-sm text-stone-500">لا توجد دروس في هذا الفصل بعد.</div>
+                        <CkEditor v-if="editorUploadUrl" ref="bodyEditor" :key="uuid" :model-value="bodySeed" name="body" :upload-url="editorUploadUrl" />
+                    </div>
 
-                                <div v-else class="space-y-2">
-                                    <div
-                                        v-for="(lesson, lessonIndex) in chapter.lessons"
-                                        :key="lesson.id"
-                                        class="overflow-hidden rounded-lg border border-stone-200 bg-white"
-                                    >
-                                        <div class="flex items-center justify-between gap-3 border-b border-stone-100 bg-stone-50 px-3 py-2.5">
-                                            <button type="button" class="flex min-w-0 flex-1 items-center gap-2 text-start" @click="openLessons[`${chapterIndex}-${lessonIndex}`] = !openLessons[`${chapterIndex}-${lessonIndex}`]">
-                                                <span class="truncate text-sm font-semibold text-stone-700">
-                                                    درس {{ lessonIndex + 1 }}
-                                                    <template v-if="lesson.title"> — {{ lesson.title }}</template>
-                                                </span>
-                                                <span v-if="lesson.source === 'link' && lesson.link" class="shrink-0 rounded-md bg-primary-50 px-2 py-0.5 text-xs text-primary-600">رابط</span>
-                                                <span v-else-if="lesson.file_name" class="shrink-0 rounded-md bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">ملف</span>
-                                            </button>
-                                            <button type="button" class="shrink-0 rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLesson(chapterIndex, lessonIndex)">
-                                                حذف
-                                            </button>
-                                        </div>
+                    <div class="space-y-4 border-y border-stone-200 py-5">
+                        <Alert
+                            color="blue"
+                            heading="المحتوى التعليمي"
+                            text="نظّم الدورة في فصول (أقسام) ودروس. لكل درس يمكنك رفع ملف أو إضافة رابط خارجي."
+                        />
 
-                                        <div v-show="openLessons[`${chapterIndex}-${lessonIndex}`]" class="space-y-3 p-4">
-                                            <Input v-model="lesson.title" :name="`lesson-title-${chapterIndex}-${lessonIndex}`" label="عنوان الدرس" />
-                                            <Textarea v-model="lesson.description" :name="`lesson-desc-${chapterIndex}-${lessonIndex}`" label="وصف الدرس" :rows="2" />
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-sm text-stone-600">
+                                {{ form.chapters.length }} {{ form.chapters.length === 1 ? 'فصل' : 'فصول' }}
+                                — {{ totalLessons }} {{ totalLessons === 1 ? 'درس' : 'دروس' }}
+                            </p>
+                            <Button type="button" variant="secondary" label="إضافة فصل" @click="addChapter" />
+                        </div>
 
-                                            <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                                                <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">مصدر المحتوى</span>
-                                                <div class="w-full p-2">
-                                                    <select v-model="lesson.source" class="block w-full rounded-lg border-stone-300 text-sm">
-                                                        <option value="file">رفع ملف</option>
-                                                        <option value="link">رابط خارجي</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                        <div v-if="form.chapters.length === 0" class="rounded-xl border border-dashed border-stone-200 p-8 text-center text-sm text-stone-500">
+                            لا يوجد محتوى تعليمي بعد. أضف فصولاً ودروساً لبناء محتوى الدورة.
+                        </div>
 
-                                            <Input
-                                                v-if="lesson.source === 'link'"
-                                                v-model="lesson.link"
-                                                :name="`lesson-link-${chapterIndex}-${lessonIndex}`"
-                                                label="رابط الدرس"
-                                                placeholder="https://www.youtube.com/watch?v=..."
-                                                dir="ltr"
-                                            />
-
-                                            <div v-else class="space-y-2">
-                                                <div v-if="lesson.file_name" class="flex items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
-                                                    <div class="min-w-0 flex-1">
-                                                        <p class="truncate text-sm font-medium text-stone-800">{{ lesson.file_name }}</p>
-                                                        <a v-if="lesson.file_url" :href="lesson.file_url" target="_blank" class="text-xs text-primary-600 hover:underline">معاينة الملف</a>
-                                                    </div>
-                                                    <button type="button" class="rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLessonFile(chapterIndex, lessonIndex)">
-                                                        حذف الملف
-                                                    </button>
-                                                </div>
-                                                <p v-else class="text-sm text-stone-500">لم يتم رفع ملف بعد.</p>
-                                                <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm text-stone-700 shadow-sm hover:bg-primary-50">
-                                                    <span>{{ lesson.file_name ? 'استبدال الملف' : 'رفع ملف الدرس' }}</span>
-                                                    <input
-                                                        type="file"
-                                                        class="hidden"
-                                                        :disabled="uploadingLesson === `${chapterIndex}-${lessonIndex}`"
-                                                        @change="uploadLessonFile(chapterIndex, lessonIndex, $event)"
-                                                    >
-                                                </label>
-                                                <p v-if="uploadingLesson === `${chapterIndex}-${lessonIndex}`" class="text-xs text-stone-500">جاري الرفع…</p>
-                                            </div>
-                                        </div>
+                        <div v-else class="space-y-3">
+                            <div
+                                v-for="(chapter, chapterIndex) in form.chapters"
+                                :key="chapter.id"
+                                class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60"
+                            >
+                                <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 py-3">
+                                    <button type="button" class="flex min-w-0 items-center gap-2 text-start" @click="openChapters[chapterIndex] = !openChapters[chapterIndex]">
+                                        <span class="truncate text-sm font-semibold text-stone-800">
+                                            فصل {{ chapterIndex + 1 }}
+                                            <template v-if="chapter.title"> — {{ chapter.title }}</template>
+                                        </span>
+                                        <span class="shrink-0 text-xs text-stone-500">{{ chapter.lessons.length }} دروس</span>
+                                    </button>
+                                    <div class="flex shrink-0 items-center gap-1">
+                                        <button type="button" class="rounded-lg px-2.5 py-1.5 text-sm text-stone-600 hover:bg-primary-50 hover:text-primary-600" @click="addLesson(chapterIndex)">
+                                            إضافة درس
+                                        </button>
+                                        <button type="button" class="rounded-lg p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeChapter(chapterIndex)">
+                                            حذف
+                                        </button>
                                     </div>
                                 </div>
 
-                                <Button type="button" variant="secondary" label="إضافة درس" @click="addLesson(chapterIndex)" />
+                                <div v-show="openChapters[chapterIndex] !== false" class="space-y-3 p-4">
+                                    <Input v-model="chapter.title" :name="`chapter-title-${chapterIndex}`" label="عنوان الفصل" placeholder="مثال: الأساسيات والتحضير" />
+                                    <Textarea v-model="chapter.description" :name="`chapter-desc-${chapterIndex}`" label="وصف الفصل" :rows="2" />
+
+                                    <div v-if="chapter.lessons.length === 0" class="text-sm text-stone-500">لا توجد دروس في هذا الفصل بعد.</div>
+
+                                    <div v-else class="space-y-2">
+                                        <div
+                                            v-for="(lesson, lessonIndex) in chapter.lessons"
+                                            :key="lesson.id"
+                                            class="overflow-hidden rounded-lg border border-stone-200 bg-white"
+                                        >
+                                            <div class="flex items-center justify-between gap-3 border-b border-stone-100 bg-stone-50 px-3 py-2.5">
+                                                <button type="button" class="flex min-w-0 flex-1 items-center gap-2 text-start" @click="openLessons[`${chapterIndex}-${lessonIndex}`] = !openLessons[`${chapterIndex}-${lessonIndex}`]">
+                                                    <span class="truncate text-sm font-semibold text-stone-700">
+                                                        درس {{ lessonIndex + 1 }}
+                                                        <template v-if="lesson.title"> — {{ lesson.title }}</template>
+                                                    </span>
+                                                    <span v-if="lesson.source === 'link' && lesson.link" class="shrink-0 rounded-md bg-primary-50 px-2 py-0.5 text-xs text-primary-600">رابط</span>
+                                                    <span v-else-if="lesson.file_name" class="shrink-0 rounded-md bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">ملف</span>
+                                                </button>
+                                                <button type="button" class="shrink-0 rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLesson(chapterIndex, lessonIndex)">
+                                                    حذف
+                                                </button>
+                                            </div>
+
+                                            <div v-show="openLessons[`${chapterIndex}-${lessonIndex}`]" class="space-y-3 p-4">
+                                                <Input v-model="lesson.title" :name="`lesson-title-${chapterIndex}-${lessonIndex}`" label="عنوان الدرس" />
+                                                <Textarea v-model="lesson.description" :name="`lesson-desc-${chapterIndex}-${lessonIndex}`" label="وصف الدرس" :rows="2" />
+
+                                                <div class="rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
+                                                    <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">مصدر المحتوى</span>
+                                                    <div class="w-full p-2">
+                                                        <select v-model="lesson.source" class="block w-full rounded-lg border-stone-300 text-sm">
+                                                            <option value="file">رفع ملف</option>
+                                                            <option value="link">رابط خارجي</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <Input
+                                                    v-if="lesson.source === 'link'"
+                                                    v-model="lesson.link"
+                                                    :name="`lesson-link-${chapterIndex}-${lessonIndex}`"
+                                                    label="رابط الدرس"
+                                                    placeholder="https://www.youtube.com/watch?v=..."
+                                                    dir="ltr"
+                                                />
+
+                                                <div v-else class="space-y-2">
+                                                    <div v-if="lesson.file_name" class="flex items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
+                                                        <div class="min-w-0 flex-1">
+                                                            <p class="truncate text-sm font-medium text-stone-800">{{ lesson.file_name }}</p>
+                                                            <a v-if="lesson.file_url" :href="lesson.file_url" target="_blank" class="text-xs text-primary-600 hover:underline">معاينة الملف</a>
+                                                        </div>
+                                                        <button type="button" class="rounded-lg p-1 text-stone-400 hover:bg-red-50 hover:text-red-600" @click="removeLessonFile(chapterIndex, lessonIndex)">
+                                                            حذف الملف
+                                                        </button>
+                                                    </div>
+                                                    <p v-else class="text-sm text-stone-500">لم يتم رفع ملف بعد.</p>
+                                                    <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm text-stone-700 shadow-sm hover:bg-primary-50">
+                                                        <span>{{ lesson.file_name ? 'استبدال الملف' : 'رفع ملف الدرس' }}</span>
+                                                        <input
+                                                            type="file"
+                                                            class="hidden"
+                                                            :disabled="uploadingLesson === `${chapterIndex}-${lessonIndex}`"
+                                                            @change="uploadLessonFile(chapterIndex, lessonIndex, $event)"
+                                                        >
+                                                    </label>
+                                                    <p v-if="uploadingLesson === `${chapterIndex}-${lessonIndex}`" class="text-xs text-stone-500">جاري الرفع…</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Button type="button" variant="secondary" label="إضافة درس" @click="addLesson(chapterIndex)" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="space-y-2" :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'">
-                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
-                        <div class="w-full space-y-1.5 p-2">
-                            <label
-                                v-for="option in categories"
-                                :key="option.id"
-                                class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-4 w-4 rounded border-stone-300"
-                                    :disabled="!option.selectable"
-                                    :checked="form.categoryIds.includes(String(option.id))"
-                                    @change="toggleCategory(option.id, $event.target.checked)"
+                    <PageFormMetaSection
+                        v-model:published="form.published"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
+                    >
+                        <Textarea
+                            v-model="form.subtitle"
+                            name="subtitle"
+                            label="عنوان ترويجي"
+                            placeholder="مثال: مقدمة شاملة تأخذك من ما قبل البداية إلى مرحلة الإنطلاقة"
+                            info="عنوان فرعي لا يزيد عن 300 حرف."
+                            maxlength="300"
+                            :rows="2"
+                        />
+
+                        <Price
+                            v-model="form.comparePrice"
+                            name="comparePrice"
+                            label="سعر المقارنة"
+                            :currency="priceCurrency"
+                            info="السعر الأصلي قبل الخصم؛ يظهر مشطوباً بجانب سعر البيع لإبراز التخفيض."
+                        />
+
+                        <div class="space-y-1.5">
+                            <span class="block text-sm font-semibold text-stone-500">القسم</span>
+                            <div class="space-y-1.5">
+                                <label
+                                    v-for="option in categories"
+                                    :key="option.id"
+                                    class="flex items-center gap-2 text-sm"
+                                    :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                                 >
-                                <span>{{ option.label }}</span>
-                            </label>
-                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-stone-300"
+                                        :disabled="!option.selectable"
+                                        :checked="form.categoryIds.includes(String(option.id))"
+                                        @change="toggleCategory(option.id, $event.target.checked)"
+                                    >
+                                    <span>{{ option.label }}</span>
+                                </label>
+                                <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <Input v-model="form.slug" name="slug" label="نص الرابط" dir="ltr" :prefix="slugPrefix" :error="errors.slug" />
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
+                    </PageFormMetaSection>
                 </div>
 
                 <template #footer>

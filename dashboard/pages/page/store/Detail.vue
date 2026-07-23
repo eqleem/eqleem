@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
+import Price from '../../../components/ui/Price.vue';
 import Button from '../../../components/ui/Button.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
 import MediaGallery from '../../../components/ui/MediaGallery.vue';
@@ -44,7 +45,7 @@ const uuid = computed(() => String(route.params.id));
 const editorUploadUrl = computed(() => `/api/store/${uuid.value}/editor-images`);
 const categories = computed(() => store.detail?.category_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/store/product/');
-const priceCurrencySuffix = computed(() => store.detail?.currency_symbol ?? '');
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 function loadForm(product, { syncEditor = true } = {}) {
     if (!product) {
@@ -273,18 +274,7 @@ function saveAndClose() {
                             @reorder="reorderImages"
                         />
 
-                        <Input
-                            v-model="form.price"
-                            name="price"
-                            label="السعر"
-                            type="number"
-                            dir="ltr"
-                            info-dir="rtl"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
-                            :prefix="priceCurrencySuffix"
-                        />
+                        <Price v-model="form.price" name="price" :currency="priceCurrency" />
 
                         <CkEditor
                             v-if="editorUploadUrl"
@@ -303,17 +293,11 @@ function saveAndClose() {
                         :slug-prefix="slugPrefix"
                         :slug-error="errors.slug"
                     >
-                        <Input
+                        <Price
                             v-model="form.comparePrice"
                             name="comparePrice"
                             label="سعر المقارنة"
-                            type="number"
-                            dir="ltr"
-                            info-dir="rtl"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
-                            :prefix="priceCurrencySuffix"
+                            :currency="priceCurrency"
                             info="السعر الأصلي قبل الخصم؛ يظهر مشطوباً بجانب سعر البيع لإبراز التخفيض."
                         />
 

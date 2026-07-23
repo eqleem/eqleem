@@ -78,14 +78,29 @@ test('owner can create list update and delete digital services', function () {
         ->assertJsonPath('data.title', 'تصميم شعار محدث')
         ->assertJsonPath('data.subtitle', 'شعار احترافي')
         ->assertJsonPath('data.delivery_days', '3')
-        ->assertJsonPath('data.compare_price', '399');
+        ->assertJsonPath('data.compare_price', '399')
+        ->assertJsonPath('data.published', true)
+        ->assertJsonPath('data.active', true)
+        ->assertJsonStructure(['data' => ['currency_symbol', 'currency_code']]);
 
     setCurrentTenant($tenant);
 
     $service = Content::query()->where('uuid', $uuid)->first();
 
     expect($service)->not->toBeNull()
-        ->and(data_get($service->data, 'delivery_days'))->toBe(3);
+        ->and(data_get($service->data, 'delivery_days'))->toBe(3)
+        ->and($service->active)->toBeTrue()
+        ->and($service->status)->toBe('published');
+
+    $clone = $this->actingAs($user)
+        ->postJson("/api/digital-services/{$uuid}/clone")
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false);
+
+    $cloneUuid = (string) $clone->json('data.uuid');
+
+    expect($cloneUuid)->not->toBe($uuid);
 
     $this->actingAs($user)
         ->deleteJson('/api/digital-services', ['ids' => [$service->id]])

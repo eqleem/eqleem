@@ -52,6 +52,7 @@ test('owner can create list update and delete digital products', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'دليل PDF')
         ->assertJsonPath('data.status', 'draft')
+        ->assertJsonPath('data.active', false)
         ->assertJsonPath('data.published', false);
 
     $uuid = (string) $create->json('data.uuid');
@@ -74,6 +75,8 @@ test('owner can create list update and delete digital products', function () {
                 'slug_prefix',
                 'price',
                 'compare_price',
+                'currency_symbol',
+                'active',
                 'subtitle',
             ],
         ]);
@@ -96,11 +99,12 @@ test('owner can create list update and delete digital products', function () {
             'price' => 49.99,
             'compare_price' => 79,
             'category_ids' => [$leaf->id],
-            'published' => true,
+            'active' => true,
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'دليل PDF محدث')
         ->assertJsonPath('data.subtitle', 'دليل شامل')
+        ->assertJsonPath('data.active', true)
         ->assertJsonPath('data.published', true)
         ->assertJsonPath('data.price', '49.99')
         ->assertJsonPath('data.compare_price', '79')
@@ -111,6 +115,7 @@ test('owner can create list update and delete digital products', function () {
     $product = Content::query()->where('uuid', $uuid)->first();
 
     expect($product)->not->toBeNull()
+        ->and($product->active)->toBeTrue()
         ->and($product->status)->toBe('published')
         ->and(data_get($product->data, 'price'))->toBe(money_minor(49.99));
 

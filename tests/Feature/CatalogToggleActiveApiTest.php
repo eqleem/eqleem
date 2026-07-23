@@ -48,6 +48,9 @@ dataset('catalogToggleEndpoints', [
     'digital-products' => ['digital-products', '/api/digital-products', 'منتج رقمي'],
     'services' => ['services', '/api/services', 'خدمة بالساعة'],
     'on-demand-services' => ['on-demand-services', '/api/on-demand-services', 'خدمة حسب الطلب'],
+    'digital-services' => ['digital-services', '/api/digital-services', 'خدمة رقمية'],
+    'menu' => ['menu', '/api/menu', 'طبق قائمة'],
+    'unit-rental' => ['unit-rental', '/api/unit-rental', 'وحدة تأجير'],
 ]);
 
 test('owner can toggle catalog item active state', function (string $typeSlug, string $endpoint, string $title) {

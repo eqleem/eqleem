@@ -50,7 +50,7 @@ class CreateDigitalProduct
             'title' => $title,
             'slug' => $this->uniqueDigitalProductSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

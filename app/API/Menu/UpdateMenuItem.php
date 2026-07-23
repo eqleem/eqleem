@@ -135,14 +135,15 @@ class UpdateMenuItem
             (int) $content->id,
         );
 
-        $published = (bool) $data['published'];
+        $active = (bool) $data['published'];
 
         $content->update([
             'title' => $data['title'],
             'slug' => $slug,
-            'status' => $published ? 'published' : 'draft',
+            'active' => $active,
+            'status' => $active ? 'published' : 'draft',
             'data' => $payload,
-            'published_at' => $published
+            'published_at' => $active
                 ? ($content->published_at ?? now())
                 : null,
         ]);

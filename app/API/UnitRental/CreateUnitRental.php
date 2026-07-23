@@ -50,7 +50,7 @@ class CreateUnitRental
             'title' => $title,
             'slug' => $this->uniqueUnitRentalSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

@@ -28,8 +28,10 @@ class MenuItemListResource extends JsonResource
             'uuid' => $content->uuid,
             'title' => $content->title,
             'slug' => $content->slug,
+            'active' => (bool) $content->active,
             'status' => $content->status,
-            'status_label' => $content->status === 'published' ? 'منشور' : 'مسودة',
+            'status_label' => $content->active ? 'مفعّل' : 'معطّل',
+            'published' => (bool) $content->active,
             'published_at' => $content->published_at?->toIso8601String(),
             'published_at_label' => $content->published_at?->translatedFormat('j F Y'),
             'price_label' => filled($priceMinor) && (int) $priceMinor > 0

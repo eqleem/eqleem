@@ -38,9 +38,12 @@ class MenuItemResource extends JsonResource
             'slug' => $content->slug,
             'price' => $this->decimalFromMinor(data_get($content->data, 'price')),
             'compare_price' => $this->decimalFromMinor(data_get($content->data, 'compare_price')),
+            'currency_code' => Money::defaultCurrencyCode(),
+            'currency_symbol' => Money::symbolFor(),
             'meal_options' => $this->mealOptionsFromData(data_get($content->data, 'meal_options', [])),
             'status' => $content->status,
-            'published' => $content->status === 'published',
+            'active' => (bool) $content->active,
+            'published' => (bool) $content->active,
             'published_at' => $content->published_at?->toIso8601String(),
             'category_ids' => $content->taxonomiesOfType('menu_category')
                 ->pluck('id')

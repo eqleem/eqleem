@@ -184,6 +184,47 @@ export const useDigitalServicesStore = defineStore('digitalServicesCatalog', {
             }
         },
 
+        async cloneDigitalService(uuid) {
+            this.saving = true;
+            this.error = null;
+
+            try {
+                const payload = await api(`/digital-services/${uuid}/clone`, {
+                    method: 'POST',
+                });
+
+                await this.fetchDigitalServices({ page: 1 });
+
+                return payload?.data ?? null;
+            } catch (error) {
+                this.error = error instanceof ApiError ? error.message : 'تعذر تكرار الخدمة.';
+                redirectIfUnauthorized(error);
+                throw error;
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        async toggleDigitalServiceActive(uuid, active) {
+            const payload = await api(`/digital-services/${uuid}/active`, {
+                method: 'PUT',
+                body: { active },
+            });
+
+            const updated = payload?.data;
+            const index = this.items.findIndex((item) => item.uuid === uuid);
+
+            if (index !== -1 && updated) {
+                this.items[index] = { ...this.items[index], ...updated };
+            }
+
+            if (this.detail?.uuid === uuid && updated) {
+                this.detail = { ...this.detail, ...updated };
+            }
+
+            return updated;
+        },
+
         async uploadImage(uuid, file) {
             const body = new FormData();
             body.append('file', file);

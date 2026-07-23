@@ -40,9 +40,12 @@ class DigitalServiceResource extends JsonResource
             'editor_mode' => (string) data_get($content->data, 'editor_mode', 'html'),
             'price' => $this->decimalFromMinor(data_get($content->data, 'price')),
             'compare_price' => $this->decimalFromMinor(data_get($content->data, 'compare_price')),
+            'currency_code' => Money::defaultCurrencyCode(),
+            'currency_symbol' => Money::symbolFor(),
             'delivery_days' => (string) (data_get($content->data, 'delivery_days') ?? ''),
             'status' => $content->status,
-            'published' => $content->status === 'published',
+            'active' => (bool) $content->active,
+            'published' => (bool) $content->active,
             'published_at' => $content->published_at?->toIso8601String(),
             'category_ids' => $content->taxonomiesOfType('digital_service_category')
                 ->pluck('id')

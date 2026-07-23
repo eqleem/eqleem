@@ -50,7 +50,7 @@ class CreateDigitalService
             'title' => $title,
             'slug' => $this->uniqueDigitalServiceSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

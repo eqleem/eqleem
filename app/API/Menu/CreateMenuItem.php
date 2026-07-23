@@ -50,7 +50,7 @@ class CreateMenuItem
             'title' => $title,
             'slug' => $this->uniqueMenuSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

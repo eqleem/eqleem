@@ -191,6 +191,47 @@ export const useUnitRentalStore = defineStore('unitRentalCatalog', {
             }
         },
 
+        async cloneUnit(uuid) {
+            this.saving = true;
+            this.error = null;
+
+            try {
+                const payload = await api(`/unit-rental/${uuid}/clone`, {
+                    method: 'POST',
+                });
+
+                await this.fetchUnits({ page: 1 });
+
+                return payload?.data ?? null;
+            } catch (error) {
+                this.error = error instanceof ApiError ? error.message : 'تعذر تكرار نوع الوحدة.';
+                redirectIfUnauthorized(error);
+                throw error;
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        async toggleUnitActive(uuid, active) {
+            const payload = await api(`/unit-rental/${uuid}/active`, {
+                method: 'PUT',
+                body: { active },
+            });
+
+            const updated = payload?.data;
+            const index = this.items.findIndex((item) => item.uuid === uuid);
+
+            if (index !== -1 && updated) {
+                this.items[index] = { ...this.items[index], ...updated };
+            }
+
+            if (this.detail?.uuid === uuid && updated) {
+                this.detail = { ...this.detail, ...updated };
+            }
+
+            return updated;
+        },
+
         async uploadImage(uuid, file) {
             const body = new FormData();
             body.append('file', file);

@@ -5,6 +5,7 @@ use App\Models\Setting;
 use App\Models\Taxonomy;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -73,9 +74,13 @@ test('owner can create list update and delete menu items', function () {
                 'slug_prefix',
                 'price',
                 'compare_price',
+                'currency_code',
+                'currency_symbol',
                 'meal_options',
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.currency_code', 'SAR')
+        ->assertJsonPath('data.currency_symbol', Money::SAR_SYMBOL);
 
     setCurrentTenant($tenant);
 
@@ -124,6 +129,7 @@ test('owner can create list update and delete menu items', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'برجر لحم محدث')
         ->assertJsonPath('data.published', true)
+        ->assertJsonPath('data.active', true)
         ->assertJsonPath('data.price', '45')
         ->assertJsonPath('data.compare_price', '55')
         ->assertJsonPath('data.category_ids.0', (string) $leaf->id)
@@ -139,9 +145,20 @@ test('owner can create list update and delete menu items', function () {
 
     expect($item)->not->toBeNull()
         ->and($item->status)->toBe('published')
+        ->and($item->active)->toBeTrue()
         ->and(data_get($item->data, 'price'))->toBe(money_minor(45.00))
         ->and(data_get($item->data, 'meal_options.0.name'))->toBe('حجم الوجبة')
         ->and(data_get($item->data, 'meal_options.0.choices.0.price'))->toBe(money_minor(5));
+
+    $clone = $this->actingAs($user)
+        ->postJson("/api/menu/{$uuid}/clone")
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false);
+
+    $cloneUuid = (string) $clone->json('data.uuid');
+
+    expect($cloneUuid)->not->toBe($uuid);
 
     $this->actingAs($user)
         ->deleteJson('/api/menu', ['ids' => [$item->id]])

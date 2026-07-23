@@ -94,7 +94,19 @@ test('owner can create list update and delete unit rentals', function () {
 
     expect($unit)->not->toBeNull()
         ->and(data_get($unit->data, 'price'))->toBe(money_minor(250))
+        ->and($unit->active)->toBeTrue()
+        ->and($unit->status)->toBe('published')
         ->and($unit->calendars()->pluck('calendars.id')->all())->toBe([$calendar->id]);
+
+    $clone = $this->actingAs($user)
+        ->postJson("/api/unit-rental/{$uuid}/clone")
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false);
+
+    $cloneUuid = (string) $clone->json('data.uuid');
+
+    expect($cloneUuid)->not->toBe($uuid);
 
     $this->actingAs($user)
         ->deleteJson('/api/unit-rental', ['ids' => [$unit->id]])

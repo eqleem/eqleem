@@ -40,6 +40,8 @@ class CourseResource extends JsonResource
             'editor_mode' => (string) data_get($content->data, 'editor_mode', 'html'),
             'price' => $this->decimalFromMinor(data_get($content->data, 'price')),
             'compare_price' => $this->decimalFromMinor(data_get($content->data, 'compare_price')),
+            'currency_code' => Money::defaultCurrencyCode(),
+            'currency_symbol' => Money::symbolFor(),
             'hours' => (string) data_get($content->data, 'hours', 0),
             'level' => (string) data_get($content->data, 'level', 'beginner'),
             'course_type' => (string) data_get($content->data, 'course_type', 'recorded'),

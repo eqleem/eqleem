@@ -78,6 +78,7 @@ use App\API\DigitalProducts\UpdateDigitalProductSettings;
 use App\API\DigitalProducts\UploadDigitalProductDownload;
 use App\API\DigitalProducts\UploadDigitalProductEditorImage;
 use App\API\DigitalProducts\UploadDigitalProductImage;
+use App\API\DigitalServices\CloneDigitalService;
 use App\API\DigitalServices\CreateDigitalService;
 use App\API\DigitalServices\CreateDigitalServiceCategory;
 use App\API\DigitalServices\DeleteDigitalServiceCategory;
@@ -89,6 +90,7 @@ use App\API\DigitalServices\ListDigitalServices;
 use App\API\DigitalServices\ReorderDigitalServiceCategories;
 use App\API\DigitalServices\ReorderDigitalServiceImages;
 use App\API\DigitalServices\ShowDigitalService;
+use App\API\DigitalServices\ToggleDigitalServiceActive;
 use App\API\DigitalServices\UpdateDigitalService;
 use App\API\DigitalServices\UpdateDigitalServiceCategory;
 use App\API\DigitalServices\UpdateDigitalServiceSettings;
@@ -106,6 +108,7 @@ use App\API\FormSubmissions\ShowFormSubmission;
 use App\API\Icons\SearchTablerIcons;
 use App\API\Invoices\ListInvoices;
 use App\API\Invoices\ShowInvoice;
+use App\API\Menu\CloneMenuItem;
 use App\API\Menu\CreateMenuCategory;
 use App\API\Menu\CreateMenuItem;
 use App\API\Menu\DeleteMenuCategory;
@@ -117,6 +120,7 @@ use App\API\Menu\ListMenuItems;
 use App\API\Menu\ReorderMenuCategories;
 use App\API\Menu\ReorderMenuImages;
 use App\API\Menu\ShowMenuItem;
+use App\API\Menu\ToggleMenuItemActive;
 use App\API\Menu\UpdateMenuCategory;
 use App\API\Menu\UpdateMenuItem;
 use App\API\Menu\UpdateMenuSettings;
@@ -286,6 +290,7 @@ use App\API\Store\UploadStoreImage;
 use App\API\Tenants\CreateUserTenant;
 use App\API\Tenants\ListUserTenants;
 use App\API\Tenants\SwitchUserTenant;
+use App\API\UnitRental\CloneUnitRental;
 use App\API\UnitRental\CreateUnitRental;
 use App\API\UnitRental\CreateUnitRentalCalendar;
 use App\API\UnitRental\CreateUnitRentalCategory;
@@ -301,6 +306,7 @@ use App\API\UnitRental\ReorderUnitRentalCategories;
 use App\API\UnitRental\ReorderUnitRentalImages;
 use App\API\UnitRental\ShowUnitRental;
 use App\API\UnitRental\ShowUnitRentalCalendar;
+use App\API\UnitRental\ToggleUnitRentalActive;
 use App\API\UnitRental\UpdateUnitRental;
 use App\API\UnitRental\UpdateUnitRentalCalendar;
 use App\API\UnitRental\UpdateUnitRentalCategory;
@@ -881,6 +887,14 @@ Route::put('/menu/{uuid}', UpdateMenuItem::class)
     ->name('api.menu.update')
     ->whereUuid('uuid');
 
+Route::put('/menu/{uuid}/active', ToggleMenuItemActive::class)
+    ->name('api.menu.active')
+    ->whereUuid('uuid');
+
+Route::post('/menu/{uuid}/clone', CloneMenuItem::class)
+    ->name('api.menu.clone')
+    ->whereUuid('uuid');
+
 Route::post('/menu/{uuid}/images', UploadMenuImage::class)
     ->name('api.menu.images.store')
     ->whereUuid('uuid');
@@ -1035,6 +1049,14 @@ Route::put('/unit-rental/{uuid}', UpdateUnitRental::class)
     ->name('api.unit-rental.update')
     ->whereUuid('uuid');
 
+Route::put('/unit-rental/{uuid}/active', ToggleUnitRentalActive::class)
+    ->name('api.unit-rental.active')
+    ->whereUuid('uuid');
+
+Route::post('/unit-rental/{uuid}/clone', CloneUnitRental::class)
+    ->name('api.unit-rental.clone')
+    ->whereUuid('uuid');
+
 Route::post('/unit-rental/{uuid}/images', UploadUnitRentalImage::class)
     ->name('api.unit-rental.images.store')
     ->whereUuid('uuid');
@@ -1090,6 +1112,14 @@ Route::get('/digital-services/{uuid}', ShowDigitalService::class)
 
 Route::put('/digital-services/{uuid}', UpdateDigitalService::class)
     ->name('api.digital-services.update')
+    ->whereUuid('uuid');
+
+Route::put('/digital-services/{uuid}/active', ToggleDigitalServiceActive::class)
+    ->name('api.digital-services.active')
+    ->whereUuid('uuid');
+
+Route::post('/digital-services/{uuid}/clone', CloneDigitalService::class)
+    ->name('api.digital-services.clone')
     ->whereUuid('uuid');
 
 Route::post('/digital-services/{uuid}/images', UploadDigitalServiceImage::class)

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
+import Price from '../../../components/ui/Price.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
@@ -48,7 +49,7 @@ const editorUploadUrl = computed(() => `/api/services/${uuid.value}/editor-image
 const categories = computed(() => store.detail?.category_options ?? []);
 const calendars = computed(() => store.detail?.calendar_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/services/');
-const priceCurrencySuffix = computed(() => store.detail?.currency_symbol ?? '');
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 function loadForm(service, { syncEditor = true } = {}) {
     if (!service) {
@@ -300,29 +301,16 @@ function saveAndClose() {
                         />
 
                         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                            <Input
-                                v-model="form.price"
-                                name="price"
-                                label="السعر"
-                                type="number"
-                                dir="ltr"
-                                info-dir="rtl"
-                                step="0.01"
-                                min="0"
-                                placeholder="0.00"
-                                :prefix="priceCurrencySuffix"
-                            />
+                            <Price v-model="form.price" name="price" :currency="priceCurrency" />
                             <Input
                                 v-model="form.durationMinutes"
                                 name="durationMinutes"
                                 label="مدة الخدمة"
                                 type="number"
-                                dir="ltr"
-                                info-dir="rtl"
                                 min="1"
                                 step="1"
                                 placeholder="60"
-                                prefix="دقائق"
+                                suffix="دقائق"
                             />
                         </div>
 
