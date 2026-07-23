@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="دورات تعليمية عملية مع دروس وفصول منظمة"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>

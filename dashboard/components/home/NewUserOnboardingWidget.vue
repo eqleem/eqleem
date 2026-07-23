@@ -1188,7 +1188,7 @@ watch(shouldShow, async (value) => {
                             name="bio"
                             label="نبذة بسيطة *"
                             placeholder="اشرح نشاطك، إيش تبيع، وإيش خدماتك"
-                            :rows="3"
+                            
                             :error="errors.bio"
                         />
                         <BrandMarkField

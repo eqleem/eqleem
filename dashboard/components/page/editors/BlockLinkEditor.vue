@@ -31,8 +31,8 @@ const pickerOptions = computed(() => props.editor.link_type_picker_options ?? []
 function parseInitialPickerKey(linkType) {
     const value = String(linkType ?? '');
 
-    if (value === 'external') {
-        return 'external';
+    if (value === 'external' || value === 'booking') {
+        return value;
     }
 
     if (value.startsWith('section:') || value.startsWith('item:')) {
@@ -43,10 +43,18 @@ function parseInitialPickerKey(linkType) {
 }
 
 function parseInitialSpecificItem(linkType, option) {
-    if (String(linkType ?? '').startsWith('item:')) {
+    const value = String(linkType ?? '');
+
+    if (value.startsWith('item:')) {
         return true;
     }
 
+    // Section links (including catalog-managed ones) never pick a specific item.
+    if (value.startsWith('section:')) {
+        return false;
+    }
+
+    // New / unset link: default to item when the destination has no section route.
     if (option && !option.supports_section && option.supports_item) {
         return true;
     }
@@ -89,6 +97,7 @@ function brandMarkFromEditor(editor) {
 
 const initialPickerKey = parseInitialPickerKey(props.editor.link_type);
 const initialOption = pickerOptions.value.find((option) => option.key === initialPickerKey) ?? null;
+const isManagedSection = computed(() => Boolean(props.editor.managed_section));
 
 const form = reactive({
     picker_key: initialPickerKey,
@@ -98,10 +107,18 @@ const form = reactive({
     url: props.editor.url ?? '',
     content_id: props.editor.content_id ?? null,
     selected_content_title: props.editor.selected_content_title ?? '',
+    branch_ids: [...(props.editor.branch_ids ?? [])].map((id) => Number(id)),
+    calendar_ids: [...(props.editor.calendar_ids ?? [])].map((id) => Number(id)),
+    allow_client_choice: props.editor.allow_client_choice ?? true,
+    duration_minutes: Number(props.editor.duration_minutes ?? 30) || 30,
 });
 
 const brandMark = ref(brandMarkFromEditor(props.editor));
-const useCustomCopy = ref(initialPickerKey === 'external');
+const useCustomCopy = ref(initialPickerKey === 'external' || initialPickerKey === 'booking');
+
+const bookingTargets = computed(() => props.editor.booking_targets ?? { branches: [], calendars: [] });
+const bookingBranches = computed(() => bookingTargets.value.branches ?? []);
+const bookingCalendars = computed(() => bookingTargets.value.calendars ?? []);
 
 const pickerOpen = ref(false);
 const pickerQuery = ref('');
@@ -124,6 +141,7 @@ const selectedOption = computed(() => (
 ));
 
 const isExternal = computed(() => form.picker_key === 'external');
+const isBooking = computed(() => form.picker_key === 'booking');
 const hasLinkType = computed(() => Boolean(form.picker_key));
 const canPickSpecificItem = computed(() => (
     Boolean(selectedOption.value?.supports_item)
@@ -136,6 +154,8 @@ const mustPickSpecificItem = computed(() => (
 const needsContentPicker = computed(() => (
     hasLinkType.value
     && !isExternal.value
+    && !isBooking.value
+    && !isManagedSection.value
     && form.specific_item
     && canPickSpecificItem.value
 ));
@@ -149,6 +169,10 @@ const canSaveLink = computed(() => {
         return false;
     }
 
+    if (isBooking.value && form.branch_ids.length === 0 && form.calendar_ids.length === 0) {
+        return false;
+    }
+
     return true;
 });
 
@@ -157,8 +181,12 @@ const linkType = computed(() => {
         return '';
     }
 
-    if (form.picker_key === 'external') {
-        return 'external';
+    if (form.picker_key === 'external' || form.picker_key === 'booking') {
+        return form.picker_key;
+    }
+
+    if (isManagedSection.value) {
+        return `section:${form.picker_key}`;
     }
 
     return form.specific_item && canPickSpecificItem.value
@@ -168,6 +196,7 @@ const linkType = computed(() => {
 
 const contentOptions = computed(() => pickerOptions.value.filter((option) => option.group === 'content'));
 const externalOption = computed(() => pickerOptions.value.find((option) => option.group === 'external') ?? null);
+const bookingOption = computed(() => pickerOptions.value.find((option) => option.group === 'booking') ?? null);
 
 const filteredContentOptions = computed(() => {
     const query = pickerQuery.value.trim().toLocaleLowerCase('ar');
@@ -188,7 +217,7 @@ const contentSelectedLabel = computed(() => (
 ));
 
 function applyDefaultCopy() {
-    if (isExternal.value) {
+    if (isExternal.value || isBooking.value) {
         return;
     }
 
@@ -255,7 +284,7 @@ watch(mustPickSpecificItem, (required) => {
 });
 
 watch(useCustomCopy, (enabled) => {
-    if (!enabled && !isExternal.value) {
+    if (!enabled && !isExternal.value && !isBooking.value) {
         applyDefaultCopy();
     }
 });
@@ -348,6 +377,10 @@ function selectPickerOption(option) {
     form.content_id = null;
     form.selected_content_title = '';
     form.url = '';
+    form.branch_ids = [];
+    form.calendar_ids = [];
+    form.allow_client_choice = true;
+    form.duration_minutes = 30;
     contentQuery.value = '';
     contentPickerOpen.value = false;
     contentResults.value = [];
@@ -355,9 +388,21 @@ function selectPickerOption(option) {
     pickerQuery.value = '';
     delete errors.content_id;
     delete errors.link_type;
+    delete errors.branch_ids;
+    delete errors.calendar_ids;
+    delete errors.duration_minutes;
 
     if (option.key === 'external') {
         useCustomCopy.value = true;
+        return;
+    }
+
+    if (option.key === 'booking') {
+        useCustomCopy.value = true;
+        form.title = option.section_title || 'حجز موعد';
+        if (props.showDescription) {
+            form.description = option.section_description || '';
+        }
         return;
     }
 
@@ -461,6 +506,23 @@ async function submit() {
         return;
     }
 
+    if (isBooking.value) {
+        if (!form.title.trim()) {
+            errors.title = 'أدخل عنوان زر الحجز.';
+            return;
+        }
+
+        if (form.branch_ids.length === 0 && form.calendar_ids.length === 0) {
+            errors.branch_ids = 'اختر فرعاً أو تقويماً واحداً على الأقل.';
+            return;
+        }
+
+        if (!form.duration_minutes || form.duration_minutes < 5) {
+            errors.duration_minutes = 'أدخل مدة الموعد بالدقائق (5 على الأقل).';
+            return;
+        }
+    }
+
     if (mustPickSpecificItem.value && !form.content_id) {
         errors.content_id = contentResults.value.length
             ? 'اختر مادة من نتائج البحث.'
@@ -489,6 +551,13 @@ async function submit() {
 
             if (isExternal.value) {
                 body.append('url', form.url ?? '');
+            }
+
+            if (isBooking.value) {
+                form.branch_ids.forEach((id) => body.append('branch_ids[]', String(id)));
+                form.calendar_ids.forEach((id) => body.append('calendar_ids[]', String(id)));
+                body.append('allow_client_choice', form.allow_client_choice ? '1' : '0');
+                body.append('duration_minutes', String(form.duration_minutes || 30));
             }
 
             if (needsContentPicker.value && form.content_id) {
@@ -529,6 +598,13 @@ async function submit() {
 
             if (isExternal.value) {
                 body.append('url', form.url ?? '');
+            }
+
+            if (isBooking.value) {
+                form.branch_ids.forEach((id) => body.append('branch_ids[]', String(id)));
+                form.calendar_ids.forEach((id) => body.append('calendar_ids[]', String(id)));
+                body.append('allow_client_choice', form.allow_client_choice ? '1' : '0');
+                body.append('duration_minutes', String(form.duration_minutes || 30));
             }
 
             if (needsContentPicker.value && form.content_id) {
@@ -638,10 +714,21 @@ async function submit() {
                                 </li>
                             </ul>
 
-                            <template v-if="externalOption && !pickerQuery.trim()">
+                            <template v-if="(bookingOption || externalOption) && !pickerQuery.trim()">
                                 <div class="mx-2 border-t border-dotted border-stone-200" />
                                 <div class="p-1">
                                     <button
+                                        v-if="bookingOption"
+                                        type="button"
+                                        class="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
+                                        :class="{ 'bg-primary-50 text-primary-700': form.picker_key === 'booking' }"
+                                        @click="selectPickerOption(bookingOption)"
+                                    >
+                                        <img :src="bookingOption.icon_url" alt="" class="h-6 w-6 shrink-0 rounded-md bg-stone-100 p-1">
+                                        <span class="truncate font-medium">{{ bookingOption.label }}</span>
+                                    </button>
+                                    <button
+                                        v-if="externalOption"
                                         type="button"
                                         class="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-start text-sm transition hover:bg-stone-50"
                                         :class="{ 'bg-primary-50 text-primary-700': form.picker_key === 'external' }"
@@ -668,8 +755,78 @@ async function submit() {
                     :error="errors.url"
                 />
 
+                <template v-if="isBooking">
+                    <Field
+                        name="branch_ids"
+                        label="الفروع"
+                        :error="errors.branch_ids"
+                        info="اختر الفروع التي يمكن الحجز فيها"
+                    >
+                        <div class="max-h-40 space-y-1 overflow-y-auto rounded-md border border-stone-100 bg-white p-2">
+                            <p v-if="!bookingBranches.length" class="px-1 py-2 text-xs text-stone-400">لا توجد فروع نشطة.</p>
+                            <label
+                                v-for="branch in bookingBranches"
+                                :key="`branch-${branch.id}`"
+                                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+                            >
+                                <input
+                                    v-model="form.branch_ids"
+                                    type="checkbox"
+                                    class="rounded border-stone-300 text-primary-600 focus:ring-primary-500"
+                                    :value="branch.id"
+                                >
+                                <span class="min-w-0 truncate">{{ branch.name }}<span v-if="branch.city" class="text-stone-400"> · {{ branch.city }}</span></span>
+                            </label>
+                        </div>
+                    </Field>
+
+                    <Field
+                        name="calendar_ids"
+                        label="التقاويم"
+                        :error="errors.calendar_ids"
+                        info="اختر تقاويم محددة بالإضافة إلى الفروع أو بدلًا منها"
+                    >
+                        <div class="max-h-40 space-y-1 overflow-y-auto rounded-md border border-stone-100 bg-white p-2">
+                            <p v-if="!bookingCalendars.length" class="px-1 py-2 text-xs text-stone-400">لا توجد تقاويم نشطة.</p>
+                            <label
+                                v-for="calendar in bookingCalendars"
+                                :key="`calendar-${calendar.id}`"
+                                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+                            >
+                                <input
+                                    v-model="form.calendar_ids"
+                                    type="checkbox"
+                                    class="rounded border-stone-300 text-primary-600 focus:ring-primary-500"
+                                    :value="calendar.id"
+                                >
+                                <span class="min-w-0 truncate">
+                                    {{ calendar.name }}
+                                    <span v-if="calendar.branch_name" class="text-stone-400"> · {{ calendar.branch_name }}</span>
+                                </span>
+                            </label>
+                        </div>
+                    </Field>
+
+                    <Toggle
+                        v-model="form.allow_client_choice"
+                        name="allow_client_choice"
+                        label="السماح للعميل باختيار الفرع أو التقويم"
+                        info="عند الإيقاف يختار النظام أقرب تقويم متاح تلقائياً"
+                    />
+
+                    <Input
+                        v-model.number="form.duration_minutes"
+                        name="duration_minutes"
+                        type="number"
+                        label="مدة الموعد (دقائق)"
+                        min="5"
+                        max="480"
+                        :error="errors.duration_minutes"
+                    />
+                </template>
+
                 <Toggle
-                    v-if="isNew && canPickSpecificItem && !isExternal && !mustPickSpecificItem"
+                    v-if="isNew && !isManagedSection && canPickSpecificItem && !isExternal && !isBooking && !mustPickSpecificItem"
                     v-model="form.specific_item"
                     name="specific_item"
                     label="مادة محددة"
@@ -797,7 +954,7 @@ async function submit() {
                         v-model="form.description"
                         name="description"
                         label="الوصف"
-                        :rows="3"
+                        
                         :error="errors.description"
                     />
                 </template>

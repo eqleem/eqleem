@@ -40,6 +40,7 @@ class TopNav extends Component
         return match ($template) {
             'contact' => 'hugeicons:call',
             'faq' => 'hugeicons:help-circle',
+            'about' => 'hugeicons:user-group',
             'features' => 'hugeicons:magic-wand-02',
             'pricing' => 'hugeicons:credit-card-change',
             default => 'hugeicons:file-01',

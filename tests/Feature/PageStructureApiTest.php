@@ -279,8 +279,8 @@ test('block-link section blocks expose content manage url and brand mark', funct
     expect($userBlock)->not->toBeNull()
         ->and($userBlock['content_manage_url'])->toBe('/dashboard/manage/blog')
         ->and($userBlock['content_manage_label'])->toBe('إدارة المدونة')
-        ->and($userBlock['icon'])->toBe('assets/icons/stationery/002-book.svg')
-        ->and($userBlock['icon_url'])->toBe(asset('assets/icons/stationery/002-book.svg'))
+        ->and($userBlock['icon'])->toBe('assets/icons/tabler/book.svg')
+        ->and($userBlock['icon_url'])->toBe(asset('assets/icons/tabler/book.svg'))
         ->and($userBlock['brand_mark'])->toMatchArray([
             'type' => 'icon',
             'value' => 'tabler:book',

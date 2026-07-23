@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Models\Taxonomy;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -59,7 +60,9 @@ test('owner can create list update and delete services', function () {
     $create = $this->actingAs($user)
         ->postJson('/api/services', ['title' => 'استشارة'])
         ->assertSuccessful()
-        ->assertJsonPath('data.title', 'استشارة');
+        ->assertJsonPath('data.title', 'استشارة')
+        ->assertJsonPath('data.duration_minutes', '60')
+        ->assertJsonPath('data.currency_symbol', Money::SAR_SYMBOL);
 
     $uuid = (string) $create->json('data.uuid');
 
@@ -82,13 +85,15 @@ test('owner can create list update and delete services', function () {
             'duration_minutes' => 60,
             'category_ids' => [$leaf->id],
             'calendar_ids' => [$calendar->id],
-            'published' => true,
+            'active' => true,
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'استشارة محدثة')
         ->assertJsonPath('data.subtitle', 'جلسة ساعة')
         ->assertJsonPath('data.duration_minutes', '60')
-        ->assertJsonPath('data.calendar_ids.0', (string) $calendar->id);
+        ->assertJsonPath('data.calendar_ids.0', (string) $calendar->id)
+        ->assertJsonPath('data.active', true)
+        ->assertJsonPath('data.published', true);
 
     setCurrentTenant($tenant);
 
@@ -174,4 +179,38 @@ test('owner can upload service gallery images', function () {
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonCount(1, 'data.images');
+});
+
+test('service detail active state stays in sync after table toggle and detail update', function () {
+    [$user] = createUserWithTenantForServices();
+
+    $uuid = (string) $this->actingAs($user)
+        ->postJson('/api/services', ['title' => 'خدمة مزامنة'])
+        ->json('data.uuid');
+
+    $this->actingAs($user)
+        ->putJson("/api/services/{$uuid}/active", ['active' => false])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false);
+
+    $this->actingAs($user)
+        ->getJson("/api/services/{$uuid}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false);
+
+    $this->actingAs($user)
+        ->putJson("/api/services/{$uuid}", [
+            'title' => 'خدمة مزامنة',
+            'slug' => 'sync-service',
+            'active' => true,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', true)
+        ->assertJsonPath('data.published', true);
+
+    $this->actingAs($user)
+        ->getJson('/api/services')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.active', true);
 });

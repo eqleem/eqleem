@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="وجبات طازجة مع أحجام وإضافات متنوعة"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>

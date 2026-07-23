@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="احجز الوحدات المتاحة للتأجير بسهولة"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>

@@ -146,3 +146,17 @@ it('always exposes permanent types and excludes them from managed sections', fun
         ->and($registry->managedSections()->pluck('slug')->all())->toBe(['blog'])
         ->and($registry->findActive('pages'))->toBeInstanceOf(ContentType::class);
 });
+
+it('uses tabler outline icons for all configured content types', function () {
+    $types = app(ContentTypeRegistry::class)->configured();
+
+    expect($types)->not->toBeEmpty();
+
+    foreach ($types as $type) {
+        expect($type->icon)
+            ->toStartWith('assets/icons/tabler/')
+            ->toEndWith('.svg');
+
+        expect(public_path($type->icon))->toBeFile();
+    }
+});

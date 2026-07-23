@@ -235,6 +235,8 @@ class SeedTenantDefaults
 
     protected function seedDefaultPages(Tenant $tenant): void
     {
+        $businessName = filled($tenant->name) ? (string) $tenant->name : (string) $tenant->handle;
+
         $pages = [
             [
                 'template' => 'contact',
@@ -248,6 +250,24 @@ class SeedTenantDefaults
                 'slug' => 'faq',
                 'data' => Content::defaultFaqPageData(),
             ],
+            [
+                'template' => 'about',
+                'title' => 'من نحن',
+                'slug' => 'about-us',
+                'data' => Content::defaultAboutPageData(),
+            ],
+            [
+                'template' => null,
+                'title' => 'اتفاقية الاستخدام',
+                'slug' => 'terms',
+                'data' => Content::defaultTermsPageData($businessName),
+            ],
+            [
+                'template' => null,
+                'title' => 'سياسة الخصوصية',
+                'slug' => 'privacy',
+                'data' => Content::defaultPrivacyPageData($businessName),
+            ],
         ];
 
         foreach ($pages as $page) {
@@ -256,15 +276,21 @@ class SeedTenantDefaults
     }
 
     /**
-     * @param  array{template: string, title: string, slug: string, data?: array<string, mixed>}  $page
+     * @param  array{template?: string|null, title: string, slug: string, data?: array<string, mixed>}  $page
      */
     protected function seedDefaultPage(Tenant $tenant, array $page): void
     {
+        $template = $page['template'] ?? null;
+
         $existing = Content::query()
             ->withoutGlobalScope('tenant')
             ->where('tenant_id', $tenant->id)
             ->type(contentTypeModel('pages'))
-            ->where('template', $page['template'])
+            ->when(
+                filled($template),
+                fn ($query) => $query->where('template', $template),
+                fn ($query) => $query->where('slug', $page['slug']),
+            )
             ->first();
 
         if ($existing) {
@@ -276,7 +302,7 @@ class SeedTenantDefaults
         Content::create([
             'tenant_id' => $tenant->id,
             'type' => contentTypeModel('pages'),
-            'template' => $page['template'],
+            'template' => $template,
             'title' => $page['title'],
             'slug' => $page['slug'],
             'data' => $page['data'] ?? [],

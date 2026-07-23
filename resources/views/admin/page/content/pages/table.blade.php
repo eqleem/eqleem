@@ -275,7 +275,7 @@ new class extends Livewire\Component
     {
         $query = Content::query()
             ->type(contentTypeModel($this->contentType['slug']))
-            ->orderByRaw("CASE template WHEN 'contact' THEN 1 WHEN 'faq' THEN 2 ELSE 99 END")
+            ->orderByRaw("CASE template WHEN 'contact' THEN 1 WHEN 'faq' THEN 2 WHEN 'about' THEN 3 ELSE 99 END")
             ->orderByDesc('id');
 
         $query = $this->applySearch($query);

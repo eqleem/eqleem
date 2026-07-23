@@ -4,6 +4,7 @@ use App\Actions\StoreCheckoutPaymentCallback;
 use App\Http\Middleware\ResolveTenantFromPath;
 use App\Http\Middleware\SetTenantTheme;
 use Illuminate\Support\Facades\Route;
+use Pages\About;
 use Pages\Branches;
 use Pages\Cart;
 use Pages\Changelog;
@@ -51,6 +52,9 @@ Route::prefix('{tenant}')
         Route::get('/digital-services', DigitalServices\Index::class)->name('digital-services.index');
         Route::get('/digital-services/{slug}', DigitalServices\Detail::class)->name('digital-services.detail');
 
+        Route::get('/on-demand-services', OnDemandServices\Index::class)->name('on-demand-services.index');
+        Route::get('/on-demand-services/{slug}', OnDemandServices\Detail::class)->name('on-demand-services.detail');
+
         Route::get('/portfolio', Portfolio\Index::class)->name('portfolio.index');
         Route::get('/portfolio/{slug}', Portfolio\Detail::class)->name('portfolio.detail');
 
@@ -58,6 +62,8 @@ Route::prefix('{tenant}')
         Route::get('/blog/{slug}', Blog\Detail::class)->name('blog.detail');
 
         Route::get('/pages/{slug}', Page\Detail::class)->name('page.detail');
+
+        Route::get('/forms/{slug}', Forms\Detail::class)->name('forms.detail');
 
         Route::get('/newsletter', Newsletter\Index::class)->name('newsletter.index');
         Route::get('/newsletter/{slug}', Newsletter\Detail::class)->name('newsletter.detail');
@@ -70,6 +76,7 @@ Route::prefix('{tenant}')
         Route::get('/features', Features::class)->name('pages.features');
         Route::get('/pricing', Pricing::class)->name('pages.pricing');
         Route::get('/contact', Contact::class)->name('pages.contact');
+        Route::get('/about', About::class)->name('pages.about');
         Route::get('/checkout', Checkout::class)->name('pages.checkout');
         Route::get('/cart', Cart::class)->name('pages.cart');
         Route::get('/orders/{order:uuid}', OrderConfirmation::class)->name('pages.order-confirmation');

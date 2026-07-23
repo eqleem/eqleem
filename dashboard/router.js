@@ -37,6 +37,9 @@ import DigitalServicesHome from './pages/page/digital-services/Home.vue';
 import DigitalServicesCategories from './pages/page/digital-services/Categories.vue';
 import DigitalServicesSettings from './pages/page/digital-services/Settings.vue';
 import DigitalServicesDetail from './pages/page/digital-services/Detail.vue';
+import OnDemandServicesHome from './pages/page/on-demand-services/Home.vue';
+import OnDemandServicesSettings from './pages/page/on-demand-services/Settings.vue';
+import OnDemandServicesDetail from './pages/page/on-demand-services/Detail.vue';
 import DigitalProductsHome from './pages/page/digital-products/Home.vue';
 import DigitalProductsCategories from './pages/page/digital-products/Categories.vue';
 import DigitalProductsSettings from './pages/page/digital-products/Settings.vue';
@@ -59,6 +62,7 @@ import PagesHome from './pages/page/pages/Home.vue';
 import PagesDetail from './pages/page/pages/Detail.vue';
 import PagesContactDetail from './pages/page/pages/ContactDetail.vue';
 import PagesFaqDetail from './pages/page/pages/FaqDetail.vue';
+import PagesAboutDetail from './pages/page/pages/AboutDetail.vue';
 import ContentIndex from './pages/page/ContentIndex.vue';
 import ContentDetail from './pages/page/ContentDetail.vue';
 import ContentCategories from './pages/page/ContentCategories.vue';
@@ -128,6 +132,11 @@ const routes = [
     { path: '/manage/digital-services/settings', name: 'digital-services-settings', component: DigitalServicesSettings },
     { path: '/manage/digital-services/detail/:id', name: 'digital-services-detail', component: DigitalServicesDetail },
 
+    // On-demand services — dedicated pages (before generic /manage/:type catch-alls).
+    { path: '/manage/on-demand-services', name: 'on-demand-services-home', component: OnDemandServicesHome },
+    { path: '/manage/on-demand-services/settings', name: 'on-demand-services-settings', component: OnDemandServicesSettings },
+    { path: '/manage/on-demand-services/detail/:id', name: 'on-demand-services-detail', component: OnDemandServicesDetail },
+
     // Digital products — dedicated pages (before generic /manage/:type catch-alls).
     { path: '/manage/digital-products', name: 'digital-products-home', component: DigitalProductsHome },
     { path: '/manage/digital-products/categories', name: 'digital-products-categories', component: DigitalProductsCategories },
@@ -160,6 +169,7 @@ const routes = [
     { path: '/manage/pages', name: 'pages-home', component: PagesHome },
     { path: '/manage/pages/contact/:id', name: 'pages-contact-detail', component: PagesContactDetail },
     { path: '/manage/pages/faq/:id', name: 'pages-faq-detail', component: PagesFaqDetail },
+    { path: '/manage/pages/about/:id', name: 'pages-about-detail', component: PagesAboutDetail },
     { path: '/manage/pages/detail/:id', name: 'pages-detail', component: PagesDetail },
 
     // Reviews has no categories; keep the old URL from landing on mock taxonomy UI.

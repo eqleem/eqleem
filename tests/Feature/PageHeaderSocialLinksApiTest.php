@@ -60,10 +60,15 @@ test('guests cannot manage header social links', function () {
         'order' => ['a'],
     ])->assertUnauthorized();
 
+    $this->putJson('/api/page/header/social/abc', [
+        'network' => 'twitter',
+        'url' => 'https://twitter.com/eqleem',
+    ])->assertUnauthorized();
+
     $this->deleteJson('/api/page/header/social/abc')->assertUnauthorized();
 });
 
-test('owner can add delete and reorder header social links', function () {
+test('owner can add update delete and reorder header social links', function () {
     [$user, $tenant] = createUserWithTenantForHeaderSocial();
 
     $add = $this->actingAs($user)
@@ -91,6 +96,20 @@ test('owner can add delete and reorder header social links', function () {
     expect($all)->toHaveCount(2);
 
     $ids = collect($all)->pluck('id')->all();
+
+    $updated = $this->actingAs($user)
+        ->putJson('/api/page/header/social/'.$ids[0], [
+            'network' => 'youtube',
+            'url' => '@eqleem',
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('message', 'تم تحديث رابط التواصل بنجاح')
+        ->json('data');
+
+    expect(collect($updated)->firstWhere('id', $ids[0]))
+        ->network->toBe('youtube')
+        ->url->toBe('@eqleem');
+
     $reversed = array_reverse($ids);
 
     $reordered = $this->actingAs($user)
@@ -108,6 +127,17 @@ test('owner can add delete and reorder header social links', function () {
 
     setCurrentTenant($tenant);
     expect(app(TenantProfileService::class)->socialLinks($tenant->fresh()))->toHaveCount(1);
+});
+
+test('updating a missing header social link returns not found', function () {
+    [$user] = createUserWithTenantForHeaderSocial();
+
+    $this->actingAs($user)
+        ->putJson('/api/page/header/social/missing-id', [
+            'network' => 'twitter',
+            'url' => 'https://twitter.com/eqleem',
+        ])
+        ->assertNotFound();
 });
 
 test('header block editor payload includes social links for the modal', function () {

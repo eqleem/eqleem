@@ -166,6 +166,54 @@ export const usePagesStore = defineStore('pages', {
             }
         },
 
+        async uploadHeroImage(uuid, file) {
+            const body = new FormData();
+            body.append('file', file);
+
+            const payload = await api(`/pages/${uuid}/hero-image`, {
+                method: 'POST',
+                body,
+            });
+
+            if (this.detail?.uuid === uuid) {
+                this.detail = {
+                    ...this.detail,
+                    hero_image: payload?.data?.hero_image ?? null,
+                    hero_image_path: payload?.data?.hero_image_path ?? null,
+                };
+            }
+
+            return payload?.data ?? null;
+        },
+
+        async deleteHeroImage(uuid) {
+            const payload = await api(`/pages/${uuid}/hero-image`, {
+                method: 'DELETE',
+            });
+
+            if (this.detail?.uuid === uuid) {
+                this.detail = {
+                    ...this.detail,
+                    hero_image: null,
+                    hero_image_path: null,
+                };
+            }
+
+            return payload?.data ?? null;
+        },
+
+        async uploadBrandMarkImage(uuid, file) {
+            const body = new FormData();
+            body.append('file', file);
+
+            const payload = await api(`/pages/${uuid}/brand-mark-image`, {
+                method: 'POST',
+                body,
+            });
+
+            return payload?.data ?? null;
+        },
+
         async deletePages(ids) {
             this.saving = true;
             this.error = null;

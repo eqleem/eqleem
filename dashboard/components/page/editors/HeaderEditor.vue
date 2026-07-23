@@ -133,7 +133,7 @@ async function submit() {
                 :error="errors.logo || errors.brand_mark_value || errors.brand_mark_type"
             />
 
-            <Textarea v-model="form.bio" name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" :maxlength="250" :rows="3" :error="errors.bio" />
+            <Textarea v-model="form.bio" name="bio" label="النبذة" placeholder="نبذة قصيرة تظهر أسفل الاسم (اتركها فارغة لإخفائها)" :maxlength="250"  :error="errors.bio" />
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <CountrySelect v-model="form.country" name="country" :error="errors.country" />

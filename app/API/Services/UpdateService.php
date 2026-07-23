@@ -67,15 +67,15 @@ class UpdateService
                     }
                 }),
             ],
-            'published' => ['required', 'boolean'],
+            'active' => ['required', 'boolean'],
         ];
     }
 
     public function prepareForValidation(ActionRequest $request): void
     {
-        if ($request->exists('published')) {
+        if ($request->exists('active')) {
             $request->merge([
-                'published' => filter_var($request->input('published'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+                'active' => filter_var($request->input('active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
             ]);
         }
 
@@ -103,7 +103,7 @@ class UpdateService
      *     duration_minutes?: int|string|null,
      *     category_ids?: list<int>|null,
      *     calendar_ids?: list<int>|null,
-     *     published: bool
+     *     active: bool
      * }  $data
      */
     public function handle(Tenant $tenant, string $uuid, array $data): Content
@@ -124,14 +124,15 @@ class UpdateService
             (int) $content->id,
         );
 
-        $published = (bool) $data['published'];
+        $active = (bool) $data['active'];
 
         $content->update([
             'title' => $data['title'],
             'slug' => $slug,
-            'status' => $published ? 'published' : 'draft',
+            'active' => $active,
+            'status' => $active ? 'published' : 'draft',
             'data' => $payload,
-            'published_at' => $published
+            'published_at' => $active
                 ? ($content->published_at ?? now())
                 : null,
         ]);
@@ -160,7 +161,7 @@ class UpdateService
          *     duration_minutes?: int|string|null,
          *     category_ids?: list<int>|null,
          *     calendar_ids?: list<int>|null,
-         *     published: bool
+         *     active: bool
          * } $validated
          */
         $validated = $request->validated();

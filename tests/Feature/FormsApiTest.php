@@ -54,7 +54,8 @@ test('owner can create list update clone and delete forms', function () {
         ->getJson('/api/forms')
         ->assertSuccessful()
         ->assertJsonPath('meta.total', 2)
-        ->assertJsonFragment(['uuid' => $uuid]);
+        ->assertJsonFragment(['uuid' => $uuid])
+        ->assertJsonFragment(['uuid' => $uuid, 'published' => false]);
 
     $this->actingAs($user)
         ->getJson("/api/forms/{$uuid}")
@@ -113,6 +114,7 @@ test('owner can create list update clone and delete forms', function () {
 
     expect($form)->not->toBeNull()
         ->and($form->status)->toBe('published')
+        ->and($form->active)->toBeTrue()
         ->and($form->published_at)->not->toBeNull()
         ->and(data_get($form->data, 'description'))->toBe('وصف النموذج')
         ->and(data_get($form->data, 'submit_label'))->toBe('أرسل الآن')

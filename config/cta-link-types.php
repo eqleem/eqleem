@@ -51,6 +51,10 @@ return [
             'index' => 'tenant.digital-services.index',
             'detail' => 'tenant.digital-services.detail',
         ],
+        'on-demand-services' => [
+            'index' => 'tenant.on-demand-services.index',
+            'detail' => 'tenant.on-demand-services.detail',
+        ],
         'reviews' => [
             'index' => 'tenant.pages.reviews',
             'detail' => null,
@@ -77,9 +81,11 @@ return [
         'courses' => 'hugeicons:presentation-06',
         'digital-products' => 'hugeicons:file-download',
         'digital-services' => 'hugeicons:customer-service-01',
+        'on-demand-services' => 'hugeicons:ruler',
         'reviews' => 'hugeicons:star',
         'pages' => 'hugeicons:file-01',
         'form' => 'hugeicons:file-01',
+        'booking' => 'hugeicons:calendar-03',
         'external' => 'hugeicons:link-04',
     ],
 
@@ -94,6 +100,7 @@ return [
         'courses' => 'دورة محددة',
         'digital-products' => 'منتج رقمي محدد',
         'digital-services' => 'خدمة رقمية محددة',
+        'on-demand-services' => 'خدمة حسب الطلب محددة',
         'pages' => 'رابط صفحة',
         'forms' => 'رابط نموذج',
     ],
@@ -140,6 +147,10 @@ return [
                 'title' => 'الخدمات الرقمية',
                 'description' => 'خدمات رقمية احترافية مع مدة تسليم واضحة.',
             ],
+            'on-demand-services' => [
+                'title' => 'خدمات حسب الطلب',
+                'description' => 'خدمات مسعّرة حسب الوحدة مثل المتر والقطعة والساعة.',
+            ],
             'reviews' => [
                 'title' => 'التقييمات',
                 'description' => 'تقييمات وآراء عملائنا.',
@@ -185,6 +196,10 @@ return [
             'digital-services' => [
                 'title' => '',
                 'description' => 'تعرّف على خدمة رقمية محددة بالتفصيل.',
+            ],
+            'on-demand-services' => [
+                'title' => '',
+                'description' => 'تعرّف على خدمة حسب الطلب محددة بالتفصيل.',
             ],
             'pages' => [
                 'title' => '',

@@ -1,6 +1,9 @@
 <script setup>
+import { computed, useSlots } from 'vue';
+import { SAR_SYMBOL } from '../../lib/money.js';
+
 // Port of resources/views/ui/field.blade.php
-defineProps({
+const props = defineProps({
     name: { type: String, default: '' },
     label: { type: String, default: null },
     labelWidth: { type: String, default: 'w-36' },
@@ -15,6 +18,12 @@ defineProps({
     prime: { type: Boolean, default: false },
     infoDir: { type: String, default: null },
 });
+
+const slots = useSlots();
+const hasPrefix = computed(() => Boolean(props.prefix) || Boolean(slots.prefix));
+const hasSuffix = computed(() => Boolean(props.suffix) || Boolean(slots.suffix));
+const isSarPrefix = computed(() => props.prefix === SAR_SYMBOL);
+const isSarSuffix = computed(() => props.suffix === SAR_SYMBOL);
 </script>
 
 <template>
@@ -37,16 +46,38 @@ defineProps({
 
         <div class="relative" :class="width" :dir="dir">
             <div class="flex w-full items-center text-stone-500">
-                <div v-if="prefix" class="shrink-0 px-2 text-xs opacity-70">
-                    {{ prefix }}
+                <div
+                    v-if="hasPrefix"
+                    class="shrink-0 px-2"
+                    :class="slots.prefix ? 'flex items-center gap-1 text-sm' : 'text-xs opacity-70'"
+                >
+                    <slot name="prefix">
+                        <span
+                            v-if="isSarPrefix"
+                            class="money-symbol icon-saudi_riyal_new"
+                            aria-hidden="true"
+                        />
+                        <template v-else>{{ prefix }}</template>
+                    </slot>
                 </div>
 
                 <div class="w-full">
                     <slot />
                 </div>
 
-                <div v-if="suffix" class="shrink-0 px-2 text-xs opacity-70">
-                    {{ suffix }}
+                <div
+                    v-if="hasSuffix"
+                    class="shrink-0 px-2"
+                    :class="slots.suffix ? 'flex items-center gap-1 text-sm' : 'text-xs opacity-70'"
+                >
+                    <slot name="suffix">
+                        <span
+                            v-if="isSarSuffix"
+                            class="money-symbol icon-saudi_riyal_new"
+                            aria-hidden="true"
+                        />
+                        <template v-else>{{ suffix }}</template>
+                    </slot>
                 </div>
             </div>
 

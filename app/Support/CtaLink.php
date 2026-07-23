@@ -45,13 +45,14 @@ class CtaLink
             }
         }
 
+        $options['booking'] = 'حجز موعد';
         $options['external'] = 'رابط خارجي';
 
         return $options;
     }
 
     /**
-     * All link_type keys accepted when saving a block-link (sections, items, external).
+     * All link_type keys accepted when saving a block-link (sections, items, booking, external).
      *
      * @return list<string>
      */
@@ -69,6 +70,7 @@ class CtaLink
             }
         }
 
+        $keys[] = 'booking';
         $keys[] = 'external';
 
         return $keys;
@@ -127,6 +129,18 @@ class CtaLink
                 ),
             ];
         }
+
+        $options[] = [
+            'key' => 'booking',
+            'label' => 'حجز موعد',
+            'icon_url' => asset('assets/icons/tabler/CalendarEvent.svg'),
+            'group' => 'booking',
+            'supports_section' => false,
+            'supports_item' => false,
+            'section_title' => 'حجز موعد',
+            'section_description' => 'يفتح نموذج حجز موعد باختيار الفرع أو التقويم والوقت المتاح.',
+            'item_description' => '',
+        ];
 
         $options[] = [
             'key' => 'external',
@@ -216,6 +230,11 @@ class CtaLink
         return $typeKey === 'external';
     }
 
+    public static function isBookingLink(string $typeKey): bool
+    {
+        return $typeKey === 'booking';
+    }
+
     public static function needsContentPicker(string $typeKey): bool
     {
         return str_starts_with($typeKey, 'item:');
@@ -242,6 +261,10 @@ class CtaLink
             return 'مثال: تواصل معنا';
         }
 
+        if (self::isBookingLink($typeKey)) {
+            return 'مثال: احجز موعداً';
+        }
+
         if (str_starts_with($typeKey, 'section:')) {
             $contentType = substr($typeKey, 8);
 
@@ -259,6 +282,10 @@ class CtaLink
     {
         if (self::isExternalLink($typeKey)) {
             return 'مطلوب للروابط الخارجية.';
+        }
+
+        if (self::isBookingLink($typeKey)) {
+            return 'مطلوب لزر حجز الموعد.';
         }
 
         if (str_starts_with($typeKey, 'item:')) {
@@ -279,6 +306,7 @@ class CtaLink
     {
         return self::navLinkTypeOptions() + self::contentLinkTypeOptions() + [
             'form' => 'نموذج',
+            'booking' => 'حجز موعد',
         ];
     }
 
@@ -289,7 +317,7 @@ class CtaLink
     {
         $linkType = $data['link_type'] ?? 'external';
 
-        if (in_array($linkType, ['external', 'form'], true)) {
+        if (in_array($linkType, ['external', 'form', 'booking'], true)) {
             return $linkType;
         }
 
@@ -383,6 +411,7 @@ class CtaLink
             'section' => self::sectionUrl($data['content_type'] ?? ''),
             'item' => self::itemUrl($data['content_type'] ?? '', (int) ($data['content_id'] ?? 0)),
             'external' => filled($data['url'] ?? null) ? (string) $data['url'] : null,
+            'booking' => '#',
             default => null,
         };
     }
@@ -400,6 +429,10 @@ class CtaLink
             return (string) config('cta-link-types.icons.external');
         }
 
+        if (($data['link_type'] ?? '') === 'booking') {
+            return (string) config('cta-link-types.icons.booking');
+        }
+
         $contentType = $data['content_type'] ?? '';
 
         return config('cta-link-types.icons.'.$contentType, config('cta-link-types.icons.external'));
@@ -415,12 +448,8 @@ class CtaLink
         $data = $link->data ?? [];
         $linkType = $data['link_type'] ?? 'external';
 
-        if ($linkType === 'external') {
-            return 'external';
-        }
-
-        if ($linkType === 'form') {
-            return 'form';
+        if (in_array($linkType, ['external', 'form', 'booking'], true)) {
+            return $linkType;
         }
 
         $contentType = $data['content_type'] ?? '';
@@ -445,6 +474,10 @@ class CtaLink
 
         if ($linkType === 'section') {
             return config('content-types.'.$data['content_type'].'.name', $data['content_type'] ?? '');
+        }
+
+        if ($linkType === 'booking') {
+            return filled($data['label'] ?? null) ? (string) $data['label'] : 'حجز موعد';
         }
 
         if (in_array($linkType, ['item', 'form'], true) && filled($data['content_id'] ?? null)) {
@@ -472,6 +505,10 @@ class CtaLink
             return config('cta-link-types.icons.form', 'hugeicons:file-01');
         }
 
+        if ($linkType === 'booking') {
+            return config('cta-link-types.icons.booking', 'hugeicons:calendar-03');
+        }
+
         $contentType = $data['content_type'] ?? '';
 
         return config('cta-link-types.icons.'.$contentType, config('cta-link-types.icons.external'));
@@ -486,7 +523,7 @@ class CtaLink
             'external' => filled($data['url'] ?? null) ? (string) $data['url'] : null,
             'section' => self::sectionUrl($data['content_type'] ?? ''),
             'item' => self::itemUrl($data['content_type'] ?? '', (int) ($data['content_id'] ?? 0)),
-            'form' => '#',
+            'form', 'booking' => '#',
             default => null,
         };
     }
@@ -500,8 +537,30 @@ class CtaLink
             'external' => (string) ($data['url'] ?? ''),
             'section' => config('content-types.'.$data['content_type'].'.name', ''),
             'item', 'form' => Content::query()->find($data['content_id'] ?? null)?->title ?? '',
+            'booking' => self::bookingSummary($data),
             default => '',
         };
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public static function bookingSummary(array $data): string
+    {
+        $config = CtaBooking::configFromData($data);
+        $parts = [];
+
+        if ($config['branch_ids'] !== []) {
+            $parts[] = count($config['branch_ids']).' فرع';
+        }
+
+        if ($config['calendar_ids'] !== []) {
+            $parts[] = count($config['calendar_ids']).' تقويم';
+        }
+
+        $parts[] = $config['duration_minutes'].' دقيقة';
+
+        return implode(' · ', $parts);
     }
 
     public static function opensInNewTab(Content $link): bool
@@ -519,6 +578,11 @@ class CtaLink
         }
 
         return $linkType === 'item' && ($data['content_type'] ?? '') === 'forms';
+    }
+
+    public static function isBooking(Content $link): bool
+    {
+        return ($link->data['link_type'] ?? '') === 'booking';
     }
 
     public static function formContentId(Content $link): ?int
@@ -547,6 +611,13 @@ class CtaLink
         if ($typeKey === 'form') {
             return [
                 'link_type' => 'form',
+                'content_type' => null,
+            ];
+        }
+
+        if ($typeKey === 'booking') {
+            return [
+                'link_type' => 'booking',
                 'content_type' => null,
             ];
         }

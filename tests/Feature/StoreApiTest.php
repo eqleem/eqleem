@@ -5,6 +5,7 @@ use App\Models\Setting;
 use App\Models\Taxonomy;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -52,6 +53,7 @@ test('owner can create list update and delete store products', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'قمي قطن')
         ->assertJsonPath('data.status', 'draft')
+        ->assertJsonPath('data.active', false)
         ->assertJsonPath('data.published', false);
 
     $uuid = (string) $create->json('data.uuid');
@@ -74,8 +76,12 @@ test('owner can create list update and delete store products', function () {
                 'price',
                 'compare_price',
                 'weight',
+                'currency_code',
+                'currency_symbol',
             ],
-        ]);
+        ])
+        ->assertJsonPath('data.currency_code', 'SAR')
+        ->assertJsonPath('data.currency_symbol', Money::SAR_SYMBOL);
 
     setCurrentTenant($tenant);
 
@@ -103,10 +109,11 @@ test('owner can create list update and delete store products', function () {
             'compare_price' => 120,
             'weight' => 0.25,
             'category_ids' => [$leaf->id],
-            'published' => true,
+            'active' => true,
         ])
         ->assertSuccessful()
         ->assertJsonPath('data.title', 'قمي قطن محدث')
+        ->assertJsonPath('data.active', true)
         ->assertJsonPath('data.published', true)
         ->assertJsonPath('data.price', '99.5')
         ->assertJsonPath('data.compare_price', '120')
@@ -118,6 +125,7 @@ test('owner can create list update and delete store products', function () {
     $product = Content::query()->where('uuid', $uuid)->first();
 
     expect($product)->not->toBeNull()
+        ->and($product->active)->toBeTrue()
         ->and($product->status)->toBe('published')
         ->and(data_get($product->data, 'price'))->toBe(money_minor(99.50));
 
@@ -186,4 +194,38 @@ test('owner can upload store gallery images', function () {
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonCount(1, 'data.images');
+});
+
+test('store product detail active state stays in sync after table toggle and detail update', function () {
+    [$user] = createUserWithTenantForStore();
+
+    $uuid = (string) $this->actingAs($user)
+        ->postJson('/api/store', ['title' => 'منتج مزامنة'])
+        ->json('data.uuid');
+
+    $this->actingAs($user)
+        ->putJson("/api/store/{$uuid}/active", ['active' => false])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false);
+
+    $this->actingAs($user)
+        ->getJson("/api/store/{$uuid}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false);
+
+    $this->actingAs($user)
+        ->putJson("/api/store/{$uuid}", [
+            'title' => 'منتج مزامنة',
+            'slug' => 'sync-product',
+            'active' => true,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', true)
+        ->assertJsonPath('data.published', true);
+
+    $this->actingAs($user)
+        ->getJson('/api/store')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.active', true);
 });

@@ -149,17 +149,14 @@ function openAddFooterDocument() {
 function openHeaderSocialLinks(block) {
     headerSocialBlockId.value = Number(block.id);
     socialModalOpen.value = true;
-    lockBodyScroll();
 }
 
 function closeHeaderSocialLinks() {
-    if (!socialModalOpen.value) {
-        return;
-    }
-
     socialModalOpen.value = false;
+}
+
+function onSocialModalClosed() {
     headerSocialBlockId.value = null;
-    unlockBodyScroll();
 }
 
 function onCtaUpdated(payload) {
@@ -781,36 +778,21 @@ function contentManageTo(block) {
             </div>
         </Teleport>
 
-        <Teleport to="body">
-            <div
-                v-if="socialModalOpen && headerSocialBlockId"
-                class="relative z-50"
-                role="dialog"
-                aria-modal="true"
-            >
-                <div class="fixed inset-0 bg-stone-800/75" @click="closeHeaderSocialLinks" />
-
-                <div class="fixed inset-0 overflow-y-auto overscroll-contain">
-                    <div class="flex min-h-full items-center justify-center p-4" @click.self="closeHeaderSocialLinks">
-                        <div class="relative w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-xl">
-                            <div class="flex items-center justify-between border-b border-stone-100 bg-white p-3 px-4">
-                                <p class="text-sm font-semibold text-stone-600">روابط الشبكات الإجتماعية</p>
-                                <button
-                                    type="button"
-                                    class="cursor-pointer rounded-md bg-stone-100 p-1 text-stone-400 transition hover:bg-stone-200 hover:text-stone-600"
-                                    aria-label="إغلاق"
-                                    @click="closeHeaderSocialLinks"
-                                >
-                                    <Icon name="x" class="h-4 w-4" />
-                                </button>
-                            </div>
-
-                            <HeaderSocialLinksPanel :block-id="headerSocialBlockId" />
-                        </div>
-                    </div>
-                </div>
+        <Modal
+            v-model:open="socialModalOpen"
+            title="روابط الشبكات الإجتماعية"
+            size="md"
+            name="header-social-links"
+            @closed="onSocialModalClosed"
+        >
+            <div class="border-b border-stone-100 px-4 pb-3">
+                <p class="text-xs text-stone-400">أضف وعدّل حسابات التواصل التي تظهر في معلومات نشاطك أعلى الصفحة.</p>
             </div>
-        </Teleport>
+            <HeaderSocialLinksPanel
+                v-if="headerSocialBlockId"
+                :block-id="headerSocialBlockId"
+            />
+        </Modal>
     </MainBox>
 
     <CatalogSectionsModal />

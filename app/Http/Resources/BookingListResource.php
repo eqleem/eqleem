@@ -38,7 +38,15 @@ class BookingListResource extends JsonResource
                 'name' => $booking->client->name,
                 'email' => $booking->client->email,
                 'phone' => $booking->client->phone,
-            ] : null,
+            ] : (filled(data_get($booking->data, 'guest_name')) ? [
+                'name' => (string) data_get($booking->data, 'guest_name'),
+                'email' => filled(data_get($booking->data, 'guest_email'))
+                    ? (string) data_get($booking->data, 'guest_email')
+                    : null,
+                'phone' => filled(data_get($booking->data, 'guest_phone'))
+                    ? (string) data_get($booking->data, 'guest_phone')
+                    : null,
+            ] : null),
             'content' => $booking->content ? [
                 'id' => $booking->content->id,
                 'title' => $booking->content->title,

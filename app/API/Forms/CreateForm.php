@@ -50,7 +50,7 @@ class CreateForm
             'title' => $title,
             'slug' => $this->uniqueFormSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

@@ -1,3 +1,6 @@
+/** New Saudi Riyal symbol (U+20C1). */
+export const SAR_SYMBOL = '\u{20C1}';
+
 const CURRENCY_SUFFIX = /[\s\u00A0]*(ر\.?\s*س\.?|SAR|R\.?\s?S)\s*$/iu;
 
 /**
@@ -5,7 +8,7 @@ const CURRENCY_SUFFIX = /[\s\u00A0]*(ر\.?\s*س\.?|SAR|R\.?\s?S)\s*$/iu;
  */
 export function stripCurrencySuffix(value) {
     return String(value ?? '')
-        .replace(/\u20C1/g, '')
+        .replaceAll(SAR_SYMBOL, '')
         .replace(CURRENCY_SUFFIX, '')
         .trim();
 }

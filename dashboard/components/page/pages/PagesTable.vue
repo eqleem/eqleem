@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Button from '../../ui/Button.vue';
+import Icon from '../../ui/Icon.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddPage from './AddPage.vue';
@@ -9,13 +10,37 @@ import { usePagesStore } from '../../../stores/pages.js';
 import { openModal } from '../../../lib/modal.js';
 import { pageEditPath } from '../../../lib/pagePaths.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
+import { useSession } from '../../../stores/session.js';
 
 const store = usePagesStore();
 const router = useRouter();
+const { tenant } = useSession();
 const search = ref('');
 const selectedIds = ref([]);
 const creatingTemplate = ref(null);
 let searchTimer = null;
+
+function pagePreviewUrl(item) {
+    const base = String(tenant.value?.url ?? '').replace(/\/$/, '');
+
+    if (!base) {
+        return null;
+    }
+
+    if (item?.template === 'contact') {
+        return `${base}/contact`;
+    }
+
+    if (item?.template === 'about') {
+        return `${base}/about`;
+    }
+
+    if (!item?.slug) {
+        return null;
+    }
+
+    return `${base}/pages/${item.slug}`;
+}
 
 onMounted(() => {
     store.fetchPages({ page: 1 });
@@ -36,6 +61,9 @@ const hasContactPage = computed(() => store.existingTemplates.includes('contact'
 
 const hasFaqPage = computed(() => store.existingTemplates.includes('faq')
     || store.items.some((item) => item.template === 'faq'));
+
+const hasAboutPage = computed(() => store.existingTemplates.includes('about')
+    || store.items.some((item) => item.template === 'about'));
 
 const allSelected = computed({
     get: () => selectableItems.value.length > 0
@@ -89,13 +117,16 @@ async function createTemplatePage(template) {
         return;
     }
 
-    if ((template === 'contact' && hasContactPage.value) || (template === 'faq' && hasFaqPage.value)) {
+    if ((template === 'contact' && hasContactPage.value)
+        || (template === 'faq' && hasFaqPage.value)
+        || (template === 'about' && hasAboutPage.value)) {
         return;
     }
 
     const defaults = {
         contact: 'اتصل بنا',
         faq: 'الأسئلة المتكررة',
+        about: 'من نحن',
     };
 
     creatingTemplate.value = template;
@@ -202,6 +233,24 @@ async function createTemplatePage(template) {
                 </button>
                 <button
                     type="button"
+                    class="flex w-full items-center gap-x-2.5 rounded-md p-2 text-start text-sm text-stone-700 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                    :disabled="Boolean(creatingTemplate) || store.saving || hasAboutPage"
+                    @click="createTemplatePage('about')"
+                >
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                        </svg>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block font-medium">صفحة من نحن</span>
+                        <span class="block text-xs text-stone-500">
+                            {{ hasAboutPage ? 'تمت إضافتها مسبقاً' : 'بطل وأرقام ومزايا تعريفية' }}
+                        </span>
+                    </span>
+                </button>
+                <button
+                    type="button"
                     class="flex w-full items-center gap-x-2.5 rounded-md p-2 text-start text-sm text-stone-700 hover:bg-stone-100"
                     :disabled="Boolean(creatingTemplate) || store.saving"
                     @click="openModal('add-page')"
@@ -276,7 +325,7 @@ async function createTemplatePage(template) {
                                     </div>
                                     <p class="mt-1 flex items-center gap-1 text-xs text-stone-500">
                                         <span class="inline-flex items-center gap-x-1 rounded-md bg-stone-100 p-1 px-2 text-xs">
-                                            {{ item.status_label }}
+                                            {{ item.active ? 'مفعّل' : 'معطّل' }}
                                         </span>
                                         <span
                                             v-if="item.template_label"
@@ -299,25 +348,41 @@ async function createTemplatePage(template) {
                             </template>
                             <RouterLink
                                 :to="pageEditPath(item)"
-                                class="flex items-center gap-x-2 rounded p-1.5 hover:bg-stone-100"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
                             >
+                                <Icon name="pencil" class="h-4 w-4 shrink-0 text-stone-500" />
                                 تعديل
                             </RouterLink>
+                            <a
+                                v-if="pagePreviewUrl(item)"
+                                :href="pagePreviewUrl(item)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
+                            >
+                                <Icon name="eye" class="h-4 w-4 shrink-0 text-stone-500" />
+                                معاينة
+                            </a>
                             <button
                                 type="button"
-                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start hover:bg-stone-100"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-stone-700 hover:bg-stone-100"
                                 :disabled="store.saving"
                                 @click="toggleActive(item)"
                             >
+                                <Icon
+                                    :name="item.active ? 'ban' : 'check'"
+                                    class="h-4 w-4 shrink-0 text-stone-500"
+                                />
                                 {{ item.active ? 'تعطيل' : 'تفعيل' }}
                             </button>
                             <button
                                 v-if="!item.is_system_page"
                                 type="button"
-                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-red-600 hover:bg-stone-100"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-red-600 hover:bg-stone-100"
                                 :disabled="store.saving"
                                 @click="removeOne(item)"
                             >
+                                <Icon name="trash" class="h-4 w-4 shrink-0" />
                                 حذف
                             </button>
                         </Dropdown>

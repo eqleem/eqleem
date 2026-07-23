@@ -17,6 +17,7 @@ const addForms = {
     services: { modal: 'add-service' },
     'digital-products': { modal: 'add-digital-product' },
     'digital-services': { modal: 'add-digital-service' },
+    'on-demand-services': { modal: 'add-on-demand-service' },
     newsletter: { modal: 'add-newsletter' },
     menu: { modal: 'add-menu-item' },
     'unit-rental': { modal: 'add-unit' },

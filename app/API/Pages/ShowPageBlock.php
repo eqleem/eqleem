@@ -90,10 +90,15 @@ class ShowPageBlock
             ? CtaLink::typeKeyFromStoredData($data)
             : CtaLink::defaultTypeKey('block');
         $allowed = CtaLink::allowedBlockLinkTypeKeys();
+        $managedSection = (bool) ($data['managed_section'] ?? false);
+        $isSectionLink = str_starts_with($linkType, 'section:');
 
         if (! in_array($linkType, $allowed, true)) {
             $linkType = CtaLink::defaultTypeKey('block');
+            $isSectionLink = false;
         }
+
+        $itemsOnly = ! $managedSection && ! $isSectionLink;
 
         return [
             'type' => 'block-link',
@@ -105,8 +110,9 @@ class ShowPageBlock
             'selected_content_title' => $contentId
                 ? (Content::query()->find($contentId)?->title ?? '')
                 : '',
+            'managed_section' => $managedSection,
             'link_type_options' => CtaLink::linkTypeOptions('block'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: true),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: $itemsOnly),
         ];
     }
 }

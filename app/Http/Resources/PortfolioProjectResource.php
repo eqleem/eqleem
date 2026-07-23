@@ -38,7 +38,8 @@ class PortfolioProjectResource extends JsonResource
             'body' => (string) data_get($content->data, 'body', ''),
             'editor_mode' => (string) data_get($content->data, 'editor_mode', 'html'),
             'status' => $content->status,
-            'published' => $content->status === 'published',
+            'active' => (bool) $content->active,
+            'published' => (bool) $content->active,
             'published_at' => $content->published_at?->toIso8601String(),
             'category_ids' => $content->taxonomiesOfType('portfolio_category')
                 ->pluck('id')

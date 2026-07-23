@@ -8,19 +8,20 @@ export const fixedTabs = [
 // Dashboard nav tabs are loaded dynamically from /api/page/content-types
 // (config/content-types.php via ContentTypeRegistry) — see stores/contentTypes.js.
 export const contentTypeCatalog = [
-    { slug: 'pages', name: 'الصفحات', description: 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.', icon: 'assets/icons/ecommerce/031-content.svg', color: 'blue' },
-    { slug: 'blog', name: 'المدونة', description: 'كتابة ونشر المقالات وتنظيم التصنيفات.', icon: 'assets/icons/stationery/002-book.svg', color: 'orange' },
-    { slug: 'portfolio', name: 'معرض الأعمال', description: 'عرض وإدارة مشاريعك وأعمالك السابقة.', icon: 'assets/icons/business/047-portfolio.svg', color: 'violet' },
-    { slug: 'forms', name: 'النماذج', description: 'إنشاء وإدارة نماذج التواصل وجمع البيانات.', icon: 'assets/icons/stationery/005-clipboard.svg', color: 'yellow' },
-    { slug: 'store', name: 'المتجر الإلكتروني', description: 'إدارة المنتجات والتصنيفات وإعدادات المتجر.', icon: 'assets/icons/ecommerce/018-cart.svg', color: 'green' },
-    { slug: 'digital-products', name: 'المنتجات الرقمية', description: 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.', icon: 'assets/icons/business/035-file.svg', color: 'red' },
-    { slug: 'digital-services', name: 'الخدمات الرقمية', description: 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.', icon: 'assets/icons/business/015-cloud-network.svg', color: 'blue' },
-    { slug: 'services', name: 'الخدمات', description: 'عرض وإدارة الخدمات المقدمة.', icon: 'assets/icons/business/025-team work.svg', color: 'teal' },
-    { slug: 'newsletter', name: 'النشرة البريدية', description: 'إنشاء وإرسال النشرات البريدية للمشتركين.', icon: 'assets/icons/business/045-message.svg', color: 'rose' },
-    { slug: 'menu', name: 'قائمة الطعام', description: 'إدارة أصناف وعناصر قائمة الطعام.', icon: 'assets/icons/business/059-teacup.svg', color: 'amber' },
-    { slug: 'unit-rental', name: 'تأجير الوحدات', description: 'إدارة الوحدات المتاحة للتأجير.', icon: 'assets/icons/business/010-location.svg', color: 'lime' },
-    { slug: 'courses', name: 'الدورات التدريبية', description: 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.', icon: 'assets/icons/business/011-presentation.svg', color: 'pink' },
-    { slug: 'reviews', name: 'التقييمات', description: 'عرض قائمة التقييمات وآراء العملاء.', icon: 'assets/icons/ecommerce/006-badge.svg', color: 'amber' },
+    { slug: 'pages', name: 'الصفحات', description: 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.', icon: 'assets/icons/tabler/file-text.svg', color: 'blue' },
+    { slug: 'blog', name: 'المدونة', description: 'كتابة ونشر المقالات وتنظيم التصنيفات.', icon: 'assets/icons/tabler/book.svg', color: 'orange' },
+    { slug: 'portfolio', name: 'معرض الأعمال', description: 'عرض وإدارة مشاريعك وأعمالك السابقة.', icon: 'assets/icons/tabler/briefcase.svg', color: 'violet' },
+    { slug: 'forms', name: 'النماذج', description: 'إنشاء وإدارة نماذج التواصل وجمع البيانات.', icon: 'assets/icons/tabler/clipboard-list.svg', color: 'yellow' },
+    { slug: 'store', name: 'المتجر الإلكتروني', description: 'إدارة المنتجات والتصنيفات وإعدادات المتجر.', icon: 'assets/icons/tabler/shopping-cart.svg', color: 'green' },
+    { slug: 'digital-products', name: 'المنتجات الرقمية', description: 'بيع وإدارة المنتجات الرقمية القابلة للتحميل والوصول الفوري.', icon: 'assets/icons/tabler/file-download.svg', color: 'red' },
+    { slug: 'digital-services', name: 'الخدمات الرقمية', description: 'بيع وإدارة الخدمات الرقمية مع تحديد مدة التسليم والسعر.', icon: 'assets/icons/tabler/cloud.svg', color: 'blue' },
+    { slug: 'on-demand-services', name: 'خدمة حسب الطلب', description: 'بيع الخدمات المسعّرة حسب الوحدة مثل المتر والقطعة والساعة.', icon: 'assets/icons/tabler/ruler.svg', color: 'cyan' },
+    { slug: 'services', name: 'الخدمات', description: 'عرض وإدارة الخدمات المقدمة.', icon: 'assets/icons/tabler/clock.svg', color: 'teal' },
+    { slug: 'newsletter', name: 'النشرة البريدية', description: 'إنشاء وإرسال النشرات البريدية للمشتركين.', icon: 'assets/icons/tabler/mail.svg', color: 'rose' },
+    { slug: 'menu', name: 'قائمة الطعام', description: 'إدارة أصناف وعناصر قائمة الطعام.', icon: 'assets/icons/tabler/tools-kitchen.svg', color: 'amber' },
+    { slug: 'unit-rental', name: 'تأجير الوحدات', description: 'إدارة الوحدات المتاحة للتأجير.', icon: 'assets/icons/tabler/home.svg', color: 'lime' },
+    { slug: 'courses', name: 'الدورات التدريبية', description: 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.', icon: 'assets/icons/tabler/school.svg', color: 'pink' },
+    { slug: 'reviews', name: 'التقييمات', description: 'عرض قائمة التقييمات وآراء العملاء.', icon: 'assets/icons/tabler/star.svg', color: 'amber' },
 ];
 
 /** @deprecated Prefer useContentTypesStore().contentTypes for nav — kept for section stores. */

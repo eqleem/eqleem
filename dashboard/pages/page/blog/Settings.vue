@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="عرض وإدارة تدويناتك ومقالاتك"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>

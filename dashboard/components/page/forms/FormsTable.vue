@@ -2,18 +2,32 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Button from '../../ui/Button.vue';
+import Icon from '../../ui/Icon.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddForm from './AddForm.vue';
 import { useFormsStore } from '../../../stores/forms.js';
+import { useSession } from '../../../stores/session.js';
 import { openModal } from '../../../lib/modal.js';
+import { notifyApiError } from '../../../lib/notify.js';
 
 const store = useFormsStore();
 const router = useRouter();
+const { tenant } = useSession();
 const search = ref('');
 const selectedIds = ref([]);
 const cloningId = ref(null);
 let searchTimer = null;
+
+function formPreviewUrl(item) {
+    const base = String(tenant.value?.url ?? '').replace(/\/$/, '');
+
+    if (!base || !item?.slug) {
+        return null;
+    }
+
+    return `${base}/forms/${item.slug}`;
+}
 
 onMounted(() => {
     store.fetchForms({ page: 1 });
@@ -74,8 +88,18 @@ async function cloneItem(id, uuid) {
         if (clone?.uuid) {
             router.push(`/manage/forms/detail/${clone.uuid}`);
         }
+    } catch (error) {
+        notifyApiError(error, 'تعذر تكرار النموذج.');
     } finally {
         cloningId.value = null;
+    }
+}
+
+async function toggleActive(item) {
+    try {
+        await store.toggleFormActive(item.uuid, !item.active);
+    } catch (error) {
+        notifyApiError(error, 'تعذر تحديث حالة النموذج.');
     }
 }
 </script>
@@ -178,7 +202,7 @@ async function cloneItem(id, uuid) {
                                     </div>
                                     <p class="mt-1 flex items-center gap-1 text-xs text-stone-500">
                                         <span class="inline-flex items-center gap-x-1 truncate rounded-md bg-stone-100 p-1 px-2 text-xs">
-                                            {{ item.status_label }}
+                                            {{ item.active ? 'مفعّل' : 'معطّل' }}
                                         </span>
                                         <span class="inline-flex items-center gap-x-1 truncate rounded-md bg-stone-100 p-1 px-2 text-xs">
                                             {{ new Intl.NumberFormat('ar').format(item.form_submissions_count) }}
@@ -191,7 +215,7 @@ async function cloneItem(id, uuid) {
                     </div>
 
                     <div class="flex-none pe-6">
-                        <Dropdown width="w-44">
+                        <Dropdown width="w-48">
                             <template #trigger>
                                 <button type="button" class="rounded p-1.5 text-stone-500 hover:bg-stone-100" aria-label="menu">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
@@ -199,18 +223,42 @@ async function cloneItem(id, uuid) {
                             </template>
                             <RouterLink
                                 :to="`/manage/forms/detail/${item.uuid}`"
-                                class="flex items-center gap-x-2 rounded p-1.5 hover:bg-stone-100"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
                             >
+                                <Icon name="pencil" class="h-4 w-4 shrink-0 text-stone-500" />
                                 تعديل
                             </RouterLink>
+                            <a
+                                v-if="formPreviewUrl(item)"
+                                :href="formPreviewUrl(item)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
+                            >
+                                <Icon name="eye" class="h-4 w-4 shrink-0 text-stone-500" />
+                                معاينة
+                            </a>
                             <button
                                 type="button"
-                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start hover:bg-stone-100"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-stone-700 hover:bg-stone-100"
                                 :disabled="store.saving || cloningId === item.id"
                                 @click="cloneItem(item.id, item.uuid)"
                             >
-                                <span v-if="cloningId === item.id" class="text-xs text-stone-400">جاري النسخ…</span>
-                                <span v-else>نسخ النموذج</span>
+                                <Icon name="copy" class="h-4 w-4 shrink-0 text-stone-500" />
+                                <span v-if="cloningId === item.id" class="text-xs text-stone-400">جاري التكرار…</span>
+                                <span v-else>تكرار النموذج</span>
+                            </button>
+                            <button
+                                type="button"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-stone-700 hover:bg-stone-100"
+                                :disabled="store.saving"
+                                @click="toggleActive(item)"
+                            >
+                                <Icon
+                                    :name="item.active ? 'ban' : 'check'"
+                                    class="h-4 w-4 shrink-0 text-stone-500"
+                                />
+                                {{ item.active ? 'تعطيل' : 'تفعيل' }}
                             </button>
                         </Dropdown>
                     </div>

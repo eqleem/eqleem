@@ -8,15 +8,17 @@ import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
 import Toggle from '../../../components/ui/Toggle.vue';
 import Select from '../../../components/ui/Select.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useFormsStore, fieldTypeHasOptions, makeField } from '../../../stores/forms.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useFormsStore();
-const formTab = ref('edit');
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const notFound = ref(false);
 const addFieldOpen = ref(false);
 const fieldModal = ref(false);
@@ -58,8 +60,8 @@ const editingField = computed(() => {
     return index === null || index < 0 ? null : form.fields[index];
 });
 
-function switchTab(tab) {
-    formTab.value = tab;
+function fieldTypeLabel(type) {
+    return fieldTypeOptions.value?.[type] ?? type;
 }
 
 function slugify(value) {
@@ -69,10 +71,6 @@ function slugify(value) {
         .replace(/[^\w\u0600-\u06FF\s-]/g, '')
         .replace(/[\s-]+/g, '_')
         .replace(/^_+|_+$/g, '');
-}
-
-function fieldTypeLabel(type) {
-    return fieldTypeOptions.value?.[type] ?? type;
 }
 
 function loadForm(item) {
@@ -120,7 +118,6 @@ watch(() => route.params.id, async (id) => {
     }
 
     notFound.value = false;
-    formTab.value = 'edit';
     editingFieldId.value = null;
     fieldModal.value = false;
 
@@ -258,7 +255,9 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            expandAdvanced();
+        }
         return;
     }
 
@@ -298,10 +297,8 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ النموذج.')
                 : null;
 
-            if (errors.title || errors.fields) {
-                switchTab('edit');
-            } else if (errors.slug) {
-                switchTab('advanced');
+            if (errors.slug) {
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ النموذج.';
@@ -339,32 +336,13 @@ function saveAndClose() {
                         <span class="truncate text-stone-600 hidden md:inline">تحرير النموذج</span>
                     </div>
                 </div>
-
-                <nav class="flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('edit')"
-                    >
-                        تحرير
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('advanced')"
-                    >
-                        متقدم
-                    </button>
-                </nav>
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
                 <p v-if="errors.fields" class="mb-3 text-sm text-red-600">{{ errors.fields }}</p>
 
-                <div v-show="formTab === 'edit'" class="space-y-4">
+                <div class="space-y-4">
                     <Input
                         v-model="form.title"
                         name="title"
@@ -378,7 +356,7 @@ function saveAndClose() {
                         name="description"
                         label="وصف النموذج"
                         placeholder="وصف مختصر يظهر للمستخدم قبل تعبئة النموذج"
-                        info="يُحفظ في data.description ويمكن استخدامه عند عرض النموذج في الموقع."
+                        info="وصف بسيط للهدف من النموذج للمستخدم الذي سيملأ النموذج، اختياري"
                     />
 
                     <div class="space-y-3">
@@ -463,35 +441,27 @@ function saveAndClose() {
                             </li>
                         </ul>
                     </div>
-                </div>
 
-                <div v-show="formTab === 'advanced'" class="space-y-2">
-                    <Input
-                        v-model="form.slug"
-                        name="slug"
-                        label="نص الرابط"
-                        dir="ltr"
-                        :prefix="slugPrefix"
-                        :error="errors.slug"
-                    />
+                    <PageFormMetaSection
+                        v-model:published="form.published"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
+                    >
+                        <Input
+                            v-model="form.submitLabel"
+                            name="submitLabel"
+                            label="نص زر الإرسال"
+                            placeholder="إرسال"
+                        />
 
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
-
-                    <Input
-                        v-model="form.submitLabel"
-                        name="submitLabel"
-                        label="نص زر الإرسال"
-                        placeholder="إرسال"
-                        info="يُحفظ في data.submit_label"
-                    />
-
-                    <Textarea
-                        v-model="form.successMessage"
-                        name="successMessage"
-                        label="رسالة النجاح"
-                        placeholder="شكراً! تم استلام طلبك بنجاح."
-                        info="يُحفظ في data.success_message"
-                    />
+                        <Textarea
+                            v-model="form.successMessage"
+                            name="successMessage"
+                            label="رسالة النجاح"
+                            placeholder="شكراً! تم استلام طلبك بنجاح."
+                        />
+                    </PageFormMetaSection>
                 </div>
 
                 <template #footer>

@@ -80,6 +80,7 @@ function createTenantWithPublishedPagesForTopNav(): array
 it('maps page menu icons by template', function () {
     expect(TopNav::pageMenuIcon('contact'))->toBe('hugeicons:call')
         ->and(TopNav::pageMenuIcon('faq'))->toBe('hugeicons:help-circle')
+        ->and(TopNav::pageMenuIcon('about'))->toBe('hugeicons:user-group')
         ->and(TopNav::pageMenuIcon('features'))->toBe('hugeicons:magic-wand-02')
         ->and(TopNav::pageMenuIcon('pricing'))->toBe('hugeicons:credit-card-change')
         ->and(TopNav::pageMenuIcon('default'))->toBe('hugeicons:file-01')

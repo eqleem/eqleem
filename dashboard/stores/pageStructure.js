@@ -106,6 +106,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
                 link_type: '',
                 content_id: null,
                 selected_content_title: '',
+                managed_section: false,
                 link_type_options: [],
                 link_type_picker_options: [],
             };
@@ -127,6 +128,7 @@ export const usePageStructureStore = defineStore('pageStructure', {
                     link_type: '',
                     content_id: null,
                     selected_content_title: '',
+                    managed_section: false,
                 },
             };
         },

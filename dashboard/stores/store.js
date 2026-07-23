@@ -184,6 +184,26 @@ export const useStoreStore = defineStore('storeCatalog', {
             }
         },
 
+        async toggleProductActive(uuid, active) {
+            const payload = await api(`/store/${uuid}/active`, {
+                method: 'PUT',
+                body: { active },
+            });
+
+            const updated = payload?.data;
+            const index = this.items.findIndex((item) => item.uuid === uuid);
+
+            if (index !== -1 && updated) {
+                this.items[index] = { ...this.items[index], ...updated };
+            }
+
+            if (this.detail?.uuid === uuid && updated) {
+                this.detail = { ...this.detail, ...updated };
+            }
+
+            return updated;
+        },
+
         async uploadImage(uuid, file) {
             const body = new FormData();
             body.append('file', file);

@@ -1,8 +1,7 @@
 <script setup>
 import Field from './Field.vue';
 
-// Port of resources/views/ui/toggle.blade.php — wire:model -> v-model.
-defineProps({
+const props = defineProps({
     modelValue: { type: Boolean, default: false },
     name: { type: String, default: null },
     label: { type: String, default: null },
@@ -11,7 +10,11 @@ defineProps({
     error: { type: String, default: null },
 });
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+function toggle() {
+    emit('update:modelValue', !props.modelValue);
+}
 </script>
 
 <template>
@@ -23,19 +26,24 @@ defineEmits(['update:modelValue']);
         :error="error"
         class="flex justify-between [&>div]:w-auto"
     >
-        <label :for="`toggle-${name}`" class="inline-flex cursor-pointer items-center">
-            <input
-                :id="`toggle-${name}`"
-                type="checkbox"
-                role="switch"
-                class="peer sr-only"
-                :checked="modelValue"
-                @change="$emit('update:modelValue', $event.target.checked)"
-            >
-            <div
-                class="relative h-6 w-11 rounded-full bg-stone-200 after:absolute after:bottom-0 after:left-[0.1rem] after:top-0 after:my-auto after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-500 peer-checked:after:translate-x-[1.3rem] peer-checked:after:bg-stone-100"
+        <button
+            type="button"
+            role="switch"
+            class="inline-flex cursor-pointer items-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2"
+            :aria-checked="modelValue ? 'true' : 'false'"
+            :aria-label="label || name || 'toggle'"
+            @click="toggle"
+        >
+            <span
+                class="relative h-6 w-11 rounded-full transition-colors"
+                :class="modelValue ? 'bg-blue-500' : 'bg-stone-300'"
                 aria-hidden="true"
-            ></div>
-        </label>
+            >
+                <span
+                    class="absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-all"
+                    :class="modelValue ? 'start-[1.35rem]' : 'start-0.5'"
+                />
+            </span>
+        </button>
     </Field>
 </template>

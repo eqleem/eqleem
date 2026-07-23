@@ -6,18 +6,19 @@ import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import Toggle from '../../../components/ui/Toggle.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
 import MediaGallery from '../../../components/ui/MediaGallery.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { usePortfolioStore } from '../../../stores/portfolio.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
-const route = useRoute(); 
+const route = useRoute();
 const router = useRouter();
 const store = usePortfolioStore();
-const formTab = ref('edit');
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const uploading = ref(false);
 const notFound = ref(false);
 const bodyEditor = ref(null);
@@ -43,10 +44,6 @@ const uuid = computed(() => String(route.params.id));
 const editorUploadUrl = computed(() => `/api/portfolio/${uuid.value}/editor-images`);
 const categories = computed(() => store.detail?.category_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/portfolio/');
-
-function switchTab(tab) {
-    formTab.value = tab;
-}
 
 function loadForm(project, { syncEditor = true } = {}) {
     if (!project) {
@@ -86,7 +83,6 @@ watch(() => route.params.id, async (id) => {
     }
 
     notFound.value = false;
-    formTab.value = 'edit';
 
     try {
         const project = await store.fetchProject(String(id));
@@ -161,7 +157,9 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            expandAdvanced();
+        }
         return;
     }
 
@@ -197,10 +195,8 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ المشروع.')
                 : null;
 
-            if (errors.title) {
-                switchTab('edit');
-            } else if (errors.slug) {
-                switchTab('advanced');
+            if (errors.slug) {
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ المشروع.';
@@ -238,103 +234,75 @@ function saveAndClose() {
                         <span class="truncate text-stone-600 hidden md:inline">تحرير المشروع</span>
                     </div>
                 </div>
-
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('edit')"
-                    >
-                        تحرير
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('advanced')"
-                    >
-                        متقدم
-                    </button>
-                </nav>
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
 
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'"
-                >
-                    <Input
-                        v-model="form.title"
-                        name="title"
-                        placeholder="عنوان المشروع"
-                        :error="errors.title"
-                    />
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <Input
+                            v-model="form.title"
+                            name="title"
+                            placeholder="عنوان المشروع"
+                            :error="errors.title"
+                        />
 
-                    <MediaGallery
-                        v-model="form.images"
-                        :uploading="uploading"
-                        :disabled="store.saving"
-                        @upload="uploadFiles"
-                        @remove="removeImage"
-                        @reorder="reorderImages"
-                    />
+                        <MediaGallery
+                            v-model="form.images"
+                            :uploading="uploading"
+                            :disabled="store.saving"
+                            @upload="uploadFiles"
+                            @remove="removeImage"
+                            @reorder="reorderImages"
+                        />
 
-                    <CkEditor
-                        v-if="editorUploadUrl"
-                        ref="bodyEditor"
-                        :key="uuid"
-                        :model-value="bodySeed"
-                        name="body"
-                        :upload-url="editorUploadUrl"
-                    />
-                </div>
-
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
-                >                    <Textarea
-                        v-model="form.subtitle"
-                        name="subtitle"
-                        placeholder="عنوان فرعي"
-                        info="عنوان فرعي يظهر تحت العنوان الرئيسي في صفحة المشروع وقائمة الأعمال."
-                        :rows="2"
-                    />
-
-                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
-                        <div class="w-full space-y-1.5 p-2">
-                            <label
-                                v-for="option in categories"
-                                :key="option.id"
-                                class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-4 w-4 rounded border-stone-300"
-                                    :disabled="!option.selectable"
-                                    :checked="form.categoryIds.includes(String(option.id))"
-                                    @change="toggleCategory(option.id, $event.target.checked)"
-                                >
-                                <span>{{ option.label }}</span>
-                            </label>
-                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
-                        </div>
+                        <CkEditor
+                            v-if="editorUploadUrl"
+                            ref="bodyEditor"
+                            :key="uuid"
+                            :model-value="bodySeed"
+                            name="body"
+                            :upload-url="editorUploadUrl"
+                        />
                     </div>
 
-                    <Input
-                        v-model="form.slug"
-                        name="slug"
-                        label="نص الرابط"
-                        dir="ltr"
-                        :prefix="slugPrefix"
-                        :error="errors.slug"
-                    />
+                    <PageFormMetaSection
+                        v-model:published="form.published"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
+                    >
+                        <div class="space-y-1.5">
+                            <span class="block text-sm font-semibold text-stone-500">القسم</span>
+                            <div class="space-y-1.5">
+                                <label
+                                    v-for="option in categories"
+                                    :key="option.id"
+                                    class="flex items-center gap-2 text-sm"
+                                    :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-stone-300"
+                                        :disabled="!option.selectable"
+                                        :checked="form.categoryIds.includes(String(option.id))"
+                                        @change="toggleCategory(option.id, $event.target.checked)"
+                                    >
+                                    <span>{{ option.label }}</span>
+                                </label>
+                                <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                            </div>
+                        </div>
 
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
+                        <Textarea
+                            v-model="form.subtitle"
+                            name="subtitle"
+                            placeholder="عنوان فرعي"
+                            info="عنوان فرعي يظهر تحت العنوان الرئيسي في صفحة المشروع وقائمة الأعمال."
+                            :rows="2"
+                        />
+                    </PageFormMetaSection>
                 </div>
 
                 <template #footer>

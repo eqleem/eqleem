@@ -12,7 +12,7 @@ use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Creates a draft content page (custom, contact, or FAQ template).
+ * Creates a draft content page (custom, contact, FAQ, or about template).
  */
 class CreatePage
 {
@@ -69,6 +69,7 @@ class CreatePage
         $data = match ($template) {
             'contact' => Content::defaultContactPageData(),
             'faq' => Content::defaultFaqPageData(),
+            'about' => Content::defaultAboutPageData(),
             default => [],
         };
 
@@ -80,7 +81,7 @@ class CreatePage
             'slug' => $this->uniquePageSlug($this->slugifyTitle($title)),
             'data' => $data,
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

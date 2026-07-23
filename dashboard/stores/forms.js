@@ -200,12 +200,32 @@ export const useFormsStore = defineStore('forms', {
 
                 return payload?.data ?? null;
             } catch (error) {
-                this.error = error instanceof ApiError ? error.message : 'تعذر نسخ النموذج.';
+                this.error = error instanceof ApiError ? error.message : 'تعذر تكرار النموذج.';
                 redirectIfUnauthorized(error);
                 throw error;
             } finally {
                 this.saving = false;
             }
+        },
+
+        async toggleFormActive(uuid, active) {
+            const payload = await api(`/forms/${uuid}/active`, {
+                method: 'PUT',
+                body: { active },
+            });
+
+            const updated = payload?.data;
+            const index = this.items.findIndex((item) => item.uuid === uuid);
+
+            if (index !== -1 && updated) {
+                this.items[index] = { ...this.items[index], ...updated };
+            }
+
+            if (this.detail?.uuid === uuid && updated) {
+                this.detail = { ...this.detail, ...updated };
+            }
+
+            return updated;
         },
     },
 });

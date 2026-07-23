@@ -355,6 +355,26 @@ class TenantProfileService
         $tenant->save();
     }
 
+    public function updateSocialLink(Tenant $tenant, string $id, string $network, string $url): bool
+    {
+        $links = $this->socialLinks($tenant);
+        $index = $links->search(fn (array $link): bool => $link['id'] === $id);
+
+        if ($index === false) {
+            return false;
+        }
+
+        $link = $links->get($index);
+        $link['network'] = $network;
+        $link['url'] = $url;
+        $links->put($index, $link);
+
+        $tenant->meta->set('social_links', $links->values()->all());
+        $tenant->save();
+
+        return true;
+    }
+
     public function deleteSocialLink(Tenant $tenant, string $id): void
     {
         $links = $this->socialLinks($tenant)

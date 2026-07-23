@@ -51,6 +51,7 @@ class EnsureSectionBlockLink
             ->where('position', 'home')
             ->where('data->content_type', $contentTypeSlug)
             ->where('data->link_type', 'section')
+            ->where('data->managed_section', true)
             ->first();
 
         if ($existing) {

@@ -110,6 +110,7 @@ class UpdatePortfolioProject
         $content->update([
             'title' => $data['title'],
             'slug' => $slug,
+            'active' => $published,
             'status' => $published ? 'published' : 'draft',
             'data' => $payload,
             'published_at' => $published

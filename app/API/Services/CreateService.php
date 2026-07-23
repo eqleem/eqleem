@@ -50,7 +50,10 @@ class CreateService
             'title' => $title,
             'slug' => $this->uniqueServiceSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
+            'data' => [
+                'duration_minutes' => 60,
+            ],
         ]);
     }
 

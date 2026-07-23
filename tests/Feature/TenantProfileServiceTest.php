@@ -142,6 +142,15 @@ it('manages social links with ordering', function () {
     $firstId = $links->first()['id'];
     $secondId = $links->last()['id'];
 
+    expect($service->updateSocialLink($tenant->fresh(), $firstId, 'youtube', '@eqleem'))->toBeTrue();
+
+    $updated = $service->socialLinks($tenant->fresh())->firstWhere('id', $firstId);
+
+    expect($updated['network'])->toBe('youtube')
+        ->and($updated['url'])->toBe('@eqleem');
+
+    expect($service->updateSocialLink($tenant->fresh(), 'missing', 'twitter', 'x'))->toBeFalse();
+
     $service->updateSocialOrder($tenant->fresh(), [
         ['value' => $firstId, 'order' => 2],
         ['value' => $secondId, 'order' => 1],
@@ -150,7 +159,7 @@ it('manages social links with ordering', function () {
     $reordered = $service->socialLinks($tenant->fresh());
 
     expect($reordered->first()['network'])->toBe('instagram')
-        ->and($reordered->last()['network'])->toBe('twitter');
+        ->and($reordered->last()['network'])->toBe('youtube');
 
     $service->deleteSocialLink($tenant->fresh(), $firstId);
 

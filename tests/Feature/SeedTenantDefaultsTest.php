@@ -65,7 +65,7 @@ it('seeds a complete contact form with uuid when registering a tenant', function
         ->and(data_get($tenant->fresh()->meta, 'bio'))->toBe('صفحة إقليم جديدة');
 });
 
-it('seeds default contact and faq pages when registering a tenant', function () {
+it('seeds default contact, faq, about, terms, and privacy pages when registering a tenant', function () {
     [, $tenant] = createTenantForSeedDefaultsTest();
 
     SeedTenantDefaults::run($tenant->fresh());
@@ -84,6 +84,27 @@ it('seeds default contact and faq pages when registering a tenant', function () 
         ->where('template', 'faq')
         ->first();
 
+    $aboutPage = Content::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->type(contentTypeModel('pages'))
+        ->where('template', 'about')
+        ->first();
+
+    $termsPage = Content::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->type(contentTypeModel('pages'))
+        ->where('slug', 'terms')
+        ->first();
+
+    $privacyPage = Content::query()
+        ->withoutGlobalScope('tenant')
+        ->where('tenant_id', $tenant->id)
+        ->type(contentTypeModel('pages'))
+        ->where('slug', 'privacy')
+        ->first();
+
     expect($contactPage)->not->toBeNull()
         ->and($contactPage->uuid)->not->toBeNull()
         ->and($contactPage->title)->toBe('اتصل بنا')
@@ -93,7 +114,29 @@ it('seeds default contact and faq pages when registering a tenant', function () 
         ->and($faqPage->uuid)->not->toBeNull()
         ->and($faqPage->title)->toBe('الأسئلة المتكررة')
         ->and($faqPage->slug)->toBe('faq')
-        ->and($faqPage->status)->toBe('published');
+        ->and($faqPage->status)->toBe('published')
+        ->and($aboutPage)->not->toBeNull()
+        ->and($aboutPage->uuid)->not->toBeNull()
+        ->and($aboutPage->title)->toBe('من نحن')
+        ->and($aboutPage->slug)->toBe('about-us')
+        ->and($aboutPage->status)->toBe('published')
+        ->and(data_get($aboutPage->data, 'stats'))->toHaveCount(3)
+        ->and($termsPage)->not->toBeNull()
+        ->and($termsPage->uuid)->not->toBeNull()
+        ->and($termsPage->title)->toBe('اتفاقية الاستخدام')
+        ->and($termsPage->status)->toBe('published')
+        ->and($termsPage->active)->toBeTrue()
+        ->and(data_get($termsPage->data, 'body'))->toContain('القبول بالشروط')
+        ->and(data_get($termsPage->data, 'body'))->toContain($tenant->name)
+        ->and(data_get($termsPage->data, 'editor_mode'))->toBe('html')
+        ->and($privacyPage)->not->toBeNull()
+        ->and($privacyPage->uuid)->not->toBeNull()
+        ->and($privacyPage->title)->toBe('سياسة الخصوصية')
+        ->and($privacyPage->status)->toBe('published')
+        ->and($privacyPage->active)->toBeTrue()
+        ->and(data_get($privacyPage->data, 'body'))->toContain('البيانات التي قد نجمعها')
+        ->and(data_get($privacyPage->data, 'body'))->toContain($tenant->name)
+        ->and(data_get($privacyPage->data, 'editor_mode'))->toBe('html');
 });
 
 it('opens the seeded contact form detail page using its uuid', function () {

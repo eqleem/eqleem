@@ -349,10 +349,12 @@ test('owner can update block-link settings', function () {
         ->getJson('/api/page/blocks/'.$blockId)
         ->assertSuccessful()
         ->assertJsonPath('data.editor.link_type', 'section:blog')
+        ->assertJsonPath('data.editor.managed_section', false)
         ->assertJsonStructure([
             'data' => [
                 'editor' => [
                     'link_type_picker_options',
+                    'managed_section',
                 ],
             ],
         ]);
@@ -366,26 +368,125 @@ test('owner can update block-link settings', function () {
     expect(collect($picker)->where('group', 'content')->pluck('key'))
         ->not->toContain('item:blog');
 
-    $expectedItemKeys = collect(CtaLink::blockLinkPickerOptions(itemsOnly: true))
+    // Section links keep supports_section so the editor does not force a content picker.
+    $expectedSectionKeys = collect(CtaLink::blockLinkPickerOptions(itemsOnly: false))
         ->where('group', 'content')
         ->pluck('key')
         ->values();
     $contentPickerKeys = collect($picker)->where('group', 'content')->pluck('key')->values();
 
     expect($contentPickerKeys->sort()->values()->all())
-        ->toBe($expectedItemKeys->sort()->values()->all());
-    expect($contentPickerKeys)->toContain('pages', 'forms')
-        ->not->toContain('menu', 'reviews', 'courses', 'newsletter');
+        ->toBe($expectedSectionKeys->sort()->values()->all());
 
     $pickerByKey = collect($picker)->keyBy('key');
 
     expect($pickerByKey['blog'])->toMatchArray([
-        'label' => 'تدوينة محددة',
-        'supports_section' => false,
+        'label' => 'رابط المدونة',
+        'supports_section' => true,
         'supports_item' => true,
     ])->and($pickerByKey['pages']['label'])->toBe('رابط صفحة')
         ->and($pickerByKey['forms']['label'])->toBe('رابط نموذج')
         ->and($pickerByKey['external']['supports_section'])->toBeFalse();
+});
+
+test('managed section block editor omits content picker and preserves managed_section on update', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    $this->actingAs($user)
+        ->putJson('/api/page/catalog-sections', [
+            'enabled' => ['blog'],
+        ])
+        ->assertSuccessful();
+
+    setCurrentTenant($tenant->fresh());
+
+    $block = Block::queryForTenantRoots()
+        ->userBlocks()
+        ->where('type', 'block-link')
+        ->where('data->link_type', 'section')
+        ->where('data->content_type', 'blog')
+        ->where('data->managed_section', true)
+        ->firstOrFail();
+
+    $show = $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$block->id)
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'section:blog')
+        ->assertJsonPath('data.editor.managed_section', true)
+        ->assertJsonPath('data.editor.content_id', null)
+        ->assertJsonPath('data.block.managed_section', true)
+        ->assertJsonPath('data.block.link_kind', 'section');
+
+    $pickerByKey = collect($show->json('data.editor.link_type_picker_options'))->keyBy('key');
+
+    expect($pickerByKey['blog'])->toMatchArray([
+        'supports_section' => true,
+        'supports_item' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->putJson('/api/page/blocks/'.$block->id, [
+            'link_type' => 'item:blog',
+            'title' => 'مدونتنا',
+            'description' => 'وصف مخصص',
+            'content_id' => 999999,
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'section:blog')
+        ->assertJsonPath('data.editor.managed_section', true)
+        ->assertJsonPath('data.editor.title', 'مدونتنا')
+        ->assertJsonPath('data.editor.content_id', null);
+
+    $block->refresh();
+
+    expect(data_get($block->data, 'managed_section'))->toBeTrue()
+        ->and(data_get($block->data, 'link_type'))->toBe('section')
+        ->and(data_get($block->data, 'content_type'))->toBe('blog')
+        ->and(data_get($block->data, 'content_id'))->toBeNull()
+        ->and($block->title)->toBe('مدونتنا');
+});
+
+test('item link block editor keeps items-only picker and content_id', function () {
+    [$user, $tenant] = createUserWithTenantForPageBlockSettings();
+
+    setCurrentTenant($tenant);
+
+    $post = Content::query()->create([
+        'tenant_id' => $tenant->id,
+        'uuid' => (string) Str::uuid(),
+        'type' => contentTypeModel('blog'),
+        'title' => 'تدوينة للرابط',
+        'slug' => 'item-link-post-'.Str::lower(Str::random(6)),
+        'status' => 'published',
+        'published_at' => now(),
+        'active' => true,
+    ]);
+
+    $blockId = (int) $this->actingAs($user)
+        ->postJson('/api/page/blocks', [
+            'type' => 'block-link',
+            'link_type' => 'item:blog',
+            'title' => 'رابط تدوينة',
+            'content_id' => $post->id,
+        ])
+        ->assertSuccessful()
+        ->json('data.block.id');
+
+    $show = $this->actingAs($user)
+        ->getJson('/api/page/blocks/'.$blockId)
+        ->assertSuccessful()
+        ->assertJsonPath('data.editor.link_type', 'item:blog')
+        ->assertJsonPath('data.editor.managed_section', false)
+        ->assertJsonPath('data.editor.content_id', $post->id)
+        ->assertJsonPath('data.block.managed_section', false)
+        ->assertJsonPath('data.block.link_kind', 'item');
+
+    $pickerByKey = collect($show->json('data.editor.link_type_picker_options'))->keyBy('key');
+
+    expect($pickerByKey['blog'])->toMatchArray([
+        'supports_section' => false,
+        'supports_item' => true,
+    ]);
 });
 
 test('owner can update block-link to external url and specific item', function () {

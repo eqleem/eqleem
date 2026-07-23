@@ -54,7 +54,7 @@ test('owner can create list update and delete pages', function () {
     $this->actingAs($user)
         ->getJson('/api/pages')
         ->assertSuccessful()
-        ->assertJsonPath('meta.total', 3)
+        ->assertJsonPath('meta.total', 6)
         ->assertJsonFragment(['uuid' => $uuid]);
 
     $this->actingAs($user)
@@ -95,6 +95,8 @@ test('owner can create list update and delete pages', function () {
         ->putJson("/api/pages/{$uuid}/active", ['active' => false])
         ->assertSuccessful()
         ->assertJsonPath('data.active', false);
+
+    expect(Content::query()->where('uuid', $uuid)->value('status'))->toBe('draft');
 
     $this->actingAs($user)
         ->deleteJson('/api/pages', ['ids' => [$page->id]])
@@ -204,7 +206,7 @@ test('owner can reorder page blocks', function () {
         ->assertJsonPath('data.1.id', $firstId);
 });
 
-test('owner can update contact and faq template pages', function () {
+test('owner can update contact faq and about template pages', function () {
     [$user, $tenant] = createUserWithTenantForPages();
 
     setCurrentTenant($tenant);
@@ -283,6 +285,65 @@ test('owner can update contact and faq template pages', function () {
         ->assertJsonPath('data.faqs.0.answer', 'من لوحة التحكم.')
         ->assertJsonPath('data.faqs.1.question', 'هل يوجد دعم؟')
         ->assertJsonCount(2, 'data.faqs');
+
+    $about = Content::query()
+        ->type(contentTypeModel('pages'))
+        ->template('about')
+        ->firstOrFail();
+
+    $this->actingAs($user)
+        ->getJson("/api/pages/{$about->uuid}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.template', 'about')
+        ->assertJsonStructure([
+            'data' => [
+                'primary_button',
+                'stats',
+                'features',
+                'link_type_picker_options',
+                'booking_targets',
+            ],
+        ]);
+
+    $this->actingAs($user)
+        ->putJson("/api/pages/{$about->uuid}", [
+            'title' => 'قصتنا',
+            'subtitle' => 'تعرف علينا أكثر',
+            'slug' => 'our-story',
+            'published' => true,
+            'primary_button' => [
+                'label' => 'ابدأ الآن',
+                'link_type' => 'external',
+                'url' => 'https://example.com/start',
+            ],
+            'stats' => [
+                ['id' => 's1', 'value' => '100+', 'label' => 'عميل'],
+                ['value' => '24/7', 'label' => 'دعم'],
+            ],
+            'features_title' => 'مزايانا',
+            'features_description' => 'ما نقدمه',
+            'features' => [
+                [
+                    'id' => 'f1',
+                    'title' => 'جودة عالية',
+                    'description' => 'نهتم بالتفاصيل',
+                    'brand_mark' => [
+                        'type' => 'emoji',
+                        'value' => '✨',
+                        'color' => '',
+                    ],
+                ],
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.title', 'قصتنا')
+        ->assertJsonPath('data.primary_button.label', 'ابدأ الآن')
+        ->assertJsonPath('data.primary_button.url', 'https://example.com/start')
+        ->assertJsonPath('data.stats.0.value', '100+')
+        ->assertJsonPath('data.stats.1.value', '24/7')
+        ->assertJsonPath('data.features.0.title', 'جودة عالية')
+        ->assertJsonPath('data.features.0.brand_mark.type', 'emoji')
+        ->assertJsonPath('data.features_title', 'مزايانا');
 });
 
 test('create page rejects unknown templates', function () {
@@ -297,7 +358,7 @@ test('create page rejects unknown templates', function () {
         ->assertJsonValidationErrors(['template']);
 });
 
-test('create page rejects duplicate contact and faq templates', function () {
+test('create page rejects duplicate contact faq and about templates', function () {
     [$user] = createUserWithTenantForPages();
 
     $this->actingAs($user)
@@ -315,6 +376,14 @@ test('create page rejects duplicate contact and faq templates', function () {
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['template']);
+
+    $this->actingAs($user)
+        ->postJson('/api/pages', [
+            'title' => 'من نحن مرة أخرى',
+            'template' => 'about',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['template']);
 });
 
 test('pages list exposes existing templates', function () {
@@ -323,7 +392,7 @@ test('pages list exposes existing templates', function () {
     $this->actingAs($user)
         ->getJson('/api/pages')
         ->assertSuccessful()
-        ->assertJsonPath('existing_templates', fn ($templates) => collect($templates)->sort()->values()->all() === ['contact', 'faq']);
+        ->assertJsonPath('existing_templates', fn ($templates) => collect($templates)->sort()->values()->all() === ['about', 'contact', 'faq']);
 });
 
 test('pages search filters by title', function () {

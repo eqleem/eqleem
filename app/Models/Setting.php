@@ -222,6 +222,29 @@ class Setting extends Model
         return array_merge(static::digitalServiceSettingsDefaults(), $saved?->settings ?? []);
     }
 
+    public const ON_DEMAND_SERVICE_SETTINGS_SLUG = 'on-demand-service-settings';
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function onDemandServiceSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'خدمات حسب الطلب',
+            'section_description' => 'خدمات مسعّرة حسب الوحدة مثل المتر والقطعة والساعة',
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, section_description: string}
+     */
+    public static function onDemandServiceSettings(): array
+    {
+        $saved = static::forSlug(static::ON_DEMAND_SERVICE_SETTINGS_SLUG);
+
+        return array_merge(static::onDemandServiceSettingsDefaults(), $saved?->settings ?? []);
+    }
+
     public const MENU_SETTINGS_SLUG = 'menu-settings';
 
     /**

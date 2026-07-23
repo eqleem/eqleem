@@ -10,6 +10,7 @@ use App\Support\BlockType;
 use App\Support\BlockTypeRegistry;
 use App\Support\BusinessDocuments;
 use App\Support\ContentTypeRegistry;
+use App\Support\CtaBooking;
 use App\Support\CtaLink;
 use Illuminate\Support\Collection;
 
@@ -42,6 +43,16 @@ trait MapsPageBlocks
                 );
             }
 
+            $linkKind = null;
+
+            if ($block->type === 'block-link') {
+                $storedLinkType = (string) ($data['link_type'] ?? '');
+                $linkKind = match ($storedLinkType) {
+                    'section', 'item', 'external' => $storedLinkType,
+                    default => null,
+                };
+            }
+
             return [
                 'id' => $block->id,
                 'uuid' => $block->uuid,
@@ -58,6 +69,9 @@ trait MapsPageBlocks
                 'brand_mark' => $brandMark,
                 'content_manage_url' => $contentManage['url'] ?? null,
                 'content_manage_label' => $contentManage['label'] ?? null,
+                'managed_section' => $block->type === 'block-link'
+                    && (bool) ($data['managed_section'] ?? false),
+                'link_kind' => $linkKind,
             ];
         });
     }
@@ -127,6 +141,10 @@ trait MapsPageBlocks
                     'links' => [],
                     'link_type_options' => CtaLink::linkTypeOptions('nav'),
                     'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+                    'booking_targets' => [
+                        'branches' => CtaBooking::branchOptions(),
+                        'calendars' => CtaBooking::calendarOptions(),
+                    ],
                 ];
         }
 
@@ -163,6 +181,10 @@ trait MapsPageBlocks
             'links' => $this->mapBlockLinks($block, 'cta-link'),
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
             'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+            'booking_targets' => [
+                'branches' => CtaBooking::branchOptions(),
+                'calendars' => CtaBooking::calendarOptions(),
+            ],
         ];
     }
 
@@ -202,6 +224,10 @@ trait MapsPageBlocks
             'links' => $links,
             'link_type_options' => CtaLink::linkTypeOptions('nav'),
             'link_type_picker_options' => CtaLink::blockLinkPickerOptions(),
+            'booking_targets' => [
+                'branches' => CtaBooking::branchOptions(),
+                'calendars' => CtaBooking::calendarOptions(),
+            ],
         ];
     }
 
@@ -285,10 +311,18 @@ trait MapsPageBlocks
             ? CtaLink::typeKeyFromStoredData($data)
             : CtaLink::defaultTypeKey('block');
         $allowed = CtaLink::allowedBlockLinkTypeKeys();
+        $managedSection = (bool) ($data['managed_section'] ?? false);
+        $isSectionLink = str_starts_with($linkType, 'section:');
 
         if (! in_array($linkType, $allowed, true)) {
             $linkType = CtaLink::defaultTypeKey('block');
+            $isSectionLink = false;
         }
+
+        // "إضافة رابط" offers item/external destinations only. Managed section blocks
+        // (from "إدارة المكونات") keep section picker flags so the editor does not
+        // force a content picker.
+        $itemsOnly = ! $managedSection && ! $isSectionLink;
 
         return [
             'type' => 'block-link',
@@ -300,11 +334,12 @@ trait MapsPageBlocks
             'selected_content_title' => $contentId
                 ? (Content::query()->find($contentId)?->title ?? '')
                 : '',
+            'managed_section' => $managedSection,
             'brand_mark' => BlockBrandMark::forEditor(
                 is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
             ),
             'link_type_options' => CtaLink::linkTypeOptions('block'),
-            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: true),
+            'link_type_picker_options' => CtaLink::blockLinkPickerOptions(itemsOnly: $itemsOnly),
         ];
     }
 

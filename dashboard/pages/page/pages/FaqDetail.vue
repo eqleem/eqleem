@@ -6,9 +6,10 @@ import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import Toggle from '../../../components/ui/Toggle.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { usePagesStore } from '../../../stores/pages.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
@@ -23,7 +24,7 @@ function makeFaq(overrides = {}) {
 const route = useRoute();
 const router = useRouter();
 const store = usePagesStore();
-const formTab = ref('edit');
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const notFound = ref(false);
 
 const form = reactive({
@@ -43,10 +44,6 @@ const errors = reactive({
 
 const uuid = computed(() => String(route.params.id));
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/');
-
-function switchFormTab(tab) {
-    formTab.value = tab;
-}
 
 function loadForm(page) {
     if (!page) {
@@ -90,7 +87,6 @@ watch(() => route.params.id, async (id) => {
     }
 
     notFound.value = false;
-    formTab.value = 'edit';
     await loadPage();
 });
 
@@ -119,7 +115,9 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchFormTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            expandAdvanced();
+        }
         return;
     }
 
@@ -148,10 +146,8 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ الصفحة.')
                 : null;
 
-            if (errors.title || errors.faqs) {
-                switchFormTab('edit');
-            } else if (errors.slug) {
-                switchFormTab('advanced');
+            if (errors.slug) {
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ الصفحة.';
@@ -189,35 +185,13 @@ function saveAndClose() {
                         <span class="truncate text-stone-600 hidden md:inline">تحرير الأسئلة المتكررة</span>
                     </div>
                 </div>
-
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchFormTab('edit')"
-                    >
-                        تحرير
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchFormTab('advanced')"
-                    >
-                        متقدم
-                    </button>
-                </nav>
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
                 <p v-if="errors.faqs" class="mb-3 text-sm text-red-600">{{ errors.faqs }}</p>
 
-                <div
-                    class="space-y-5"
-                    :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'"
-                >
+                <div class="space-y-5">
                     <div class="space-y-2">
                         <Input
                             v-model="form.title"
@@ -231,7 +205,6 @@ function saveAndClose() {
                             name="subtitle"
                             label="الوصف"
                             placeholder="وصف قصير يظهر أعلى الصفحة"
-                            :rows="3"
                         />
                     </div>
 
@@ -277,26 +250,16 @@ function saveAndClose() {
                                 :name="`faq_answer_${faq.id}`"
                                 label="الجواب"
                                 placeholder="اكتب الجواب"
-                                :rows="3"
                             />
                         </div>
                     </div>
-                </div>
 
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
-                >
-                    <Input
-                        v-model="form.slug"
-                        name="slug"
-                        label="نص الرابط"
-                        dir="ltr"
-                        :prefix="slugPrefix"
-                        :error="errors.slug"
+                    <PageFormMetaSection
+                        v-model:published="form.published"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
                     />
-
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
                 </div>
 
                 <template #footer>

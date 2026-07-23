@@ -42,9 +42,13 @@ test('guests cannot access portfolio endpoints', function () {
     $this->postJson('/api/portfolio', ['title' => 'مشروع'])->assertUnauthorized();
     $this->getJson('/api/portfolio/categories')->assertUnauthorized();
     $this->getJson('/api/portfolio/settings')->assertUnauthorized();
+
+    $uuid = (string) Str::uuid();
+    $this->putJson("/api/portfolio/{$uuid}/active", ['active' => false])->assertUnauthorized();
+    $this->postJson("/api/portfolio/{$uuid}/clone")->assertUnauthorized();
 });
 
-test('owner can create list update and delete portfolio projects', function () {
+test('owner can create list update clone toggle and delete portfolio projects', function () {
     [$user, $tenant] = createUserWithTenantForPortfolio();
 
     $create = $this->actingAs($user)
@@ -112,7 +116,37 @@ test('owner can create list update and delete portfolio projects', function () {
 
     expect($project)->not->toBeNull()
         ->and($project->status)->toBe('published')
+        ->and($project->active)->toBeTrue()
         ->and($project->published_at)->not->toBeNull();
+
+    $clone = $this->actingAs($user)
+        ->postJson("/api/portfolio/{$uuid}/clone")
+        ->assertSuccessful()
+        ->assertJsonPath('data.title', 'فيلا نجدية محدثة ٢')
+        ->assertJsonPath('data.status', 'draft')
+        ->assertJsonPath('data.published', false);
+
+    $cloneUuid = (string) $clone->json('data.uuid');
+
+    expect($cloneUuid)->not->toBe($uuid);
+
+    $this->actingAs($user)
+        ->putJson("/api/portfolio/{$uuid}/active", ['active' => false])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', false)
+        ->assertJsonPath('data.published', false)
+        ->assertJsonPath('data.status', 'draft');
+
+    expect($project->fresh())
+        ->active->toBeFalse()
+        ->status->toBe('draft')
+        ->published_at->toBeNull();
+
+    $this->actingAs($user)
+        ->putJson("/api/portfolio/{$uuid}/active", ['active' => true])
+        ->assertSuccessful()
+        ->assertJsonPath('data.active', true)
+        ->assertJsonPath('data.status', 'published');
 
     $this->actingAs($user)
         ->deleteJson('/api/portfolio', ['ids' => [$project->id]])

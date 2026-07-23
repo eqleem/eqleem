@@ -41,8 +41,8 @@ watch(() => props.editor, (value) => {
 }, { deep: true });
 
 function linkTypeFromData(data = {}) {
-    if (data.link_type === 'external') {
-        return 'external';
+    if (data.link_type === 'external' || data.link_type === 'booking') {
+        return data.link_type;
     }
 
     if (data.link_type && data.content_type) {
@@ -70,7 +70,12 @@ function buildLinkEditor(link = null) {
         brand_mark: brandMark ?? (icon
             ? { type: 'icon', value: icon, color: '', url: null }
             : null),
+        branch_ids: [...(data.branch_ids ?? [])].map((id) => Number(id)),
+        calendar_ids: [...(data.calendar_ids ?? [])].map((id) => Number(id)),
+        allow_client_choice: data.allow_client_choice ?? true,
+        duration_minutes: Number(data.duration_minutes ?? 30) || 30,
         link_type_picker_options: props.editor.link_type_picker_options ?? [],
+        booking_targets: props.editor.booking_targets ?? { branches: [], calendars: [] },
     };
 }
 

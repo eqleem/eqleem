@@ -5,9 +5,12 @@ namespace App\API\Page;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Page\Concerns\MapsPageBlocks;
 use App\Models\Block;
+use App\Models\Branch;
+use App\Models\Calendar;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Support\BlockBrandMark;
+use App\Support\CtaBooking;
 use App\Support\CtaLink;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
@@ -44,6 +47,12 @@ class UpsertPageBlockLink
             'url' => ['nullable', 'url', 'max:500'],
             'icon' => ['nullable', 'string', 'max:100'],
             'content_id' => ['nullable', 'integer'],
+            'branch_ids' => ['sometimes', 'array'],
+            'branch_ids.*' => ['integer'],
+            'calendar_ids' => ['sometimes', 'array'],
+            'calendar_ids.*' => ['integer'],
+            'allow_client_choice' => ['sometimes', 'boolean'],
+            'duration_minutes' => ['sometimes', 'integer', 'min:5', 'max:480'],
             'logo' => ['nullable', 'image', 'max:15024'],
             'brand_mark_type' => ['nullable', 'string', Rule::in(['image', 'emoji', 'icon', 'none'])],
             'brand_mark_value' => ['nullable', 'string', 'max:64'],
@@ -70,6 +79,7 @@ class UpsertPageBlockLink
         $linkType = (string) $data['link_type'];
         $parsed = CtaLink::parseTypeKey($linkType);
         $isExternal = CtaLink::isExternalLink($linkType);
+        $isBooking = CtaLink::isBookingLink($linkType);
         $needsPicker = CtaLink::needsContentPicker($linkType);
 
         if ($parsed['link_type'] === 'section' && filled($parsed['content_type'])
@@ -79,6 +89,16 @@ class UpsertPageBlockLink
 
         if ($isExternal && (! filled($data['label'] ?? null) || ! filled($data['url'] ?? null))) {
             throw new UnprocessableEntityHttpException('الرابط الخارجي يتطلب اسماً وعنواناً.');
+        }
+
+        if ($isBooking && ! filled($data['label'] ?? null)) {
+            throw new UnprocessableEntityHttpException('زر حجز الموعد يتطلب عنواناً.');
+        }
+
+        $bookingConfig = null;
+
+        if ($isBooking) {
+            $bookingConfig = $this->validatedBookingConfig($data);
         }
 
         $contentId = null;
@@ -122,6 +142,8 @@ class UpsertPageBlockLink
             $icon = (string) $data['icon'];
         } elseif ($isExternal && $brandMark === null) {
             $icon = (string) ($existingData['icon'] ?? 'hugeicons:link-04');
+        } elseif ($isBooking && $brandMark === null) {
+            $icon = (string) ($existingData['icon'] ?? config('cta-link-types.icons.booking'));
         }
 
         $payload = [
@@ -133,6 +155,10 @@ class UpsertPageBlockLink
             'icon' => $icon,
             'brand_mark' => $brandMark,
         ];
+
+        if ($bookingConfig !== null) {
+            $payload = array_merge($payload, $bookingConfig);
+        }
 
         $title = filled($payload['label'])
             ? $payload['label']
@@ -184,6 +210,10 @@ class UpsertPageBlockLink
             $validated['remove_logo'] = true;
         }
 
+        if ($request->has('allow_client_choice')) {
+            $validated['allow_client_choice'] = $request->boolean('allow_client_choice');
+        }
+
         return $this->handle($tenant, $id, $validated, $linkId);
     }
 
@@ -203,6 +233,10 @@ class UpsertPageBlockLink
      */
     protected function defaultTitle(array $parsed, ?int $contentId): string
     {
+        if ($parsed['link_type'] === 'booking') {
+            return 'حجز موعد';
+        }
+
         if ($parsed['link_type'] === 'section' && filled($parsed['content_type'])) {
             return (string) config('content-types.'.$parsed['content_type'].'.name', 'رابط');
         }
@@ -212,5 +246,52 @@ class UpsertPageBlockLink
         }
 
         return 'رابط';
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array{
+     *     branch_ids: list<int>,
+     *     calendar_ids: list<int>,
+     *     allow_client_choice: bool,
+     *     duration_minutes: int
+     * }
+     */
+    protected function validatedBookingConfig(array $data): array
+    {
+        $config = CtaBooking::configFromData($data);
+
+        if ($config['branch_ids'] === [] && $config['calendar_ids'] === []) {
+            throw new UnprocessableEntityHttpException('اختر فرعاً واحداً على الأقل أو تقويماً للحجز.');
+        }
+
+        if ($config['branch_ids'] !== []) {
+            $validBranchCount = Branch::query()
+                ->whereIn('id', $config['branch_ids'])
+                ->count();
+
+            if ($validBranchCount !== count($config['branch_ids'])) {
+                throw new UnprocessableEntityHttpException('أحد الفروع المحددة غير صالح.');
+            }
+        }
+
+        if ($config['calendar_ids'] !== []) {
+            $validCalendarCount = Calendar::query()
+                ->whereIn('id', $config['calendar_ids'])
+                ->where('active', true)
+                ->count();
+
+            if ($validCalendarCount !== count($config['calendar_ids'])) {
+                throw new UnprocessableEntityHttpException('أحد التقاويم المحددة غير صالح.');
+            }
+        }
+
+        $calendars = CtaBooking::resolveCalendars($config['branch_ids'], $config['calendar_ids']);
+
+        if ($calendars->isEmpty()) {
+            throw new UnprocessableEntityHttpException('لا توجد تقاويم نشطة تطابق الفروع أو التقاويم المحددة.');
+        }
+
+        return $config;
     }
 }

@@ -50,7 +50,7 @@ class CreatePortfolioProject
             'title' => $title,
             'slug' => $this->uniquePortfolioSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

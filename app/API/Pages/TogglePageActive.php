@@ -43,7 +43,13 @@ class TogglePageActive
         setCurrentTenant($tenant);
 
         $content = $this->findPage($uuid);
-        $content->update(['active' => $active]);
+        $content->update([
+            'active' => $active,
+            'status' => $active ? 'published' : 'draft',
+            'published_at' => $active
+                ? ($content->published_at ?? now())
+                : null,
+        ]);
 
         return $content->fresh();
     }

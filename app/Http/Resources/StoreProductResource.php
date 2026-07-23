@@ -40,8 +40,11 @@ class StoreProductResource extends JsonResource
             'price' => $this->decimalFromMinor(data_get($content->data, 'price')),
             'compare_price' => $this->decimalFromMinor(data_get($content->data, 'compare_price')),
             'weight' => (string) (data_get($content->data, 'weight') ?? ''),
+            'currency_code' => Money::defaultCurrencyCode(),
+            'currency_symbol' => Money::symbolFor(),
             'status' => $content->status,
-            'published' => $content->status === 'published',
+            'active' => (bool) $content->active,
+            'published' => (bool) $content->active,
             'published_at' => $content->published_at?->toIso8601String(),
             'category_ids' => $content->taxonomiesOfType('store_category')
                 ->pluck('id')

@@ -184,6 +184,26 @@ export const useBlogStore = defineStore('blog', {
             }
         },
 
+        async togglePostActive(uuid, active) {
+            const payload = await api(`/blog/${uuid}/active`, {
+                method: 'PUT',
+                body: { active },
+            });
+
+            const updated = payload?.data;
+            const index = this.items.findIndex((item) => item.uuid === uuid);
+
+            if (index !== -1 && updated) {
+                this.items[index] = { ...this.items[index], ...updated };
+            }
+
+            if (this.detail?.uuid === uuid && updated) {
+                this.detail = { ...this.detail, ...updated };
+            }
+
+            return updated;
+        },
+
         async uploadFeaturedImage(uuid, file) {
             const body = new FormData();
             body.append('file', file);

@@ -581,7 +581,7 @@ async function continueStep() {
                     name="bio"
                     label="البيو"
                     placeholder="نبذة قصيرة عن نشاطك"
-                    :rows="3"
+                    
                     :error="errors.bio"
                 />
                 <BrandMarkField

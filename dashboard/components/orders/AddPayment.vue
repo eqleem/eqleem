@@ -120,7 +120,7 @@ async function submit() {
             name="paymentNotes"
             label="ملاحظات"
             placeholder="ملاحظات اختيارية..."
-            :rows="3"
+            
             :error="errors.notes"
         />
 

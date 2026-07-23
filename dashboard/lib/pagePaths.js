@@ -13,5 +13,9 @@ export function pageEditPath(page) {
         return `/manage/pages/faq/${uuid}`;
     }
 
+    if (page.template === 'about') {
+        return `/manage/pages/about/${uuid}`;
+    }
+
     return `/manage/pages/detail/${uuid}`;
 }

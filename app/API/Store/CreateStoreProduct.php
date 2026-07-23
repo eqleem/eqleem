@@ -50,7 +50,7 @@ class CreateStoreProduct
             'title' => $title,
             'slug' => $this->uniqueStoreSlug($this->slugifyTitle($title)),
             'status' => 'draft',
-            'active' => true,
+            'active' => false,
         ]);
     }
 

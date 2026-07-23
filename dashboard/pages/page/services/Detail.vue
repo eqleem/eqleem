@@ -6,18 +6,19 @@ import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import Toggle from '../../../components/ui/Toggle.vue';
 import CkEditor from '../../../components/ui/CkEditor.vue';
 import MediaGallery from '../../../components/ui/MediaGallery.vue';
+import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useServicesStore } from '../../../stores/services.js';
+import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useServicesStore();
-const formTab = ref('edit');
+const { expand: expandAdvanced } = usePageAdvancedOpen();
 const uploading = ref(false);
 const notFound = ref(false);
 const bodyEditor = ref(null);
@@ -32,7 +33,7 @@ const form = reactive({
     durationMinutes: '',
     categoryIds: [],
     calendarIds: [],
-    published: false,
+    active: false,
     images: [],
 });
 
@@ -47,10 +48,7 @@ const editorUploadUrl = computed(() => `/api/services/${uuid.value}/editor-image
 const categories = computed(() => store.detail?.category_options ?? []);
 const calendars = computed(() => store.detail?.calendar_options ?? []);
 const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/services/');
-
-function switchTab(tab) {
-    formTab.value = tab;
-}
+const priceCurrencySuffix = computed(() => store.detail?.currency_symbol ?? '');
 
 function loadForm(service, { syncEditor = true } = {}) {
     if (!service) {
@@ -64,7 +62,7 @@ function loadForm(service, { syncEditor = true } = {}) {
     form.durationMinutes = service.duration_minutes ?? '';
     form.categoryIds = [...(service.category_ids ?? [])].map(String);
     form.calendarIds = [...(service.calendar_ids ?? [])].map(String);
-    form.published = Boolean(service.published);
+    form.active = Boolean(service.active ?? service.published);
     form.images = [...(service.images ?? [])];
     errors.title = null;
     errors.slug = null;
@@ -93,7 +91,6 @@ watch(() => route.params.id, async (id) => {
     }
 
     notFound.value = false;
-    formTab.value = 'edit';
 
     try {
         const service = await store.fetchService(String(id));
@@ -180,7 +177,9 @@ async function persist({ close = false } = {}) {
     errors.form = null;
 
     if (errors.title || errors.slug) {
-        switchTab(errors.title ? 'edit' : 'advanced');
+        if (errors.slug) {
+            expandAdvanced();
+        }
         return;
     }
 
@@ -207,7 +206,7 @@ async function persist({ close = false } = {}) {
         slug,
         category_ids: categoryIds,
         calendar_ids: calendarIds,
-        published: Boolean(form.published),
+        active: Boolean(form.active),
         editor_mode: 'html',
     };
 
@@ -237,10 +236,8 @@ async function persist({ close = false } = {}) {
                 ? (error.message || 'تعذر حفظ الخدمة.')
                 : null;
 
-            if (errors.title) {
-                switchTab('edit');
-            } else if (errors.slug) {
-                switchTab('advanced');
+            if (errors.slug) {
+                expandAdvanced();
             }
         } else {
             errors.form = 'تعذر حفظ الخدمة.';
@@ -278,151 +275,127 @@ function saveAndClose() {
                         <span class="truncate text-stone-600 hidden md:inline">تحرير الخدمة</span>
                     </div>
                 </div>
-
-                <nav class="relative z-20 flex shrink-0 items-center gap-1 rounded-xl bg-stone-300/40 p-0.5">
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'edit' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('edit')"
-                    >
-                        تحرير
-                    </button>
-                    <button
-                        type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition"
-                        :class="formTab === 'advanced' ? 'bg-white font-semibold text-stone-900 shadow-sm' : 'text-stone-600 hover:bg-white/60 hover:text-stone-800'"
-                        @click.prevent.stop="switchTab('advanced')"
-                    >
-                        متقدم
-                    </button>
-                </nav>
             </div>
 
             <Form class="!rounded-none !p-4 md:!p-6" @submit="save">
                 <p v-if="errors.form" class="mb-3 text-sm text-red-600">{{ errors.form }}</p>
 
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'edit' ? 'relative z-0 block' : 'hidden'"
-                >
-                    <Input
-                        v-model="form.title"
-                        name="title"
-                        placeholder="اسم الخدمة"
-                        :error="errors.title"
-                    />
-
-                    <Textarea
-                        v-model="form.subtitle"
-                        name="subtitle"
-                        placeholder="عنوان فرعي"
-                        info="عنوان فرعي يظهر تحت اسم الخدمة في صفحة الحجز وقائمة الخدمات."
-                        :rows="2"
-                    />
-
-                    <MediaGallery
-                        v-model="form.images"
-                        label="صور الخدمة"
-                        :uploading="uploading"
-                        :disabled="store.saving"
-                        @upload="uploadFiles"
-                        @remove="removeImage"
-                        @reorder="reorderImages"
-                    />
-
-                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div class="space-y-4">
+                    <div class="space-y-2">
                         <Input
-                            v-model="form.price"
-                            name="price"
-                            label="السعر"
-                            type="number"
-                            dir="ltr"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
+                            v-model="form.title"
+                            name="title"
+                            placeholder="اسم الخدمة"
+                            :error="errors.title"
                         />
-                        <Input
-                            v-model="form.durationMinutes"
-                            name="durationMinutes"
-                            label="مدة الخدمة (بالدقائق)"
-                            type="number"
-                            dir="ltr"
-                            min="1"
-                            step="1"
-                            placeholder="60"
+
+                        <MediaGallery
+                            v-model="form.images"
+                            label="صور الخدمة"
+                            :uploading="uploading"
+                            :disabled="store.saving"
+                            @upload="uploadFiles"
+                            @remove="removeImage"
+                            @reorder="reorderImages"
+                        />
+
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <Input
+                                v-model="form.price"
+                                name="price"
+                                label="السعر"
+                                type="number"
+                                dir="ltr"
+                                info-dir="rtl"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                :prefix="priceCurrencySuffix"
+                            />
+                            <Input
+                                v-model="form.durationMinutes"
+                                name="durationMinutes"
+                                label="مدة الخدمة"
+                                type="number"
+                                dir="ltr"
+                                info-dir="rtl"
+                                min="1"
+                                step="1"
+                                placeholder="60"
+                                prefix="دقائق"
+                            />
+                        </div>
+
+                        <CkEditor
+                            v-if="editorUploadUrl"
+                            ref="bodyEditor"
+                            :key="uuid"
+                            :model-value="bodySeed"
+                            name="body"
+                            :upload-url="editorUploadUrl"
                         />
                     </div>
 
-                    <CkEditor
-                        v-if="editorUploadUrl"
-                        ref="bodyEditor"
-                        :key="uuid"
-                        :model-value="bodySeed"
-                        name="body"
-                        :upload-url="editorUploadUrl"
-                    />
-                </div>
+                    <PageFormMetaSection
+                        v-model:published="form.active"
+                        v-model:slug="form.slug"
+                        :slug-prefix="slugPrefix"
+                        :slug-error="errors.slug"
+                    >
+                        <Textarea
+                            v-model="form.subtitle"
+                            name="subtitle"
+                            label="عنوان فرعي"
+                            placeholder="عنوان فرعي"
+                            info="عنوان فرعي يظهر تحت اسم الخدمة في صفحة الحجز وقائمة الخدمات."
+                            :rows="2"
+                        />
 
-                <div
-                    class="space-y-2"
-                    :class="formTab === 'advanced' ? 'relative z-10 block' : 'hidden'"
-                >
-                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">القسم</span>
-                        <div class="w-full space-y-1.5 p-2">
-                            <label
-                                v-for="option in categories"
-                                :key="option.id"
-                                class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-4 w-4 rounded border-stone-300"
-                                    :disabled="!option.selectable"
-                                    :checked="form.categoryIds.includes(String(option.id))"
-                                    @change="toggleCategory(option.id, $event.target.checked)"
+                        <div class="space-y-1.5">
+                            <span class="block text-sm font-semibold text-stone-500">القسم</span>
+                            <div class="space-y-1.5">
+                                <label
+                                    v-for="option in categories"
+                                    :key="option.id"
+                                    class="flex items-center gap-2 text-sm"
+                                    :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                                 >
-                                <span>{{ option.label }}</span>
-                            </label>
-                            <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-stone-300"
+                                        :disabled="!option.selectable"
+                                        :checked="form.categoryIds.includes(String(option.id))"
+                                        @change="toggleCategory(option.id, $event.target.checked)"
+                                    >
+                                    <span>{{ option.label }}</span>
+                                </label>
+                                <p v-if="categories.length === 0" class="text-xs text-stone-400">لا توجد تصنيفات بعد.</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="relative rounded-md bg-stone-100/75 p-1 lg:flex lg:items-start lg:gap-x-2">
-                        <span class="inline-block w-36 flex-shrink-0 p-2 text-sm font-semibold text-stone-500">مقدمو الخدمات</span>
-                        <div class="w-full space-y-1.5 p-2">
-                            <label
-                                v-for="option in calendars"
-                                :key="option.id"
-                                class="flex items-center gap-2 text-sm"
-                                :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-4 w-4 rounded border-stone-300"
-                                    :disabled="!option.selectable"
-                                    :checked="form.calendarIds.includes(String(option.id))"
-                                    @change="toggleCalendar(option.id, $event.target.checked)"
+                        <div class="space-y-1.5">
+                            <span class="block text-sm font-semibold text-stone-500">مقدمو الخدمات</span>
+                            <div class="space-y-1.5">
+                                <label
+                                    v-for="option in calendars"
+                                    :key="option.id"
+                                    class="flex items-center gap-2 text-sm"
+                                    :class="option.selectable ? 'text-stone-700' : 'text-stone-400'"
                                 >
-                                <span>{{ option.label }}</span>
-                            </label>
-                            <p v-if="calendars.length === 0" class="text-xs text-stone-400">لا يوجد مقدمو خدمات بعد.</p>
-                            <p class="text-xs text-stone-400">اربط الخدمة بمقدمي الخدمات المتاحين لحجز المواعيد حسب جداولهم.</p>
+                                    <input
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-stone-300"
+                                        :disabled="!option.selectable"
+                                        :checked="form.calendarIds.includes(String(option.id))"
+                                        @change="toggleCalendar(option.id, $event.target.checked)"
+                                    >
+                                    <span>{{ option.label }}</span>
+                                </label>
+                                <p v-if="calendars.length === 0" class="text-xs text-stone-400">لا يوجد مقدمو خدمات بعد.</p>
+                                <p class="text-xs text-stone-400">اربط الخدمة بمقدمي الخدمات المتاحين لحجز المواعيد حسب جداولهم.</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <Input
-                        v-model="form.slug"
-                        name="slug"
-                        label="نص الرابط"
-                        dir="ltr"
-                        :prefix="slugPrefix"
-                        :error="errors.slug"
-                    />
-
-                    <Toggle v-model="form.published" name="published" label="حالة النشر" />
+                    </PageFormMetaSection>
                 </div>
 
                 <template #footer>

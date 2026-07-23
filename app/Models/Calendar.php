@@ -57,6 +57,11 @@ class Calendar extends Model
         return $this->hasMany(self::class, 'parent_id');
     }
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function bookables(): HasMany
     {
         return $this->hasMany(Bookable::class);

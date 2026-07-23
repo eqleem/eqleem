@@ -72,6 +72,7 @@ class SyncTenantSections
             ->where('type', 'block-link')
             ->where('data->link_type', 'section')
             ->where('data->content_type', $contentTypeSlug)
+            ->where('data->managed_section', true)
             ->get();
     }
 }

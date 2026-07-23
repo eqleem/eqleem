@@ -1,17 +1,30 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import Button from '../../ui/Button.vue';
-import Badge from '../../ui/Badge.vue';
+import Icon from '../../ui/Icon.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddService from './AddService.vue';
 import { useServicesStore } from '../../../stores/services.js';
+import { useSession } from '../../../stores/session.js';
 import { openModal } from '../../../lib/modal.js';
+import { notifyApiError } from '../../../lib/notify.js';
 
 const store = useServicesStore();
+const { tenant } = useSession();
 const search = ref('');
 const selectedIds = ref([]);
 let searchTimer = null;
+
+function servicePreviewUrl(item) {
+    const base = String(tenant.value?.url ?? '').replace(/\/$/, '');
+
+    if (!base || !item?.slug) {
+        return null;
+    }
+
+    return `${base}/services/${item.slug}`;
+}
 
 onMounted(() => {
     store.fetchServices({ page: 1 });
@@ -56,6 +69,23 @@ async function removeSelected() {
 
     await store.deleteServices(selectedIds.value);
     selectedIds.value = [];
+}
+
+async function removeOne(item) {
+    if (!confirm('هل أنت متأكد من حذف هذه الخدمة؟')) {
+        return;
+    }
+
+    await store.deleteServices([item.id]);
+    selectedIds.value = selectedIds.value.filter((id) => id !== String(item.id));
+}
+
+async function toggleActive(item) {
+    try {
+        await store.toggleServiceActive(item.uuid, !item.active);
+    } catch (error) {
+        notifyApiError(error, 'تعذر تحديث حالة الخدمة.');
+    }
 }
 </script>
 
@@ -135,7 +165,7 @@ async function removeSelected() {
                     </div>
 
                     <div class="min-w-0 flex-1 py-3">
-                        <RouterLink :to="`/manage/services/detail/${item.uuid}`" class="flex items-center gap-x-3">
+                        <RouterLink :to="`/manage/services/detail/${item.uuid}`" class="flex items-center gap-x-3 text-start">
                             <div class="flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-xl bg-stone-100">
                                 <img
                                     v-if="item.image"
@@ -148,23 +178,25 @@ async function removeSelected() {
                             <div class="min-w-0">
                                 <h2 class="truncate text-sm font-semibold text-stone-700">{{ item.title }}</h2>
                                 <div class="mt-1 flex items-center gap-x-2">
-                                    <span v-if="item.status === 'published'" class="flex items-center">
-                                        <span class="rounded-full bg-emerald-500/20 p-1">
-                                            <span class="block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                    <div v-if="item.active" class="mt-1 flex items-center gap-x-1.5">
+                                        <div class="flex-none rounded-full bg-emerald-500/20 p-1">
+                                            <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-1 flex items-center gap-1 text-xs text-stone-500">
+                                        <span class="inline-flex items-center gap-x-1 rounded-md bg-stone-100 p-1 px-2 text-xs">
+                                            {{ item.active ? 'مفعّل' : 'معطّل' }}
                                         </span>
-                                    </span>
-                                    <Badge :color="item.status === 'published' ? 'green' : 'gray'">
-                                        {{ item.status_label ?? (item.status === 'published' ? 'منشور' : 'مسودة') }}
-                                    </Badge>
-                                    <Money v-if="item.price_label" :formatted="item.price_label" class="text-xs font-medium text-stone-700" />
-                                    <span v-if="item.published_at_label" class="text-xs text-stone-500" dir="ltr">{{ item.published_at_label }}</span>
+                                        <Money v-if="item.price_label" :formatted="item.price_label" class="text-xs font-medium text-stone-700" />
+                                        <span v-if="item.published_at_label" class="text-xs text-stone-500" dir="ltr">{{ item.published_at_label }}</span>
+                                    </p>
                                 </div>
                             </div>
                         </RouterLink>
                     </div>
 
                     <div class="flex-none pe-6">
-                        <Dropdown width="w-36">
+                        <Dropdown width="w-48">
                             <template #trigger>
                                 <button type="button" class="rounded p-1.5 text-stone-500 hover:bg-stone-100" aria-label="menu">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
@@ -172,10 +204,42 @@ async function removeSelected() {
                             </template>
                             <RouterLink
                                 :to="`/manage/services/detail/${item.uuid}`"
-                                class="flex items-center gap-x-2 rounded p-1.5 hover:bg-stone-100"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
                             >
+                                <Icon name="pencil" class="h-4 w-4 shrink-0 text-stone-500" />
                                 تعديل
                             </RouterLink>
+                            <a
+                                v-if="servicePreviewUrl(item)"
+                                :href="servicePreviewUrl(item)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-x-2 rounded p-1.5 text-sm text-stone-700 hover:bg-stone-100"
+                            >
+                                <Icon name="eye" class="h-4 w-4 shrink-0 text-stone-500" />
+                                معاينة
+                            </a>
+                            <button
+                                type="button"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-stone-700 hover:bg-stone-100"
+                                :disabled="store.saving"
+                                @click="toggleActive(item)"
+                            >
+                                <Icon
+                                    :name="item.active ? 'ban' : 'check'"
+                                    class="h-4 w-4 shrink-0 text-stone-500"
+                                />
+                                {{ item.active ? 'تعطيل' : 'تفعيل' }}
+                            </button>
+                            <button
+                                type="button"
+                                class="flex w-full items-center gap-x-2 rounded p-1.5 text-start text-sm text-red-600 hover:bg-stone-100"
+                                :disabled="store.saving"
+                                @click="removeOne(item)"
+                            >
+                                <Icon name="trash" class="h-4 w-4 shrink-0" />
+                                حذف
+                            </button>
                         </Dropdown>
                     </div>
                 </div>
@@ -200,6 +264,11 @@ async function removeSelected() {
                     />
                 </div>
             </div>
+
+            <div
+                v-if="store.loading"
+                class="absolute inset-0 bg-white opacity-50"
+            />
         </div>
     </div>
 </template>

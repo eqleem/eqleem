@@ -14,7 +14,7 @@ return [
         'count_singular' => 'صفحة',
         'count_plural' => 'صفحات',
         'description' => 'إنشاء وإدارة صفحات الموقع الثابتة والمخصصة.',
-        'icon' => 'assets/icons/ecommerce/031-content.svg',
+        'icon' => 'assets/icons/tabler/file-text.svg',
         'color' => 'blue',
         'components' => [
             'index' => 'admin::page.content.pages.index',
@@ -33,7 +33,7 @@ return [
         'count_singular' => 'تدوينة',
         'count_plural' => 'تدوينات',
         'description' => 'كتابة ونشر المقالات وتنظيم التصنيفات.',
-        'icon' => 'assets/icons/stationery/002-book.svg',
+        'icon' => 'assets/icons/tabler/book.svg',
         'color' => 'orange',
         'components' => [
             'index' => 'admin::page.content.blog.index',
@@ -52,7 +52,7 @@ return [
         'count_singular' => 'مشروع',
         'count_plural' => 'مشاريع',
         'description' => 'عرض وإدارة مشاريعك وأعمالك السابقة.',
-        'icon' => 'assets/icons/business/047-portfolio.svg',
+        'icon' => 'assets/icons/tabler/briefcase.svg',
         'color' => 'violet',
         'components' => [
             'index' => 'admin::page.content.portfolio.index',
@@ -72,7 +72,7 @@ return [
         'count_singular' => 'نموذج',
         'count_plural' => 'نماذج',
         'description' => 'إنشاء وإدارة نماذج التواصل وجمع البيانات.',
-        'icon' => 'assets/icons/stationery/005-clipboard.svg',
+        'icon' => 'assets/icons/tabler/clipboard-list.svg',
         'color' => 'yellow',
         'components' => [
             'index' => 'admin::page.content.forms.index',
@@ -84,14 +84,14 @@ return [
         'active' => true,
         'default' => false,
         'sellable' => true,
-        'slug' => 'store', 
+        'slug' => 'store',
         'model_type' => 'product',
         'section' => 'sell',
         'name' => 'المتجر الإلكتروني',
         'count_singular' => 'منتج',
         'count_plural' => 'منتجات',
         'description' => 'لبيع المنتجات القابلة للشحن.',
-        'icon' => 'assets/icons/ecommerce/018-cart.svg',
+        'icon' => 'assets/icons/tabler/shopping-cart.svg',
         'color' => 'green',
         'components' => [
             'index' => 'admin::page.content.store.index',
@@ -110,7 +110,7 @@ return [
         'count_singular' => 'منتج رقمي',
         'count_plural' => 'منتجات رقمية',
         'description' => 'لبيع المنتجات الرقمية القابلة للتحميل والوصول الفوري.',
-        'icon' => 'assets/icons/business/035-file.svg',
+        'icon' => 'assets/icons/tabler/file-download.svg',
         'color' => 'red',
         'components' => [
             'index' => 'admin::page.content.digital-products.index',
@@ -129,7 +129,7 @@ return [
         'count_singular' => 'خدمة رقمية',
         'count_plural' => 'خدمات رقمية',
         'description' => 'لبيع الخدمات الرقمية مع تحديد مدة التسليم.',
-        'icon' => 'assets/icons/business/015-cloud-network.svg',
+        'icon' => 'assets/icons/tabler/cloud.svg',
         'color' => 'blue',
         'components' => [
             'index' => 'admin::page.content.digital-services.index',
@@ -148,11 +148,30 @@ return [
         'count_singular' => 'خدمة',
         'count_plural' => 'خدمات',
         'description' => 'لبيع الخدمات المقدمة بالساعة وحجزها مع ربط مقدمي الخدمة.',
-        'icon' => 'assets/icons/business/025-team work.svg',
+        'icon' => 'assets/icons/tabler/clock.svg',
         'color' => 'teal',
         'components' => [
             'index' => 'admin::page.content.services.index',
             'detail' => 'admin::page.content.services.detail',
+        ],
+    ],
+    'on-demand-services' => [
+        'order' => 9,
+        'active' => true,
+        'default' => false,
+        'sellable' => true,
+        'slug' => 'on-demand-services',
+        'model_type' => 'on-demand-service',
+        'section' => 'sell',
+        'name' => 'خدمة حسب الطلب',
+        'count_singular' => 'خدمة',
+        'count_plural' => 'خدمات',
+        'description' => 'لبيع الخدمات المسعّرة حسب الوحدة مثل المتر والقطعة والساعة.',
+        'icon' => 'assets/icons/tabler/ruler.svg',
+        'color' => 'cyan',
+        'components' => [
+            'index' => 'admin::page.content.on-demand-services.index',
+            'detail' => 'admin::page.content.on-demand-services.detail',
         ],
     ],
     'menu' => [
@@ -167,7 +186,7 @@ return [
         'count_singular' => 'صنف',
         'count_plural' => 'أصناف',
         'description' => 'إدارة أصناف وعناصر قائمة الطعام.',
-        'icon' => 'assets/icons/business/059-teacup.svg',
+        'icon' => 'assets/icons/tabler/tools-kitchen.svg',
         'color' => 'amber',
         'components' => [
             'index' => 'admin::page.content.menu.index',
@@ -186,7 +205,7 @@ return [
         'count_singular' => 'وحدة',
         'count_plural' => 'وحدات',
         'description' => 'إدارة الوحدات المتاحة للتأجير.',
-        'icon' => 'assets/icons/business/010-location.svg',
+        'icon' => 'assets/icons/tabler/home.svg',
         'color' => 'lime',
         'components' => [
             'index' => 'admin::page.content.unit-rental.index',
@@ -199,7 +218,7 @@ return [
     //     'model_type' => 'cv',
     //     'name' => 'السيرة الذاتية',
     //     'description' => 'إدارة بيانات السيرة الذاتية والخبرات والمهارات.',
-    //     'icon' => 'assets/icons/stationery/011-id-card.svg',
+    //     'icon' => 'assets/icons/tabler/id.svg',
     //     'color' => 'purple',
     //     'components' => [
     //         'index' => 'admin::page.content.cv.index',
@@ -218,7 +237,7 @@ return [
         'count_singular' => 'دورة',
         'count_plural' => 'دورات',
         'description' => 'إنشاء وإدارة الدورات التدريبية والدروس والمحتوى التعليمي.',
-        'icon' => 'assets/icons/business/011-presentation.svg',
+        'icon' => 'assets/icons/tabler/school.svg',
         'color' => 'pink',
         'components' => [
             'index' => 'admin::page.content.courses.index',
@@ -237,7 +256,7 @@ return [
         'count_singular' => 'تقييم',
         'count_plural' => 'تقييمات',
         'description' => 'عرض قائمة التقييمات وآراء العملاء.',
-        'icon' => 'assets/icons/ecommerce/006-badge.svg',
+        'icon' => 'assets/icons/tabler/star.svg',
         'color' => 'amber',
     ],
 ];

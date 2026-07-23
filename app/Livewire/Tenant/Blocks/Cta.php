@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ResolvesTenantBlockView;
 use App\Models\Block;
 use App\Models\Content;
 use App\Support\BlockBrandMark;
+use App\Support\CtaBooking;
 use App\Support\CtaLink;
 use App\Support\FormField;
 use Illuminate\Contracts\View\View;
@@ -45,7 +46,7 @@ class Cta extends Component
 
     /**
      * @param  Collection<int, Content>  $ctaLinks
-     * @return Collection<int, array{id: int, label: string, icon: string, brand_mark: array{type: string, value: string, color: string, url: string|null}|null, url: ?string, isForm: bool, formContentId: ?int, opensInNewTab: bool, formDescription: string, formFields: list<array<string, mixed>>}>
+     * @return Collection<int, array<string, mixed>>
      */
     protected function preparedLinks(Collection $ctaLinks): Collection
     {
@@ -68,8 +69,10 @@ class Cta extends Component
             $formContentId = CtaLink::formContentId($link);
             $form = $formContentId ? $forms->get($formContentId) : null;
             $isForm = CtaLink::isForm($link) && $form !== null;
+            $isBooking = CtaLink::isBooking($link);
             $data = is_array($link->data) ? $link->data : [];
             $formFields = $isForm ? FormField::normalize(data_get($form?->data, 'fields')) : [];
+            $bookingConfig = $isBooking ? CtaBooking::configFromData($data) : null;
 
             return [
                 'id' => $link->id,
@@ -78,14 +81,19 @@ class Cta extends Component
                 'brand_mark' => BlockBrandMark::forDisplay(
                     is_array($data['brand_mark'] ?? null) ? $data['brand_mark'] : null
                 ),
-                'url' => $isForm ? null : CtaLink::url($link),
+                'url' => ($isForm || $isBooking) ? null : CtaLink::url($link),
                 'isForm' => $isForm,
+                'isBooking' => $isBooking,
                 'formContentId' => $isForm ? $formContentId : null,
                 'opensInNewTab' => CtaLink::opensInNewTab($link),
                 'formDescription' => $isForm
                     ? (string) data_get($form?->data, 'description', 'املأ النموذج وسنتواصل معك في أقرب وقت.')
                     : '',
                 'formFields' => $formFields,
+                'bookingBranchIds' => $bookingConfig['branch_ids'] ?? [],
+                'bookingCalendarIds' => $bookingConfig['calendar_ids'] ?? [],
+                'bookingAllowClientChoice' => $bookingConfig['allow_client_choice'] ?? true,
+                'bookingDurationMinutes' => $bookingConfig['duration_minutes'] ?? 30,
             ];
         });
     }

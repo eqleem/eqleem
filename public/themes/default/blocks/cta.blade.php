@@ -1,6 +1,6 @@
 <div class="p-4">
     @php
-        $visibleCtaLinks = $ctaLinks->filter(fn ($link) => $link['isForm'] || filled($link['url']));
+        $visibleCtaLinks = $ctaLinks->filter(fn ($link) => $link['isForm'] || $link['isBooking'] || filled($link['url']));
         $ctaLinksCount = $visibleCtaLinks->count();
         $ctaLinksRemainder = $ctaLinksCount % 3;
     @endphp
@@ -20,13 +20,17 @@
                 $ctaBgClasses = $isPrimaryCta
                     ? 'bg-primary-600 hover:bg-primary-700 text-white'
                     : 'bg-secondary-900/10 hover:bg-secondary-900/20 text-secondary-900';
+                $isModalCta = $link['isForm'] || $link['isBooking'];
+                $modalName = $link['isBooking']
+                    ? 'cta-booking-'.$link['id']
+                    : 'cta-form-'.$link['id'];
             @endphp
 
             @if($ctaLinksCount >= 3 && $ctaLinksRemainder === 2 && $loop->iteration === $ctaLinksCount - 1)
                 <div class="contents lg:col-span-3 lg:grid lg:grid-cols-2 lg:gap-4">
             @endif
 
-            @if($link['isForm'])
+            @if($isModalCta)
             <button
                 type="button"
                 wire:key="cta-link-{{ $link['id'] }}"
@@ -37,11 +41,11 @@
                     'col-span-2 lg:col-span-3' => $isLonelyMobileLast && $isLonelyLgLast,
                     'lg:col-span-3' => $isLonelyLgLast && ! $isLonelyMobileLast,
                 ])
-                x-on:click="$dispatch('open-modal', { name: 'cta-form-{{ $link['id'] }}' })"
+                x-on:click="$dispatch('open-modal', { name: '{{ $modalName }}' })"
             >
                 @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
                     @if (($brandMark['type'] ?? '') === 'image')
-                        <span class="size-9 shrink-0 overflow-hidden rounded-lg bg-white/15">
+                        <span class="size-9 shrink-0 overflow-hidden rounded-lg">
                             <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-full object-cover" icon-size="1.35rem" />
                         </span>
                     @elseif (($brandMark['type'] ?? '') === 'emoji')
@@ -49,8 +53,8 @@
                             <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.35rem" />
                         </span>
                     @else
-                        <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/15 text-white">
-                            <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.35rem" />
+                        <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+                            <x-brand-mark :mark="array_merge($brandMark, ['color' => ''])" :alt="$link['label']" class="size-7 object-cover text-current" icon-size="1.35rem" />
                         </span>
                     @endif
                 @elseif (filled($link['icon'] ?? null))
@@ -74,16 +78,16 @@
                 <span class="relative z-10 flex items-center gap-2 truncate">
                     @if (is_array($brandMark) && filled($brandMark['type'] ?? null))
                         @if (($brandMark['type'] ?? '') === 'image')
-                            <span class="size-9x shrink-0 overflow-hidden rounded-lg bg-white/15">
+                            <span class="size-9 shrink-0 overflow-hidden rounded-lg">
                                 <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-full object-cover" icon-size="1.35rem" />
                             </span>
                         @elseif (($brandMark['type'] ?? '') === 'emoji')
-                            <span class="flex size-9x shrink-0 items-center justify-center overflow-hidden rounded-lg text-xl leading-none">
-                                <x-brand-mark :mark="$brandMark" :alt="$link['label']" class=" object-cover" icon-size="1.5rem" />
+                            <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg text-xl leading-none">
+                                <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.35rem" />
                             </span>
                         @else
-                            <span class="flex size-9x shrink-0 items-center justify-center overflow-hidden">
-                                <x-brand-mark :mark="$brandMark" :alt="$link['label']" class="size-7 object-cover" icon-size="1.35rem" />
+                            <span class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+                                <x-brand-mark :mark="array_merge($brandMark, ['color' => ''])" :alt="$link['label']" class="size-7 object-cover text-current" icon-size="1.35rem" />
                             </span>
                         @endif
                     @elseif (filled($link['icon'] ?? null))
@@ -116,6 +120,28 @@
 
                 <x-slot:footer>
                     <button type="button" x-on:click="$dispatch('close-modal', { name: 'cta-form-{{ $link['id'] }}' })" class="rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50">
+                        إغلاق
+                    </button>
+                </x-slot:footer>
+            </x-tenant-theme::modal>
+        @endif
+
+        @if($link['isBooking'])
+            <x-tenant-theme::modal wire:key="cta-booking-modal-{{ $link['id'] }}" name="cta-booking-{{ $link['id'] }}" maxWidth="md">
+                <x-slot:title>{{ $link['label'] }}</x-slot:title>
+
+                <livewire:tenant.bookings.cta-submit
+                    :link-id="$link['id']"
+                    :block-id="$block?->id"
+                    :branch-ids="$link['bookingBranchIds']"
+                    :calendar-ids="$link['bookingCalendarIds']"
+                    :allow-client-choice="$link['bookingAllowClientChoice']"
+                    :duration-minutes="$link['bookingDurationMinutes']"
+                    :key="'cta-booking-submit-'.$link['id']"
+                />
+
+                <x-slot:footer>
+                    <button type="button" x-on:click="$dispatch('close-modal', { name: 'cta-booking-{{ $link['id'] }}' })" class="rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50">
                         إغلاق
                     </button>
                 </x-slot:footer>

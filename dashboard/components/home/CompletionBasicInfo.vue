@@ -95,7 +95,7 @@ async function submit() {
             name="bio"
             label="النبذة"
             placeholder="نبذة قصيرة تظهر أسفل الاسم"
-            :rows="3"
+            
             :error="errors.bio"
         />
         <template #footer>

@@ -11,6 +11,7 @@ use App\API\Blog\ListBlogCategories;
 use App\API\Blog\ListBlogPosts;
 use App\API\Blog\ReorderBlogCategories;
 use App\API\Blog\ShowBlogPost;
+use App\API\Blog\ToggleBlogPostActive;
 use App\API\Blog\UpdateBlogCategory;
 use App\API\Blog\UpdateBlogPost;
 use App\API\Blog\UpdateBlogSettings;
@@ -70,6 +71,7 @@ use App\API\DigitalProducts\ReorderDigitalProductCategories;
 use App\API\DigitalProducts\ReorderDigitalProductDownloads;
 use App\API\DigitalProducts\ReorderDigitalProductImages;
 use App\API\DigitalProducts\ShowDigitalProduct;
+use App\API\DigitalProducts\ToggleDigitalProductActive;
 use App\API\DigitalProducts\UpdateDigitalProduct;
 use App\API\DigitalProducts\UpdateDigitalProductCategory;
 use App\API\DigitalProducts\UpdateDigitalProductSettings;
@@ -97,6 +99,7 @@ use App\API\Forms\CreateForm;
 use App\API\Forms\DeleteForms;
 use App\API\Forms\ListForms;
 use App\API\Forms\ShowForm;
+use App\API\Forms\ToggleFormActive;
 use App\API\Forms\UpdateForm;
 use App\API\FormSubmissions\ListFormSubmissions;
 use App\API\FormSubmissions\ShowFormSubmission;
@@ -129,6 +132,18 @@ use App\API\Newsletter\UpdateNewsletter;
 use App\API\Newsletter\UpdateNewsletterSettings;
 use App\API\Newsletter\UploadNewsletterEditorImage;
 use App\API\Newsletter\UploadNewsletterFeaturedImage;
+use App\API\OnDemandServices\CreateOnDemandService;
+use App\API\OnDemandServices\DeleteOnDemandServiceImage;
+use App\API\OnDemandServices\DeleteOnDemandServices;
+use App\API\OnDemandServices\GetOnDemandServiceSettings;
+use App\API\OnDemandServices\ListOnDemandServices;
+use App\API\OnDemandServices\ReorderOnDemandServiceImages;
+use App\API\OnDemandServices\ShowOnDemandService;
+use App\API\OnDemandServices\ToggleOnDemandServiceActive;
+use App\API\OnDemandServices\UpdateOnDemandService;
+use App\API\OnDemandServices\UpdateOnDemandServiceSettings;
+use App\API\OnDemandServices\UploadOnDemandServiceEditorImage;
+use App\API\OnDemandServices\UploadOnDemandServiceImage;
 use App\API\Orders\CreateOrder;
 use App\API\Orders\CreateOrderContent;
 use App\API\Orders\ListOrders;
@@ -158,11 +173,13 @@ use App\API\Page\SetDefaultPageTheme;
 use App\API\Page\ShowPageBlock;
 use App\API\Page\TogglePageBlockActive;
 use App\API\Page\UpdatePageBlock;
+use App\API\Page\UpdatePageHeaderSocialLink;
 use App\API\Page\UpsertPageBlockLink;
 use App\API\Page\UpsertPageFooterDocument;
 use App\API\Pages\CreatePage;
 use App\API\Pages\CreatePageBlock as StandaloneCreatePageBlock;
 use App\API\Pages\DeletePageBlock as StandaloneDeletePageBlock;
+use App\API\Pages\DeletePageHeroImage;
 use App\API\Pages\DeletePages;
 use App\API\Pages\ListPageBlocks;
 use App\API\Pages\ListPages;
@@ -173,12 +190,15 @@ use App\API\Pages\TogglePageActive;
 use App\API\Pages\TogglePageBlockActive as StandaloneTogglePageBlockActive;
 use App\API\Pages\UpdatePage;
 use App\API\Pages\UpdatePageBlock as StandaloneUpdatePageBlock;
+use App\API\Pages\UploadPageBrandMarkImage;
 use App\API\Pages\UploadPageEditorImage;
+use App\API\Pages\UploadPageHeroImage;
 use App\API\Payments\ListPayments;
 use App\API\Payments\ShowPayment;
 use App\API\Plan\GetPlanCheckout;
 use App\API\Plan\ListPlans;
 use App\API\Plan\SubscribeFreePlan;
+use App\API\Portfolio\ClonePortfolioProject;
 use App\API\Portfolio\CreatePortfolioCategory;
 use App\API\Portfolio\CreatePortfolioProject;
 use App\API\Portfolio\DeletePortfolioCategory;
@@ -190,6 +210,7 @@ use App\API\Portfolio\ListPortfolioProjects;
 use App\API\Portfolio\ReorderPortfolioCategories;
 use App\API\Portfolio\ReorderPortfolioImages;
 use App\API\Portfolio\ShowPortfolioProject;
+use App\API\Portfolio\TogglePortfolioProjectActive;
 use App\API\Portfolio\UpdatePortfolioCategory;
 use App\API\Portfolio\UpdatePortfolioProject;
 use App\API\Portfolio\UpdatePortfolioSettings;
@@ -211,6 +232,7 @@ use App\API\Services\ReorderServiceCategories;
 use App\API\Services\ReorderServiceImages;
 use App\API\Services\ShowService;
 use App\API\Services\ShowServiceCalendar;
+use App\API\Services\ToggleServiceActive;
 use App\API\Services\UpdateService;
 use App\API\Services\UpdateServiceCalendar;
 use App\API\Services\UpdateServiceCategory;
@@ -255,6 +277,7 @@ use App\API\Store\ListStoreProducts;
 use App\API\Store\ReorderStoreCategories;
 use App\API\Store\ReorderStoreImages;
 use App\API\Store\ShowStoreProduct;
+use App\API\Store\ToggleStoreProductActive;
 use App\API\Store\UpdateStoreCategory;
 use App\API\Store\UpdateStoreProduct;
 use App\API\Store\UpdateStoreSettings;
@@ -630,6 +653,9 @@ Route::post('/page/header/social', AddPageHeaderSocialLink::class)
 Route::put('/page/header/social/reorder', ReorderPageHeaderSocialLinks::class)
     ->name('api.page.header.social.reorder');
 
+Route::put('/page/header/social/{id}', UpdatePageHeaderSocialLink::class)
+    ->name('api.page.header.social.update');
+
 Route::delete('/page/header/social/{id}', DeletePageHeaderSocialLink::class)
     ->name('api.page.header.social.destroy');
 
@@ -671,6 +697,14 @@ Route::get('/portfolio/{uuid}', ShowPortfolioProject::class)
 
 Route::put('/portfolio/{uuid}', UpdatePortfolioProject::class)
     ->name('api.portfolio.update')
+    ->whereUuid('uuid');
+
+Route::put('/portfolio/{uuid}/active', TogglePortfolioProjectActive::class)
+    ->name('api.portfolio.active')
+    ->whereUuid('uuid');
+
+Route::post('/portfolio/{uuid}/clone', ClonePortfolioProject::class)
+    ->name('api.portfolio.clone')
     ->whereUuid('uuid');
 
 Route::post('/portfolio/{uuid}/images', UploadPortfolioImage::class)
@@ -730,6 +764,10 @@ Route::put('/blog/{uuid}', UpdateBlogPost::class)
     ->name('api.blog.update')
     ->whereUuid('uuid');
 
+Route::put('/blog/{uuid}/active', ToggleBlogPostActive::class)
+    ->name('api.blog.active')
+    ->whereUuid('uuid');
+
 Route::post('/blog/{uuid}/featured-image', UploadBlogFeaturedImage::class)
     ->name('api.blog.featured-image.store')
     ->whereUuid('uuid');
@@ -780,6 +818,10 @@ Route::get('/store/{uuid}', ShowStoreProduct::class)
 
 Route::put('/store/{uuid}', UpdateStoreProduct::class)
     ->name('api.store.update')
+    ->whereUuid('uuid');
+
+Route::put('/store/{uuid}/active', ToggleStoreProductActive::class)
+    ->name('api.store.active')
     ->whereUuid('uuid');
 
 Route::post('/store/{uuid}/images', UploadStoreImage::class)
@@ -912,6 +954,10 @@ Route::get('/services/{uuid}', ShowService::class)
 
 Route::put('/services/{uuid}', UpdateService::class)
     ->name('api.services.update')
+    ->whereUuid('uuid');
+
+Route::put('/services/{uuid}/active', ToggleServiceActive::class)
+    ->name('api.services.active')
     ->whereUuid('uuid');
 
 Route::post('/services/{uuid}/images', UploadServiceImage::class)
@@ -1063,6 +1109,50 @@ Route::post('/digital-services/{uuid}/editor-images', UploadDigitalServiceEditor
     ->name('api.digital-services.editor-images.store')
     ->whereUuid('uuid');
 
+Route::get('/on-demand-services', ListOnDemandServices::class)
+    ->name('api.on-demand-services.index');
+
+Route::post('/on-demand-services', CreateOnDemandService::class)
+    ->name('api.on-demand-services.store');
+
+Route::delete('/on-demand-services', DeleteOnDemandServices::class)
+    ->name('api.on-demand-services.destroy');
+
+Route::get('/on-demand-services/settings', GetOnDemandServiceSettings::class)
+    ->name('api.on-demand-services.settings.show');
+
+Route::put('/on-demand-services/settings', UpdateOnDemandServiceSettings::class)
+    ->name('api.on-demand-services.settings.update');
+
+Route::get('/on-demand-services/{uuid}', ShowOnDemandService::class)
+    ->name('api.on-demand-services.show')
+    ->whereUuid('uuid');
+
+Route::put('/on-demand-services/{uuid}', UpdateOnDemandService::class)
+    ->name('api.on-demand-services.update')
+    ->whereUuid('uuid');
+
+Route::put('/on-demand-services/{uuid}/active', ToggleOnDemandServiceActive::class)
+    ->name('api.on-demand-services.active')
+    ->whereUuid('uuid');
+
+Route::post('/on-demand-services/{uuid}/images', UploadOnDemandServiceImage::class)
+    ->name('api.on-demand-services.images.store')
+    ->whereUuid('uuid');
+
+Route::put('/on-demand-services/{uuid}/images/reorder', ReorderOnDemandServiceImages::class)
+    ->name('api.on-demand-services.images.reorder')
+    ->whereUuid('uuid');
+
+Route::delete('/on-demand-services/{uuid}/images/{mediaId}', DeleteOnDemandServiceImage::class)
+    ->name('api.on-demand-services.images.destroy')
+    ->whereUuid('uuid')
+    ->whereNumber('mediaId');
+
+Route::post('/on-demand-services/{uuid}/editor-images', UploadOnDemandServiceEditorImage::class)
+    ->name('api.on-demand-services.editor-images.store')
+    ->whereUuid('uuid');
+
 Route::get('/digital-products', ListDigitalProducts::class)
     ->name('api.digital-products.index');
 
@@ -1101,6 +1191,10 @@ Route::get('/digital-products/{uuid}', ShowDigitalProduct::class)
 
 Route::put('/digital-products/{uuid}', UpdateDigitalProduct::class)
     ->name('api.digital-products.update')
+    ->whereUuid('uuid');
+
+Route::put('/digital-products/{uuid}/active', ToggleDigitalProductActive::class)
+    ->name('api.digital-products.active')
     ->whereUuid('uuid');
 
 Route::post('/digital-products/{uuid}/images', UploadDigitalProductImage::class)
@@ -1255,6 +1349,18 @@ Route::post('/pages/{uuid}/editor-images', UploadPageEditorImage::class)
     ->name('api.pages.editor-images.store')
     ->whereUuid('uuid');
 
+Route::post('/pages/{uuid}/hero-image', UploadPageHeroImage::class)
+    ->name('api.pages.hero-image.store')
+    ->whereUuid('uuid');
+
+Route::delete('/pages/{uuid}/hero-image', DeletePageHeroImage::class)
+    ->name('api.pages.hero-image.destroy')
+    ->whereUuid('uuid');
+
+Route::post('/pages/{uuid}/brand-mark-image', UploadPageBrandMarkImage::class)
+    ->name('api.pages.brand-mark-image.store')
+    ->whereUuid('uuid');
+
 Route::get('/pages/{uuid}/blocks', ListPageBlocks::class)
     ->name('api.pages.blocks.index')
     ->whereUuid('uuid');
@@ -1302,6 +1408,10 @@ Route::get('/forms/{uuid}', ShowForm::class)
 
 Route::put('/forms/{uuid}', UpdateForm::class)
     ->name('api.forms.update')
+    ->whereUuid('uuid');
+
+Route::put('/forms/{uuid}/active', ToggleFormActive::class)
+    ->name('api.forms.active')
     ->whereUuid('uuid');
 
 Route::post('/forms/{uuid}/clone', CloneForm::class)

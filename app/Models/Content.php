@@ -153,6 +153,7 @@ class Content extends Model implements HasMedia
             'default' => 'صفحة عادية',
             'contact' => 'اتصل بنا',
             'faq' => 'الأسئلة المتكررة',
+            'about' => 'من نحن',
             'features' => 'المزايا',
             'pricing' => 'الباقات والأسعار',
         ];
@@ -163,7 +164,7 @@ class Content extends Model implements HasMedia
      */
     public static function systemPageTemplates(): array
     {
-        return ['contact', 'faq'];
+        return ['contact', 'faq', 'about'];
     }
 
     /**
@@ -173,7 +174,7 @@ class Content extends Model implements HasMedia
      */
     public static function creatablePageTemplates(): array
     {
-        return ['contact', 'faq'];
+        return ['contact', 'faq', 'about'];
     }
 
     /**
@@ -217,6 +218,142 @@ class Content extends Model implements HasMedia
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public static function defaultAboutPageData(): array
+    {
+        return [
+            'subtitle' => 'تعرف على قصتنا ورؤيتنا وما يميزنا.',
+            'hero_image' => null,
+            'primary_button' => self::defaultAboutPrimaryButton(),
+            'stats' => [
+                [
+                    'id' => 'stat_1',
+                    'value' => '95%',
+                    'label' => 'رضا العملاء',
+                ],
+                [
+                    'id' => 'stat_2',
+                    'value' => '10+',
+                    'label' => 'سنوات من الخبرة',
+                ],
+                [
+                    'id' => 'stat_3',
+                    'value' => '500+',
+                    'label' => 'مشروع منجز',
+                ],
+            ],
+            'features_title' => 'لماذا تختارنا؟',
+            'features_description' => 'نقدم قيمة حقيقية عبر تجربة واضحة وخدمات موثوقة.',
+            'features' => [],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function defaultAboutPrimaryButton(): array
+    {
+        return [
+            'label' => '',
+            'link_type' => 'external',
+            'content_type' => null,
+            'content_id' => null,
+            'url' => null,
+            'branch_ids' => [],
+            'calendar_ids' => [],
+            'allow_client_choice' => true,
+            'duration_minutes' => 30,
+        ];
+    }
+
+    /**
+     * Generic terms-of-use content suitable for most online stores and pages.
+     *
+     * @return array{subtitle: string, body: string, editor_mode: string}
+     */
+    public static function defaultTermsPageData(string $businessName = 'هذه الصفحة'): array
+    {
+        $name = filled(trim($businessName)) ? trim($businessName) : 'هذه الصفحة';
+
+        return [
+            'subtitle' => 'يرجى قراءة هذه الاتفاقية بعناية قبل استخدام '.$name.' أو طلب أي منتج أو خدمة.',
+            'editor_mode' => 'html',
+            'body' => <<<HTML
+<p>آخر تحديث: يمكن تحديث هذه الاتفاقية عند الحاجة. استمرارك في استخدام الصفحة يعني موافقتك على النسخة السارية.</p>
+<h2>1. القبول بالشروط</h2>
+<p>باستخدامك لـ {$name} أو تصفّحك لمحتواها أو طلبك لأي منتج أو خدمة معروضة، فإنك توافق على الالتزام بهذه الاتفاقية. إذا لم توافق على أي جزء منها، يرجى التوقف عن استخدام الصفحة.</p>
+<h2>2. طبيعة الصفحة والخدمات</h2>
+<p>قد تعرض {$name} معلومات، منتجات، خدمات، حجوزات، محتوى رقمياً، أو وسائل تواصل حسب ما يتيحه صاحب الصفحة. المحتوى والأسعار والتوفر قابلة للتغيير دون إشعار مسبق ما لم يُنص على خلاف ذلك.</p>
+<h2>3. الاستخدام المقبول</h2>
+<p>تتعهد باستخدام الصفحة لأغراض مشروعة فقط، وعدم محاولة الإضرار بها أو تعطيلها أو الوصول غير المصرح به إلى أنظمتها أو بيانات الآخرين، وعدم نشر محتوى مخالف للأنظمة أو مضلل أو مسيء.</p>
+<h2>4. الطلبات والحجوزات والمنتجات</h2>
+<p>عند تقديم طلب أو حجز أو شراء، تتحمل مسؤولية صحة البيانات التي تقدمها. قبول الطلب أو تأكيده يخضع لسياسات البيع والتوفر والشحن أو التنفيذ المعتمدة لدى {$name}. قد تُرفض أو تُلغى الطلبات عند وجود خطأ واضح في السعر أو التوفر أو الاشتباه في احتيال.</p>
+<h2>5. الأسعار والمدفوعات</h2>
+<p>الأسعار المعروضة هي الأسعار السارية وقت العرض ما لم يُذكر غير ذلك. عند إتمام عملية دفع عبر مزوّد دفع إلكتروني، تخضع العملية أيضاً لشروط ذلك المزوّد. أي استرداد أو إلغاء يتم وفق السياسة المعلنة أو ما يُتفق عليه عند إتمام الطلب.</p>
+<h2>6. الملكية الفكرية</h2>
+<p>جميع النصوص والصور والشعارات والتصاميم والمحتوى المعروض على {$name} محمية بحقوق الملكية الفكرية الخاصة بصاحب الصفحة أو مرخّصيها، ولا يجوز نسخها أو إعادة استخدامها لأغراض تجارية دون إذن مسبق.</p>
+<h2>7. روابط ومحتوى الأطراف الثالثة</h2>
+<p>قد تتضمن الصفحة روابط أو تكاملات مع مواقع أو خدمات خارجية. لسنا مسؤولين عن محتوى تلك الأطراف أو سياساتها، واستخدامك لها يكون على مسؤوليتك ووفقاً لشروطها.</p>
+<h2>8. إخلاء المسؤولية</h2>
+<p>تُقدَّم الصفحة ومحتواها «كما هي». ضمن الحدود التي يسمح بها النظام، لا نضمن خلو الخدمة من الانقطاع أو الأخطاء، ولا نتحمل مسؤولية الأضرار غير المباشرة الناتجة عن الاعتماد على المحتوى أو عن تأخير أو تعذر تنفيذ طلب بسبب ظروف خارجة عن السيطرة المعقولة.</p>
+<h2>9. التعديلات</h2>
+<p>يحق لصاحب {$name} تعديل هذه الاتفاقية في أي وقت بنشر النسخة المحدّثة على هذه الصفحة. ننصح بمراجعتها بشكل دوري.</p>
+<h2>10. التواصل</h2>
+<p>لأي استفسار حول اتفاقية الاستخدام، يرجى التواصل عبر صفحة اتصل بنا أو عبر وسائل التواصل المتاحة على الصفحة.</p>
+HTML,
+        ];
+    }
+
+    /**
+     * Generic privacy-policy content suitable for most online stores and pages.
+     *
+     * @return array{subtitle: string, body: string, editor_mode: string}
+     */
+    public static function defaultPrivacyPageData(string $businessName = 'هذه الصفحة'): array
+    {
+        $name = filled(trim($businessName)) ? trim($businessName) : 'هذه الصفحة';
+
+        return [
+            'subtitle' => 'نوضح هنا كيف نجمع بياناتك ونستخدمها ونحميها عند تفاعلك مع '.$name.'.',
+            'editor_mode' => 'html',
+            'body' => <<<HTML
+<p>آخر تحديث: قد نحدّث هذه السياسة من وقت لآخر. سننشر أي تعديل على هذه الصفحة.</p>
+<h2>1. المقدمة</h2>
+<p>تحترم {$name} خصوصيتك. تشرح هذه السياسة أنواع المعلومات التي قد نجمعها عند زيارتك أو تواصلك أو تقديمك لطلب، وكيف نستخدمها، والخيارات المتاحة لك.</p>
+<h2>2. البيانات التي قد نجمعها</h2>
+<p>قد نجمع أنواعاً من البيانات تشمل:</p>
+<ul>
+<li>بيانات التعريف والتواصل مثل الاسم والبريد الإلكتروني ورقم الجوال والعنوان عند تقديمها طوعاً.</li>
+<li>بيانات الطلبات والحجوزات والمدفوعات اللازمة لتنفيذ الخدمة، مع العلم أن بيانات البطاقة الكاملة غالباً تُعالج عبر مزوّدي دفع معتمدين.</li>
+<li>محتوى الرسائل أو النماذج التي ترسلها إلينا.</li>
+<li>بيانات تقنية أساسية مثل نوع الجهاز أو المتصفح وعنوان IP وسجلات الاستخدام لتحسين الأداء والأمان.</li>
+</ul>
+<h2>3. كيف نستخدم البيانات</h2>
+<p>نستخدم البيانات من أجل:</p>
+<ul>
+<li>تشغيل الصفحة وتقديم المنتجات أو الخدمات والرد على الاستفسارات.</li>
+<li>معالجة الطلبات والمدفوعات والتواصل بشأن حالة الطلب أو الدعم.</li>
+<li>تحسين التجربة ومنع الاحتيال وضمان أمان الصفحة.</li>
+<li>الامتثال للمتطلبات النظامية عند الاقتضاء.</li>
+</ul>
+<h2>4. مشاركة البيانات</h2>
+<p>لا نبيع بياناتك الشخصية. قد نشارك بيانات محدودة مع مزوّدي خدمات يساعدوننا في التشغيل (مثل الاستضافة، البريد، والشحن، والمدفوعات) وبالقدر اللازم لتقديم الخدمة فقط، أو عند وجود التزام نظامي أو لحماية حقوقنا وحقوق المستخدمين.</p>
+<h2>5. ملفات تعريف الارتباط</h2>
+<p>قد نستخدم ملفات تعريف الارتباط أو تقنيات مشابهة لتشغيل الجلسات، وتذكر التفضيلات، وتحسين تجربة الاستخدام. يمكنك التحكم فيها من إعدادات متصفحك، وقد يؤثر تعطيلها على بعض الوظائف.</p>
+<h2>6. الاحتفاظ بالبيانات وأمانها</h2>
+<p>نحتفظ بالبيانات للمدة اللازمة لتقديم الخدمة والوفاء بالالتزامات التشغيلية والنظامية. نتخذ إجراءات تقنية وتنظيمية معقولة لحماية بياناتك، مع العلم أنه لا توجد وسيلة نقل أو تخزين إلكتروني آمنة بنسبة كاملة.</p>
+<h2>7. حقوقك</h2>
+<p>وفق الأنظمة المعمول بها، قد يحق لك طلب الاطلاع على بياناتك أو تصحيحها أو حذفها أو تقييد معالجتها، ضمن الحدود النظامية وما يلزم لتشغيل الطلبات والحسابات ذات الصلة. لتقديم طلب متعلق بخصوصيتك، تواصل معنا عبر وسائل الاتصال المتاحة.</p>
+<h2>8. خصوصية الأطفال</h2>
+<p>الصفحة غير موجّهة للأطفال دون السن النظامي المناسب دون موافقة ولي الأمر عند الحاجة. إذا وصلنا إلى علمنا بجمع بيانات طفل بالمخالفة لذلك، سنعمل على حذفها وفق الإجراءات المناسبة.</p>
+<h2>9. التواصل</h2>
+<p>لأي أسئلة حول سياسة الخصوصية، راسلنا عبر صفحة اتصل بنا أو عبر قنوات التواصل المعروضة على {$name}.</p>
+HTML,
+        ];
+    }
+
     public function isSystemPage(): bool
     {
         return $this->type === contentTypeModel('pages')
@@ -257,6 +394,9 @@ class Content extends Model implements HasMedia
             ->useDisk(config('media-library.disk_name'));
 
         $this->addMediaCollection('digital-service-media')
+            ->useDisk(config('media-library.disk_name'));
+
+        $this->addMediaCollection('on-demand-service-media')
             ->useDisk(config('media-library.disk_name'));
 
         $this->addMediaCollection('menu-media')
@@ -458,6 +598,20 @@ class Content extends Model implements HasMedia
             ->all();
     }
 
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function onDemandServiceImages(): array
+    {
+        return $this->getMedia('on-demand-service-media')
+            ->map(fn (Media $media): array => [
+                'id' => (int) $media->id,
+                'url' => $media->getUrl(),
+            ])
+            ->values()
+            ->all();
+    }
+
     public function calendars(): MorphToMany
     {
         return $this->morphToMany(Calendar::class, 'bookable', 'bookables')
@@ -596,6 +750,7 @@ class Content extends Model implements HasMedia
             'course' => 'course',
             'digital-product' => 'digital_product',
             'digital-service' => 'digital_service',
+            'on-demand-service' => 'on_demand_service',
             'menu' => 'menu',
             'unit' => 'unit_rental',
             default => 'other',
@@ -610,6 +765,7 @@ class Content extends Model implements HasMedia
             'course' => $this->getFirstMediaUrl('course-media'),
             'digital-product' => $this->getFirstMediaUrl('digital-product-media'),
             'digital-service' => $this->getFirstMediaUrl('digital-service-media'),
+            'on-demand-service' => $this->getFirstMediaUrl('on-demand-service-media'),
             'menu' => $this->getFirstMediaUrl('menu-media'),
             'unit' => $this->getFirstMediaUrl('unit-media'),
             default => null,

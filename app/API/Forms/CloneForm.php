@@ -45,7 +45,7 @@ class CloneForm
             'title' => $title,
             'slug' => $slug,
             'status' => 'draft',
-            'active' => $original->active,
+            'active' => false,
             'data' => $original->data,
         ]);
     }

@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="خدمات رقمية احترافية مع مدة تسليم واضحة"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>

@@ -274,7 +274,17 @@ class UpdatePageBlock
      */
     protected function updateBlockLink(Block $block, Tenant $tenant, array $data): void
     {
-        $linkType = (string) $data['link_type'];
+        $existingData = is_array($block->data) ? $block->data : [];
+        $managedSection = (bool) ($existingData['managed_section'] ?? false);
+
+        // Catalog-managed section blocks stay section links for their content type.
+        if ($managedSection) {
+            $contentType = (string) ($existingData['content_type'] ?? '');
+            $linkType = filled($contentType) ? 'section:'.$contentType : (string) $data['link_type'];
+        } else {
+            $linkType = (string) $data['link_type'];
+        }
+
         $parsed = CtaLink::parseTypeKey($linkType);
         $isExternal = CtaLink::isExternalLink($linkType);
         $needsPicker = CtaLink::needsContentPicker($linkType);
@@ -302,7 +312,6 @@ class UpdatePageBlock
             }
         }
 
-        $existingData = is_array($block->data) ? $block->data : [];
         $existingMark = is_array($existingData['brand_mark'] ?? null)
             ? $existingData['brand_mark']
             : null;
@@ -316,6 +325,10 @@ class UpdatePageBlock
             'url' => $isExternal ? (string) ($data['url'] ?? '') : null,
             'icon' => $isExternal ? (string) ($data['icon'] ?? config('cta-link-types.icons.external')) : null,
         ];
+
+        if ($managedSection) {
+            $payload['managed_section'] = true;
+        }
 
         $brandMark = BlockBrandMark::resolveStored($tenant, (int) $block->id, $data, $existingMark);
 

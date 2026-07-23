@@ -79,7 +79,7 @@ async function submit() {
                             name="sectionDescription"
                             label="وصف القسم"
                             placeholder="منتجات رقمية قابلة للتحميل والوصول الفوري"
-                            :rows="3"
+                            
                             :error="errors.sectionDescription"
                         />
                     </div>
