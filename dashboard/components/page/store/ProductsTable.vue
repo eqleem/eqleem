@@ -31,6 +31,10 @@ function productPreviewUrl(item) {
 }
 
 onMounted(() => {
+    if (store.loaded && (store.meta.current_page || 1) === 1) {
+        return;
+    }
+
     store.fetchProducts({ page: 1 });
 });
 

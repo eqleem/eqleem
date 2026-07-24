@@ -2,8 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import PickerColor from '../../ui/PickerColor.vue';
 import TailwindColorPickerLight from '../../ui/TailwindColorPickerLight.vue';
-import FileCrop from '../../ui/FileCrop.vue';
-import UploadCover from '../../ui/UploadCover.vue';
+import { FileCrop, UploadCover } from '../../ui/asyncHeavy.js';
 import Radio from '../../ui/Radio.vue';
 import Input from '../../ui/Input.vue';
 import Textarea from '../../ui/Textarea.vue';

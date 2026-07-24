@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { markRaw } from 'vue';
 import { api, ApiError } from '../lib/api.js';
 import { lineChartOptions } from '../components/home/chartOptions.js';
 
@@ -61,7 +62,7 @@ export const useDashboardChartsStore = defineStore('dashboardCharts', {
                     slot.title = data.title ?? '';
                     slot.label = data.label ?? '';
                     slot.rangeDays = data.range_days ?? 0;
-                    slot.options = data.options ?? lineChartOptions(slot.label || 'العدد', [], []);
+                    slot.options = markRaw(data.options ?? lineChartOptions(slot.label || 'العدد', [], []));
                     slot.loaded = true;
                     slot.fetchedAt = Date.now();
                 } catch (error) {

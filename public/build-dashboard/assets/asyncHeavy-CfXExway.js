@@ -1,2 +1,0 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/CkEditor-B2efa-Q7.js","assets/main-DbEoVakw.js","assets/CkEditor-DlR_3DcN.css","assets/MediaGallery-LlmtbmJE.js","assets/FileGallery-CpFsd-Kw.js"])))=>i.map(i=>d[i]);
-import{R as _,S as o}from"./main-DbEoVakw.js";const e=_(()=>o(()=>import("./CkEditor-B2efa-Q7.js"),__vite__mapDeps([0,1,2]))),r=_(()=>o(()=>import("./MediaGallery-LlmtbmJE.js"),__vite__mapDeps([3,1]))),i=_(()=>o(()=>import("./FileGallery-CpFsd-Kw.js"),__vite__mapDeps([4,1])));export{e as C,i as F,r as M};

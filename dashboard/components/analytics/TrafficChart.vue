@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
-import Chart from 'chart.js/auto';
+import { Chart } from '../../lib/chart.js';
 import { sectionIcons } from '../../lib/analyticsIcons.js';
 
 const props = defineProps({
@@ -93,7 +93,7 @@ async function renderChart() {
 }
 
 onMounted(renderChart);
-watch(() => [props.labels, props.datasets], renderChart, { deep: true });
+watch(() => [props.labels, props.datasets], renderChart);
 onBeforeUnmount(() => chart?.destroy());
 </script>
 

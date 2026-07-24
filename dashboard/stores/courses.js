@@ -232,9 +232,13 @@ export const useCoursesStore = defineStore('coursesCatalog', {
             });
         },
 
-        async fetchCategories({ search } = {}) {
+        async fetchCategories({ search, force = false } = {}) {
             if (search !== undefined) {
                 this.categoriesSearch = search;
+            }
+
+            if (this.categoriesLoaded && !force && search === undefined) {
+                return;
             }
 
             this.categoriesLoading = true;

@@ -22,4 +22,38 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (!id.includes('node_modules')) {
+                        return;
+                    }
+
+                    if (id.includes('@ckeditor') || id.includes('ckeditor5')) {
+                        return 'ckeditor';
+                    }
+
+                    if (id.includes('chart.js')) {
+                        return 'chart';
+                    }
+
+                    if (id.includes('@fullcalendar') || id.includes('fullcalendar')) {
+                        return 'fullcalendar';
+                    }
+
+                    if (
+                        id.includes('/vue/')
+                        || id.includes('/vue-router/')
+                        || id.includes('/pinia/')
+                        || id.includes('\\vue\\')
+                        || id.includes('\\vue-router\\')
+                        || id.includes('\\pinia\\')
+                    ) {
+                        return 'vue-vendor';
+                    }
+                },
+            },
+        },
+    },
 });

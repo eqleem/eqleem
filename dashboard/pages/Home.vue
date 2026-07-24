@@ -1,13 +1,13 @@
 <script setup>
 import { defineAsyncComponent } from 'vue';
 import Container from '../components/ui/Container.vue';
-import NewUserOnboardingWidget from '../components/home/NewUserOnboardingWidget.vue';
-import WelcomeWidget from '../components/home/WelcomeWidget.vue';
-import OrdersCount from '../components/home/OrdersCount.vue';
-import SalesTotalCount from '../components/home/SalesTotalCount.vue';
-import VisitsCount from '../components/home/VisitsCount.vue';
-import ClientsCount from '../components/home/ClientsCount.vue';
 
+const NewUserOnboardingWidget = defineAsyncComponent(() => import('../components/home/NewUserOnboardingWidget.vue'));
+const WelcomeWidget = defineAsyncComponent(() => import('../components/home/WelcomeWidget.vue'));
+const OrdersCount = defineAsyncComponent(() => import('../components/home/OrdersCount.vue'));
+const SalesTotalCount = defineAsyncComponent(() => import('../components/home/SalesTotalCount.vue'));
+const VisitsCount = defineAsyncComponent(() => import('../components/home/VisitsCount.vue'));
+const ClientsCount = defineAsyncComponent(() => import('../components/home/ClientsCount.vue'));
 const OrdersChart = defineAsyncComponent(() => import('../components/home/OrdersChart.vue'));
 const VisitsChart = defineAsyncComponent(() => import('../components/home/VisitsChart.vue'));
 const ClientsChart = defineAsyncComponent(() => import('../components/home/ClientsChart.vue'));

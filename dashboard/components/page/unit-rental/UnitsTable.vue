@@ -34,6 +34,10 @@ function unitPreviewUrl(item) {
 }
 
 onMounted(() => {
+    if (store.loaded && (store.meta.current_page || 1) === 1) {
+        return;
+    }
+
     store.fetchUnits({ page: 1 });
 });
 

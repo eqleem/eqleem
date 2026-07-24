@@ -30,6 +30,10 @@ function formPreviewUrl(item) {
 }
 
 onMounted(() => {
+    if (store.loaded && (store.meta.current_page || 1) === 1) {
+        return;
+    }
+
     store.fetchForms({ page: 1 });
 });
 

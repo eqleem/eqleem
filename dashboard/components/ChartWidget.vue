@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import Chart from 'chart.js/auto';
+import { Chart } from '../lib/chart.js';
 
 // Port of resources/views/admin/chart-widget.blade.php (Alpine + Chart.js -> Vue).
 const props = defineProps({

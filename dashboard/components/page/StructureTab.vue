@@ -1,23 +1,24 @@
 <script setup>
-import { nextTick, onMounted, onBeforeUnmount, ref } from 'vue';
+import { defineAsyncComponent, nextTick, onMounted, onBeforeUnmount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import MainBox from '../ui/MainBox.vue';
 import Button from '../ui/Button.vue';
 import BrandMark from '../ui/BrandMark.vue';
 import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
-import BlockEditor from './editors/BlockEditor.vue';
 import BlockEditorSkeleton from './editors/BlockEditorSkeleton.vue';
-import BlockLinkEditor from './editors/BlockLinkEditor.vue';
-import BlockLinksPanel from './editors/BlockLinksPanel.vue';
-import FooterDocumentsPanel from './editors/FooterDocumentsPanel.vue';
-import FloatLinksPanel from './editors/FloatLinksPanel.vue';
-import HeaderSocialLinksPanel from './editors/HeaderSocialLinksPanel.vue';
-import CatalogSectionsModal from './CatalogSectionsModal.vue';
 import { openModal } from '../../lib/modal.js';
 import { notifyApiSuccess } from '../../lib/notify.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/bodyScrollLock.js';
 import { usePageStructureStore } from '../../stores/pageStructure.js';
+
+const BlockEditor = defineAsyncComponent(() => import('./editors/BlockEditor.vue'));
+const BlockLinkEditor = defineAsyncComponent(() => import('./editors/BlockLinkEditor.vue'));
+const BlockLinksPanel = defineAsyncComponent(() => import('./editors/BlockLinksPanel.vue'));
+const FooterDocumentsPanel = defineAsyncComponent(() => import('./editors/FooterDocumentsPanel.vue'));
+const FloatLinksPanel = defineAsyncComponent(() => import('./editors/FloatLinksPanel.vue'));
+const HeaderSocialLinksPanel = defineAsyncComponent(() => import('./editors/HeaderSocialLinksPanel.vue'));
+const CatalogSectionsModal = defineAsyncComponent(() => import('./CatalogSectionsModal.vue'));
 
 function openManageSections() {
     openModal('catalog-sections');

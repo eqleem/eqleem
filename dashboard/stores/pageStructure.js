@@ -23,6 +23,8 @@ export const usePageStructureStore = defineStore('pageStructure', {
         blockTypes: [],
         blockLinkEditor: null,
         contentCounts: {},
+        contentCountsLoaded: false,
+        contentCountsFetchedAt: null,
         contentCountsLoading: false,
         contentCountsError: null,
         loading: false,
@@ -160,8 +162,19 @@ export const usePageStructureStore = defineStore('pageStructure', {
             }
         },
 
-        async fetchContentCounts() {
+        async fetchContentCounts({ force = false } = {}) {
             if (this.contentCountsLoading) {
+                return;
+            }
+
+            const CACHE_TTL_MS = 3 * 60 * 1000;
+
+            if (
+                this.contentCountsLoaded
+                && !force
+                && this.contentCountsFetchedAt
+                && (Date.now() - this.contentCountsFetchedAt) < CACHE_TTL_MS
+            ) {
                 return;
             }
 
@@ -174,6 +187,8 @@ export const usePageStructureStore = defineStore('pageStructure', {
                 this.contentCounts = counts && typeof counts === 'object' && !Array.isArray(counts)
                     ? counts
                     : {};
+                this.contentCountsLoaded = true;
+                this.contentCountsFetchedAt = Date.now();
             } catch (error) {
                 this.contentCountsError = error instanceof ApiError
                     ? error.message

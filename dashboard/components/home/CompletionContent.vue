@@ -42,8 +42,8 @@ const visibleContentTypes = computed(() => {
 
 onMounted(() => {
     void Promise.all([
-        contentTypesStore.fetchContentTypes({ force: true }),
-        contentTypesStore.fetchCatalogSections({ force: true }),
+        contentTypesStore.fetchContentTypes(),
+        contentTypesStore.fetchCatalogSections(),
     ]).catch(() => {});
 });
 

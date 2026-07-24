@@ -34,6 +34,10 @@ export const useAnalyticsStore = defineStore('analytics', {
 
     actions: {
         async fetchOverview({ force = false } = {}) {
+            if (this.loaded && !force) {
+                return this;
+            }
+
             if (this.inflight) {
                 return this.inflight;
             }
@@ -94,12 +98,28 @@ export const useAnalyticsStore = defineStore('analytics', {
         },
 
         setFilters({ dateRangeDays, requestCategory } = {}) {
+            let changed = false;
+
             if (dateRangeDays !== undefined) {
-                this.dateRangeDays = Number(dateRangeDays);
+                const next = Number(dateRangeDays);
+
+                if (this.dateRangeDays !== next) {
+                    this.dateRangeDays = next;
+                    changed = true;
+                }
             }
 
             if (requestCategory !== undefined) {
-                this.requestCategory = requestCategory ?? '';
+                const next = requestCategory ?? '';
+
+                if (this.requestCategory !== next) {
+                    this.requestCategory = next;
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                this.loaded = false;
             }
         },
     },

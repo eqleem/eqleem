@@ -266,9 +266,13 @@ export const usePortfolioStore = defineStore('portfolio', {
             return payload?.data?.images ?? [];
         },
 
-        async fetchCategories({ search } = {}) {
+        async fetchCategories({ search, force = false } = {}) {
             if (search !== undefined) {
                 this.categoriesSearch = search;
+            }
+
+            if (this.categoriesLoaded && !force && search === undefined) {
+                return;
             }
 
             this.categoriesLoading = true;

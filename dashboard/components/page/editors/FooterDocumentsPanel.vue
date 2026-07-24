@@ -3,7 +3,7 @@ import {
     computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 import BrandMark from '../../ui/BrandMark.vue';
-import BrandMarkField from '../../ui/BrandMarkField.vue';
+import { BrandMarkField } from '../../ui/asyncHeavy.js';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
 import Input from '../../ui/Input.vue';

@@ -34,6 +34,10 @@ function itemPreviewUrl(item) {
 }
 
 onMounted(() => {
+    if (store.loaded && (store.meta.current_page || 1) === 1) {
+        return;
+    }
+
     store.fetchItems({ page: 1 });
 });
 

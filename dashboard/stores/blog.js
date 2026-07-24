@@ -232,9 +232,13 @@ export const useBlogStore = defineStore('blog', {
             return payload?.data?.featured_image ?? null;
         },
 
-        async fetchCategories({ search } = {}) {
+        async fetchCategories({ search, force = false } = {}) {
             if (search !== undefined) {
                 this.categoriesSearch = search;
+            }
+
+            if (this.categoriesLoaded && !force && search === undefined) {
+                return;
             }
 
             this.categoriesLoading = true;

@@ -35,7 +35,11 @@ export function useSession() {
     };
 }
 
-export async function loadDashboardContext() {
+export async function loadDashboardContext({ force = false } = {}) {
+    if (state.loaded && !force) {
+        return state;
+    }
+
     if (state.loading) {
         return state;
     }

@@ -1502,6 +1502,11 @@ export const countries = [
     }
 ];
 
+Object.freeze(countries);
+for (const country of countries) {
+    Object.freeze(country);
+}
+
 export const defaultCountryCode = 'SA';
 
 export function countryByCode(code) {

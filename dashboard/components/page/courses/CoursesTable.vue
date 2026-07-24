@@ -18,6 +18,10 @@ const { search } = useDebouncedSearch((value) => {
 });
 
 onMounted(() => {
+    if (store.loaded && (store.meta.current_page || 1) === 1) {
+        return;
+    }
+
     store.fetchCourses({ page: 1 });
 });
 

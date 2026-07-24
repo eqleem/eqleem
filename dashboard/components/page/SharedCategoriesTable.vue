@@ -21,6 +21,10 @@ const dragId = ref(null);
 let searchTimer = null;
 
 onMounted(() => {
+    if (props.store.categoriesLoaded) {
+        return;
+    }
+
     props.store.fetchCategories();
 });
 

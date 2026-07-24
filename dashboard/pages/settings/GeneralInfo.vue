@@ -8,7 +8,7 @@ import Select from '../../components/ui/Select.vue';
 import CountrySelect from '../../components/ui/CountrySelect.vue';
 import Button from '../../components/ui/Button.vue';
 import Modal from '../../components/ui/Modal.vue';
-import BrandMarkField from '../../components/ui/BrandMarkField.vue';
+import { BrandMarkField } from '../../components/ui/asyncHeavy.js';
 import { socialNetworks as fallbackNetworks } from '../../data/settings.js';
 import { openModal, closeModal } from '../../lib/modal.js';
 import { api, ApiError } from '../../lib/api.js';
