@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
-import { MediaGallery } from '../../../components/ui/asyncHeavy.js';
+import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Price from '../../../components/ui/Price.vue';

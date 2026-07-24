@@ -1,20 +1,19 @@
 <script setup>
-import { defineAsyncComponent } from 'vue';
 import Modal from '../ui/Modal.vue';
 
-const AddBlogPost = defineAsyncComponent(() => import('../page/blog/AddPost.vue'));
-const AddPage = defineAsyncComponent(() => import('../page/pages/AddPage.vue'));
-const AddForm = defineAsyncComponent(() => import('../page/forms/AddForm.vue'));
-const AddStoreProduct = defineAsyncComponent(() => import('../page/store/AddProduct.vue'));
-const AddDigitalProduct = defineAsyncComponent(() => import('../page/digital-products/AddProduct.vue'));
-const AddDigitalService = defineAsyncComponent(() => import('../page/digital-services/AddDigitalService.vue'));
-const AddOnDemandService = defineAsyncComponent(() => import('../page/on-demand-services/AddOnDemandService.vue'));
-const AddService = defineAsyncComponent(() => import('../page/services/AddService.vue'));
-const AddNewsletter = defineAsyncComponent(() => import('../page/newsletter/AddNewsletter.vue'));
-const AddMenuItem = defineAsyncComponent(() => import('../page/menu/AddItem.vue'));
-const AddUnit = defineAsyncComponent(() => import('../page/unit-rental/AddUnit.vue'));
-const AddCourse = defineAsyncComponent(() => import('../page/courses/AddCourse.vue'));
-const AddPortfolioProject = defineAsyncComponent(() => import('../page/portfolio/AddProject.vue'));
+import AddBlogPost from '../page/blog/AddPost.vue';
+import AddPage from '../page/pages/AddPage.vue';
+import AddForm from '../page/forms/AddForm.vue';
+import AddStoreProduct from '../page/store/AddProduct.vue';
+import AddDigitalProduct from '../page/digital-products/AddProduct.vue';
+import AddDigitalService from '../page/digital-services/AddDigitalService.vue';
+import AddOnDemandService from '../page/on-demand-services/AddOnDemandService.vue';
+import AddService from '../page/services/AddService.vue';
+import AddNewsletter from '../page/newsletter/AddNewsletter.vue';
+import AddMenuItem from '../page/menu/AddItem.vue';
+import AddUnit from '../page/unit-rental/AddUnit.vue';
+import AddCourse from '../page/courses/AddCourse.vue';
+import AddPortfolioProject from '../page/portfolio/AddProject.vue';
 
 const addForms = [
     { slug: 'blog', modal: 'add-blog-post', title: 'إضافة تدوينة جديدة', component: AddBlogPost },

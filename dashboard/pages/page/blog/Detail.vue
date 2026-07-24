@@ -2,7 +2,7 @@
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
-import { CkEditor } from '../../../components/ui/asyncHeavy.js';
+import CkEditor from '../../../components/ui/CkEditor.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';

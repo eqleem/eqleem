@@ -2,7 +2,9 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
-import { CkEditor, MediaGallery, FileGallery } from '../../../components/ui/asyncHeavy.js';
+import CkEditor from '../../../components/ui/CkEditor.vue';
+import MediaGallery from '../../../components/ui/MediaGallery.vue';
+import FileGallery from '../../../components/ui/FileGallery.vue';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Price from '../../../components/ui/Price.vue';

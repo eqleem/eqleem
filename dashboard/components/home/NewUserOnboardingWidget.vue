@@ -1,18 +1,22 @@
 <script setup>
 import {
-    computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch,
+    computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch,
 } from 'vue';
 import { storeToRefs } from 'pinia';
 import Modal from '../ui/Modal.vue';
 import Input from '../ui/Input.vue';
 import Textarea from '../ui/Textarea.vue';
 import Select from '../ui/Select.vue';
+import CountrySelect from '../ui/CountrySelect.vue';
 import SearchableSelect from '../ui/SearchableSelect.vue';
+import BrandMarkField from '../ui/BrandMarkField.vue';
 import PickerColor from '../ui/PickerColor.vue';
+import UploadCover from '../ui/UploadCover.vue';
 import Button from '../ui/Button.vue';
 import OnboardingPagePreview from './OnboardingPagePreview.vue';
 import CompletionVerification from './CompletionVerification.vue';
-import { BrandMarkField, CountrySelect, UploadCover } from '../ui/asyncHeavy.js';
+import SettingsPaymentOptions from '../../pages/settings/PaymentOptions.vue';
+import SettingsShippingOptions from '../../pages/settings/ShippingOptions.vue';
 import { useOnboardingStore } from '../../stores/onboarding.js';
 import { useWelcomeStore } from '../../stores/welcome.js';
 import { useSession, updateTenant, loadDashboardContext } from '../../stores/session.js';
@@ -21,9 +25,6 @@ import { notifySuccess, notifyError } from '../../lib/notify.js';
 import { defaultCountryCode } from '../../data/countries.js';
 import { COVER_CLEAR, COVER_COLORS, encodeCssCover } from '../../data/coverPresets.js';
 import { appDomain } from '../../data/settings.js';
-
-const SettingsPaymentOptions = defineAsyncComponent(() => import('../../pages/settings/PaymentOptions.vue'));
-const SettingsShippingOptions = defineAsyncComponent(() => import('../../pages/settings/ShippingOptions.vue'));
 
 const store = useOnboardingStore();
 const welcomeStore = useWelcomeStore();

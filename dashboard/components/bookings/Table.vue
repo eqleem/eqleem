@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import Badge from '../ui/Badge.vue';
@@ -11,7 +11,7 @@ import { statusFilterColors, statusFilters, walkingClientLabel } from '../../dat
 import { openModal } from '../../lib/modal.js';
 import { useBookingsStore } from '../../stores/bookings.js';
 
-const BookingsCalendar = defineAsyncComponent(() => import('./BookingsCalendar.vue'));
+import BookingsCalendar from './BookingsCalendar.vue';
 
 const route = useRoute();
 const router = useRouter();

@@ -5,7 +5,7 @@ import MainBox from '../components/ui/MainBox.vue';
 import Form from '../components/ui/Form.vue';
 import Input from '../components/ui/Input.vue';
 import Button from '../components/ui/Button.vue';
-import { FileCrop } from '../components/ui/asyncHeavy.js';
+import FileCrop from '../components/ui/FileCrop.vue';
 import { api, ApiError } from '../lib/api.js';
 import { notifyApiSuccess, notifyApiError } from '../lib/notify.js';
 import { useSession, updateUser } from '../stores/session.js';

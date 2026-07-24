@@ -7,7 +7,7 @@ import Textarea from '../../ui/Textarea.vue';
 import Toggle from '../../ui/Toggle.vue';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
-import { BrandMarkField } from '../../ui/asyncHeavy.js';
+import BrandMarkField from '../../ui/BrandMarkField.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { api, ApiError } from '../../../lib/api.js';
 import { notifyApiError } from '../../../lib/notify.js';

@@ -6,7 +6,7 @@ import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import { BrandMarkField } from '../../../components/ui/asyncHeavy.js';
+import BrandMarkField from '../../../components/ui/BrandMarkField.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import AboutPrimaryButtonField from '../../../components/page/pages/AboutPrimaryButtonField.vue';
 import NotFound from '../../NotFound.vue';

@@ -1,12 +1,19 @@
 <script setup>
 import {
-    computed, nextTick, onBeforeUnmount, ref, shallowRef, watch,
+    computed, nextTick, onBeforeUnmount, ref, watch,
 } from 'vue';
 import { createSimpleCrop } from '../../../resources/js/lib/image-crop-engine.js';
 import Field from './Field.vue';
 import Button from './Button.vue';
 import Icon from './Icon.vue';
 import { api } from '../../lib/api.js';
+import {
+    emojiCategories,
+    emojiGroups,
+    emojiKeywords,
+    iconColors,
+    skinTones,
+} from '../../data/emojis.js';
 
 const props = defineProps({
     modelValue: { type: Object, default: null },
@@ -51,43 +58,16 @@ const cropInstance = ref(null);
 const recentEmojis = ref(loadRecent('emoji'));
 const recentIcons = ref(loadRecent('icon'));
 
-const emojiCategories = shallowRef([]);
-const emojiGroups = shallowRef({});
-const emojiKeywords = shallowRef({});
-const iconColors = shallowRef([]);
-const skinTones = shallowRef([]);
-let emojiCatalogPromise = null;
-
-function ensureEmojiCatalog() {
-    if (emojiCatalogPromise) {
-        return emojiCatalogPromise;
-    }
-
-    emojiCatalogPromise = import('../../data/emojis.js').then((mod) => {
-        emojiCategories.value = Object.freeze(mod.emojiCategories);
-        emojiGroups.value = Object.freeze(mod.emojiGroups);
-        emojiKeywords.value = Object.freeze(mod.emojiKeywords);
-        iconColors.value = Object.freeze(mod.iconColors);
-        skinTones.value = Object.freeze(mod.skinTones);
-    });
-
-    return emojiCatalogPromise;
-}
-
 let iconSearchTimer = null;
 
 const current = computed(() => normalizeMark(props.modelValue));
 
 const filteredEmojiGroups = computed(() => {
-    if (!open.value || tab.value !== 'emoji' || !skinTones.value.length) {
-        return {};
-    }
-
     const q = filter.value.trim().toLowerCase();
-    const tone = skinTones.value.find((item) => item.id === skinTone.value)?.modifier ?? null;
+    const tone = skinTones.find((item) => item.id === skinTone.value)?.modifier ?? null;
     const result = {};
 
-    for (const [key, list] of Object.entries(emojiGroups.value)) {
+    for (const [key, list] of Object.entries(emojiGroups)) {
         if (key === 'recent') {
             continue;
         }
@@ -107,11 +87,7 @@ const filteredEmojiGroups = computed(() => {
 });
 
 const visibleRecentEmojis = computed(() => {
-    if (!open.value || tab.value !== 'emoji') {
-        return [];
-    }
-
-    const tone = skinTones.value.find((item) => item.id === skinTone.value)?.modifier ?? null;
+    const tone = skinTones.find((item) => item.id === skinTone.value)?.modifier ?? null;
     const q = filter.value.trim().toLowerCase();
 
     return recentEmojis.value
@@ -121,7 +97,7 @@ const visibleRecentEmojis = computed(() => {
 const previewStyle = computed(() => iconColorStyle(current.value.type === 'icon' ? current.value.color : null));
 
 const activeSkinModifier = computed(
-    () => skinTones.value.find((item) => item.id === skinTone.value)?.modifier ?? null,
+    () => skinTones.find((item) => item.id === skinTone.value)?.modifier ?? null,
 );
 
 watch(filter, (value) => {
@@ -142,8 +118,6 @@ watch(tab, (value) => {
 
 watch(open, (value) => {
     if (value) {
-        void ensureEmojiCatalog();
-
         if (current.value.type === 'icon') {
             tab.value = 'icons';
             iconColor.value = current.value.color || '';
@@ -289,7 +263,7 @@ function emojiCategoryLabel(key) {
         flags: 'أعلام',
     };
 
-    return labels[key] || emojiCategories.value.find((item) => item.id === key)?.label || key;
+    return labels[key] || emojiCategories.find((item) => item.id === key)?.label || key;
 }
 
 function removeMark() {
@@ -554,10 +528,10 @@ function emojiMatchesQuery(emoji, query) {
     }
 
     const base = normalizeEmojiBase(emoji);
-    const keywords = emojiKeywords.value[emoji]
-        || emojiKeywords.value[base]
-        || emojiKeywords.value[`${base}\uFE0F`]
-        || emojiKeywords.value[emoji.replace(/\uFE0F/g, '')]
+    const keywords = emojiKeywords[emoji]
+        || emojiKeywords[base]
+        || emojiKeywords[`${base}\uFE0F`]
+        || emojiKeywords[emoji.replace(/\uFE0F/g, '')]
         || '';
 
     return keywords.includes(query);

@@ -5,7 +5,7 @@ import Input from '../../ui/Input.vue';
 import Textarea from '../../ui/Textarea.vue';
 import Button from '../../ui/Button.vue';
 import CountrySelect from '../../ui/CountrySelect.vue';
-import { BrandMarkField } from '../../ui/asyncHeavy.js';
+import BrandMarkField from '../../ui/BrandMarkField.vue';
 import { usePageStructureStore } from '../../../stores/pageStructure.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifyApiError } from '../../../lib/notify.js';
