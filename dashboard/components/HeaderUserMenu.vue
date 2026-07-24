@@ -12,23 +12,24 @@ import { useSession } from '../stores/session.js';
 
 const props = defineProps({
     variant: { type: String, default: 'compact' },
-    userName: { type: String, default: '' },
-    userEmail: { type: String, default: '' },
-    userPhone: { type: String, default: '' },
-    userImage: { type: String, default: '' },
-    tenantName: { type: String, default: '' },
-    tenantLogo: { type: String, default: null },
-    tenantBrandMark: { type: Object, default: null },
-    tenantPlan: { type: String, default: '' },
-    tenantUrl: { type: String, default: '#' },
-    appName: { type: String, default: '' },
-    homeUrl: { type: String, default: '/' },
-    logoutUrl: { type: String, default: '/logout' },
 });
 
 const emit = defineEmits(['navigate']);
 
-const { tenant } = useSession();
+const { user, tenant, app } = useSession();
+
+const tenantName = computed(() => tenant.value?.name ?? '…');
+const tenantLogo = computed(() => tenant.value?.logo ?? null);
+const tenantBrandMark = computed(() => tenant.value?.brand_mark ?? null);
+const tenantPlan = computed(() => tenant.value?.plan ?? 'بداية');
+const tenantUrl = computed(() => tenant.value?.url ?? '#');
+const userName = computed(() => user.value?.name ?? '');
+const userEmail = computed(() => user.value?.email ?? '');
+const userPhone = computed(() => user.value?.phone ?? '');
+const userImage = computed(() => user.value?.image ?? 'https://www.gravatar.com/avatar/?d=mp');
+const appName = computed(() => app.value?.name ?? 'Eqleem');
+const homeUrl = computed(() => app.value?.home_url ?? '/');
+const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
 
 const tenants = ref([]);
 const loadingTenants = ref(false);

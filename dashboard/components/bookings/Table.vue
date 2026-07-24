@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import Badge from '../ui/Badge.vue';
@@ -7,10 +7,11 @@ import Button from '../ui/Button.vue';
 import Icon from '../ui/Icon.vue';
 import Modal from '../ui/Modal.vue';
 import AddBooking from './AddBooking.vue';
-import BookingsCalendar from './BookingsCalendar.vue';
 import { statusFilterColors, statusFilters, walkingClientLabel } from '../../data/bookings.js';
 import { openModal } from '../../lib/modal.js';
 import { useBookingsStore } from '../../stores/bookings.js';
+
+const BookingsCalendar = defineAsyncComponent(() => import('./BookingsCalendar.vue'));
 
 const route = useRoute();
 const router = useRouter();
@@ -21,8 +22,6 @@ const searchInput = ref('');
 let searchTimer = null;
 
 const viewMode = computed(() => (route.query.view === 'calendar' ? 'calendar' : 'list'));
-const isListView = computed(() => viewMode.value === 'list');
-const isCalendarView = computed(() => viewMode.value === 'calendar');
 
 const activeStatus = computed(() => {
     const value = route.query.status;
@@ -77,7 +76,7 @@ async function setStatusFilter(nextStatus) {
 watch(searchInput, (value) => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-        bookingsStore.setSearch(value, { fetch: isListView.value });
+        bookingsStore.setSearch(value, { fetch: (viewMode.value === 'list') });
     }, 300);
 });
 
@@ -86,10 +85,10 @@ watch(activeStatus, (value, previous) => {
         return;
     }
 
-    bookingsStore.setStatus(value, { fetch: isListView.value });
+    bookingsStore.setStatus(value, { fetch: (viewMode.value === 'list') });
 });
 
-watch(isListView, (list) => {
+watch(() => viewMode.value === 'list', (list) => {
     if (!list) {
         return;
     }
@@ -111,7 +110,7 @@ onMounted(() => {
     searchInput.value = search.value;
     const statusFromUrl = activeStatus.value;
 
-    if (isListView.value && (!loaded.value || status.value !== statusFromUrl)) {
+    if ((viewMode.value === 'list') && (!loaded.value || status.value !== statusFromUrl)) {
         bookingsStore.fetchBookings({ status: statusFromUrl });
     }
 });
@@ -154,7 +153,7 @@ onMounted(() => {
                         type="button"
                         class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition"
                         :class="viewToggleClass('list')"
-                        :aria-pressed="isListView"
+                        :aria-pressed="viewMode === 'list'"
                         @click="setViewMode('list')"
                     >
                         <Icon name="list" class="h-4 w-4" />
@@ -164,7 +163,7 @@ onMounted(() => {
                         type="button"
                         class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition"
                         :class="viewToggleClass('calendar')"
-                        :aria-pressed="isCalendarView"
+                        :aria-pressed="viewMode === 'calendar'"
                         @click="setViewMode('calendar')"
                     >
                         <Icon name="calendar" class="h-4 w-4" />
@@ -208,7 +207,7 @@ onMounted(() => {
         </div>
 
         <BookingsCalendar
-            v-if="isCalendarView"
+            v-if="viewMode === 'calendar'"
             :search="search"
             :status="status"
         />

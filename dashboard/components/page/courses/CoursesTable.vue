@@ -1,49 +1,25 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted } from 'vue';
 import Button from '../../ui/Button.vue';
 import Badge from '../../ui/Badge.vue';
 import Modal from '../../ui/Modal.vue';
 import Dropdown from '../../Dropdown.vue';
 import AddCourse from './AddCourse.vue';
 import { useCoursesStore } from '../../../stores/courses.js';
+import { useDebouncedSearch } from '../../../composables/useDebouncedSearch.js';
+import { useSelectableList } from '../../../composables/useSelectableList.js';
 import { openModal } from '../../../lib/modal.js';
 
 const store = useCoursesStore();
-const search = ref('');
-const selectedIds = ref([]);
-let searchTimer = null;
+const { selectedIds, allSelected, toggleOne, clearSelection } = useSelectableList(() => store.items);
+const { search } = useDebouncedSearch((value) => {
+    store.setSearch(value);
+    clearSelection();
+});
 
 onMounted(() => {
     store.fetchCourses({ page: 1 });
 });
-
-watch(search, (value) => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-        store.setSearch(value);
-        selectedIds.value = [];
-    }, 300);
-});
-
-const allSelected = computed({
-    get: () => store.items.length > 0 && store.items.every((item) => selectedIds.value.includes(String(item.id))),
-    set: (value) => {
-        selectedIds.value = value ? store.items.map((item) => String(item.id)) : [];
-    },
-});
-
-function toggleOne(id, checked) {
-    const key = String(id);
-
-    if (checked) {
-        if (!selectedIds.value.includes(key)) {
-            selectedIds.value = [...selectedIds.value, key];
-        }
-        return;
-    }
-
-    selectedIds.value = selectedIds.value.filter((item) => item !== key);
-}
 
 async function removeSelected() {
     if (selectedIds.value.length === 0) {
@@ -55,7 +31,7 @@ async function removeSelected() {
     }
 
     await store.deleteCourses(selectedIds.value);
-    selectedIds.value = [];
+    clearSelection();
 }
 </script>
 

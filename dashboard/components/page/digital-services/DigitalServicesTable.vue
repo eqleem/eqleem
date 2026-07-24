@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Button from '../../ui/Button.vue';
 import Icon from '../../ui/Icon.vue';
@@ -8,16 +8,20 @@ import Dropdown from '../../Dropdown.vue';
 import AddDigitalService from './AddDigitalService.vue';
 import { useDigitalServicesStore } from '../../../stores/digital-services.js';
 import { useSession } from '../../../stores/session.js';
+import { useDebouncedSearch } from '../../../composables/useDebouncedSearch.js';
+import { useSelectableList } from '../../../composables/useSelectableList.js';
 import { openModal } from '../../../lib/modal.js';
 import { notifyApiError } from '../../../lib/notify.js';
 
 const store = useDigitalServicesStore();
 const router = useRouter();
 const { tenant } = useSession();
-const search = ref('');
-const selectedIds = ref([]);
 const cloningId = ref(null);
-let searchTimer = null;
+const { selectedIds, allSelected, toggleOne, clearSelection, removeFromSelection } = useSelectableList(() => store.items);
+const { search } = useDebouncedSearch((value) => {
+    store.setSearch(value);
+    clearSelection();
+});
 
 function servicePreviewUrl(item) {
     const base = String(tenant.value?.url ?? '').replace(/\/$/, '');
@@ -33,34 +37,6 @@ onMounted(() => {
     store.fetchDigitalServices({ page: 1 });
 });
 
-watch(search, (value) => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-        store.setSearch(value);
-        selectedIds.value = [];
-    }, 300);
-});
-
-const allSelected = computed({
-    get: () => store.items.length > 0 && store.items.every((item) => selectedIds.value.includes(String(item.id))),
-    set: (value) => {
-        selectedIds.value = value ? store.items.map((item) => String(item.id)) : [];
-    },
-});
-
-function toggleOne(id, checked) {
-    const key = String(id);
-
-    if (checked) {
-        if (!selectedIds.value.includes(key)) {
-            selectedIds.value = [...selectedIds.value, key];
-        }
-        return;
-    }
-
-    selectedIds.value = selectedIds.value.filter((item) => item !== key);
-}
-
 async function removeSelected() {
     if (selectedIds.value.length === 0) {
         return;
@@ -71,7 +47,7 @@ async function removeSelected() {
     }
 
     await store.deleteDigitalServices(selectedIds.value);
-    selectedIds.value = [];
+    clearSelection();
 }
 
 async function removeOne(item) {
@@ -80,7 +56,7 @@ async function removeOne(item) {
     }
 
     await store.deleteDigitalServices([item.id]);
-    selectedIds.value = selectedIds.value.filter((id) => id !== String(item.id));
+    removeFromSelection(item.id);
 }
 
 async function cloneItem(id, uuid) {

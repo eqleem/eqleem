@@ -1,13 +1,12 @@
 <script setup>
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import MainBox from '../../ui/MainBox.vue';
+import PageModuleShell from '../PageModuleShell.vue';
 import { useStoreStore } from '../../../stores/store.js';
 
-// Store-specific shell — labels match Livewire store/index.blade.php tabs.
 const route = useRoute();
 const store = useStoreStore();
-const storeType = computed(() => store.type);
+const type = computed(() => store.type);
 
 const section = computed(() => {
     if (route.name === 'store-categories') {
@@ -26,7 +25,6 @@ const section = computed(() => {
         return 'shipping-options';
     }
 
-    // store-home + store-detail keep "المنتجات" active
     return 'products';
 });
 
@@ -40,26 +38,7 @@ const subTabs = [
 </script>
 
 <template>
-    <MainBox :title="storeType.name" :subtitle="storeType.description">
-        <template #icon>
-            <img :src="`/${storeType.icon}`" class="h-7 w-7" alt="">
-        </template>
-
-        <div>
-            <div class="flex border-b border-stone-200 px-px flex items-center overflow-x-auto no-scrollbar">
-                <RouterLink
-                    v-for="tab in subTabs"
-                    :key="tab.key"
-                    :to="tab.to"
-                    class="inline-flex items-center gap-1.5 px-4 py-3 text-sm transition shrink-0"
-                    :class="section === tab.key ? 'border-b-2 border-primary-500 text-stone-900' : 'text-stone-500 hover:text-stone-800'"
-                >
-                    <iconify-icon :icon="tab.icon" class="text-base"></iconify-icon>
-                    {{ tab.label }}
-                </RouterLink>
-            </div>
-
-            <slot />
-        </div>
-    </MainBox>
+    <PageModuleShell :type="type" :section="section" :sub-tabs="subTabs">
+        <slot />
+    </PageModuleShell>
 </template>

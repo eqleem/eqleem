@@ -1,20 +1,21 @@
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { CkEditor, MediaGallery, FileGallery } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Price from '../../../components/ui/Price.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
 import Alert from '../../../components/ui/Alert.vue';
-import CkEditor from '../../../components/ui/CkEditor.vue';
-import MediaGallery from '../../../components/ui/MediaGallery.vue';
-import FileGallery from '../../../components/ui/FileGallery.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useDigitalProductsStore } from '../../../stores/digital-products.js';
 import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
+import { useContentDetailEditor } from '../../../composables/useContentDetailEditor.js';
+import { useMediaGalleryActions } from '../../../composables/useMediaGalleryActions.js';
+import { useIdChecklist } from '../../../composables/useIdChecklist.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
@@ -23,11 +24,7 @@ const router = useRouter();
 const store = useDigitalProductsStore();
 const { expand: expandAdvanced } = usePageAdvancedOpen();
 const formTab = ref('edit');
-const uploading = ref(false);
 const uploadingDownloads = ref(false);
-const notFound = ref(false);
-const bodyEditor = ref(null);
-const bodySeed = ref('');
 
 const form = reactive({
     title: '',
@@ -47,17 +44,11 @@ const errors = reactive({
     form: null,
 });
 
-const uuid = computed(() => String(route.params.id));
-const editorUploadUrl = computed(() => `/api/digital-products/${uuid.value}/editor-images`);
-const categories = computed(() => store.detail?.category_options ?? []);
-const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/digital-products/');
-const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
-
 function switchTab(tab) {
     formTab.value = tab;
 }
 
-function loadForm(product, { syncEditor = true } = {}) {
+function loadForm(product, { syncEditor: shouldSync = true } = {}) {
     if (!product) {
         return;
     }
@@ -75,82 +66,38 @@ function loadForm(product, { syncEditor = true } = {}) {
     errors.slug = null;
     errors.form = null;
 
-    if (syncEditor) {
-        bodySeed.value = product.body ?? '';
-        nextTick(() => {
-            bodyEditor.value?.setData?.(bodySeed.value);
-        });
+    if (shouldSync) {
+        syncEditor(product.body ?? '');
     }
 }
 
-onMounted(async () => {
-    try {
-        const product = await store.fetchDigitalProduct(uuid.value);
-        loadForm(product);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
+const { uuid, notFound, bodyEditor, bodySeed, readBody, syncEditor } = useContentDetailEditor({
+    fetchItem: (id) => store.fetchDigitalProduct(id),
+    onLoaded: (product, opts) => loadForm(product, opts),
+});
+
+watch(() => route.params.id, (id) => {
+    if (id) {
+        formTab.value = 'edit';
     }
 });
 
-watch(() => route.params.id, async (id) => {
-    if (!id) {
-        return;
-    }
-
-    notFound.value = false;
-    formTab.value = 'edit';
-
-    try {
-        const product = await store.fetchDigitalProduct(String(id));
-        loadForm(product);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
-    }
+const { uploading, uploadFiles, reorderImages, removeImage } = useMediaGalleryActions({
+    uuid,
+    form,
+    errors,
+    uploadImage: (id, file) => store.uploadImage(id, file),
+    reorderImages: (id, order) => store.reorderImages(id, order),
+    deleteImage: (id, mediaId) => store.deleteImage(id, mediaId),
+    fallbackImages: () => store.detail?.images ?? [],
 });
 
-function toggleCategory(id, checked) {
-    const key = String(id);
+const { toggle: toggleCategory } = useIdChecklist(form);
 
-    if (checked) {
-        if (!form.categoryIds.includes(key)) {
-            form.categoryIds.push(key);
-        }
-        return;
-    }
-
-    form.categoryIds = form.categoryIds.filter((item) => item !== key);
-}
-
-async function uploadFiles(files) {
-    uploading.value = true;
-
-    try {
-        for (const file of files) {
-            form.images = await store.uploadImage(uuid.value, file);
-        }
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر رفع الصورة.';
-    } finally {
-        uploading.value = false;
-    }
-}
-
-async function reorderImages(order) {
-    try {
-        form.images = await store.reorderImages(uuid.value, order);
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر إعادة ترتيب الصور.';
-        form.images = [...(store.detail?.images ?? [])];
-    }
-}
-
-async function removeImage(mediaId) {
-    try {
-        form.images = await store.deleteImage(uuid.value, mediaId);
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر حذف الصورة.';
-    }
-}
+const editorUploadUrl = computed(() => `/api/digital-products/${uuid.value}/editor-images`);
+const categories = computed(() => store.detail?.category_options ?? []);
+const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/digital-products/');
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 async function uploadDownloads(files) {
     uploadingDownloads.value = true;
@@ -180,14 +127,6 @@ async function removeDownload(mediaId) {
         form.downloads = await store.deleteDownload(uuid.value, mediaId);
     } catch (error) {
         errors.form = error instanceof ApiError ? error.message : 'تعذر حذف الملف.';
-    }
-}
-
-function readBody() {
-    try {
-        return bodyEditor.value?.getData?.() ?? bodySeed.value ?? '';
-    } catch {
-        return bodySeed.value ?? '';
     }
 }
 

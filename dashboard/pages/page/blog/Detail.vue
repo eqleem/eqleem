@@ -1,28 +1,26 @@
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { CkEditor } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import CkEditor from '../../../components/ui/CkEditor.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useBlogStore } from '../../../stores/blog.js';
 import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
+import { useContentDetailEditor } from '../../../composables/useContentDetailEditor.js';
+import { useIdChecklist } from '../../../composables/useIdChecklist.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
-const route = useRoute();
 const router = useRouter();
 const store = useBlogStore();
 const { expand: expandAdvanced } = usePageAdvancedOpen();
 const uploadingImage = ref(false);
-const notFound = ref(false);
-const bodyEditor = ref(null);
 const featuredInput = ref(null);
-const bodySeed = ref('');
 
 const form = reactive({
     title: '',
@@ -39,12 +37,7 @@ const errors = reactive({
     form: null,
 });
 
-const uuid = computed(() => String(route.params.id));
-const editorUploadUrl = computed(() => `/api/blog/${uuid.value}/editor-images`);
-const categories = computed(() => store.detail?.category_options ?? []);
-const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/blog/');
-
-function loadForm(post, { syncEditor = true } = {}) {
+function loadForm(post, { syncEditor: shouldSync = true } = {}) {
     if (!post) {
         return;
     }
@@ -59,50 +52,21 @@ function loadForm(post, { syncEditor = true } = {}) {
     errors.slug = null;
     errors.form = null;
 
-    if (syncEditor) {
-        bodySeed.value = post.body ?? '';
-        nextTick(() => {
-            bodyEditor.value?.setData?.(bodySeed.value);
-        });
+    if (shouldSync) {
+        syncEditor(post.body ?? '');
     }
 }
 
-onMounted(async () => {
-    try {
-        const post = await store.fetchPost(uuid.value);
-        loadForm(post);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
-    }
+const { uuid, notFound, bodyEditor, bodySeed, readBody, syncEditor } = useContentDetailEditor({
+    fetchItem: (id) => store.fetchPost(id),
+    onLoaded: (post, opts) => loadForm(post, opts),
 });
 
-watch(() => route.params.id, async (id) => {
-    if (!id) {
-        return;
-    }
+const { toggle: toggleCategory } = useIdChecklist(form);
 
-    notFound.value = false;
-
-    try {
-        const post = await store.fetchPost(String(id));
-        loadForm(post);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
-    }
-});
-
-function toggleCategory(id, checked) {
-    const key = String(id);
-
-    if (checked) {
-        if (!form.categoryIds.includes(key)) {
-            form.categoryIds.push(key);
-        }
-        return;
-    }
-
-    form.categoryIds = form.categoryIds.filter((item) => item !== key);
-}
+const editorUploadUrl = computed(() => `/api/blog/${uuid.value}/editor-images`);
+const categories = computed(() => store.detail?.category_options ?? []);
+const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/blog/');
 
 function openFeaturedPicker() {
     featuredInput.value?.click();
@@ -133,14 +97,6 @@ async function removeFeaturedImage() {
         form.featuredImage = await store.deleteFeaturedImage(uuid.value);
     } catch (error) {
         errors.form = error instanceof ApiError ? error.message : 'تعذر حذف الصورة.';
-    }
-}
-
-function readBody() {
-    try {
-        return bodyEditor.value?.getData?.() ?? bodySeed.value ?? '';
-    } catch {
-        return bodySeed.value ?? '';
     }
 }
 

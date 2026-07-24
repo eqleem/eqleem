@@ -1,11 +1,12 @@
 <script setup>
-import { computed } from 'vue';
-import TopNavEditor from './TopNavEditor.vue';
-import FloatLinksEditor from './FloatLinksEditor.vue';
-import HeaderEditor from './HeaderEditor.vue';
-import FooterEditor from './FooterEditor.vue';
-import CtaEditor from './CtaEditor.vue';
-import BlockLinkEditor from './BlockLinkEditor.vue';
+import { computed, defineAsyncComponent } from 'vue';
+
+const TopNavEditor = defineAsyncComponent(() => import('./TopNavEditor.vue'));
+const FloatLinksEditor = defineAsyncComponent(() => import('./FloatLinksEditor.vue'));
+const HeaderEditor = defineAsyncComponent(() => import('./HeaderEditor.vue'));
+const FooterEditor = defineAsyncComponent(() => import('./FooterEditor.vue'));
+const CtaEditor = defineAsyncComponent(() => import('./CtaEditor.vue'));
+const BlockLinkEditor = defineAsyncComponent(() => import('./BlockLinkEditor.vue'));
 
 const props = defineProps({
     payload: { type: Object, required: true },

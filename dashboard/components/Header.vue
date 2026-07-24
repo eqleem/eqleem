@@ -8,7 +8,7 @@ import Icon from './ui/Icon.vue';
 import { useSession } from '../stores/session.js';
 
 const route = useRoute();
-const { user, tenant, app, loaded } = useSession();
+const { user, tenant, loaded } = useSession();
 
 const mobileMenuOpen = ref(false);
 
@@ -17,28 +17,7 @@ const tenantLogo = computed(() => tenant.value?.logo ?? null);
 const tenantBrandMark = computed(() => tenant.value?.brand_mark ?? null);
 const tenantUrl = computed(() => tenant.value?.url ?? '#');
 const tenantPlan = computed(() => tenant.value?.plan ?? 'بداية');
-const userName = computed(() => user.value?.name ?? '');
-const userEmail = computed(() => user.value?.email ?? '');
-const userPhone = computed(() => user.value?.phone ?? '');
 const userImage = computed(() => user.value?.image ?? 'https://www.gravatar.com/avatar/?d=mp');
-const appName = computed(() => app.value?.name ?? 'Eqleem');
-const homeUrl = computed(() => app.value?.home_url ?? '/');
-const logoutUrl = computed(() => app.value?.logout_url ?? '/logout');
-
-const menuProps = computed(() => ({
-    userName: userName.value,
-    userEmail: userEmail.value,
-    userPhone: userPhone.value,
-    userImage: userImage.value,
-    tenantName: tenantName.value,
-    tenantLogo: tenantLogo.value,
-    tenantBrandMark: tenantBrandMark.value,
-    tenantPlan: tenantPlan.value,
-    tenantUrl: tenantUrl.value,
-    appName: appName.value,
-    homeUrl: homeUrl.value,
-    logoutUrl: logoutUrl.value,
-}));
 
 function openMobileMenu() {
     mobileMenuOpen.value = true;
@@ -165,7 +144,7 @@ onBeforeUnmount(() => {
                             </button>
                         </template>
 
-                        <HeaderUserMenu variant="compact" v-bind="menuProps" />
+                        <HeaderUserMenu variant="compact" />
                     </Dropdown>
                 </div>
             </div>
@@ -217,7 +196,6 @@ onBeforeUnmount(() => {
 
                 <HeaderUserMenu
                     variant="panel"
-                    v-bind="menuProps"
                     @navigate="closeMobileMenu"
                 />
             </aside>

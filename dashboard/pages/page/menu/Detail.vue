@@ -2,12 +2,12 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { MediaGallery } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Price from '../../../components/ui/Price.vue';
 import Button from '../../../components/ui/Button.vue';
 import Toggle from '../../../components/ui/Toggle.vue';
-import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useMenuStore } from '../../../stores/menu.js';

@@ -2,11 +2,11 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { CkEditor } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import CkEditor from '../../../components/ui/CkEditor.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 // import PageBlocksPanel from '../../../components/page/pages/PageBlocksPanel.vue'; // temporarily hidden
 import NotFound from '../../NotFound.vue';

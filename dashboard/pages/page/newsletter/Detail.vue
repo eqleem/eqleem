@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { CkEditor } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
@@ -9,7 +10,6 @@ import Button from '../../../components/ui/Button.vue';
 import Toggle from '../../../components/ui/Toggle.vue';
 import Select from '../../../components/ui/Select.vue';
 import Alert from '../../../components/ui/Alert.vue';
-import CkEditor from '../../../components/ui/CkEditor.vue';
 import NotFound from '../../NotFound.vue';
 import { useNewsletterStore } from '../../../stores/newsletter.js';
 import { ApiError } from '../../../lib/api.js';

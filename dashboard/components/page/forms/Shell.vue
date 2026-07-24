@@ -1,18 +1,14 @@
 <script setup>
 import { computed } from 'vue';
-import MainBox from '../../ui/MainBox.vue';
+import PageModuleShell from '../PageModuleShell.vue';
 import { useFormsStore } from '../../../stores/forms.js';
 
 const store = useFormsStore();
-const formsType = computed(() => store.type);
+const type = computed(() => store.type);
 </script>
 
 <template>
-    <MainBox :title="formsType.name" :subtitle="formsType.description">
-        <template #icon>
-            <img :src="`/${formsType.icon}`" class="h-7 w-7" alt="">
-        </template>
-
+    <PageModuleShell :type="type">
         <slot />
-    </MainBox>
+    </PageModuleShell>
 </template>

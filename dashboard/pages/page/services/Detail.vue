@@ -1,30 +1,26 @@
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import ManageLayout from '../../../components/page/ManageLayout.vue';
+import { CkEditor, MediaGallery } from '../../../components/ui/asyncHeavy.js';
 import Form from '../../../components/ui/Form.vue';
 import Input from '../../../components/ui/Input.vue';
 import Price from '../../../components/ui/Price.vue';
 import Textarea from '../../../components/ui/Textarea.vue';
 import Button from '../../../components/ui/Button.vue';
-import CkEditor from '../../../components/ui/CkEditor.vue';
-import MediaGallery from '../../../components/ui/MediaGallery.vue';
 import PageFormMetaSection from '../../../components/page/pages/PageFormMetaSection.vue';
 import NotFound from '../../NotFound.vue';
 import { useServicesStore } from '../../../stores/services.js';
 import { usePageAdvancedOpen } from '../../../composables/usePageAdvancedOpen.js';
+import { useContentDetailEditor } from '../../../composables/useContentDetailEditor.js';
+import { useMediaGalleryActions } from '../../../composables/useMediaGalleryActions.js';
+import { useIdChecklist } from '../../../composables/useIdChecklist.js';
 import { ApiError } from '../../../lib/api.js';
 import { notifySuccess, notifyApiError } from '../../../lib/notify.js';
 
-const route = useRoute();
 const router = useRouter();
 const store = useServicesStore();
 const { expand: expandAdvanced } = usePageAdvancedOpen();
-const uploading = ref(false);
-const notFound = ref(false);
-const bodyEditor = ref(null);
-/** Body HTML loaded from the server — pushed into the editor only on load/save refresh. */
-const bodySeed = ref('');
 
 const form = reactive({
     title: '',
@@ -44,14 +40,7 @@ const errors = reactive({
     form: null,
 });
 
-const uuid = computed(() => String(route.params.id));
-const editorUploadUrl = computed(() => `/api/services/${uuid.value}/editor-images`);
-const categories = computed(() => store.detail?.category_options ?? []);
-const calendars = computed(() => store.detail?.calendar_options ?? []);
-const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/services/');
-const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
-
-function loadForm(service, { syncEditor = true } = {}) {
+function loadForm(service, { syncEditor: shouldSync = true } = {}) {
     if (!service) {
         return;
     }
@@ -69,102 +58,34 @@ function loadForm(service, { syncEditor = true } = {}) {
     errors.slug = null;
     errors.form = null;
 
-    if (syncEditor) {
-        bodySeed.value = service.body ?? '';
-        nextTick(() => {
-            bodyEditor.value?.setData?.(bodySeed.value);
-        });
+    if (shouldSync) {
+        syncEditor(service.body ?? '');
     }
 }
 
-onMounted(async () => {
-    try {
-        const service = await store.fetchService(uuid.value);
-        loadForm(service);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
-    }
+const { uuid, notFound, bodyEditor, bodySeed, readBody, syncEditor } = useContentDetailEditor({
+    fetchItem: (id) => store.fetchService(id),
+    onLoaded: (service, opts) => loadForm(service, opts),
 });
 
-watch(() => route.params.id, async (id) => {
-    if (!id) {
-        return;
-    }
-
-    notFound.value = false;
-
-    try {
-        const service = await store.fetchService(String(id));
-        loadForm(service);
-    } catch (error) {
-        notFound.value = error instanceof ApiError && error.status === 404;
-    }
+const { uploading, uploadFiles, reorderImages, removeImage } = useMediaGalleryActions({
+    uuid,
+    form,
+    errors,
+    uploadImage: (id, file) => store.uploadImage(id, file),
+    reorderImages: (id, order) => store.reorderImages(id, order),
+    deleteImage: (id, mediaId) => store.deleteImage(id, mediaId),
+    fallbackImages: () => store.detail?.images ?? [],
 });
 
-function toggleCategory(id, checked) {
-    const key = String(id);
+const { toggle: toggleCategory } = useIdChecklist(form);
+const { toggle: toggleCalendar } = useIdChecklist(form, 'calendarIds');
 
-    if (checked) {
-        if (!form.categoryIds.includes(key)) {
-            form.categoryIds.push(key);
-        }
-        return;
-    }
-
-    form.categoryIds = form.categoryIds.filter((item) => item !== key);
-}
-
-function toggleCalendar(id, checked) {
-    const key = String(id);
-
-    if (checked) {
-        if (!form.calendarIds.includes(key)) {
-            form.calendarIds.push(key);
-        }
-        return;
-    }
-
-    form.calendarIds = form.calendarIds.filter((item) => item !== key);
-}
-
-async function uploadFiles(files) {
-    uploading.value = true;
-
-    try {
-        for (const file of files) {
-            form.images = await store.uploadImage(uuid.value, file);
-        }
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر رفع الصورة.';
-    } finally {
-        uploading.value = false;
-    }
-}
-
-async function reorderImages(order) {
-    try {
-        form.images = await store.reorderImages(uuid.value, order);
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر إعادة ترتيب الصور.';
-        form.images = [...(store.detail?.images ?? [])];
-    }
-}
-
-async function removeImage(mediaId) {
-    try {
-        form.images = await store.deleteImage(uuid.value, mediaId);
-    } catch (error) {
-        errors.form = error instanceof ApiError ? error.message : 'تعذر حذف الصورة.';
-    }
-}
-
-function readBody() {
-    try {
-        return bodyEditor.value?.getData?.() ?? bodySeed.value ?? '';
-    } catch {
-        return bodySeed.value ?? '';
-    }
-}
+const editorUploadUrl = computed(() => `/api/services/${uuid.value}/editor-images`);
+const categories = computed(() => store.detail?.category_options ?? []);
+const calendars = computed(() => store.detail?.calendar_options ?? []);
+const slugPrefix = computed(() => store.detail?.slug_prefix ?? '/services/');
+const priceCurrency = computed(() => store.detail?.currency_symbol ?? '');
 
 async function persist({ close = false } = {}) {
     const body = readBody();

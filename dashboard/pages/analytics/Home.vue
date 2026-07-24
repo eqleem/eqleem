@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { defineAsyncComponent, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import Container from '../../components/ui/Container.vue';
 import Button from '../../components/ui/Button.vue';
 import SummaryCard from '../../components/analytics/SummaryCard.vue';
-import TrafficChart from '../../components/analytics/TrafficChart.vue';
 import StatsList from '../../components/analytics/StatsList.vue';
 import { useAnalyticsStore } from '../../stores/analytics.js';
 import { sectionIcons } from '../../lib/analyticsIcons.js';
+
+const TrafficChart = defineAsyncComponent(() => import('../../components/analytics/TrafficChart.vue'));
 
 const store = useAnalyticsStore();
 const {
