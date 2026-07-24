@@ -143,7 +143,6 @@ new class extends \Livewire\Component
         $this->body = (string) data_get($content->data, 'body', '');
         $this->editorMode = (string) data_get($content->data, 'editor_mode', 'html');
         $this->slug = $content->slug;
-        $content->migrateLegacyBlogCategoriesIfNeeded();
         $this->categoryIds = $content->taxonomiesOfType('blog_category')
             ->pluck('id')
             ->map(fn (mixed $id): string => (string) $id)

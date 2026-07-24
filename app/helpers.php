@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Content;
 use App\Models\Tenant;
 use App\Support\Money;
 use Illuminate\Support\Facades\Context;
@@ -175,29 +174,6 @@ if (! function_exists('contentImageUrl')) {
     }
 }
 
-if (! function_exists('legacyBlogCategoryIdsFromData')) {
-    /**
-     * @param  array<string, mixed>|null  $data
-     * @return array<int, int>
-     */
-    function legacyBlogCategoryIdsFromData(?array $data): array
-    {
-        $categoryIds = data_get($data, 'category_ids');
-
-        if (! is_array($categoryIds) || $categoryIds === []) {
-            $legacyId = data_get($data, 'category_id');
-
-            return filled($legacyId) ? [(int) $legacyId] : [];
-        }
-
-        return collect($categoryIds)
-            ->filter(fn (mixed $id): bool => filled($id))
-            ->map(fn (mixed $id): int => (int) $id)
-            ->values()
-            ->all();
-    }
-}
-
 if (! function_exists('contentTypeModel')) {
     function contentTypeModel(string $slug): string
     {
@@ -219,22 +195,6 @@ if (! function_exists('contentTypeSlugFromModel')) {
         }
 
         return null;
-    }
-}
-
-if (! function_exists('blogPostCategoryIds')) {
-    /**
-     * @return array<int, int>
-     */
-    function blogPostCategoryIds(Content $content): array
-    {
-        $content->migrateLegacyBlogCategoriesIfNeeded();
-
-        return $content->taxonomiesOfType('blog_category')
-            ->pluck('id')
-            ->map(fn (mixed $id): int => (int) $id)
-            ->values()
-            ->all();
     }
 }
 

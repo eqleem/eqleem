@@ -301,6 +301,7 @@ class SeedTenantDefaults
 
         Content::create([
             'tenant_id' => $tenant->id,
+            'uuid' => \Str::uuid()->toString(),
             'type' => contentTypeModel('pages'),
             'template' => $template,
             'title' => $page['title'],

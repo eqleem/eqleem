@@ -52,6 +52,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id')->nullable()->index();
             $table->unsignedBigInteger('product_id')->nullable()->index();
+            $table->unsignedBigInteger('booking_id')->nullable()->index();
             $table->unsignedBigInteger('variant_id')->nullable()->index();
             $table->string('sku', 120)->nullable()->index();
             $table->string('name');

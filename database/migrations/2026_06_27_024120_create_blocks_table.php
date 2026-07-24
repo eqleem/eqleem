@@ -64,6 +64,14 @@ return new class extends Migration
             $table->index('position');
             $table->index('type');
             $table->index('status');
+            $table->index(
+                ['tenant_id', 'parent_id', 'content_id', 'type'],
+                'blocks_tenant_roots_type_index'
+            );
+            $table->index(
+                ['tenant_id', 'parent_id', 'content_id', 'is_default', 'active', 'position', 'sort_order'],
+                'blocks_tenant_home_page_index'
+            );
 
             $table->unique([
                 'tenant_id',

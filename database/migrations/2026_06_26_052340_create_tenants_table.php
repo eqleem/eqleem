@@ -30,6 +30,8 @@ return new class extends Migration
             $table->timestamp('verified_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index(['handle', 'active'], 'tenants_handle_active_index');
         });
 
         Schema::create('tenantables', function (Blueprint $table) {

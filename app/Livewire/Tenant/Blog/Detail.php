@@ -48,8 +48,6 @@ class Detail extends Component
 
     public function render()
     {
-        $this->post->migrateLegacyBlogCategoriesIfNeeded();
-
         $categories = $this->post->taxonomiesOfType('blog_category');
 
         return tenantView('blog.detail', [

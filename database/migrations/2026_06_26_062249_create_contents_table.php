@@ -39,6 +39,8 @@ return new class extends Migration
 
             $table->string('slug');
 
+            $table->integer('price')->nullable();
+
             $table->jsonb('data')
                 ->nullable();
             $table->jsonb('meta')
@@ -66,6 +68,15 @@ return new class extends Migration
             $table->index('status');
             $table->index('published_at');
             $table->index('sort_order');
+            $table->index('block_id', 'contents_block_id_index');
+            $table->index(
+                ['block_id', 'type', 'active', 'sort_order'],
+                'contents_block_type_active_sort_index'
+            );
+            $table->index(
+                ['tenant_id', 'type', 'status', 'active', 'sort_order'],
+                'contents_tenant_type_status_active_sort_index'
+            );
 
             $table->unique([
                 'tenant_id',

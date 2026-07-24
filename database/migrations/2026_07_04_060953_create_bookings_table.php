@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();
+            $table->unsignedBigInteger('order_id')->nullable()->index();
             $table->unsignedBigInteger('content_id')->nullable();
             $table->unsignedBigInteger('calendar_id')->nullable();
             $table->dateTime('start_at');

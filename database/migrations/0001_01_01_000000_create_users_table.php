@@ -61,6 +61,7 @@ return new class extends Migration
         Schema::create('registration_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
+            $table->string('code')->nullable();
             $table->timestamp('created_at')->nullable();
         });
 

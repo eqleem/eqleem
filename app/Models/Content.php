@@ -654,29 +654,6 @@ HTML,
         $this->forceFill(['data' => $data])->save();
     }
 
-    public function migrateLegacyBlogCategoriesIfNeeded(): void
-    {
-        if ($this->type !== 'blog') {
-            return;
-        }
-
-        if ($this->taxonomies()->where('type', 'blog_category')->exists()) {
-            return;
-        }
-
-        $legacyIds = legacyBlogCategoryIdsFromData($this->data);
-
-        if ($legacyIds === []) {
-            return;
-        }
-
-        $this->syncTaxonomiesOfType('blog_category', $legacyIds);
-
-        $data = $this->data ?? [];
-        unset($data['category_ids'], $data['category_id']);
-        $this->forceFill(['data' => $data])->save();
-    }
-
     public function block(): BelongsTo
     {
         return $this->belongsTo(Block::class);
