@@ -21,6 +21,10 @@ class Detail extends Component
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
+            ->with(['media', 'taxonomies'])
+            ->withCount([
+                'media as downloads_count' => fn ($query) => $query->where('collection_name', 'digital-product-downloads'),
+            ])
             ->firstOrFail();
     }
 
@@ -58,7 +62,7 @@ class Detail extends Component
             'imageUrl' => $images[0] ?? $this->product->avatar,
             'price' => (int) data_get($this->product->data, 'price', 0),
             'comparePrice' => data_get($this->product->data, 'compare_price'),
-            'downloadsCount' => $this->product->getMedia('digital-product-downloads')->count(),
+            'downloadsCount' => (int) ($this->product->downloads_count ?? $this->product->getMedia('digital-product-downloads')->count()),
         ])->title($this->product->title);
     }
 }

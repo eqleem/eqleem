@@ -24,8 +24,9 @@ class ShowUnitRental
         setCurrentTenant($tenant);
 
         $content = $this->findUnitRental($uuid);
+        $content->loadMissing(['media', 'taxonomies', 'calendars']);
 
-        return $content->fresh(['media']);
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

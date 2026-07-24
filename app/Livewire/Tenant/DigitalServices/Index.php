@@ -43,7 +43,10 @@ class Index extends Component
             ->type(contentTypeModel('digital-services'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'digital_service_category')])
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'digital-service-media'),
+                'taxonomies' => fn ($query) => $query->where('type', 'digital_service_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('digital_service_category', $categoryIds),

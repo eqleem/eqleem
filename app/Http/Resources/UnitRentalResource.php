@@ -50,9 +50,9 @@ class UnitRentalResource extends JsonResource
                 ->map(fn (mixed $id): string => (string) $id)
                 ->values()
                 ->all(),
-            'calendar_ids' => $content->calendars()
-                ->where('calendars.type', 'rental-unit')
-                ->pluck('calendars.id')
+            'calendar_ids' => $content->loadMissing('calendars')->calendars
+                ->where('type', 'rental-unit')
+                ->pluck('id')
                 ->map(fn (mixed $id): string => (string) $id)
                 ->values()
                 ->all(),

@@ -24,8 +24,9 @@ class ShowOnDemandService
         setCurrentTenant($tenant);
 
         $content = $this->findOnDemandService($uuid);
+        $content->loadMissing(['media', 'taxonomies']);
 
-        return $content->fresh(['media']);
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

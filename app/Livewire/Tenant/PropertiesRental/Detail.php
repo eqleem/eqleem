@@ -31,6 +31,7 @@ class Detail extends Component
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
+            ->with(['media', 'taxonomies', 'calendars'])
             ->firstOrFail();
 
         $this->checkIn = now()->toDateString();
@@ -120,9 +121,10 @@ class Detail extends Component
 
     protected function loadCalendars(): void
     {
-        $this->calendars = $this->unit->calendars()
-            ->where('calendars.active', true)
-            ->get()
+        $this->unit->loadMissing('calendars');
+
+        $this->calendars = $this->unit->calendars
+            ->where('active', true)
             ->map(fn (Calendar $calendar): array => [
                 'id' => (int) $calendar->id,
                 'name' => $calendar->name,

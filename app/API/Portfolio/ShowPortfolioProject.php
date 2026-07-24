@@ -25,8 +25,9 @@ class ShowPortfolioProject
 
         $content = $this->findPortfolioProject($uuid);
         $content->migrateLegacyPortfolioImagesIfNeeded();
+        $content->load(['media', 'taxonomies']);
 
-        return $content->fresh(['media']);
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

@@ -58,7 +58,10 @@ class Index extends Component
             ->type(contentTypeModel('menu'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'menu_category')])
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'menu-media'),
+                'taxonomies' => fn ($query) => $query->where('type', 'menu_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('menu_category', $categoryIds),

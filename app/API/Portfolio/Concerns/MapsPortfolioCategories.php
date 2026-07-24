@@ -7,12 +7,23 @@ use Illuminate\Support\Collection;
 
 trait MapsPortfolioCategories
 {
+    /** @var Collection<int, Taxonomy>|null */
+    private ?Collection $categoryTreeCache = null;
+
+    /**
+     * @return Collection<int, Taxonomy>
+     */
+    protected function categoryTree(): Collection
+    {
+        return $this->categoryTreeCache ??= Taxonomy::flatTree('portfolio_category');
+    }
+
     /**
      * @return Collection<int, array{id: int, name: string, slug: string, description: string|null, parent_id: int|null, depth: int, sort_order: int}>
      */
     protected function mapCategoryTree(?string $search = null): Collection
     {
-        $categories = Taxonomy::flatTree('portfolio_category');
+        $categories = $this->categoryTree();
 
         if ($search !== null && $search !== '') {
             $term = mb_strtolower($search);
@@ -54,7 +65,7 @@ trait MapsPortfolioCategories
             ['id' => '', 'label' => 'بدون تصنيف أب'],
         ];
 
-        foreach (Taxonomy::flatTree('portfolio_category') as $item) {
+        foreach ($this->categoryTree() as $item) {
             if (in_array((int) $item->id, $excluded, true)) {
                 continue;
             }

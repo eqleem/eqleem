@@ -21,6 +21,7 @@ class Detail extends Component
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
+            ->with(['media', 'taxonomies'])
             ->firstOrFail();
     }
 

@@ -38,6 +38,7 @@ class Detail extends Component
             ->published()
             ->where('active', true)
             ->where('slug', $slug)
+            ->with(['media', 'taxonomies', 'calendars'])
             ->firstOrFail();
 
         $this->loadCalendars();
@@ -148,9 +149,10 @@ class Detail extends Component
 
     protected function loadCalendars(): void
     {
-        $this->calendars = $this->service->calendars()
-            ->where('calendars.active', true)
-            ->get()
+        $this->service->loadMissing('calendars');
+
+        $this->calendars = $this->service->calendars
+            ->where('active', true)
             ->map(fn (Calendar $calendar): array => [
                 'id' => (int) $calendar->id,
                 'name' => $calendar->name,

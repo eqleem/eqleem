@@ -43,7 +43,10 @@ class Index extends Component
             ->type(contentTypeModel('courses'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'course_category')])
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'course-media'),
+                'taxonomies' => fn ($query) => $query->where('type', 'course_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('course_category', $categoryIds),

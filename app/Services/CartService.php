@@ -22,6 +22,9 @@ class CartService
 {
     protected ?Cart $resolvedCart = null;
 
+    /** @var Collection<int, CartItem>|null */
+    protected ?Collection $resolvedItems = null;
+
     public function __construct(
         protected CheckoutShippingService $shipping,
         protected CalendarSlotService $calendarSlots,
@@ -79,6 +82,12 @@ class CartService
     public function forgetCart(): void
     {
         $this->resolvedCart = null;
+        $this->resolvedItems = null;
+    }
+
+    protected function forgetItems(): void
+    {
+        $this->resolvedItems = null;
     }
 
     public function mergeGuestCartInto(Client $client, int $tenantId, ?string $guestSessionId = null): void
@@ -115,6 +124,9 @@ class CartService
                     ->where('cart_id', $clientCart->id)
                     ->where('productable_type', $guestItem->productable_type)
                     ->where('productable_id', $guestItem->productable_id)
+                    ->where(function ($query): void {
+                        $query->where('line_signature', '')->orWhereNull('line_signature');
+                    })
                     ->get()
                     ->first(fn (CartItem $item): bool => ! $item->isBooking() && ! $item->hasMealOptions());
 
@@ -181,7 +193,7 @@ class CartService
      */
     public function items(): Collection
     {
-        return CartItem::query()
+        return $this->resolvedItems ??= CartItem::query()
             ->where('cart_id', $this->cart()->id)
             ->with('productable')
             ->orderBy('id')
@@ -237,16 +249,20 @@ class CartService
             ->where('cart_id', $cart->id)
             ->where('productable_type', $content->getMorphClass())
             ->where('productable_id', $content->id)
+            ->where(function ($query): void {
+                $query->where('line_signature', '')->orWhereNull('line_signature');
+            })
             ->get()
             ->first(fn (CartItem $cartItem): bool => ! $cartItem->isBooking() && ! $cartItem->hasMealOptions());
 
         if ($item) {
             $item->increment('quantity', $quantity);
+            $this->forgetItems();
 
             return $item->refresh();
         }
 
-        return CartItem::query()->create([
+        $created = CartItem::query()->create([
             'cart_id' => $cart->id,
             'productable_type' => $content->getMorphClass(),
             'productable_id' => $content->id,
@@ -255,6 +271,10 @@ class CartService
             'line_signature' => '',
             'meta' => $this->baseCartMeta($content),
         ]);
+
+        $this->forgetItems();
+
+        return $created;
     }
 
     /**
@@ -329,7 +349,7 @@ class CartService
             $meta['check_out'] = $booking['check_out'];
         }
 
-        return CartItem::query()->create([
+        $created = CartItem::query()->create([
             'cart_id' => $cart->id,
             'productable_type' => $content->getMorphClass(),
             'productable_id' => $content->id,
@@ -338,6 +358,10 @@ class CartService
             'line_signature' => $lineSignature,
             'meta' => $meta,
         ]);
+
+        $this->forgetItems();
+
+        return $created;
     }
 
     /**
@@ -368,11 +392,12 @@ class CartService
 
         if ($duplicate instanceof CartItem) {
             $duplicate->increment('quantity', $quantity);
+            $this->forgetItems();
 
             return $duplicate->refresh();
         }
 
-        return CartItem::query()->create([
+        $created = CartItem::query()->create([
             'cart_id' => $cart->id,
             'productable_type' => $meal->getMorphClass(),
             'productable_id' => $meal->id,
@@ -385,6 +410,10 @@ class CartService
                 'meal_options_label' => $resolved['label'],
             ]),
         ]);
+
+        $this->forgetItems();
+
+        return $created;
     }
 
     public function bookingRangeIsAvailable(int $calendarId, string $startAt, string $endAt, ?int $excludeItemId = null): bool
@@ -545,6 +574,7 @@ class CartService
 
         if ($quantity < 1) {
             $item->delete();
+            $this->forgetItems();
 
             return;
         }
@@ -554,11 +584,13 @@ class CartService
         }
 
         $item->update(['quantity' => $quantity]);
+        $this->forgetItems();
     }
 
     public function removeItem(int $itemId): void
     {
         $this->findOwnedItem($itemId)->delete();
+        $this->forgetItems();
     }
 
     public function clear(): void
@@ -566,6 +598,7 @@ class CartService
         CartItem::query()
             ->where('cart_id', $this->cart()->id)
             ->delete();
+        $this->forgetItems();
     }
 
     /**

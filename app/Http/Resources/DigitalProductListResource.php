@@ -37,7 +37,7 @@ class DigitalProductListResource extends JsonResource
             'price_label' => filled($priceMinor) && (int) $priceMinor > 0
                 ? money_format_plain((int) $priceMinor)
                 : null,
-            'downloads_count' => $content->getMedia('digital-product-downloads')->count(),
+            'downloads_count' => (int) ($content->downloads_count ?? $content->getMedia('digital-product-downloads')->count()),
             'image' => $this->thumbnailUrl($content),
         ];
     }

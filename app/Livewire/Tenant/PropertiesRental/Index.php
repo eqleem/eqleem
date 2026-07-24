@@ -28,7 +28,10 @@ class Index extends Component
             ->type(contentTypeModel('unit-rental'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'unit_category')])
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'unit-media'),
+                'taxonomies' => fn ($query) => $query->where('type', 'unit_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('unit_category', $categoryIds),

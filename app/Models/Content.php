@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Aliziodev\LaravelTaxonomy\Enums\TaxonomyType;
 use Aliziodev\LaravelTaxonomy\Traits\HasTaxonomy;
 use App\Actions\EnsureSectionBlockLink;
 use App\Traits\BelongsToTenant;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -125,6 +127,31 @@ class Content extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Prefer already-eager-loaded taxonomies to avoid N+1 / duplicate queries.
+     *
+     * @return Collection<int, Taxonomy>
+     */
+    public function taxonomiesOfType(string|TaxonomyType $type, string $name = 'taxonomable'): Collection
+    {
+        $typeValue = $type instanceof TaxonomyType ? $type->value : $type;
+
+        if ($name === 'taxonomable' && $this->relationLoaded('taxonomies')) {
+            return $this->taxonomies
+                ->where('type', $typeValue)
+                ->values();
+        }
+
+        return $this->taxonomies($name)->where('type', $typeValue)->get();
+    }
+
+    public function calendars(): MorphToMany
+    {
+        return $this->morphToMany(Calendar::class, 'bookable', 'bookables')
+            ->withPivot(['type', 'active'])
+            ->withTimestamps();
     }
 
     public function scopePublished(Builder $query): Builder
@@ -559,13 +586,6 @@ HTML,
             ->pluck('url')
             ->values()
             ->all();
-    }
-
-    public function calendars(): MorphToMany
-    {
-        return $this->morphToMany(Calendar::class, 'bookable', 'bookables')
-            ->withPivot(['type', 'active'])
-            ->withTimestamps();
     }
 
     public function migrateLegacyPortfolioImagesIfNeeded(): void

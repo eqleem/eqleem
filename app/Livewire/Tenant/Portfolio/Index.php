@@ -28,7 +28,10 @@ class Index extends Component
             ->type(contentTypeModel('portfolio'))
             ->published()
             ->where('active', true)
-            ->with(['taxonomies' => fn ($query) => $query->where('type', 'portfolio_category')])
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'portfolio-media'),
+                'taxonomies' => fn ($query) => $query->where('type', 'portfolio_category'),
+            ])
             ->when(
                 $categoryIds !== [],
                 fn (Builder $query) => $query->withAnyTaxonomiesOfType('portfolio_category', $categoryIds),

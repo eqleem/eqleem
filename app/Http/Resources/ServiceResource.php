@@ -51,8 +51,8 @@ class ServiceResource extends JsonResource
                 ->map(fn (mixed $id): string => (string) $id)
                 ->values()
                 ->all(),
-            'calendar_ids' => $content->calendars()
-                ->pluck('calendars.id')
+            'calendar_ids' => $content->loadMissing('calendars')->calendars
+                ->pluck('id')
                 ->map(fn (mixed $id): string => (string) $id)
                 ->values()
                 ->all(),

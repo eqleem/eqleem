@@ -38,7 +38,6 @@ class ListBlogPosts
 
         $query = Content::query()
             ->type($this->blogType())
-            ->with('media')
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

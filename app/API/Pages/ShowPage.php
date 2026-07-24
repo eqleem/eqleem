@@ -23,7 +23,7 @@ class ShowPage
     {
         setCurrentTenant($tenant);
 
-        return $this->findPage($uuid)->fresh();
+        return $this->findPage($uuid);
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

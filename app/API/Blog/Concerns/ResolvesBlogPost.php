@@ -29,19 +29,26 @@ trait ResolvesBlogPost
         return $content;
     }
 
+    /** @var Collection<int, array{id: string, label: string, selectable: bool}>|null */
+    private ?Collection $cachedCategoryOptions = null;
+
     /**
      * @return Collection<int, array{id: string, label: string, selectable: bool}>
      */
     protected function categoryOptions(): Collection
     {
-        $parentIds = Taxonomy::query()
-            ->type('blog_category')
-            ->whereNotNull('parent_id')
+        if ($this->cachedCategoryOptions instanceof Collection) {
+            return $this->cachedCategoryOptions;
+        }
+
+        $tree = Taxonomy::flatTree('blog_category');
+        $parentIds = $tree
             ->pluck('parent_id')
+            ->filter()
             ->map(fn (mixed $id): int => (int) $id)
             ->flip();
 
-        return Taxonomy::flatTree('blog_category')
+        return $this->cachedCategoryOptions = $tree
             ->map(fn (Taxonomy $item): array => [
                 'id' => (string) $item->id,
                 'label' => str_repeat('— ', (int) ($item->depth ?? 0)).$item->name,

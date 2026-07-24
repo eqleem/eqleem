@@ -24,8 +24,9 @@ class ShowService
         setCurrentTenant($tenant);
 
         $content = $this->findService($uuid);
+        $content->loadMissing(['media', 'taxonomies', 'calendars']);
 
-        return $content->fresh(['media']);
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content
