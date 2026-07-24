@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Actions;
- 
+
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
-use App\Actions\CreateUser;
-use App\Actions\CreateTenant;
- 
+
 class RegisterTenant
 {
     use AsAction, WithAttributes;
@@ -25,31 +23,31 @@ class RegisterTenant
     public function handle(array $data): array
     {
         $this->fill($data);
-        
         $validatedData = $this->validateAttributes();
-         
+
         $user = CreateUser::run([
             'name' => $validatedData['user_name'],
             'email' => $validatedData['user_email'],
             'password' => $validatedData['user_password'],
-        ]); 
+        ]);
 
-        if($user) {
-            $tenant = CreateTenant::run([
-                'tenant_name' => $validatedData['tenant_name'],
-                'tenant_handle' => $validatedData['tenant_handle'],
-                'email' => $validatedData['user_email'],
-                'user_id' => $user->id,
-            ]); 
+        if (! $user) {
+            return ['tenant' => null, 'user' => null];
         }
 
-        if($tenant) {
+        $tenant = CreateTenant::run([
+            'tenant_name' => $validatedData['tenant_name'],
+            'tenant_handle' => $validatedData['tenant_handle'],
+            'email' => $validatedData['user_email'],
+            'user_id' => $user->id,
+        ]);
+
+        if ($tenant) {
             $user->update([
                 'current_tenant_id' => $tenant->id,
             ]);
         }
 
-        return ['tenant' => $tenant ?? null, 'user' => $user ?? null];
+        return ['tenant' => $tenant, 'user' => $user];
     }
-
 }

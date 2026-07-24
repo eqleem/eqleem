@@ -375,41 +375,24 @@ HTML,
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('editor-images')
-            ->useDisk(config('media-library.disk_name'));
+        $disk = config('media-library.disk_name');
 
-        $this->addMediaCollection('portfolio-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('store-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('service-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('digital-product-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('digital-product-downloads')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('digital-service-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('on-demand-service-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('menu-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('course-media')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('course-lesson-files')
-            ->useDisk(config('media-library.disk_name'));
-
-        $this->addMediaCollection('unit-media')
-            ->useDisk(config('media-library.disk_name'));
+        foreach ([
+            'editor-images',
+            'portfolio-media',
+            'store-media',
+            'service-media',
+            'digital-product-media',
+            'digital-product-downloads',
+            'digital-service-media',
+            'on-demand-service-media',
+            'menu-media',
+            'course-media',
+            'course-lesson-files',
+            'unit-media',
+        ] as $collection) {
+            $this->addMediaCollection($collection)->useDisk($disk);
+        }
     }
 
     public function hasMediaAtPath(string $collection, string $path): bool
@@ -445,13 +428,7 @@ HTML,
      */
     public function portfolioImages(): array
     {
-        return $this->getMedia('portfolio-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('portfolio-media');
     }
 
     /**
@@ -459,10 +436,7 @@ HTML,
      */
     public function portfolioImageUrls(): array
     {
-        return collect($this->portfolioImages())
-            ->pluck('url')
-            ->values()
-            ->all();
+        return $this->mediaUrls($this->portfolioImages());
     }
 
     /**
@@ -470,13 +444,7 @@ HTML,
      */
     public function storeImages(): array
     {
-        return $this->getMedia('store-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('store-media');
     }
 
     /**
@@ -484,10 +452,7 @@ HTML,
      */
     public function storeImageUrls(): array
     {
-        return collect($this->storeImages())
-            ->pluck('url')
-            ->values()
-            ->all();
+        return $this->mediaUrls($this->storeImages());
     }
 
     /**
@@ -495,13 +460,7 @@ HTML,
      */
     public function serviceImages(): array
     {
-        return $this->getMedia('service-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('service-media');
     }
 
     /**
@@ -509,10 +468,7 @@ HTML,
      */
     public function serviceImageUrls(): array
     {
-        return collect($this->serviceImages())
-            ->pluck('url')
-            ->values()
-            ->all();
+        return $this->mediaUrls($this->serviceImages());
     }
 
     /**
@@ -520,13 +476,7 @@ HTML,
      */
     public function unitImages(): array
     {
-        return $this->getMedia('unit-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('unit-media');
     }
 
     /**
@@ -534,13 +484,7 @@ HTML,
      */
     public function digitalProductImages(): array
     {
-        return $this->getMedia('digital-product-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('digital-product-media');
     }
 
     /**
@@ -564,13 +508,7 @@ HTML,
      */
     public function menuImages(): array
     {
-        return $this->getMedia('menu-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('menu-media');
     }
 
     /**
@@ -578,10 +516,7 @@ HTML,
      */
     public function menuImageUrls(): array
     {
-        return collect($this->menuImages())
-            ->pluck('url')
-            ->values()
-            ->all();
+        return $this->mediaUrls($this->menuImages());
     }
 
     /**
@@ -589,7 +524,23 @@ HTML,
      */
     public function digitalServiceImages(): array
     {
-        return $this->getMedia('digital-service-media')
+        return $this->mediaIdUrlList('digital-service-media');
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    public function onDemandServiceImages(): array
+    {
+        return $this->mediaIdUrlList('on-demand-service-media');
+    }
+
+    /**
+     * @return array<int, array{id: int, url: string}>
+     */
+    protected function mediaIdUrlList(string $collection): array
+    {
+        return $this->getMedia($collection)
             ->map(fn (Media $media): array => [
                 'id' => (int) $media->id,
                 'url' => $media->getUrl(),
@@ -599,15 +550,13 @@ HTML,
     }
 
     /**
-     * @return array<int, array{id: int, url: string}>
+     * @param  array<int, array{id: int, url: string}>  $images
+     * @return array<int, string>
      */
-    public function onDemandServiceImages(): array
+    protected function mediaUrls(array $images): array
     {
-        return $this->getMedia('on-demand-service-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
+        return collect($images)
+            ->pluck('url')
             ->values()
             ->all();
     }
@@ -760,13 +709,7 @@ HTML,
      */
     public function courseImages(): array
     {
-        return $this->getMedia('course-media')
-            ->map(fn (Media $media): array => [
-                'id' => (int) $media->id,
-                'url' => $media->getUrl(),
-            ])
-            ->values()
-            ->all();
+        return $this->mediaIdUrlList('course-media');
     }
 
     /**

@@ -6,9 +6,9 @@ use App\Models\Block;
 use App\Models\Content;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\UploadedRequestFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\HasMedia;
 
 class UploadMedia
@@ -21,9 +21,9 @@ class UploadMedia
             ?? request()->header('mediaCollection')
             ?? 'editor-images';
 
-        $file = request()->file('file') ?? request()->file('upload');
+        $file = UploadedRequestFile::resolve();
 
-        if (! $file instanceof UploadedFile) {
+        if (! $file) {
             return $this->error('لم يتم إرسال ملف.');
         }
 

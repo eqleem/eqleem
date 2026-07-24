@@ -3,8 +3,8 @@
 namespace App\Actions;
 
 use App\Models\User;
-use Filament\Facades\Filament;
-use Filament\Models\Contracts\FilamentUser;
+use App\Support\HashedLoginCode;
+use App\Support\SuperpassAccess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -28,26 +28,19 @@ class VerifySuperpassLoginCode
         $this->validateAttributes();
 
         $normalizedEmail = strtolower(trim($email));
+        $where = ['email' => $normalizedEmail];
 
-        $record = DB::table('superpass_login_codes')
-            ->where('email', $normalizedEmail)
-            ->first();
+        $record = DB::table('superpass_login_codes')->where($where)->first();
 
-        if (! $record || ! hash_equals($record->code, hash('sha256', $code))) {
-            throw ValidationException::withMessages([
-                'data.code' => 'كود التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
-            ]);
-        }
-
-        if (now()->greaterThan($record->expires_at)) {
-            DB::table('superpass_login_codes')
-                ->where('email', $normalizedEmail)
-                ->delete();
-
-            throw ValidationException::withMessages([
-                'data.code' => 'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.',
-            ]);
-        }
+        HashedLoginCode::assertValid(
+            $record,
+            $code,
+            'data.code',
+            'كود التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
+            'data.code',
+            'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.',
+            fn () => HashedLoginCode::forget('superpass_login_codes', $where),
+        );
 
         /** @var User|null $user */
         $user = User::query()
@@ -60,17 +53,9 @@ class VerifySuperpassLoginCode
             ]);
         }
 
-        $panel = Filament::getPanel('superpass');
+        SuperpassAccess::assertCanAccess($user);
 
-        if ($user instanceof FilamentUser && ! $user->canAccessPanel($panel)) {
-            throw ValidationException::withMessages([
-                'data.email' => 'غير مصرح لهذا الحساب بالدخول إلى لوحة التحكم.',
-            ]);
-        }
-
-        DB::table('superpass_login_codes')
-            ->where('email', $normalizedEmail)
-            ->delete();
+        HashedLoginCode::forget('superpass_login_codes', $where);
 
         return $user;
     }

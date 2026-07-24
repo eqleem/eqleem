@@ -3,14 +3,16 @@
 namespace App\Actions;
 
 use App\Services\CartService;
+use App\Support\Moyasar;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
 class StoreCheckoutPaymentCallback
 {
     use AsAction, WithAttributes;
+
+    public function __construct(protected CartService $cart) {}
 
     public function rules(): array
     {
@@ -28,12 +30,9 @@ class StoreCheckoutPaymentCallback
             return $this->redirectWithError('انتهت جلسة الدفع. يرجى المحاولة مرة أخرى.');
         }
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic '.base64_encode(config('services.moyasar.secret_key')),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ])->get(config('services.moyasar.base_url').'payments/'.$validatedData['id'])->json();
+        $response = Moyasar::fetchPayment($validatedData['id']);
 
-        if (data_get($response, 'status') !== 'paid') {
+        if (! Moyasar::isPaid($response)) {
             return $this->redirectWithError('عملية الدفع فشلت، الرجاء المحاولة مرة أخرى.');
         }
 
@@ -49,7 +48,7 @@ class StoreCheckoutPaymentCallback
         $customer = (array) data_get($pendingCheckout, 'customer', []);
         $shippingMethod = (string) data_get($pendingCheckout, 'shipping_method', 'express');
 
-        $order = app(CartService::class)->checkout(
+        $order = $this->cart->checkout(
             [
                 'name' => (string) data_get($customer, 'name'),
                 'phone' => (string) data_get($customer, 'phone'),

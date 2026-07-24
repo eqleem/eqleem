@@ -4,14 +4,16 @@ namespace App\Actions;
 
 use App\Models\Tenant;
 use App\Services\ClientAuthService;
+use App\Support\HashedLoginCode;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
 class VerifyClientLoginCode
 {
     use AsAction, WithAttributes;
+
+    public function __construct(protected ClientAuthService $clientAuth) {}
 
     public function rules(): array
     {
@@ -27,39 +29,29 @@ class VerifyClientLoginCode
         $this->fill(compact('email', 'code', 'tenantId'));
         $this->validateAttributes();
 
-        $record = DB::table('client_login_codes')
-            ->where('email', strtolower($email))
-            ->where('tenant_id', $tenantId)
-            ->first();
+        $normalizedEmail = strtolower($email);
+        $where = ['email' => $normalizedEmail, 'tenant_id' => $tenantId];
 
-        if (! $record || ! hash_equals($record->code, hash('sha256', $code))) {
-            throw ValidationException::withMessages([
-                'code' => __('OTP code is not correct. Please try again.'),
-            ]);
-        }
+        $record = DB::table('client_login_codes')->where($where)->first();
 
-        if (now()->greaterThan($record->expires_at)) {
-            DB::table('client_login_codes')
-                ->where('email', strtolower($email))
-                ->where('tenant_id', $tenantId)
-                ->delete();
-
-            throw ValidationException::withMessages([
-                'code' => 'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.',
-            ]);
-        }
+        HashedLoginCode::assertValid(
+            $record,
+            $code,
+            'code',
+            __('OTP code is not correct. Please try again.'),
+            'code',
+            'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.',
+            fn () => HashedLoginCode::forget('client_login_codes', $where),
+        );
 
         $tenant = Tenant::query()->findOrFail($tenantId);
         $name = explode('@', $email)[0];
 
-        app(ClientAuthService::class)->authenticateForTenant($email, $tenant, [
+        $this->clientAuth->authenticateForTenant($email, $tenant, [
             'name' => $name,
             'email' => $email,
         ]);
 
-        DB::table('client_login_codes')
-            ->where('email', strtolower($email))
-            ->where('tenant_id', $tenantId)
-            ->delete();
+        HashedLoginCode::forget('client_login_codes', $where);
     }
 }

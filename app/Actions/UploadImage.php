@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
+use App\Support\UploadedRequestFile;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class UploadImage
@@ -14,9 +14,9 @@ class UploadImage
             ?? request()->header('mediaCollection')
             ?? 'tenant-media/'.(tenant('uuid') ?? 'shared').'/uploads';
 
-        $file = request()->file('file') ?? request()->file('upload');
+        $file = UploadedRequestFile::resolve();
 
-        if (! $file instanceof UploadedFile) {
+        if (! $file) {
             return response()->json([
                 'success' => false,
                 'message' => 'لم يتم إرسال ملف.',

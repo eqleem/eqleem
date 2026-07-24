@@ -4,8 +4,8 @@ namespace App\Actions;
 
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Support\Moyasar;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
@@ -23,12 +23,9 @@ class PaymentCallback
      */
     public function verifyAndSubscribe(string $paymentId): array
     {
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic '.base64_encode((string) config('services.moyasar.secret_key')),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ])->get(config('services.moyasar.base_url').'payments/'.$paymentId)->json();
+        $response = Moyasar::fetchPayment($paymentId);
 
-        if (data_get($response, 'status') !== 'paid') {
+        if (! Moyasar::isPaid($response)) {
             return [
                 'success' => false,
                 'message' => 'عملية الدفع فشلت، الرجاء المحاولة مرة أخرى',

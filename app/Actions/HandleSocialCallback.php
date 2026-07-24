@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\SocialAccount;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\SocialiteUserMeta;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -30,13 +31,7 @@ class HandleSocialCallback
                 'provider_id' => $socialUser->getId(),
                 'provider_token' => $socialUser->token ?? null,
                 'provider_refresh_token' => $socialUser->refreshToken ?? null,
-                'meta' => [
-                    'id' => $socialUser->getId(),
-                    'nickname' => $socialUser->getNickname(),
-                    'name' => $socialUser->getName(),
-                    'email' => $socialUser->getEmail(),
-                    'avatar' => $socialUser->getAvatar(),
-                ],
+                'meta' => SocialiteUserMeta::from($socialUser),
             ]
         );
 

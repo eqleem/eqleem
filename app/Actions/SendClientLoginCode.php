@@ -4,11 +4,10 @@ namespace App\Actions;
 
 use App\Mail\ClientLoginCode;
 use App\Models\Tenant;
+use App\Support\LoginCodeThrottle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
@@ -29,17 +28,10 @@ class SendClientLoginCode
         $this->fill(compact('email', 'tenantId'));
         $this->validateAttributes();
 
-        $throttleKey = 'client-login-code:'.$tenantId.':'.strtolower($email);
-
-        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
-
-            throw ValidationException::withMessages([
-                'email' => "يرجى الانتظار {$seconds} ثانية قبل إعادة إرسال رابط الدخول.",
-            ]);
-        }
-
-        RateLimiter::hit($throttleKey, 60);
+        LoginCodeThrottle::hitOrFail(
+            'client-login-code:'.$tenantId.':'.strtolower($email),
+            'email',
+        );
 
         $code = (string) random_int(100000, 999999);
         $tenant = Tenant::query()->findOrFail($tenantId);

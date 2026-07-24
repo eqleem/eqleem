@@ -5,11 +5,14 @@ namespace App\Services;
 use App\Models\Client;
 use App\Models\ClientSocialAccount;
 use App\Models\Tenant;
+use App\Support\SocialiteUserMeta;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 class ClientAuthService
 {
+    public function __construct(protected CartService $cart) {}
+
     /**
      * @param  array{name?: string|null, email?: string|null, phone?: string|null, avatar?: string|null}  $profile
      */
@@ -77,11 +80,11 @@ class ClientAuthService
 
         $guestSessionId = session()->getId();
 
-        app(CartService::class)->stashGuestCartReference($tenant->id);
+        $this->cart->stashGuestCartReference($tenant->id);
 
         Auth::guard('client')->login($client, remember: true);
 
-        app(CartService::class)->mergeGuestCartInto($client, $tenant->id, $guestSessionId);
+        $this->cart->mergeGuestCartInto($client, $tenant->id, $guestSessionId);
 
         return $client;
     }
@@ -97,13 +100,7 @@ class ClientAuthService
                 'client_id' => $client->id,
                 'provider_token' => $socialUser->token ?? null,
                 'provider_refresh_token' => $socialUser->refreshToken ?? null,
-                'meta' => [
-                    'id' => $socialUser->getId(),
-                    'nickname' => $socialUser->getNickname(),
-                    'name' => $socialUser->getName(),
-                    'email' => $socialUser->getEmail(),
-                    'avatar' => $socialUser->getAvatar(),
-                ],
+                'meta' => SocialiteUserMeta::from($socialUser),
             ],
         );
     }

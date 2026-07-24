@@ -2,28 +2,23 @@
 
 namespace App\Actions;
 
-use Lorisleiva\Actions\Concerns\AsAction;
 use App\Models\Link;
+use Lorisleiva\Actions\Concerns\AsAction;
 
 class VisitLink
 {
     use AsAction;
 
-    public function handle($id)
+    public function handle(int|string $id)
     {
-
-        $link = Link::where('id', $id)->with('tenant:id,handle')->first();
+        $link = Link::query()->where('id', $id)->with('tenant:id,handle')->first();
 
         config()->set('tenant', $link->tenant);
 
-        if($link) {
-            // RequestAnalytics::create([
-            //     'url' => $url,
-            //     'tenant_id' => tenant()->id,
-            // ]);
-
-            return redirect()->to($link->link);
+        if (! $link) {
+            return;
         }
- 
+
+        return redirect()->to($link->link);
     }
 }

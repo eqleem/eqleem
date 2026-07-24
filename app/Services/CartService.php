@@ -22,6 +22,11 @@ class CartService
 {
     protected ?Cart $resolvedCart = null;
 
+    public function __construct(
+        protected CheckoutShippingService $shipping,
+        protected CalendarSlotService $calendarSlots,
+    ) {}
+
     public function cart(): Cart
     {
         if ($this->resolvedCart instanceof Cart) {
@@ -202,7 +207,7 @@ class CartService
             return 0;
         }
 
-        return app(CheckoutShippingService::class)->fee(
+        return $this->shipping->fee(
             $shippingMethod,
             $address['country'] ?? null,
             $address['city_id'] ?? null,
@@ -538,17 +543,13 @@ class CartService
     {
         $item = $this->findOwnedItem($itemId);
 
-        if ($item->isBooking()) {
-            if ($quantity < 1) {
-                $item->delete();
-            }
+        if ($quantity < 1) {
+            $item->delete();
 
             return;
         }
 
-        if ($quantity < 1) {
-            $item->delete();
-
+        if ($item->isBooking()) {
             return;
         }
 
@@ -584,19 +585,18 @@ class CartService
         $requiresShipping = $this->requiresShipping();
         $effectiveShippingMethod = $requiresShipping ? $shippingMethod : 'none';
         $shippingAddress = $requiresShipping
-            ? app(CheckoutShippingService::class)->normalizeAddress($customer)
+            ? $this->shipping->normalizeAddress($customer)
             : [];
         $shippingFee = $this->shippingFee($effectiveShippingMethod, $shippingAddress);
         $grandTotal = $subtotal + $shippingFee;
         $shippingMethodLabel = $requiresShipping
-            ? app(CheckoutShippingService::class)->label($effectiveShippingMethod)
+            ? $this->shipping->label($effectiveShippingMethod)
             : null;
 
         $this->validateBookingItems($items);
 
         return DB::transaction(function () use ($items, $customer, $effectiveShippingMethod, $paymentMethod, $paymentMeta, $tenantId, $subtotal, $shippingFee, $grandTotal, $shippingAddress, $shippingMethodLabel): Order {
             $client = $this->resolveCheckoutClient($customer, $tenantId);
-
             $isFreeOrder = $grandTotal <= 0;
 
             $order = Order::create([
@@ -611,7 +611,7 @@ class CartService
                 'discount_total' => 0,
                 'tax_total' => 0,
                 'grand_total' => $grandTotal,
-                'paid_total' => $isFreeOrder ? 0 : 0,
+                'paid_total' => 0,
                 'due_total' => $isFreeOrder ? 0 : $grandTotal,
                 'payment_status' => $isFreeOrder ? 'paid' : 'unpaid',
                 'issued_at' => now(),
@@ -628,58 +628,7 @@ class CartService
                 ], $paymentMeta),
             ]);
 
-            foreach ($items as $item) {
-                $productId = $item->productable_type === Content::class
-                    ? $item->productable_id
-                    : null;
-
-                $bookingId = null;
-                $orderItemMeta = [
-                    'type' => $item->itemType(),
-                    'slug' => $item->slug(),
-                    'image_url' => $item->imageUrl(),
-                ];
-
-                if ($item->isBooking()) {
-                    $booking = Booking::query()->create([
-                        'tenant_id' => $tenantId,
-                        'client_id' => $client->id,
-                        'order_id' => $order->id,
-                        'content_id' => $productId,
-                        'calendar_id' => $item->calendarId(),
-                        'start_at' => $item->bookingStartAt(),
-                        'end_at' => $item->bookingEndAt(),
-                        'status' => 'new',
-                        'price_snapshot' => Order::fromMinor($item->unit_price),
-                        'currency' => Money::defaultCurrencyCode(),
-                        'meta' => [
-                            'order_channel' => 'ecommerce',
-                        ],
-                    ]);
-
-                    $bookingId = $booking->id;
-                    $orderItemMeta['booking_id'] = $bookingId;
-                    $orderItemMeta['calendar_id'] = $item->calendarId();
-                    $orderItemMeta['booking_start_at'] = $item->bookingStartAt();
-                    $orderItemMeta['booking_end_at'] = $item->bookingEndAt();
-                }
-
-                DB::table('order_items')->insert([
-                    'order_id' => $order->id,
-                    'product_id' => $productId,
-                    'booking_id' => $bookingId,
-                    'name' => $item->title(),
-                    'qty' => $item->quantity,
-                    'unit_price' => $item->unit_price,
-                    'discount_total' => 0,
-                    'tax_total' => 0,
-                    'line_total' => $item->lineTotal(),
-                    'meta' => json_encode($orderItemMeta),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
+            $this->createOrderItemsFromCart($order, $items, $client, $tenantId);
             $this->clear();
 
             SendOrderConfirmationEmail::run($order);
@@ -690,6 +639,64 @@ class CartService
 
             return $order;
         });
+    }
+
+    /**
+     * @param  Collection<int, CartItem>  $items
+     */
+    protected function createOrderItemsFromCart(Order $order, Collection $items, Client $client, int $tenantId): void
+    {
+        foreach ($items as $item) {
+            $productId = $item->productable_type === Content::class
+                ? $item->productable_id
+                : null;
+
+            $bookingId = null;
+            $orderItemMeta = [
+                'type' => $item->itemType(),
+                'slug' => $item->slug(),
+                'image_url' => $item->imageUrl(),
+            ];
+
+            if ($item->isBooking()) {
+                $booking = Booking::query()->create([
+                    'tenant_id' => $tenantId,
+                    'client_id' => $client->id,
+                    'order_id' => $order->id,
+                    'content_id' => $productId,
+                    'calendar_id' => $item->calendarId(),
+                    'start_at' => $item->bookingStartAt(),
+                    'end_at' => $item->bookingEndAt(),
+                    'status' => 'new',
+                    'price_snapshot' => Order::fromMinor($item->unit_price),
+                    'currency' => Money::defaultCurrencyCode(),
+                    'meta' => [
+                        'order_channel' => 'ecommerce',
+                    ],
+                ]);
+
+                $bookingId = $booking->id;
+                $orderItemMeta['booking_id'] = $bookingId;
+                $orderItemMeta['calendar_id'] = $item->calendarId();
+                $orderItemMeta['booking_start_at'] = $item->bookingStartAt();
+                $orderItemMeta['booking_end_at'] = $item->bookingEndAt();
+            }
+
+            DB::table('order_items')->insert([
+                'order_id' => $order->id,
+                'product_id' => $productId,
+                'booking_id' => $bookingId,
+                'name' => $item->title(),
+                'qty' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'discount_total' => 0,
+                'tax_total' => 0,
+                'line_total' => $item->lineTotal(),
+                'meta' => json_encode($orderItemMeta),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     /**
@@ -777,23 +784,7 @@ class CartService
                     ]);
                 }
 
-                $start = Carbon::parse($startAt);
-                $end = Carbon::parse($endAt);
-
-                foreach ($selections as $existing) {
-                    if ($existing['calendar_id'] !== $calendarId) {
-                        continue;
-                    }
-
-                    $existingStart = Carbon::parse($existing['start_at']);
-                    $existingEnd = Carbon::parse($existing['end_at']);
-
-                    if ($start->lt($existingEnd) && $end->gt($existingStart)) {
-                        throw ValidationException::withMessages([
-                            'cart' => 'يوجد تعارض بين مواعيد الحجز في السلة.',
-                        ]);
-                    }
-                }
+                $this->assertNoSelectionOverlap($selections, $calendarId, (string) $startAt, (string) $endAt);
 
                 $selections[] = [
                     'calendar_id' => $calendarId,
@@ -824,7 +815,7 @@ class CartService
                 ->values()
                 ->all();
 
-            $slot = collect(app(CalendarSlotService::class)->availableTimeSlots(
+            $slot = collect($this->calendarSlots->availableTimeSlots(
                 $calendar,
                 $bookingDate,
                 $durationMinutes,
@@ -839,29 +830,37 @@ class CartService
                 ]);
             }
 
-            $start = Carbon::parse($startAt);
-            $end = Carbon::parse($endAt);
-
-            foreach ($selections as $existing) {
-                if ($existing['calendar_id'] !== $calendarId) {
-                    continue;
-                }
-
-                $existingStart = Carbon::parse($existing['start_at']);
-                $existingEnd = Carbon::parse($existing['end_at']);
-
-                if ($start->lt($existingEnd) && $end->gt($existingStart)) {
-                    throw ValidationException::withMessages([
-                        'cart' => 'يوجد تعارض بين مواعيد الحجز في السلة.',
-                    ]);
-                }
-            }
+            $this->assertNoSelectionOverlap($selections, $calendarId, (string) $startAt, (string) $endAt);
 
             $selections[] = [
                 'calendar_id' => $calendarId,
                 'start_at' => $startAt,
                 'end_at' => $endAt,
             ];
+        }
+    }
+
+    /**
+     * @param  list<array{calendar_id: int, start_at: string, end_at: string}>  $selections
+     */
+    protected function assertNoSelectionOverlap(array $selections, int $calendarId, string $startAt, string $endAt): void
+    {
+        $start = Carbon::parse($startAt);
+        $end = Carbon::parse($endAt);
+
+        foreach ($selections as $existing) {
+            if ($existing['calendar_id'] !== $calendarId) {
+                continue;
+            }
+
+            $existingStart = Carbon::parse($existing['start_at']);
+            $existingEnd = Carbon::parse($existing['end_at']);
+
+            if ($start->lt($existingEnd) && $end->gt($existingStart)) {
+                throw ValidationException::withMessages([
+                    'cart' => 'يوجد تعارض بين مواعيد الحجز في السلة.',
+                ]);
+            }
         }
     }
 

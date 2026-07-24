@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
+use App\Support\HashedLoginCode;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
 
@@ -31,19 +31,11 @@ class VerifyRegistrationCode
             ->where('email', $email)
             ->first();
 
-        if (! $record || blank($record->code) || ! hash_equals($record->code, hash('sha256', $code))) {
-            throw ValidationException::withMessages([
-                'code' => 'كود التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
-            ]);
-        }
-
-        if (now()->diffInMinutes($record->created_at) > 60) {
-            DB::table('registration_tokens')->where('email', $email)->delete();
-
-            throw ValidationException::withMessages([
-                'code' => 'انتهت صلاحية كود التحقق. يرجى طلب كود جديد.',
-            ]);
-        }
+        HashedLoginCode::assertValidRegistrationToken(
+            $record,
+            $code,
+            fn () => HashedLoginCode::forget('registration_tokens', ['email' => $email]),
+        );
 
         return VerifyRegistration::make()->complete($email);
     }

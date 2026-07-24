@@ -4,11 +4,10 @@ namespace App\Actions;
 
 use App\Mail\SuperpassLoginCode;
 use App\Models\User;
-use Filament\Facades\Filament;
-use Filament\Models\Contracts\FilamentUser;
+use App\Support\LoginCodeThrottle;
+use App\Support\SuperpassAccess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\WithAttributes;
@@ -30,17 +29,12 @@ class SendSuperpassLoginCode
         $this->validateAttributes();
 
         $normalizedEmail = strtolower(trim($email));
-        $throttleKey = 'superpass-login-code:'.$normalizedEmail;
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
-
-            throw ValidationException::withMessages([
-                'data.email' => "يرجى الانتظار {$seconds} ثانية قبل إعادة إرسال كود الدخول.",
-            ]);
-        }
-
-        RateLimiter::hit($throttleKey, 60);
+        LoginCodeThrottle::hitOrFail(
+            'superpass-login-code:'.$normalizedEmail,
+            'data.email',
+            'كود الدخول',
+        );
 
         /** @var User|null $user */
         $user = User::query()
@@ -53,13 +47,7 @@ class SendSuperpassLoginCode
             ]);
         }
 
-        $panel = Filament::getPanel('superpass');
-
-        if ($user instanceof FilamentUser && ! $user->canAccessPanel($panel)) {
-            throw ValidationException::withMessages([
-                'data.email' => 'غير مصرح لهذا الحساب بالدخول إلى لوحة التحكم.',
-            ]);
-        }
+        SuperpassAccess::assertCanAccess($user);
 
         $code = (string) random_int(100000, 999999);
 

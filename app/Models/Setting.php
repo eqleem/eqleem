@@ -102,9 +102,7 @@ class Setting extends Model
      */
     public static function blogSettings(): array
     {
-        $saved = static::forSlug(static::BLOG_SETTINGS_SLUG);
-
-        return array_merge(static::blogSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::BLOG_SETTINGS_SLUG, static::blogSettingsDefaults());
     }
 
     public const PORTFOLIO_SETTINGS_SLUG = 'portfolio-settings';
@@ -125,9 +123,7 @@ class Setting extends Model
      */
     public static function portfolioSettings(): array
     {
-        $saved = static::forSlug(static::PORTFOLIO_SETTINGS_SLUG);
-
-        return array_merge(static::portfolioSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::PORTFOLIO_SETTINGS_SLUG, static::portfolioSettingsDefaults());
     }
 
     public const STORE_SETTINGS_SLUG = 'store-settings';
@@ -148,9 +144,7 @@ class Setting extends Model
      */
     public static function storeSettings(): array
     {
-        $saved = static::forSlug(static::STORE_SETTINGS_SLUG);
-
-        return array_merge(static::storeSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::STORE_SETTINGS_SLUG, static::storeSettingsDefaults());
     }
 
     public const SERVICE_SETTINGS_SLUG = 'service-settings';
@@ -171,9 +165,7 @@ class Setting extends Model
      */
     public static function serviceSettings(): array
     {
-        $saved = static::forSlug(static::SERVICE_SETTINGS_SLUG);
-
-        return array_merge(static::serviceSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::SERVICE_SETTINGS_SLUG, static::serviceSettingsDefaults());
     }
 
     public const DIGITAL_PRODUCT_SETTINGS_SLUG = 'digital-product-settings';
@@ -194,9 +186,7 @@ class Setting extends Model
      */
     public static function digitalProductSettings(): array
     {
-        $saved = static::forSlug(static::DIGITAL_PRODUCT_SETTINGS_SLUG);
-
-        return array_merge(static::digitalProductSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::DIGITAL_PRODUCT_SETTINGS_SLUG, static::digitalProductSettingsDefaults());
     }
 
     public const DIGITAL_SERVICE_SETTINGS_SLUG = 'digital-service-settings';
@@ -217,9 +207,7 @@ class Setting extends Model
      */
     public static function digitalServiceSettings(): array
     {
-        $saved = static::forSlug(static::DIGITAL_SERVICE_SETTINGS_SLUG);
-
-        return array_merge(static::digitalServiceSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::DIGITAL_SERVICE_SETTINGS_SLUG, static::digitalServiceSettingsDefaults());
     }
 
     public const ON_DEMAND_SERVICE_SETTINGS_SLUG = 'on-demand-service-settings';
@@ -240,9 +228,7 @@ class Setting extends Model
      */
     public static function onDemandServiceSettings(): array
     {
-        $saved = static::forSlug(static::ON_DEMAND_SERVICE_SETTINGS_SLUG);
-
-        return array_merge(static::onDemandServiceSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::ON_DEMAND_SERVICE_SETTINGS_SLUG, static::onDemandServiceSettingsDefaults());
     }
 
     public const MENU_SETTINGS_SLUG = 'menu-settings';
@@ -263,9 +249,7 @@ class Setting extends Model
      */
     public static function menuSettings(): array
     {
-        $saved = static::forSlug(static::MENU_SETTINGS_SLUG);
-
-        return array_merge(static::menuSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::MENU_SETTINGS_SLUG, static::menuSettingsDefaults());
     }
 
     public const NEWSLETTER_SETTINGS_SLUG = 'newsletter-settings';
@@ -286,9 +270,7 @@ class Setting extends Model
      */
     public static function newsletterSettings(): array
     {
-        $saved = static::forSlug(static::NEWSLETTER_SETTINGS_SLUG);
-
-        return array_merge(static::newsletterSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::NEWSLETTER_SETTINGS_SLUG, static::newsletterSettingsDefaults());
     }
 
     public const COURSE_SETTINGS_SLUG = 'course-settings';
@@ -309,9 +291,7 @@ class Setting extends Model
      */
     public static function courseSettings(): array
     {
-        $saved = static::forSlug(static::COURSE_SETTINGS_SLUG);
-
-        return array_merge(static::courseSettingsDefaults(), $saved?->settings ?? []);
+        return static::sectionSettings(static::COURSE_SETTINGS_SLUG, static::courseSettingsDefaults());
     }
 
     public const UNIT_RENTAL_SETTINGS_SLUG = 'unit-rental-settings';
@@ -332,9 +312,18 @@ class Setting extends Model
      */
     public static function unitRentalSettings(): array
     {
-        $saved = static::forSlug(static::UNIT_RENTAL_SETTINGS_SLUG);
+        return static::sectionSettings(static::UNIT_RENTAL_SETTINGS_SLUG, static::unitRentalSettingsDefaults());
+    }
 
-        return array_merge(static::unitRentalSettingsDefaults(), $saved?->settings ?? []);
+    /**
+     * @param  array{section_title: string, section_description: string}  $defaults
+     * @return array{section_title: string, section_description: string}
+     */
+    protected static function sectionSettings(string $slug, array $defaults): array
+    {
+        $saved = static::forSlug($slug);
+
+        return array_merge($defaults, $saved?->settings ?? []);
     }
 
     public const LOCALE_CURRENCY_SETTINGS_SLUG = 'locale-currency';

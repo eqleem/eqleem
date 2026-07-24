@@ -422,10 +422,7 @@ class TenantProfileService
             return;
         }
 
-        $headerBlock = Block::query()
-            ->where('tenant_id', $tenant->id)
-            ->where('type', 'header')
-            ->first();
+        $headerBlock = $this->headerBlockFor($tenant);
 
         $headerBio = (string) data_get($headerBlock?->data ?? [], 'bio', '');
 
@@ -475,10 +472,7 @@ class TenantProfileService
 
     protected function importFromHeaderBlock(Tenant $tenant): void
     {
-        $headerBlock = Block::query()
-            ->where('tenant_id', $tenant->id)
-            ->where('type', 'header')
-            ->first();
+        $headerBlock = $this->headerBlockFor($tenant);
 
         if (! $headerBlock) {
             return;
@@ -491,13 +485,10 @@ class TenantProfileService
             $tenant->meta->set('bio_saved', true);
         }
 
-        $tenant->meta->set('contact', [
-            'phone' => '',
-            'email' => '',
-            'whatsapp' => '',
+        $tenant->meta->set('contact', $this->emptyContact([
             'country' => (string) ($data['country'] ?? ''),
             'city' => (string) ($data['city'] ?? ''),
-        ]);
+        ]));
 
         $this->seedContactFromUser($tenant);
 
@@ -521,6 +512,29 @@ class TenantProfileService
         }
 
         $tenant->save();
+    }
+
+    protected function headerBlockFor(Tenant $tenant): ?Block
+    {
+        return Block::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('type', 'header')
+            ->first();
+    }
+
+    /**
+     * @param  array{phone?: string, email?: string, whatsapp?: string, country?: string, city?: string}  $overrides
+     * @return array{phone: string, email: string, whatsapp: string, country: string, city: string}
+     */
+    protected function emptyContact(array $overrides = []): array
+    {
+        return array_merge([
+            'phone' => '',
+            'email' => '',
+            'whatsapp' => '',
+            'country' => '',
+            'city' => '',
+        ], $overrides);
     }
 
     /**
