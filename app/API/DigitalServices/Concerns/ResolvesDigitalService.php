@@ -13,7 +13,7 @@ trait ResolvesDigitalService
 
     protected function taxonomyCategoryType(): string
     {
-        return 'digital_service_category';
+        return Content::TAXONOMY_DIGITAL_SERVICE;
     }
 
     protected function digitalServiceType(): string

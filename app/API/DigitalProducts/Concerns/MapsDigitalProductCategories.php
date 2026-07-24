@@ -3,6 +3,7 @@
 namespace App\API\DigitalProducts\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsDigitalProductCategories
 {
@@ -10,6 +11,6 @@ trait MapsDigitalProductCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'digital_store_category';
+        return Content::TAXONOMY_DIGITAL_STORE;
     }
 }

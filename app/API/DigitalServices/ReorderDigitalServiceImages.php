@@ -4,13 +4,13 @@ namespace App\API\DigitalServices;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\DigitalServices\Concerns\ResolvesDigitalService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store project gallery images.
+ * Reorders digital service gallery images.
  */
 class ReorderDigitalServiceImages
 {
@@ -34,10 +34,7 @@ class ReorderDigitalServiceImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderDigitalServiceImages
         setCurrentTenant($tenant);
 
         $content = $this->findDigitalService($uuid);
-        $validIds = $content->getMedia('digital-service-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_DIGITAL_SERVICE, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('digital-service-media')->digitalServiceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_DIGITAL_SERVICE)->digitalServiceImages(),
         ];
     }
 

@@ -4,13 +4,13 @@ namespace App\API\Services;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Services\Concerns\ResolvesService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store project gallery images.
+ * Reorders service gallery images.
  */
 class ReorderServiceImages
 {
@@ -34,10 +34,7 @@ class ReorderServiceImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderServiceImages
         setCurrentTenant($tenant);
 
         $content = $this->findService($uuid);
-        $validIds = $content->getMedia('service-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_SERVICE, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('service-media')->serviceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_SERVICE)->serviceImages(),
         ];
     }
 

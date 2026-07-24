@@ -14,7 +14,7 @@ trait ResolvesCourse
 
     protected function taxonomyCategoryType(): string
     {
-        return 'course_category';
+        return Content::TAXONOMY_COURSE;
     }
 
     protected function courseType(): string

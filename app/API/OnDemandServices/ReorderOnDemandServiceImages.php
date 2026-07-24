@@ -4,13 +4,13 @@ namespace App\API\OnDemandServices;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\OnDemandServices\Concerns\ResolvesOnDemandService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store project gallery images.
+ * Reorders on-demand service gallery images.
  */
 class ReorderOnDemandServiceImages
 {
@@ -34,10 +34,7 @@ class ReorderOnDemandServiceImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderOnDemandServiceImages
         setCurrentTenant($tenant);
 
         $content = $this->findOnDemandService($uuid);
-        $validIds = $content->getMedia('on-demand-service-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_ON_DEMAND_SERVICE, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('on-demand-service-media')->onDemandServiceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_ON_DEMAND_SERVICE)->onDemandServiceImages(),
         ];
     }
 

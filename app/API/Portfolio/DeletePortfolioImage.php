@@ -4,11 +4,10 @@ namespace App\API\Portfolio;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Portfolio\Concerns\ResolvesPortfolioProject;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Deletes a gallery image from a portfolio project.
@@ -38,16 +37,10 @@ class DeletePortfolioImage
         setCurrentTenant($tenant);
 
         $content = $this->findPortfolioProject($uuid);
-        $media = $content->getMedia('portfolio-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_PORTFOLIO, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('portfolio-media')->portfolioImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_PORTFOLIO)->portfolioImages(),
         ];
     }
 

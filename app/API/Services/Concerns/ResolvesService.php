@@ -15,7 +15,7 @@ trait ResolvesService
 
     protected function taxonomyCategoryType(): string
     {
-        return 'service_category';
+        return Content::TAXONOMY_SERVICE;
     }
 
     protected function serviceType(): string

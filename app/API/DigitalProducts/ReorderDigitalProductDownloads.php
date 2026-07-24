@@ -4,7 +4,7 @@ namespace App\API\DigitalProducts;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\DigitalProducts\Concerns\ResolvesDigitalProduct;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -34,10 +34,7 @@ class ReorderDigitalProductDownloads
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderDigitalProductDownloads
         setCurrentTenant($tenant);
 
         $content = $this->findDigitalProduct($uuid);
-        $validIds = $content->getMedia('digital-product-downloads')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_DIGITAL_PRODUCT_DOWNLOADS, $order);
 
         return [
-            'downloads' => $content->reloadMediaCollection('digital-product-downloads')->digitalProductDownloadFiles(),
+            'downloads' => $content->reloadMediaCollection(Content::MEDIA_DIGITAL_PRODUCT_DOWNLOADS)->digitalProductDownloadFiles(),
         ];
     }
 

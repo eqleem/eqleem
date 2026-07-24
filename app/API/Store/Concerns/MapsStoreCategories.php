@@ -3,6 +3,7 @@
 namespace App\API\Store\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsStoreCategories
 {
@@ -10,6 +11,6 @@ trait MapsStoreCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'store_category';
+        return Content::TAXONOMY_STORE;
     }
 }

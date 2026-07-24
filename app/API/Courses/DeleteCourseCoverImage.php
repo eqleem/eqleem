@@ -4,11 +4,10 @@ namespace App\API\Courses;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Courses\Concerns\ResolvesCourse;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Deletes the course cover image.
@@ -38,16 +37,10 @@ class DeleteCourseCoverImage
         setCurrentTenant($tenant);
 
         $content = $this->findCourse($uuid);
-        $media = $content->getMedia('course-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_COURSE, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('course-media')->courseImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_COURSE)->courseImages(),
         ];
     }
 

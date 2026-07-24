@@ -13,7 +13,7 @@ trait ResolvesBlogPost
 
     protected function taxonomyCategoryType(): string
     {
-        return 'blog_category';
+        return Content::TAXONOMY_BLOG;
     }
 
     protected function blogType(): string

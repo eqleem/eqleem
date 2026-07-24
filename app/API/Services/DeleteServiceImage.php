@@ -4,14 +4,13 @@ namespace App\API\Services;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Services\Concerns\ResolvesService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from a service.
  */
 class DeleteServiceImage
 {
@@ -38,16 +37,10 @@ class DeleteServiceImage
         setCurrentTenant($tenant);
 
         $content = $this->findService($uuid);
-        $media = $content->getMedia('service-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_SERVICE, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('service-media')->serviceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_SERVICE)->serviceImages(),
         ];
     }
 

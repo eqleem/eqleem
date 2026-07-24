@@ -39,10 +39,10 @@ class ListDigitalProducts
         $query = Content::query()
             ->type($this->digitalProductType())
             ->with([
-                'media' => fn ($query) => $query->where('collection_name', 'digital-product-media'),
+                'media' => fn ($query) => $query->where('collection_name', Content::MEDIA_DIGITAL_PRODUCT),
             ])
             ->withCount([
-                'media as downloads_count' => fn ($query) => $query->where('collection_name', 'digital-product-downloads'),
+                'media as downloads_count' => fn ($query) => $query->where('collection_name', Content::MEDIA_DIGITAL_PRODUCT_DOWNLOADS),
             ])
             ->orderByDesc('id');
 

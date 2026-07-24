@@ -4,13 +4,12 @@ namespace App\API\Services;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Services\Concerns\MapsServiceCategories;
-use App\Models\Taxonomy;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store categories (sort_order per sibling group).
+ * Reorders service categories (sort_order per sibling group).
  */
 class ReorderServiceCategories
 {
@@ -34,10 +33,7 @@ class ReorderServiceCategories
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -48,33 +44,7 @@ class ReorderServiceCategories
     {
         setCurrentTenant($tenant);
 
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->values()
-            ->all();
-
-        $categories = Taxonomy::query()
-            ->type('service_category')
-            ->whereIn('id', $orderedIds)
-            ->get()
-            ->keyBy('id');
-
-        $siblingCounters = [];
-
-        foreach ($orderedIds as $id) {
-            $category = $categories->get($id);
-
-            if (! $category instanceof Taxonomy) {
-                continue;
-            }
-
-            $parentKey = (string) ($category->parent_id ?? 'root');
-            $sortOrder = $siblingCounters[$parentKey] ?? 0;
-
-            $category->update(['sort_order' => $sortOrder]);
-
-            $siblingCounters[$parentKey] = $sortOrder + 1;
-        }
+        $this->reorderSiblingCategories($order);
 
         return [
             'categories' => $this->mapCategoryTree()->values()->all(),

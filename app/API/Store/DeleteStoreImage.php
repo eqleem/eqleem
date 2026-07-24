@@ -4,14 +4,13 @@ namespace App\API\Store;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Store\Concerns\ResolvesStoreProduct;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from a store product.
  */
 class DeleteStoreImage
 {
@@ -38,16 +37,10 @@ class DeleteStoreImage
         setCurrentTenant($tenant);
 
         $content = $this->findStoreProduct($uuid);
-        $media = $content->getMedia('store-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_STORE, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('store-media')->storeImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_STORE)->storeImages(),
         ];
     }
 

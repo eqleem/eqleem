@@ -13,7 +13,7 @@ trait ResolvesDigitalProduct
 
     protected function taxonomyCategoryType(): string
     {
-        return 'digital_store_category';
+        return Content::TAXONOMY_DIGITAL_STORE;
     }
 
     protected function digitalProductType(): string

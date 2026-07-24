@@ -4,13 +4,13 @@ namespace App\API\Store;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Store\Concerns\ResolvesStoreProduct;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store project gallery images.
+ * Reorders store product gallery images.
  */
 class ReorderStoreImages
 {
@@ -34,10 +34,7 @@ class ReorderStoreImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderStoreImages
         setCurrentTenant($tenant);
 
         $content = $this->findStoreProduct($uuid);
-        $validIds = $content->getMedia('store-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_STORE, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('store-media')->storeImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_STORE)->storeImages(),
         ];
     }
 

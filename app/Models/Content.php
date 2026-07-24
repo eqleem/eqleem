@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[Fillable([
     'tenant_id',
@@ -40,6 +41,48 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Content extends Model implements HasMedia
 {
     use BelongsToTenant, HasTaxonomy, HasUuid, InteractsWithMedia, SoftDeletes;
+
+    public const MEDIA_EDITOR_IMAGES = 'editor-images';
+
+    public const MEDIA_PORTFOLIO = 'portfolio-media';
+
+    public const MEDIA_STORE = 'store-media';
+
+    public const MEDIA_SERVICE = 'service-media';
+
+    public const MEDIA_DIGITAL_PRODUCT = 'digital-product-media';
+
+    public const MEDIA_DIGITAL_PRODUCT_DOWNLOADS = 'digital-product-downloads';
+
+    public const MEDIA_DIGITAL_SERVICE = 'digital-service-media';
+
+    public const MEDIA_ON_DEMAND_SERVICE = 'on-demand-service-media';
+
+    public const MEDIA_MENU = 'menu-media';
+
+    public const MEDIA_COURSE = 'course-media';
+
+    public const MEDIA_COURSE_LESSON_FILES = 'course-lesson-files';
+
+    public const MEDIA_UNIT = 'unit-media';
+
+    public const TAXONOMY_PORTFOLIO = 'portfolio_category';
+
+    public const TAXONOMY_STORE = 'store_category';
+
+    public const TAXONOMY_SERVICE = 'service_category';
+
+    public const TAXONOMY_DIGITAL_STORE = 'digital_store_category';
+
+    public const TAXONOMY_DIGITAL_SERVICE = 'digital_service_category';
+
+    public const TAXONOMY_MENU = 'menu_category';
+
+    public const TAXONOMY_BLOG = 'blog_category';
+
+    public const TAXONOMY_COURSE = 'course_category';
+
+    public const TAXONOMY_UNIT = 'unit_category';
 
     protected function casts(): array
     {
@@ -405,21 +448,66 @@ HTML,
         $disk = config('media-library.disk_name');
 
         foreach ([
-            'editor-images',
-            'portfolio-media',
-            'store-media',
-            'service-media',
-            'digital-product-media',
-            'digital-product-downloads',
-            'digital-service-media',
-            'on-demand-service-media',
-            'menu-media',
-            'course-media',
-            'course-lesson-files',
-            'unit-media',
+            self::MEDIA_EDITOR_IMAGES,
+            self::MEDIA_PORTFOLIO,
+            self::MEDIA_STORE,
+            self::MEDIA_SERVICE,
+            self::MEDIA_DIGITAL_PRODUCT,
+            self::MEDIA_DIGITAL_PRODUCT_DOWNLOADS,
+            self::MEDIA_DIGITAL_SERVICE,
+            self::MEDIA_ON_DEMAND_SERVICE,
+            self::MEDIA_MENU,
+            self::MEDIA_COURSE,
+            self::MEDIA_COURSE_LESSON_FILES,
+            self::MEDIA_UNIT,
         ] as $collection) {
             $this->addMediaCollection($collection)->useDisk($disk);
         }
+    }
+
+    /**
+     * @param  list<int|string>  $order
+     */
+    public function reorderMediaCollection(string $collection, array $order): void
+    {
+        $validIds = $this->getMedia($collection)->pluck('id')->all();
+
+        $orderedIds = collect($order)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
+            ->values()
+            ->all();
+
+        if ($orderedIds !== []) {
+            Media::setNewOrder($orderedIds);
+        }
+    }
+
+    public function deleteMediaFromCollection(string $collection, int $mediaId): void
+    {
+        $media = $this->getMedia($collection)->firstWhere('id', $mediaId);
+
+        if (! $media instanceof Media) {
+            throw new NotFoundHttpException;
+        }
+
+        $media->delete();
+    }
+
+    public static function mediaCollectionForType(?string $type = null): ?string
+    {
+        return match ($type) {
+            'product' => self::MEDIA_STORE,
+            'service' => self::MEDIA_SERVICE,
+            'course' => self::MEDIA_COURSE,
+            'digital-product' => self::MEDIA_DIGITAL_PRODUCT,
+            'digital-service' => self::MEDIA_DIGITAL_SERVICE,
+            'on-demand-service' => self::MEDIA_ON_DEMAND_SERVICE,
+            'menu' => self::MEDIA_MENU,
+            'unit' => self::MEDIA_UNIT,
+            'portfolio' => self::MEDIA_PORTFOLIO,
+            default => null,
+        };
     }
 
     public function hasMediaAtPath(string $collection, string $path): bool
@@ -455,7 +543,7 @@ HTML,
      */
     public function portfolioImages(): array
     {
-        return $this->mediaIdUrlList('portfolio-media');
+        return $this->mediaIdUrlList(self::MEDIA_PORTFOLIO);
     }
 
     /**
@@ -471,7 +559,7 @@ HTML,
      */
     public function storeImages(): array
     {
-        return $this->mediaIdUrlList('store-media');
+        return $this->mediaIdUrlList(self::MEDIA_STORE);
     }
 
     /**
@@ -487,7 +575,7 @@ HTML,
      */
     public function serviceImages(): array
     {
-        return $this->mediaIdUrlList('service-media');
+        return $this->mediaIdUrlList(self::MEDIA_SERVICE);
     }
 
     /**
@@ -503,7 +591,7 @@ HTML,
      */
     public function unitImages(): array
     {
-        return $this->mediaIdUrlList('unit-media');
+        return $this->mediaIdUrlList(self::MEDIA_UNIT);
     }
 
     /**
@@ -511,7 +599,7 @@ HTML,
      */
     public function digitalProductImages(): array
     {
-        return $this->mediaIdUrlList('digital-product-media');
+        return $this->mediaIdUrlList(self::MEDIA_DIGITAL_PRODUCT);
     }
 
     /**
@@ -519,7 +607,7 @@ HTML,
      */
     public function digitalProductDownloadFiles(): array
     {
-        return $this->getMedia('digital-product-downloads')
+        return $this->getMedia(self::MEDIA_DIGITAL_PRODUCT_DOWNLOADS)
             ->map(fn (Media $media): array => [
                 'id' => (int) $media->id,
                 'name' => $media->file_name,
@@ -535,7 +623,7 @@ HTML,
      */
     public function menuImages(): array
     {
-        return $this->mediaIdUrlList('menu-media');
+        return $this->mediaIdUrlList(self::MEDIA_MENU);
     }
 
     /**
@@ -551,7 +639,7 @@ HTML,
      */
     public function digitalServiceImages(): array
     {
-        return $this->mediaIdUrlList('digital-service-media');
+        return $this->mediaIdUrlList(self::MEDIA_DIGITAL_SERVICE);
     }
 
     /**
@@ -559,7 +647,7 @@ HTML,
      */
     public function onDemandServiceImages(): array
     {
-        return $this->mediaIdUrlList('on-demand-service-media');
+        return $this->mediaIdUrlList(self::MEDIA_ON_DEMAND_SERVICE);
     }
 
     /**
@@ -613,7 +701,7 @@ HTML,
             return;
         }
 
-        if ($this->getMedia('portfolio-media')->isEmpty()) {
+        if ($this->getMedia(self::MEDIA_PORTFOLIO)->isEmpty()) {
             foreach ($legacyImages as $path) {
                 if (! filled($path) || ! is_string($path)) {
                     continue;
@@ -627,7 +715,7 @@ HTML,
 
                 $this->addMediaFromDisk($path, $disk)
                     ->preservingOriginal()
-                    ->toMediaCollection('portfolio-media');
+                    ->toMediaCollection(self::MEDIA_PORTFOLIO);
             }
         }
 
@@ -718,17 +806,8 @@ HTML,
 
     public function cartImageUrl(): ?string
     {
-        $url = match ($this->type) {
-            'product' => $this->getFirstMediaUrl('store-media'),
-            'service' => $this->getFirstMediaUrl('service-media'),
-            'course' => $this->getFirstMediaUrl('course-media'),
-            'digital-product' => $this->getFirstMediaUrl('digital-product-media'),
-            'digital-service' => $this->getFirstMediaUrl('digital-service-media'),
-            'on-demand-service' => $this->getFirstMediaUrl('on-demand-service-media'),
-            'menu' => $this->getFirstMediaUrl('menu-media'),
-            'unit' => $this->getFirstMediaUrl('unit-media'),
-            default => null,
-        };
+        $collection = self::mediaCollectionForType($this->type);
+        $url = $collection !== null ? $this->getFirstMediaUrl($collection) : null;
 
         if (filled($url)) {
             return $url;
@@ -742,7 +821,7 @@ HTML,
      */
     public function courseImages(): array
     {
-        return $this->mediaIdUrlList('course-media');
+        return $this->mediaIdUrlList(self::MEDIA_COURSE);
     }
 
     /**
@@ -750,7 +829,7 @@ HTML,
      */
     public function courseLessonFiles(): array
     {
-        return $this->getMedia('course-lesson-files')
+        return $this->getMedia(self::MEDIA_COURSE_LESSON_FILES)
             ->map(fn (Media $media): array => [
                 'id' => (int) $media->id,
                 'name' => $media->file_name,

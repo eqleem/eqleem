@@ -113,4 +113,40 @@ trait MapsTaxonomyCategories
             ->values()
             ->all();
     }
+
+    /**
+     * @param  list<int>  $order
+     */
+    protected function reorderSiblingCategories(array $order): void
+    {
+        $orderedIds = collect($order)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->values()
+            ->all();
+
+        $categories = Taxonomy::query()
+            ->type($this->taxonomyCategoryType())
+            ->whereIn('id', $orderedIds)
+            ->get()
+            ->keyBy('id');
+
+        $siblingCounters = [];
+
+        foreach ($orderedIds as $id) {
+            $category = $categories->get($id);
+
+            if (! $category instanceof Taxonomy) {
+                continue;
+            }
+
+            $parentKey = (string) ($category->parent_id ?? 'root');
+            $sortOrder = $siblingCounters[$parentKey] ?? 0;
+
+            $category->update(['sort_order' => $sortOrder]);
+
+            $siblingCounters[$parentKey] = $sortOrder + 1;
+        }
+
+        $this->categoryTreeCache = null;
+    }
 }

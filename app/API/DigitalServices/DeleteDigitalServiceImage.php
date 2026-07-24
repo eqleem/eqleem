@@ -4,14 +4,13 @@ namespace App\API\DigitalServices;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\DigitalServices\Concerns\ResolvesDigitalService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from a digital service.
  */
 class DeleteDigitalServiceImage
 {
@@ -38,16 +37,10 @@ class DeleteDigitalServiceImage
         setCurrentTenant($tenant);
 
         $content = $this->findDigitalService($uuid);
-        $media = $content->getMedia('digital-service-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_DIGITAL_SERVICE, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('digital-service-media')->digitalServiceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_DIGITAL_SERVICE)->digitalServiceImages(),
         ];
     }
 

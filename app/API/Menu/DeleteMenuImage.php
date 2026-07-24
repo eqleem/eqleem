@@ -4,11 +4,10 @@ namespace App\API\Menu;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Menu\Concerns\ResolvesMenuItem;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Deletes a gallery image from a menu item.
@@ -38,16 +37,10 @@ class DeleteMenuImage
         setCurrentTenant($tenant);
 
         $content = $this->findMenuItem($uuid);
-        $media = $content->getMedia('menu-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_MENU, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('menu-media')->menuImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_MENU)->menuImages(),
         ];
     }
 

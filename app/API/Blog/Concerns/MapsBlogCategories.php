@@ -3,6 +3,7 @@
 namespace App\API\Blog\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsBlogCategories
 {
@@ -10,6 +11,6 @@ trait MapsBlogCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'blog_category';
+        return Content::TAXONOMY_BLOG;
     }
 }

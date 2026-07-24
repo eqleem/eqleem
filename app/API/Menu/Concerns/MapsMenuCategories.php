@@ -3,6 +3,7 @@
 namespace App\API\Menu\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsMenuCategories
 {
@@ -10,6 +11,6 @@ trait MapsMenuCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'menu_category';
+        return Content::TAXONOMY_MENU;
     }
 }

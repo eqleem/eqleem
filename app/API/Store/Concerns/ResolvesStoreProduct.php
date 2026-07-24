@@ -13,7 +13,7 @@ trait ResolvesStoreProduct
 
     protected function taxonomyCategoryType(): string
     {
-        return 'store_category';
+        return Content::TAXONOMY_STORE;
     }
 
     protected function storeType(): string

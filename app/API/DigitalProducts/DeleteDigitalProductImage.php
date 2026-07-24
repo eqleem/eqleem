@@ -4,14 +4,13 @@ namespace App\API\DigitalProducts;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\DigitalProducts\Concerns\ResolvesDigitalProduct;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from a digital product.
  */
 class DeleteDigitalProductImage
 {
@@ -38,16 +37,10 @@ class DeleteDigitalProductImage
         setCurrentTenant($tenant);
 
         $content = $this->findDigitalProduct($uuid);
-        $media = $content->getMedia('digital-product-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_DIGITAL_PRODUCT, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('digital-product-media')->digitalProductImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_DIGITAL_PRODUCT)->digitalProductImages(),
         ];
     }
 

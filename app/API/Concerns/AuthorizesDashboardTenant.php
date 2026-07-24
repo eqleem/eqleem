@@ -62,4 +62,15 @@ trait AuthorizesDashboardTenant
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
         ];
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function orderRules(): array
+    {
+        return [
+            'order' => ['required', 'array', 'min:1'],
+            'order.*' => ['integer'],
+        ];
+    }
 }

@@ -4,14 +4,13 @@ namespace App\API\UnitRental;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\UnitRental\Concerns\ResolvesUnitRental;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from a unit rental.
  */
 class DeleteUnitRentalImage
 {
@@ -38,16 +37,10 @@ class DeleteUnitRentalImage
         setCurrentTenant($tenant);
 
         $content = $this->findUnitRental($uuid);
-        $media = $content->getMedia('unit-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_UNIT, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('unit-media')->unitImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_UNIT)->unitImages(),
         ];
     }
 

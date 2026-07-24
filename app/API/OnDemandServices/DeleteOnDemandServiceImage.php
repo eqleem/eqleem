@@ -4,14 +4,13 @@ namespace App\API\OnDemandServices;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\OnDemandServices\Concerns\ResolvesOnDemandService;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Deletes a gallery image from a store project.
+ * Deletes a gallery image from an on-demand service.
  */
 class DeleteOnDemandServiceImage
 {
@@ -38,16 +37,10 @@ class DeleteOnDemandServiceImage
         setCurrentTenant($tenant);
 
         $content = $this->findOnDemandService($uuid);
-        $media = $content->getMedia('on-demand-service-media')->firstWhere('id', $mediaId);
-
-        if (! $media instanceof Media) {
-            throw new NotFoundHttpException;
-        }
-
-        $media->delete();
+        $content->deleteMediaFromCollection(Content::MEDIA_ON_DEMAND_SERVICE, $mediaId);
 
         return [
-            'images' => $content->reloadMediaCollection('on-demand-service-media')->onDemandServiceImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_ON_DEMAND_SERVICE)->onDemandServiceImages(),
         ];
     }
 

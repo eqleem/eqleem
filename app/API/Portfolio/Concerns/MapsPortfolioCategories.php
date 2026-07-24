@@ -3,6 +3,7 @@
 namespace App\API\Portfolio\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsPortfolioCategories
 {
@@ -10,6 +11,6 @@ trait MapsPortfolioCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'portfolio_category';
+        return Content::TAXONOMY_PORTFOLIO;
     }
 }

@@ -4,7 +4,7 @@ namespace App\API\Menu;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Menu\Concerns\ResolvesMenuItem;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -34,10 +34,7 @@ class ReorderMenuImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderMenuImages
         setCurrentTenant($tenant);
 
         $content = $this->findMenuItem($uuid);
-        $validIds = $content->getMedia('menu-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_MENU, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('menu-media')->menuImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_MENU)->menuImages(),
         ];
     }
 

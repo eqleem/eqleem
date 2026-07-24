@@ -4,7 +4,7 @@ namespace App\API\Portfolio;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Portfolio\Concerns\ResolvesPortfolioProject;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -34,10 +34,7 @@ class ReorderPortfolioImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderPortfolioImages
         setCurrentTenant($tenant);
 
         $content = $this->findPortfolioProject($uuid);
-        $validIds = $content->getMedia('portfolio-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_PORTFOLIO, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('portfolio-media')->portfolioImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_PORTFOLIO)->portfolioImages(),
         ];
     }
 

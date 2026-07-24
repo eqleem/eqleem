@@ -3,6 +3,7 @@
 namespace App\API\Courses\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsCourseCategories
 {
@@ -10,6 +11,6 @@ trait MapsCourseCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'course_category';
+        return Content::TAXONOMY_COURSE;
     }
 }

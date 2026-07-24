@@ -15,7 +15,7 @@ trait ResolvesUnitRental
 
     protected function taxonomyCategoryType(): string
     {
-        return 'unit_category';
+        return Content::TAXONOMY_UNIT;
     }
 
     protected function unitRentalType(): string

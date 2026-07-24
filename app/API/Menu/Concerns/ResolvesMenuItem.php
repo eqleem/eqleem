@@ -13,7 +13,7 @@ trait ResolvesMenuItem
 
     protected function taxonomyCategoryType(): string
     {
-        return 'menu_category';
+        return Content::TAXONOMY_MENU;
     }
 
     protected function menuType(): string

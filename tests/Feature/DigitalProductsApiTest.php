@@ -86,7 +86,7 @@ test('owner can create list update and delete digital products', function () {
     $leaf = Taxonomy::query()->create([
         'tenant_id' => $tenant->id,
         'name' => 'أدلة',
-        'type' => 'digital_store_category',
+        'type' => Content::TAXONOMY_DIGITAL_STORE,
         'sort_order' => 0,
     ]);
 
@@ -191,4 +191,102 @@ test('owner can upload gallery images and download files', function () {
         ], ['Accept' => 'application/json'])
         ->assertSuccessful()
         ->assertJsonCount(1, 'data.downloads');
+});
+
+test('owner can reorder and delete gallery images and downloads', function () {
+    Storage::fake(config('media-library.disk_name'));
+
+    [$user] = createUserWithTenantForDigitalProducts();
+
+    $create = $this->actingAs($user)
+        ->postJson('/api/digital-products', ['title' => 'منتج ترتيب'])
+        ->assertSuccessful();
+
+    $uuid = (string) $create->json('data.uuid');
+
+    $firstImage = $this->actingAs($user)
+        ->post("/api/digital-products/{$uuid}/images", [
+            'file' => UploadedFile::fake()->image('first.jpg'),
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful();
+
+    $secondImage = $this->actingAs($user)
+        ->post("/api/digital-products/{$uuid}/images", [
+            'file' => UploadedFile::fake()->image('second.jpg'),
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful();
+
+    $imageIdA = (int) $firstImage->json('data.images.0.id');
+    $imageIdB = (int) collect($secondImage->json('data.images'))->pluck('id')->first(fn (int $id): bool => $id !== $imageIdA);
+
+    $this->actingAs($user)
+        ->putJson("/api/digital-products/{$uuid}/images/reorder", [
+            'order' => [$imageIdB, $imageIdA],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.images.0.id', $imageIdB)
+        ->assertJsonPath('data.images.1.id', $imageIdA);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/digital-products/{$uuid}/images/{$imageIdA}")
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data.images')
+        ->assertJsonPath('data.images.0.id', $imageIdB);
+
+    $firstDownload = $this->actingAs($user)
+        ->post("/api/digital-products/{$uuid}/downloads", [
+            'file' => UploadedFile::fake()->create('a.pdf', 50, 'application/pdf'),
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful();
+
+    $secondDownload = $this->actingAs($user)
+        ->post("/api/digital-products/{$uuid}/downloads", [
+            'file' => UploadedFile::fake()->create('b.pdf', 50, 'application/pdf'),
+        ], ['Accept' => 'application/json'])
+        ->assertSuccessful();
+
+    $downloadIdA = (int) $firstDownload->json('data.downloads.0.id');
+    $downloadIdB = (int) collect($secondDownload->json('data.downloads'))->pluck('id')->first(fn (int $id): bool => $id !== $downloadIdA);
+
+    $this->actingAs($user)
+        ->putJson("/api/digital-products/{$uuid}/downloads/reorder", [
+            'order' => [$downloadIdB, $downloadIdA],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.downloads.0.id', $downloadIdB)
+        ->assertJsonPath('data.downloads.1.id', $downloadIdA);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/digital-products/{$uuid}/downloads/{$downloadIdA}")
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data.downloads')
+        ->assertJsonPath('data.downloads.0.id', $downloadIdB);
+});
+
+test('owner can reorder digital product categories', function () {
+    [$user, $tenant] = createUserWithTenantForDigitalProducts();
+
+    $first = $this->actingAs($user)
+        ->postJson('/api/digital-products/categories', ['name' => 'أول'])
+        ->assertSuccessful();
+
+    $second = $this->actingAs($user)
+        ->postJson('/api/digital-products/categories', ['name' => 'ثاني'])
+        ->assertSuccessful();
+
+    $firstId = (int) $first->json('data.category.id');
+    $secondId = (int) $second->json('data.category.id');
+
+    $this->actingAs($user)
+        ->putJson('/api/digital-products/categories/reorder', [
+            'order' => [$secondId, $firstId],
+        ])
+        ->assertSuccessful()
+        ->assertJsonPath('data.categories.0.id', $secondId)
+        ->assertJsonPath('data.categories.1.id', $firstId);
+
+    setCurrentTenant($tenant);
+
+    expect(Taxonomy::query()->whereKey($secondId)->value('sort_order'))->toBe(0)
+        ->and(Taxonomy::query()->whereKey($firstId)->value('sort_order'))->toBe(1);
 });

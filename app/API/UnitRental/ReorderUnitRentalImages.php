@@ -4,13 +4,13 @@ namespace App\API\UnitRental;
 
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\UnitRental\Concerns\ResolvesUnitRental;
-use App\Models\Media;
+use App\Models\Content;
 use App\Models\Tenant;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Reorders store project gallery images.
+ * Reorders unit rental gallery images.
  */
 class ReorderUnitRentalImages
 {
@@ -34,10 +34,7 @@ class ReorderUnitRentalImages
      */
     public function rules(): array
     {
-        return [
-            'order' => ['required', 'array', 'min:1'],
-            'order.*' => ['integer'],
-        ];
+        return $this->orderRules();
     }
 
     /**
@@ -49,20 +46,10 @@ class ReorderUnitRentalImages
         setCurrentTenant($tenant);
 
         $content = $this->findUnitRental($uuid);
-        $validIds = $content->getMedia('unit-media')->pluck('id')->all();
-
-        $orderedIds = collect($order)
-            ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => in_array($id, $validIds, true))
-            ->values()
-            ->all();
-
-        if ($orderedIds !== []) {
-            Media::setNewOrder($orderedIds);
-        }
+        $content->reorderMediaCollection(Content::MEDIA_UNIT, $order);
 
         return [
-            'images' => $content->reloadMediaCollection('unit-media')->unitImages(),
+            'images' => $content->reloadMediaCollection(Content::MEDIA_UNIT)->unitImages(),
         ];
     }
 

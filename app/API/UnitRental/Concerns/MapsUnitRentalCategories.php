@@ -3,6 +3,7 @@
 namespace App\API\UnitRental\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsUnitRentalCategories
 {
@@ -10,6 +11,6 @@ trait MapsUnitRentalCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'unit_category';
+        return Content::TAXONOMY_UNIT;
     }
 }

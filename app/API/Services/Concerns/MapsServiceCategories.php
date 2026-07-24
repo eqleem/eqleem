@@ -3,6 +3,7 @@
 namespace App\API\Services\Concerns;
 
 use App\API\Concerns\MapsTaxonomyCategories;
+use App\Models\Content;
 
 trait MapsServiceCategories
 {
@@ -10,6 +11,6 @@ trait MapsServiceCategories
 
     protected function taxonomyCategoryType(): string
     {
-        return 'service_category';
+        return Content::TAXONOMY_SERVICE;
     }
 }

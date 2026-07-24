@@ -13,7 +13,7 @@ trait ResolvesPortfolioProject
 
     protected function taxonomyCategoryType(): string
     {
-        return 'portfolio_category';
+        return Content::TAXONOMY_PORTFOLIO;
     }
 
     protected function portfolioType(): string
