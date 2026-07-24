@@ -77,9 +77,3 @@ export const COVER_GRADIENTS = [
     { id: 'midnight', value: 'linear-gradient(135deg, #020617 0%, #1e3a8a 50%, #4c1d95 100%)' },
     { id: 'peach', value: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 50%, #fb7185 100%)' },
 ];
-
-/** @deprecated Prefer COVER_COLORS / COVER_GRADIENTS. Kept for older imports. */
-export const COVER_PRESETS = [
-    ...COVER_COLORS.map((item) => ({ ...item, type: 'color' })),
-    ...COVER_GRADIENTS.map((item) => ({ ...item, type: 'gradient' })),
-];

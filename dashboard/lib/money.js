@@ -32,10 +32,3 @@ export function formatMoneyAmount(value, { maximumFractionDigits = 2 } = {}) {
 export function formatMoneyMinor(minor, options = {}) {
     return formatMoneyAmount(Number(minor) / 100, options);
 }
-
-/**
- * @deprecated Prefer the <Money /> component for display.
- */
-export function money(value) {
-    return formatMoneyAmount(value || 0, { maximumFractionDigits: 0 });
-}

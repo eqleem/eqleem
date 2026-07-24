@@ -1507,7 +1507,3 @@ export const defaultCountryCode = 'SA';
 export function countryByCode(code) {
     return countries.find((country) => country.code === code) ?? null;
 }
-
-export function countryCodes() {
-    return countries.map((country) => country.code);
-}

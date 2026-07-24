@@ -71,7 +71,3 @@ export function unlockBodyScroll() {
 
     window.scrollTo(0, scrollY);
 }
-
-export function isBodyScrollLocked() {
-    return locks > 0;
-}

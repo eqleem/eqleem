@@ -11,8 +11,6 @@ export const settingsList = [
     { order: 11, slug: 'shipping-option', name: 'وسائل الشحن', description: 'تخصيص طرق الشحن المتاحة.', icon: 'assets/icons/ecommerce/018-cart.svg' },
 ];
 
-export const settingBySlug = (slug) => settingsList.find((item) => item.slug === slug);
-
 export const socialNetworks = {
     twitter: 'X (تويتر)',
     instagram: 'إنستغرام',
@@ -102,18 +100,6 @@ export const verificationCountries = {
 };
 
 export const appDomain = 'eqleem.test';
-
-export const paymentMethods = [
-    { slug: 'bank-transfer', name: 'التحويل البنكي', description: 'اسمح لعملائك بالدفع بواسطة التحويل البنكي إلى حساباتك مباشرة.', icon: 'assets/images/bank-transfer.png', active: true },
-    { slug: 'credit-card', name: 'البطاقة الإئتمانية', description: 'مدفوعات كتالوج: الدفع بواسطة البطاقات الإئتمانية، فيز وماستركارد ومدى.', icon: 'assets/images/credit-card-payment.svg', active: false },
-    { slug: 'cash-on-delivery', name: 'الدفع عند الاستلام', description: 'اسمح لعملائك بالدفع نقداً عند استلام الشحنة. متاح للمنتجات القابلة للشحن فقط.', icon: 'assets/images/cod-payment.webp', active: true },
-    { slug: 'tabby', name: 'تابي', description: 'قسّم مشتريات عملائك على 4 دفعات بدون رسوم.', icon: 'assets/images/tabby-payment.webp', active: false },
-    { slug: 'tamara', name: 'تمارا', description: 'قسّم مشتريات عملائك على دفعات مريحة.', icon: 'assets/images/tamara_installment_mini.webp', active: false },
-];
-
-export const shippingMethods = [
-    { slug: 'eqleem-ship', name: 'شحن إقليم - شحن عادي', description: 'خيار الشحن المفضل، شحن داخلي ودولي، للشحن العادي الجاف.', icon: 'assets/icons/ecommerce/009-cargo ship.svg', active: true },
-];
 
 export const weekdayLabels = {
     sunday: 'الأحد',

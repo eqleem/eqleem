@@ -24,9 +24,6 @@ export const contentTypeCatalog = [
     { slug: 'reviews', name: 'التقييمات', description: 'عرض قائمة التقييمات وآراء العملاء.', icon: 'assets/icons/tabler/star.svg', color: 'amber' },
 ];
 
-/** @deprecated Prefer useContentTypesStore().contentTypes for nav — kept for section stores. */
-export const contentTypes = contentTypeCatalog;
-
 export const contentTypeBySlug = (slug) => contentTypeCatalog.find((type) => type.slug === slug);
 
 // Structure tab — live data comes from /api/page/structure (see stores/pageStructure.js).
