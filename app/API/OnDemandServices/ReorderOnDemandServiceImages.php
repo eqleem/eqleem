@@ -62,7 +62,7 @@ class ReorderOnDemandServiceImages
         }
 
         return [
-            'images' => $content->fresh()->onDemandServiceImages(),
+            'images' => $content->reloadMediaCollection('on-demand-service-media')->onDemandServiceImages(),
         ];
     }
 

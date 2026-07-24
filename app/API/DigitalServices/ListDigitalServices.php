@@ -38,7 +38,9 @@ class ListDigitalServices
 
         $query = Content::query()
             ->type($this->digitalServiceType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'digital-service-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

@@ -62,7 +62,11 @@ class ToggleDigitalProductActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        $content->loadCount([
+            'media as downloads_count' => fn ($query) => $query->where('collection_name', 'digital-product-downloads'),
+        ]);
+
+        return $content->reloadMediaCollection('digital-product-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

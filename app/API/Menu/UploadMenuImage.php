@@ -62,7 +62,7 @@ class UploadMenuImage
             ->toMediaCollection('menu-media');
 
         return [
-            'images' => $content->fresh()->menuImages(),
+            'images' => $content->reloadMediaCollection('menu-media')->menuImages(),
         ];
     }
 

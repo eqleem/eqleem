@@ -62,7 +62,7 @@ class ReorderDigitalServiceImages
         }
 
         return [
-            'images' => $content->fresh()->digitalServiceImages(),
+            'images' => $content->reloadMediaCollection('digital-service-media')->digitalServiceImages(),
         ];
     }
 

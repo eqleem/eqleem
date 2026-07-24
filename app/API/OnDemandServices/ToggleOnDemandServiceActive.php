@@ -62,7 +62,7 @@ class ToggleOnDemandServiceActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('on-demand-service-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

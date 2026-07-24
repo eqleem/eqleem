@@ -101,7 +101,7 @@ class CreatePage
 
     public function jsonResponse(Content $content): PageResource
     {
-        return (new PageResource($content->fresh(), [
+        return (new PageResource($content, [
             'slug_prefix' => $this->slugPrefix(),
         ]))->additional([
             'message' => __('Saved'),

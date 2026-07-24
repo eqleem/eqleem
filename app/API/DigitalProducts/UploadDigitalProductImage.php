@@ -62,7 +62,7 @@ class UploadDigitalProductImage
             ->toMediaCollection('digital-product-media');
 
         return [
-            'images' => $content->fresh()->digitalProductImages(),
+            'images' => $content->reloadMediaCollection('digital-product-media')->digitalProductImages(),
         ];
     }
 

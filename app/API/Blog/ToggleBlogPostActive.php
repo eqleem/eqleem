@@ -62,7 +62,7 @@ class ToggleBlogPostActive
                 : null,
         ]);
 
-        return $content->fresh();
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

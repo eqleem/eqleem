@@ -38,7 +38,9 @@ class ListMenuItems
 
         $query = Content::query()
             ->type($this->menuType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'menu-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

@@ -69,7 +69,7 @@ class CreateService
 
     public function jsonResponse(Content $content): ServiceResource
     {
-        return (new ServiceResource($content->fresh(), [
+        return (new ServiceResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
             'calendar_options' => $this->calendarOptions()->values()->all(),

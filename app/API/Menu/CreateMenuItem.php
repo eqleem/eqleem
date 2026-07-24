@@ -66,7 +66,7 @@ class CreateMenuItem
 
     public function jsonResponse(Content $content): MenuItemResource
     {
-        return (new MenuItemResource($content->fresh(), [
+        return (new MenuItemResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

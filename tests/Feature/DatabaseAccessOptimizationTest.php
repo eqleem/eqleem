@@ -1,8 +1,11 @@
 <?php
 
+use App\API\Blog\ShowBlogPost;
 use App\API\DigitalProducts\ListDigitalProducts;
 use App\API\Store\ListStoreCategories;
+use App\API\Store\ListStoreProducts;
 use App\API\Store\ShowStoreProduct;
+use App\API\Store\UpdateStoreProduct;
 use App\Models\Content;
 use App\Models\Taxonomy;
 use App\Models\Tenant;
@@ -201,4 +204,119 @@ test('list store categories returns tree and parent options from a shared catego
     expect($payload['categories'])->not->toBeEmpty()
         ->and($payload['parent_options'])->not->toBeEmpty()
         ->and($payload['parent_options'][0])->toMatchArray(['id' => '', 'label' => 'بدون تصنيف أب']);
+});
+
+test('store products list constrains eager-loaded media to the store-media collection', function () {
+    [, $tenant] = createOptimizationTenant();
+
+    Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('store'),
+        'title' => 'منتج قائمة',
+        'slug' => 'list-'.Str::lower(Str::random(4)),
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+        'active' => true,
+        'data' => ['price' => 100],
+    ]);
+
+    $sql = [];
+
+    DB::listen(function ($query) use (&$sql): void {
+        $sql[] = $query->sql;
+    });
+
+    $page = ListStoreProducts::run($tenant);
+
+    expect($page)->toHaveCount(1)
+        ->and($page->first()->relationLoaded('media'))->toBeTrue();
+
+    $mediaQueries = collect($sql)->filter(
+        fn (string $statement): bool => str_contains(strtolower($statement), 'collection_name'),
+    );
+
+    expect($mediaQueries)->not->toBeEmpty();
+});
+
+test('update store product refreshes media and taxonomies together', function () {
+    [, $tenant] = createOptimizationTenant();
+
+    $product = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('store'),
+        'title' => 'منتج تحديث',
+        'slug' => 'update-'.Str::lower(Str::random(4)),
+        'status' => 'draft',
+        'active' => false,
+        'data' => ['price' => 100, 'body' => '', 'editor_mode' => 'html'],
+    ]);
+
+    $category = Taxonomy::query()->create([
+        'tenant_id' => $tenant->id,
+        'name' => 'تصنيف تحديث',
+        'type' => 'store_category',
+        'slug' => 'upd-cat-'.Str::lower(Str::random(4)),
+    ]);
+
+    $updated = UpdateStoreProduct::run($tenant, $product->uuid, [
+        'title' => 'منتج محدث',
+        'slug' => $product->slug,
+        'body' => '',
+        'editor_mode' => 'html',
+        'price' => 2,
+        'compare_price' => null,
+        'weight' => null,
+        'category_ids' => [$category->id],
+        'active' => true,
+    ]);
+
+    expect($updated->relationLoaded('media'))->toBeTrue()
+        ->and($updated->relationLoaded('taxonomies'))->toBeTrue()
+        ->and($updated->taxonomiesOfType('store_category')->pluck('id')->all())->toContain($category->id);
+});
+
+test('show blog post loads taxonomies without a second content select', function () {
+    [, $tenant] = createOptimizationTenant();
+
+    $post = Content::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $tenant->id,
+        'type' => contentTypeModel('blog'),
+        'title' => 'مقال',
+        'slug' => 'blog-'.Str::lower(Str::random(4)),
+        'status' => 'draft',
+        'active' => false,
+        'data' => [],
+    ]);
+
+    $sql = [];
+
+    DB::listen(function ($query) use (&$sql): void {
+        $sql[] = $query->sql;
+    });
+
+    $content = ShowBlogPost::run($tenant, $post->uuid);
+
+    expect($content->relationLoaded('taxonomies'))->toBeTrue()
+        ->and($content->relationLoaded('media'))->toBeTrue();
+
+    $contentSelects = collect($sql)->filter(
+        fn (string $statement): bool => str_contains(strtolower($statement), 'from `contents`')
+            || str_contains(strtolower($statement), 'from "contents"'),
+    );
+
+    expect($contentSelects)->toHaveCount(1);
+});
+
+test('course lesson count avoids intermediate collections', function () {
+    $content = new Content([
+        'data' => [
+            'chapters' => [
+                ['lessons' => [['id' => 1], ['id' => 2]]],
+                ['lessons' => [['id' => 3]]],
+                'invalid',
+            ],
+        ],
+    ]);
+
+    expect($content->courseLessonCount())->toBe(3);
 });

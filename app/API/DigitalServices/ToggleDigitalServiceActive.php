@@ -62,7 +62,7 @@ class ToggleDigitalServiceActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('digital-service-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

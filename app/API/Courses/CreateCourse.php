@@ -72,7 +72,7 @@ class CreateCourse
 
     public function jsonResponse(Content $content): CourseResource
     {
-        return (new CourseResource($content->fresh(['media']), [
+        return (new CourseResource($content->loadMissing(['media']), [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
             'chapters' => $this->normalizeChapters($content, data_get($content->data, 'chapters', [])),

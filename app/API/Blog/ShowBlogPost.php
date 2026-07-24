@@ -24,8 +24,9 @@ class ShowBlogPost
         setCurrentTenant($tenant);
 
         $content = $this->findBlogPost($uuid);
+        $content->loadMissing(['media', 'taxonomies']);
 
-        return $content->fresh();
+        return $content;
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

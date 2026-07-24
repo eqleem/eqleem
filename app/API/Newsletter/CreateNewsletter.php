@@ -69,7 +69,7 @@ class CreateNewsletter
 
     public function jsonResponse(Content $content): NewsletterResource
     {
-        return (new NewsletterResource($content->fresh(), [
+        return (new NewsletterResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'mail_status_options' => Content::newsletterMailStatusOptions(),
         ]))->additional([

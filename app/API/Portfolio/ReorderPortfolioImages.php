@@ -62,7 +62,7 @@ class ReorderPortfolioImages
         }
 
         return [
-            'images' => $content->fresh()->portfolioImages(),
+            'images' => $content->reloadMediaCollection('portfolio-media')->portfolioImages(),
         ];
     }
 

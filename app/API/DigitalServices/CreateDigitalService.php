@@ -66,7 +66,7 @@ class CreateDigitalService
 
     public function jsonResponse(Content $content): DigitalServiceResource
     {
-        return (new DigitalServiceResource($content->fresh(), [
+        return (new DigitalServiceResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

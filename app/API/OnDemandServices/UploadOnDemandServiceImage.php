@@ -62,7 +62,7 @@ class UploadOnDemandServiceImage
             ->toMediaCollection('on-demand-service-media');
 
         return [
-            'images' => $content->fresh()->onDemandServiceImages(),
+            'images' => $content->reloadMediaCollection('on-demand-service-media')->onDemandServiceImages(),
         ];
     }
 

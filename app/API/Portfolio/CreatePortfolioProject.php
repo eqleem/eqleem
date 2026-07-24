@@ -68,7 +68,7 @@ class CreatePortfolioProject
     {
         $content->migrateLegacyPortfolioImagesIfNeeded();
 
-        return (new PortfolioProjectResource($content->fresh(), [
+        return (new PortfolioProjectResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

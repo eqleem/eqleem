@@ -47,7 +47,7 @@ class DeleteUnitRentalImage
         $media->delete();
 
         return [
-            'images' => $content->fresh()->unitImages(),
+            'images' => $content->reloadMediaCollection('unit-media')->unitImages(),
         ];
     }
 

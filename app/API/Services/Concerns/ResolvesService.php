@@ -2,15 +2,22 @@
 
 namespace App\API\Services\Concerns;
 
+use App\API\Concerns\ResolvesTaxonomyCategoryOptions;
 use App\Models\Calendar;
 use App\Models\Content;
-use App\Models\Taxonomy;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResolvesService
 {
+    use ResolvesTaxonomyCategoryOptions;
+
+    protected function taxonomyCategoryType(): string
+    {
+        return 'service_category';
+    }
+
     protected function serviceType(): string
     {
         return contentTypeModel('services');
@@ -28,53 +35,6 @@ trait ResolvesService
         }
 
         return $content;
-    }
-
-    /** @var Collection<int, array{id: string, label: string, selectable: bool}>|null */
-    private ?Collection $cachedCategoryOptions = null;
-
-    /**
-     * @return Collection<int, array{id: string, label: string, selectable: bool}>
-     */
-    protected function categoryOptions(): Collection
-    {
-        if ($this->cachedCategoryOptions instanceof Collection) {
-            return $this->cachedCategoryOptions;
-        }
-
-        $tree = Taxonomy::flatTree('service_category');
-        $parentIds = $tree
-            ->pluck('parent_id')
-            ->filter()
-            ->map(fn (mixed $id): int => (int) $id)
-            ->flip();
-
-        return $this->cachedCategoryOptions = $tree
-            ->map(fn (Taxonomy $item): array => [
-                'id' => (string) $item->id,
-                'label' => str_repeat('— ', (int) ($item->depth ?? 0)).$item->name,
-                'selectable' => ! $parentIds->has((int) $item->id),
-            ]);
-    }
-
-    /**
-     * @param  array<int, int|string>  $categoryIds
-     * @return list<int>
-     */
-    protected function selectableCategoryIds(array $categoryIds): array
-    {
-        $selectableIds = $this->categoryOptions()
-            ->where('selectable', true)
-            ->pluck('id')
-            ->map(fn (mixed $id): string => (string) $id)
-            ->all();
-
-        return collect($categoryIds)
-            ->map(fn (mixed $id): string => (string) $id)
-            ->intersect($selectableIds)
-            ->map(fn (string $id): int => (int) $id)
-            ->values()
-            ->all();
     }
 
     protected function uniqueServiceSlug(string $baseSlug, ?int $exceptId = null): string

@@ -563,6 +563,19 @@ HTML,
     }
 
     /**
+     * Reload only the given media collection without re-selecting the content row.
+     */
+    public function reloadMediaCollection(string $collection): static
+    {
+        $this->unsetRelation('media');
+        $this->load([
+            'media' => fn ($query) => $query->where('collection_name', $collection),
+        ]);
+
+        return $this;
+    }
+
+    /**
      * @return array<int, array{id: int, url: string}>
      */
     protected function mediaIdUrlList(string $collection): array
@@ -752,9 +765,27 @@ HTML,
 
     public function courseLessonCount(): int
     {
-        return collect(data_get($this->data, 'chapters', []))
-            ->flatMap(fn (mixed $chapter): array => is_array($chapter) ? ($chapter['lessons'] ?? []) : [])
-            ->count();
+        $chapters = data_get($this->data, 'chapters', []);
+
+        if (! is_array($chapters)) {
+            return 0;
+        }
+
+        $count = 0;
+
+        foreach ($chapters as $chapter) {
+            if (! is_array($chapter)) {
+                continue;
+            }
+
+            $lessons = $chapter['lessons'] ?? null;
+
+            if (is_array($lessons)) {
+                $count += count($lessons);
+            }
+        }
+
+        return $count;
     }
 
     /**

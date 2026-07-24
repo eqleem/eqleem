@@ -66,7 +66,7 @@ class CreateForm
 
     public function jsonResponse(Content $content): FormResource
     {
-        return (new FormResource($content->fresh(), [
+        return (new FormResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'field_type_options' => $this->fieldTypeOptions(),
         ]))->additional([

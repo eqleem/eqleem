@@ -62,7 +62,7 @@ class ToggleUnitRentalActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('unit-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

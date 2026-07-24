@@ -62,7 +62,7 @@ class UploadStoreImage
             ->toMediaCollection('store-media');
 
         return [
-            'images' => $content->fresh()->storeImages(),
+            'images' => $content->reloadMediaCollection('store-media')->storeImages(),
         ];
     }
 

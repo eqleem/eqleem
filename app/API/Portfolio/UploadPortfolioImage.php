@@ -62,7 +62,7 @@ class UploadPortfolioImage
             ->toMediaCollection('portfolio-media');
 
         return [
-            'images' => $content->fresh()->portfolioImages(),
+            'images' => $content->reloadMediaCollection('portfolio-media')->portfolioImages(),
         ];
     }
 

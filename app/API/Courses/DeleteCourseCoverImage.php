@@ -47,7 +47,7 @@ class DeleteCourseCoverImage
         $media->delete();
 
         return [
-            'images' => $content->fresh()->courseImages(),
+            'images' => $content->reloadMediaCollection('course-media')->courseImages(),
         ];
     }
 

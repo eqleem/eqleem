@@ -66,7 +66,7 @@ class CreateStoreProduct
 
     public function jsonResponse(Content $content): StoreProductResource
     {
-        return (new StoreProductResource($content->fresh(), [
+        return (new StoreProductResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

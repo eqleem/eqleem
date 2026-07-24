@@ -66,7 +66,7 @@ class CreateBlogPost
 
     public function jsonResponse(Content $content): BlogPostResource
     {
-        return (new BlogPostResource($content->fresh(), [
+        return (new BlogPostResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

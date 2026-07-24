@@ -23,7 +23,7 @@ class ShowForm
     {
         setCurrentTenant($tenant);
 
-        return $this->findForm($uuid)->fresh();
+        return $this->findForm($uuid);
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

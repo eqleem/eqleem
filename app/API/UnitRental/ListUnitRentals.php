@@ -38,7 +38,9 @@ class ListUnitRentals
 
         $query = Content::query()
             ->type($this->unitRentalType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'unit-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

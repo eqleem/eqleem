@@ -25,10 +25,14 @@ trait MapsContentPageBlocks
                 'title' => $block->title,
                 'type' => $block->type,
                 'sort_order' => $block->sort_order,
+                'is_default' => false,
                 'editable' => filled($editors[$block->type] ?? null),
                 'active' => (bool) $block->active,
                 'icon' => $icon,
                 'icon_url' => asset($icon),
+                'brand_mark' => null,
+                'content_manage_url' => null,
+                'content_manage_label' => null,
             ];
         });
     }

@@ -175,15 +175,11 @@ class CreateBooking
         );
     }
 
-    /**
-     * @return array{data: array<string, mixed>, message: string}
-     */
-    public function jsonResponse(Booking $booking): array
+    public function jsonResponse(Booking $booking): BookingListResource
     {
-        return [
-            'data' => (new BookingListResource($booking))->resolve(),
+        return (new BookingListResource($booking))->additional([
             'message' => 'تم إنشاء الحجز بنجاح.',
-        ];
+        ]);
     }
 
     private function resolveContent(Tenant $tenant, int $contentId, string $type): Content

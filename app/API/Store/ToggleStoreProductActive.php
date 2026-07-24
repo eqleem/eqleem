@@ -62,7 +62,7 @@ class ToggleStoreProductActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('store-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

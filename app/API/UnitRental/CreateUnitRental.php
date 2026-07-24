@@ -66,7 +66,7 @@ class CreateUnitRental
 
     public function jsonResponse(Content $content): UnitRentalResource
     {
-        return (new UnitRentalResource($content->fresh(), [
+        return (new UnitRentalResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
             'calendar_options' => $this->calendarOptions()->values()->all(),

@@ -66,7 +66,7 @@ class CreateDigitalProduct
 
     public function jsonResponse(Content $content): DigitalProductResource
     {
-        return (new DigitalProductResource($content->fresh(), [
+        return (new DigitalProductResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'category_options' => $this->categoryOptions()->values()->all(),
         ]))->additional([

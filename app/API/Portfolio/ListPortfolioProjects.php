@@ -38,7 +38,9 @@ class ListPortfolioProjects
 
         $query = Content::query()
             ->type($this->portfolioType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'portfolio-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

@@ -62,7 +62,7 @@ class UploadDigitalServiceImage
             ->toMediaCollection('digital-service-media');
 
         return [
-            'images' => $content->fresh()->digitalServiceImages(),
+            'images' => $content->reloadMediaCollection('digital-service-media')->digitalServiceImages(),
         ];
     }
 

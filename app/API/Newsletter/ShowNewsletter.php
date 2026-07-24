@@ -23,7 +23,7 @@ class ShowNewsletter
     {
         setCurrentTenant($tenant);
 
-        return $this->findNewsletter($uuid)->fresh();
+        return $this->findNewsletter($uuid);
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

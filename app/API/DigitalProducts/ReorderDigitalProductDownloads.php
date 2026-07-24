@@ -62,7 +62,7 @@ class ReorderDigitalProductDownloads
         }
 
         return [
-            'downloads' => $content->fresh()->digitalProductDownloadFiles(),
+            'downloads' => $content->reloadMediaCollection('digital-product-downloads')->digitalProductDownloadFiles(),
         ];
     }
 

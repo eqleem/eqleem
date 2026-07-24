@@ -5,11 +5,10 @@ namespace App\API\Pages;
 use App\API\Concerns\AuthorizesDashboardTenant;
 use App\API\Pages\Concerns\MapsContentPageBlocks;
 use App\API\Pages\Concerns\ResolvesPage;
-use App\Http\Resources\PageBlockResource;
 use App\Models\Block;
 use App\Models\Tenant;
 use App\Support\BlockTypeRegistry;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -70,12 +69,12 @@ class ReorderPageBlocks
     /**
      * @param  array<string, mixed>  $payload
      */
-    public function jsonResponse(array $payload): AnonymousResourceCollection
+    public function jsonResponse(array $payload): JsonResponse
     {
-        return PageBlockResource::collection($payload['blocks'] ?? [])
-            ->additional([
-                'block_types' => $payload['block_types'] ?? [],
-                'message' => __('Blocks reordered successfully.'),
-            ]);
+        return response()->json([
+            'data' => $payload['blocks'] ?? [],
+            'block_types' => $payload['block_types'] ?? [],
+            'message' => __('Blocks reordered successfully.'),
+        ]);
     }
 }

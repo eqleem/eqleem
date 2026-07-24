@@ -47,7 +47,7 @@ class DeleteStoreImage
         $media->delete();
 
         return [
-            'images' => $content->fresh()->storeImages(),
+            'images' => $content->reloadMediaCollection('store-media')->storeImages(),
         ];
     }
 

@@ -62,7 +62,7 @@ class ReorderStoreImages
         }
 
         return [
-            'images' => $content->fresh()->storeImages(),
+            'images' => $content->reloadMediaCollection('store-media')->storeImages(),
         ];
     }
 

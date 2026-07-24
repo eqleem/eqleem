@@ -47,7 +47,7 @@ class DeleteServiceImage
         $media->delete();
 
         return [
-            'images' => $content->fresh()->serviceImages(),
+            'images' => $content->reloadMediaCollection('service-media')->serviceImages(),
         ];
     }
 

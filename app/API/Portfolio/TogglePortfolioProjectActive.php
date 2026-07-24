@@ -62,7 +62,7 @@ class TogglePortfolioProjectActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('portfolio-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

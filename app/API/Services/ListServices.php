@@ -38,7 +38,9 @@ class ListServices
 
         $query = Content::query()
             ->type($this->serviceType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'service-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

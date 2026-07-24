@@ -38,7 +38,9 @@ class ListCourses
 
         $query = Content::query()
             ->type($this->courseType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'course-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

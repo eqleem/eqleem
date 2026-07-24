@@ -38,7 +38,9 @@ class ListStoreProducts
 
         $query = Content::query()
             ->type($this->storeType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'store-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

@@ -62,7 +62,7 @@ class ToggleMenuItemActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('menu-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

@@ -62,7 +62,7 @@ class UploadUnitRentalImage
             ->toMediaCollection('unit-media');
 
         return [
-            'images' => $content->fresh()->unitImages(),
+            'images' => $content->reloadMediaCollection('unit-media')->unitImages(),
         ];
     }
 

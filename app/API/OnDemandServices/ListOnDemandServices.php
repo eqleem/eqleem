@@ -38,7 +38,9 @@ class ListOnDemandServices
 
         $query = Content::query()
             ->type($this->onDemandServiceType())
-            ->with('media')
+            ->with([
+                'media' => fn ($query) => $query->where('collection_name', 'on-demand-service-media'),
+            ])
             ->orderByDesc('id');
 
         if ($search !== null && $search !== '') {

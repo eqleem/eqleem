@@ -141,7 +141,7 @@ class UpdateUnitRental
 
         $content->calendars()->sync($this->selectableCalendarIds($data['calendar_ids'] ?? []));
 
-        return $content->fresh(['media']);
+        return $content->fresh(['media', 'taxonomies', 'calendars']);
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

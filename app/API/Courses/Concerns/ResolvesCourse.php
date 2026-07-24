@@ -2,15 +2,21 @@
 
 namespace App\API\Courses\Concerns;
 
+use App\API\Concerns\ResolvesTaxonomyCategoryOptions;
 use App\Models\Content;
 use App\Models\Media;
-use App\Models\Taxonomy;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResolvesCourse
 {
+    use ResolvesTaxonomyCategoryOptions;
+
+    protected function taxonomyCategoryType(): string
+    {
+        return 'course_category';
+    }
+
     protected function courseType(): string
     {
         return contentTypeModel('courses');
@@ -28,53 +34,6 @@ trait ResolvesCourse
         }
 
         return $content;
-    }
-
-    /** @var Collection<int, array{id: string, label: string, selectable: bool}>|null */
-    private ?Collection $cachedCategoryOptions = null;
-
-    /**
-     * @return Collection<int, array{id: string, label: string, selectable: bool}>
-     */
-    protected function categoryOptions(): Collection
-    {
-        if ($this->cachedCategoryOptions instanceof Collection) {
-            return $this->cachedCategoryOptions;
-        }
-
-        $tree = Taxonomy::flatTree('course_category');
-        $parentIds = $tree
-            ->pluck('parent_id')
-            ->filter()
-            ->map(fn (mixed $id): int => (int) $id)
-            ->flip();
-
-        return $this->cachedCategoryOptions = $tree
-            ->map(fn (Taxonomy $item): array => [
-                'id' => (string) $item->id,
-                'label' => str_repeat('— ', (int) ($item->depth ?? 0)).$item->name,
-                'selectable' => ! $parentIds->has((int) $item->id),
-            ]);
-    }
-
-    /**
-     * @param  array<int, int|string>  $categoryIds
-     * @return list<int>
-     */
-    protected function selectableCategoryIds(array $categoryIds): array
-    {
-        $selectableIds = $this->categoryOptions()
-            ->where('selectable', true)
-            ->pluck('id')
-            ->map(fn (mixed $id): string => (string) $id)
-            ->all();
-
-        return collect($categoryIds)
-            ->map(fn (mixed $id): string => (string) $id)
-            ->intersect($selectableIds)
-            ->map(fn (string $id): int => (int) $id)
-            ->values()
-            ->all();
     }
 
     protected function uniqueCourseSlug(string $baseSlug, ?int $exceptId = null): string

@@ -56,7 +56,7 @@ class UploadDigitalProductDownload
             ->toMediaCollection('digital-product-downloads');
 
         return [
-            'downloads' => $content->fresh()->digitalProductDownloadFiles(),
+            'downloads' => $content->reloadMediaCollection('digital-product-downloads')->digitalProductDownloadFiles(),
         ];
     }
 

@@ -123,7 +123,7 @@ class UpdatePortfolioProject
             $this->selectableCategoryIds($data['category_ids'] ?? []),
         );
 
-        return $content->fresh(['media']);
+        return $content->fresh(['media', 'taxonomies']);
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

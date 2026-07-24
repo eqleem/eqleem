@@ -59,7 +59,7 @@ class UploadCourseCoverImage
             ->toMediaCollection('course-media');
 
         return [
-            'images' => $content->fresh()->courseImages(),
+            'images' => $content->reloadMediaCollection('course-media')->courseImages(),
         ];
     }
 

@@ -62,7 +62,7 @@ class ToggleServiceActive
                 : null,
         ]);
 
-        return $content->fresh(['media']);
+        return $content->reloadMediaCollection('service-media');
     }
 
     public function asController(ActionRequest $request, string $uuid): Content

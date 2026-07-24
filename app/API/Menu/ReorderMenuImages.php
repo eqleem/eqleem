@@ -62,7 +62,7 @@ class ReorderMenuImages
         }
 
         return [
-            'images' => $content->fresh()->menuImages(),
+            'images' => $content->reloadMediaCollection('menu-media')->menuImages(),
         ];
     }
 

@@ -73,7 +73,7 @@ class CreateOnDemandService
 
     public function jsonResponse(Content $content): OnDemandServiceResource
     {
-        return (new OnDemandServiceResource($content->fresh(), [
+        return (new OnDemandServiceResource($content, [
             'slug_prefix' => $this->slugPrefix(),
             'unit_options' => $this->unitOptions(),
         ]))->additional([
