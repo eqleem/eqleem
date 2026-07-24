@@ -35,7 +35,7 @@ Route::prefix('{tenant}')
                 return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
             }
 
-            return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
+            return redirect()->to(clientAuthIntendedUrl($tenant));
         })->middleware('signed')->name('client.auth.email');
 
         Route::get('/client/auth/{provider}', function (string $provider) {

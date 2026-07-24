@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, ApiError } from '../lib/api.js';
+import { syncListImage } from '../lib/syncListImage.js';
 import { contentTypeBySlug } from '../data/page.js';
 
 function emptyMeta() {
@@ -234,11 +235,15 @@ export const usePortfolioStore = defineStore('portfolio', {
                 body,
             });
 
+            const images = payload?.data?.images ?? this.detail?.images ?? [];
+
             if (this.detail) {
-                this.detail.images = payload?.data?.images ?? this.detail.images;
+                this.detail.images = images;
             }
 
-            return payload?.data?.images ?? [];
+            syncListImage(this.items, uuid, images);
+
+            return images;
         },
 
         async reorderImages(uuid, order) {
@@ -247,11 +252,15 @@ export const usePortfolioStore = defineStore('portfolio', {
                 body: { order },
             });
 
+            const images = payload?.data?.images ?? this.detail?.images ?? [];
+
             if (this.detail) {
-                this.detail.images = payload?.data?.images ?? this.detail.images;
+                this.detail.images = images;
             }
 
-            return payload?.data?.images ?? [];
+            syncListImage(this.items, uuid, images);
+
+            return images;
         },
 
         async deleteImage(uuid, mediaId) {
@@ -259,11 +268,15 @@ export const usePortfolioStore = defineStore('portfolio', {
                 method: 'DELETE',
             });
 
+            const images = payload?.data?.images ?? this.detail?.images ?? [];
+
             if (this.detail) {
-                this.detail.images = payload?.data?.images ?? this.detail.images;
+                this.detail.images = images;
             }
 
-            return payload?.data?.images ?? [];
+            syncListImage(this.items, uuid, images);
+
+            return images;
         },
 
         async fetchCategories({ search, force = false } = {}) {

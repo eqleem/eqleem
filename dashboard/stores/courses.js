@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, ApiError } from '../lib/api.js';
+import { syncListImage } from '../lib/syncListImage.js';
 import { contentTypeBySlug } from '../data/page.js';
 
 function emptyMeta() {
@@ -193,11 +194,15 @@ export const useCoursesStore = defineStore('coursesCatalog', {
                 body,
             });
 
+            const images = payload?.data?.images ?? this.detail?.images ?? [];
+
             if (this.detail) {
-                this.detail.images = payload?.data?.images ?? this.detail.images;
+                this.detail.images = images;
             }
 
-            return payload?.data?.images ?? [];
+            syncListImage(this.items, uuid, images);
+
+            return images;
         },
 
         async deleteCoverImage(uuid, mediaId) {
@@ -205,11 +210,15 @@ export const useCoursesStore = defineStore('coursesCatalog', {
                 method: 'DELETE',
             });
 
+            const images = payload?.data?.images ?? this.detail?.images ?? [];
+
             if (this.detail) {
-                this.detail.images = payload?.data?.images ?? this.detail.images;
+                this.detail.images = images;
             }
 
-            return payload?.data?.images ?? [];
+            syncListImage(this.items, uuid, images);
+
+            return images;
         },
 
         async uploadLessonFile(uuid, { chapterId, lessonId, file }) {

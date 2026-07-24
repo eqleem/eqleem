@@ -315,6 +315,32 @@ class Setting extends Model
         return static::sectionSettings(static::UNIT_RENTAL_SETTINGS_SLUG, static::unitRentalSettingsDefaults());
     }
 
+    public const REVIEW_SETTINGS_SLUG = 'review-settings';
+
+    /**
+     * @return array{section_title: string, per_page: int}
+     */
+    public static function reviewSettingsDefaults(): array
+    {
+        return [
+            'section_title' => 'التقييمات',
+            'per_page' => 12,
+        ];
+    }
+
+    /**
+     * @return array{section_title: string, per_page: int}
+     */
+    public static function reviewSettings(): array
+    {
+        $settings = static::sectionSettings(static::REVIEW_SETTINGS_SLUG, static::reviewSettingsDefaults());
+
+        return [
+            'section_title' => (string) ($settings['section_title'] ?? static::reviewSettingsDefaults()['section_title']),
+            'per_page' => max(1, min(50, (int) ($settings['per_page'] ?? 12))),
+        ];
+    }
+
     /**
      * @param  array{section_title: string, section_description: string}  $defaults
      * @return array{section_title: string, section_description: string}

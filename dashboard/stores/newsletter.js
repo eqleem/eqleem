@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, ApiError } from '../lib/api.js';
+import { syncListImage } from '../lib/syncListImage.js';
 import { contentTypeBySlug } from '../data/page.js';
 
 function emptyMeta() {
@@ -185,11 +186,15 @@ export const useNewsletterStore = defineStore('newsletter', {
                 body,
             });
 
+            const featuredImage = payload?.data?.featured_image ?? this.detail?.featured_image ?? null;
+
             if (this.detail) {
-                this.detail.featured_image = payload?.data?.featured_image ?? this.detail.featured_image;
+                this.detail.featured_image = featuredImage;
             }
 
-            return payload?.data?.featured_image ?? null;
+            syncListImage(this.items, uuid, featuredImage);
+
+            return featuredImage;
         },
 
         async deleteFeaturedImage(uuid) {
@@ -197,11 +202,15 @@ export const useNewsletterStore = defineStore('newsletter', {
                 method: 'DELETE',
             });
 
+            const featuredImage = payload?.data?.featured_image ?? null;
+
             if (this.detail) {
-                this.detail.featured_image = payload?.data?.featured_image ?? null;
+                this.detail.featured_image = featuredImage;
             }
 
-            return payload?.data?.featured_image ?? null;
+            syncListImage(this.items, uuid, featuredImage);
+
+            return featuredImage;
         },
 
         async fetchSettings({ force = false } = {}) {

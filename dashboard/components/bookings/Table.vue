@@ -188,7 +188,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="shrink-0">
+                <!-- <div class="shrink-0">
                     <Button type="button" aria-label="إضافة حجز" @click="openModal('add-booking')">
                         <template #icon>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
@@ -198,11 +198,11 @@ onMounted(() => {
                         </template>
                         <span class="hidden sm:inline">إضافة حجز</span>
                     </Button>
-                </div>
+                </div> -->
 
-                <Modal name="add-booking" title="إضافة حجز جديد" size="4xl" :escape="false">
+                <!-- <Modal name="add-booking" title="إضافة حجز جديد" size="4xl" :escape="false">
                     <AddBooking />
-                </Modal>
+                </Modal> -->
             </div>
         </div>
 

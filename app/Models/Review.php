@@ -74,4 +74,16 @@ class Review extends Model
     {
         return $this->client?->phone ?: $this->phone;
     }
+
+    public static function forClientAndContent(int $clientId, ?int $contentId = null): ?self
+    {
+        return static::query()
+            ->where('client_id', $clientId)
+            ->when(
+                $contentId === null,
+                fn ($query) => $query->whereNull('content_id'),
+                fn ($query) => $query->where('content_id', $contentId),
+            )
+            ->first();
+    }
 }

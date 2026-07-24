@@ -170,7 +170,7 @@ onMounted(() => {
                     </button>
                 </div>
 
-                <div>
+                <!-- <div>
                     <Button type="button" label="إضافة طلب" @click="openModal('add-order')">
                         <template #icon>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
@@ -179,11 +179,11 @@ onMounted(() => {
                             </svg>
                         </template>
                     </Button>
-                </div>
+                </div> -->
 
-                <Modal name="add-order" title="إضافة طلب جديد" size="4xl" :escape="false">
+                <!-- <Modal name="add-order" title="إضافة طلب جديد" size="4xl" :escape="false">
                     <AddOrder />
-                </Modal>
+                </Modal> -->
             </div>
         </div>
 

@@ -139,6 +139,32 @@ it('rejects an invalid login code', function () {
     VerifyClientLoginCode::run('client@example.com', '999999', $tenant->id);
 })->throws(ValidationException::class);
 
+it('redirects to the intended reviews page after client otp login', function () {
+    Mail::fake();
+
+    $tenant = createClientAuthTenant();
+    setCurrentTenant($tenant);
+
+    $intended = route('tenant.pages.reviews', ['tenant' => $tenant->handle]);
+    rememberClientAuthIntended($intended);
+
+    Livewire::test('tenant.client-login')
+        ->set('email', 'intended@example.com')
+        ->call('sendCode');
+
+    $code = Mail::queued(ClientLoginCode::class)->first()->code;
+
+    Livewire::test('tenant.client-login')
+        ->set('email', 'intended@example.com')
+        ->set('code', $code)
+        ->set('otpStep', true)
+        ->call('verifyCode')
+        ->assertRedirect($intended);
+
+    expect(session()->has('client_auth_intended'))->toBeFalse()
+        ->and(auth('client')->check())->toBeTrue();
+});
+
 it('logs in through the livewire client login component', function () {
     Mail::fake();
 

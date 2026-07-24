@@ -69,9 +69,11 @@ Route::get('/auth/{social}/callback', function ($social) {
         } catch (Throwable $exception) {
             report($exception);
             session()->flash('client_auth_error', 'تعذر إكمال تسجيل الدخول. يرجى المحاولة مرة أخرى.');
+
+            return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
         }
 
-        return redirect()->route('tenant.home', ['tenant' => $tenant->handle]);
+        return redirect()->to(clientAuthIntendedUrl($tenant));
     }
 
     $socialUser = Socialite::driver($social)->user();

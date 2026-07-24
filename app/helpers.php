@@ -112,6 +112,31 @@ if (! function_exists('authClient')) {
     }
 }
 
+if (! function_exists('rememberClientAuthIntended')) {
+    function rememberClientAuthIntended(?string $url = null): void
+    {
+        session(['client_auth_intended' => $url ?: url()->full()]);
+    }
+}
+
+if (! function_exists('clientAuthIntendedUrl')) {
+    function clientAuthIntendedUrl(?Tenant $tenant = null): string
+    {
+        $tenant ??= currentTenant();
+
+        abort_unless($tenant instanceof Tenant, 404);
+
+        $intended = session()->pull('client_auth_intended');
+        $prefix = rtrim(url('/'.$tenant->handle), '/');
+
+        if (is_string($intended) && str_starts_with(rtrim($intended, '/'), $prefix)) {
+            return $intended;
+        }
+
+        return route('tenant.home', ['tenant' => $tenant->handle]);
+    }
+}
+
 if (! function_exists('generateKey')) {
     function generateKey($count = 16)
     {

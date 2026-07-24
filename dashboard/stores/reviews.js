@@ -5,6 +5,12 @@ function emptyMeta() {
     return { current_page: 1, last_page: 1, per_page: 20, total: 0 };
 }
 
+function redirectIfUnauthorized(error) {
+    if (error instanceof ApiError && error.status === 401) {
+        window.location.href = '/login';
+    }
+}
+
 export const useReviewsStore = defineStore('reviews', {
     state: () => ({
         items: [],
@@ -13,6 +19,14 @@ export const useReviewsStore = defineStore('reviews', {
         loading: false,
         loaded: false,
         error: null,
+        saving: false,
+        settings: {
+            section_title: '',
+            per_page: 12,
+        },
+        settingsLoading: false,
+        settingsLoaded: false,
+        settingsError: null,
     }),
 
     getters: {
@@ -51,11 +65,7 @@ export const useReviewsStore = defineStore('reviews', {
                 this.loaded = true;
             } catch (error) {
                 this.error = error instanceof ApiError ? error.message : 'تعذر تحميل التقييمات.';
-
-                if (error instanceof ApiError && error.status === 401) {
-                    window.location.href = '/login';
-                }
-
+                redirectIfUnauthorized(error);
                 throw error;
             } finally {
                 this.loading = false;
@@ -69,6 +79,60 @@ export const useReviewsStore = defineStore('reviews', {
 
         async goToPage(page) {
             await this.fetchReviews({ page });
+        },
+
+        async fetchSettings({ force = false } = {}) {
+            if (this.settingsLoading) {
+                return;
+            }
+
+            if (this.settingsLoaded && !force) {
+                return;
+            }
+
+            this.settingsLoading = true;
+            this.settingsError = null;
+
+            try {
+                const payload = await api('/reviews/settings');
+                this.settings = {
+                    section_title: payload?.data?.section_title ?? '',
+                    per_page: Number(payload?.data?.per_page ?? 12),
+                };
+                this.settingsLoaded = true;
+            } catch (error) {
+                this.settingsError = error instanceof ApiError ? error.message : 'تعذر تحميل الإعدادات.';
+                redirectIfUnauthorized(error);
+                throw error;
+            } finally {
+                this.settingsLoading = false;
+            }
+        },
+
+        async updateSettings(data) {
+            this.saving = true;
+            this.settingsError = null;
+
+            try {
+                const payload = await api('/reviews/settings', {
+                    method: 'PUT',
+                    body: data,
+                });
+
+                this.settings = {
+                    section_title: payload?.data?.section_title ?? data.section_title,
+                    per_page: Number(payload?.data?.per_page ?? data.per_page ?? 12),
+                };
+                this.settingsLoaded = true;
+
+                return this.settings;
+            } catch (error) {
+                this.settingsError = error instanceof ApiError ? error.message : 'تعذر حفظ الإعدادات.';
+                redirectIfUnauthorized(error);
+                throw error;
+            } finally {
+                this.saving = false;
+            }
         },
     },
 });

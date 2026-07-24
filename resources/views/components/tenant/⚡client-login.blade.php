@@ -173,7 +173,14 @@ new class extends Component
 
         VerifyClientLoginCode::run($this->email, $this->code, $tenantId);
 
+        if (session()->has('client_auth_intended')) {
+            $this->redirect(clientAuthIntendedUrl(currentTenant()), navigate: true);
+
+            return;
+        }
+
         $this->dispatch('close-modal', name: 'customer-login-modal');
+        $this->dispatch('close-modal', name: 'reviews-login-modal');
         $this->dispatch('client-authenticated');
         $this->dispatch('cart-updated');
     }
